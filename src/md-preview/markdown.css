@@ -1,0 +1,68 @@
+.md-preview {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  padding: 16px;
+  line-height: 1.6;
+  font-size: 15px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
+}
+
+.md-preview h1 { font-size: 2em; border-bottom: 1px solid var(--bg-surface1); padding-bottom: 0.3em; margin: 1em 0 0.5em; }
+.md-preview h2 { font-size: 1.5em; border-bottom: 1px solid var(--bg-surface1); padding-bottom: 0.3em; margin: 1em 0 0.5em; }
+.md-preview h3 { font-size: 1.25em; margin: 1em 0 0.5em; }
+.md-preview h4 { font-size: 1em; margin: 1em 0 0.5em; }
+.md-preview h5 { font-size: 0.875em; margin: 1em 0 0.5em; }
+.md-preview h6 { font-size: 0.85em; margin: 1em 0 0.5em; color: var(--text-muted); }
+
+.md-preview p { margin: 0.5em 0; }
+
+.md-preview pre {
+  background: var(--bg-mantle);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0.5em 0;
+}
+
+.md-preview code {
+  font-family: 'Fira Code', 'Source Code Pro', monospace;
+  font-size: 0.9em;
+}
+
+.md-preview :not(pre) > code {
+  background: var(--bg-surface0);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.md-preview table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
+.md-preview th,
+.md-preview td { border: 1px solid var(--bg-surface1); padding: 8px; text-align: left; }
+.md-preview th { background: var(--bg-surface0); font-weight: 600; }
+
+.md-preview ul,
+.md-preview ol { padding-left: 1.5em; margin: 0.5em 0; }
+.md-preview li { margin: 0.25em 0; }
+
+.md-preview input[type="checkbox"] { pointer-events: none; margin-right: 6px; }
+
+.md-preview blockquote {
+  border-left: 4px solid var(--accent-blue);
+  padding-left: 12px;
+  margin: 0.5em 0;
+  color: var(--text-secondary);
+}
+
+.md-preview a { color: var(--accent-blue); text-decoration: none; }
+.md-preview a:hover { text-decoration: underline; }
+
+.md-preview img { max-width: 100%; border-radius: 4px; margin: 0.5em 0; }
+
+.md-preview hr { border: none; border-top: 1px solid var(--bg-surface1); margin: 1em 0; }
+
+.md-preview del { color: var(--text-muted); }
+
+.md-preview strong { color: var(--text-primary); font-weight: 600; }
