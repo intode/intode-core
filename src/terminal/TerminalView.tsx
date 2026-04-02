@@ -7,12 +7,13 @@ import { debugLog } from '../lib/debug-log';
 export interface TerminalViewProps {
   sessionId: string;
   defaultPath?: string;
+  terminalId?: string;
   visible: boolean;
 }
 
 const manager = new TerminalManager();
 
-export function TerminalView({ sessionId, defaultPath, visible }: TerminalViewProps) {
+export function TerminalView({ sessionId, defaultPath, terminalId, visible }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<TerminalSession | null>(null);
   const selectionRef = useRef<TerminalSelection | null>(null);
@@ -57,7 +58,8 @@ export function TerminalView({ sessionId, defaultPath, visible }: TerminalViewPr
       selectionRef.current = sel;
 
       const { cols, rows } = session.terminal;
-      await manager.attachShell(session, sessionId, cols, rows, defaultPath);
+      const tmuxId = terminalId?.substring(0, 8);
+      await manager.attachShell(session, sessionId, cols, rows, defaultPath, tmuxId);
 
       // Focus terminal after init (visible effect can't — sessionRef is null on first render)
       setTimeout(() => {

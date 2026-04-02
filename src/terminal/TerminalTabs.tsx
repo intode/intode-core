@@ -84,6 +84,7 @@ export function TerminalTabs({ sessionId, defaultPath, visible }: TerminalTabsPr
             <TerminalView
               sessionId={sessionId}
               defaultPath={defaultPath}
+              terminalId={tab.id}
               visible={visible && tab.id === activeId}
             />
           </div>
