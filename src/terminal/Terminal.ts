@@ -1,6 +1,5 @@
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
-import { WebglAddon } from '@xterm/addon-webgl';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Unicode11Addon } from '@xterm/addon-unicode11';
 import {
@@ -48,15 +47,7 @@ export function createTerminal(config: TerminalConfig = {}): {
 
   terminal.loadAddon(new WebLinksAddon());
 
-  try {
-    const webgl = new WebglAddon();
-    webgl.onContextLoss(() => {
-      webgl.dispose();
-    });
-    terminal.loadAddon(webgl);
-  } catch {
-    // Canvas fallback
-  }
+  // Canvas renderer — WebGL disabled (crashes on CJK glyph rendering)
 
   return { terminal, fitAddon };
 }
