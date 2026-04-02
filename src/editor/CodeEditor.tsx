@@ -2,8 +2,12 @@ import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react
 import { EditorState, Extension, Compartment } from '@codemirror/state';
 import { EditorView, lineNumbers, highlightActiveLine, keymap } from '@codemirror/view';
 import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
-import { defaultKeymap, indentWithTab, undo, redo } from '@codemirror/commands';
+import {
+  defaultKeymap, indentWithTab, undo, redo,
+  cursorLineUp, cursorLineDown, cursorCharLeft, cursorCharRight,
+} from '@codemirror/commands';
 import { getLanguageExtension } from './languages';
+import { PinchZoom } from '../gestures/PinchZoom';
 import { FONT_MONO, TERMINAL_FONT_SIZE } from '../lib/constants';
 
 export interface CodeEditorProps {
@@ -17,9 +21,18 @@ export interface CodeEditorProps {
 export interface CodeEditorRef {
   undo(): void;
   redo(): void;
+  save(): void;
   insertText(text: string): void;
   setFontSize(size: number): void;
+  cursorUp(): void;
+  cursorDown(): void;
+  cursorLeft(): void;
+  cursorRight(): void;
 }
+
+// Global ref for active editor — used by ExtraKeyBar routing in App.tsx
+let activeEditorApi: CodeEditorRef | null = null;
+export function getActiveEditorApi(): CodeEditorRef | null { return activeEditorApi; }
 
 const fontSizeCompartment = new Compartment();
 
@@ -61,14 +74,16 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
   function CodeEditor({ content, fileName, visible, onContentChange, onSave }, ref) {
     const containerRef = useRef<HTMLDivElement>(null);
     const viewRef = useRef<EditorView | null>(null);
+    const pinchRef = useRef<PinchZoom | null>(null);
     const onContentChangeRef = useRef(onContentChange);
     const onSaveRef = useRef(onSave);
     onContentChangeRef.current = onContentChange;
     onSaveRef.current = onSave;
 
-    useImperativeHandle(ref, () => ({
+    const api: CodeEditorRef = {
       undo() { if (viewRef.current) undo(viewRef.current); },
       redo() { if (viewRef.current) redo(viewRef.current); },
+      save() { onSaveRef.current?.(); },
       insertText(text: string) {
         const view = viewRef.current;
         if (!view) return;
@@ -80,7 +95,19 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
           effects: fontSizeCompartment.reconfigure(makeFontSizeTheme(size)),
         });
       },
-    }));
+      cursorUp() { if (viewRef.current) cursorLineUp(viewRef.current); },
+      cursorDown() { if (viewRef.current) cursorLineDown(viewRef.current); },
+      cursorLeft() { if (viewRef.current) cursorCharLeft(viewRef.current); },
+      cursorRight() { if (viewRef.current) cursorCharRight(viewRef.current); },
+    };
+
+    useImperativeHandle(ref, () => api);
+
+    // Register/unregister as active editor for ExtraKeyBar routing
+    useEffect(() => {
+      if (visible) activeEditorApi = api;
+      return () => { if (activeEditorApi === api) activeEditorApi = null; };
+    }, [visible]);
 
     useEffect(() => {
       if (!containerRef.current) return;
@@ -117,12 +144,24 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
 
         if (viewRef.current) viewRef.current.destroy();
         viewRef.current = new EditorView({ state, parent: container });
+
+        // Pinch zoom for editor font size
+        pinchRef.current?.detach();
+        const pinch = new PinchZoom({
+          element: container,
+          initialFontSize: TERMINAL_FONT_SIZE,
+          onFontSizeChange: (size) => api.setFontSize(size),
+        });
+        pinch.attach();
+        pinchRef.current = pinch;
       }
 
       init();
 
       return () => {
         cancelled = true;
+        pinchRef.current?.detach();
+        pinchRef.current = null;
         viewRef.current?.destroy();
         viewRef.current = null;
       };

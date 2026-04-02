@@ -39,7 +39,8 @@ export { FileTree } from './files/FileTree';
 export { FileTabManager, detectFileType } from './files/TabManager';
 
 // Editor
-export { CodeEditor, CodeEditor as CodeViewer } from './editor/CodeEditor';
+export { CodeEditor, CodeEditor as CodeViewer, getActiveEditorApi } from './editor/CodeEditor';
+export type { CodeEditorRef } from './editor/CodeEditor';
 
 // Markdown
 export { MarkdownPreview } from './md-preview/MarkdownPreview';

@@ -13,8 +13,11 @@ import { MarkdownPreview } from '../md-preview/MarkdownPreview';
 import { EditorTabs } from '../editor/EditorTabs';
 import { TerminalTabs } from '../terminal/TerminalTabs';
 import { terminalManager } from '../terminal/TerminalView';
+import { getActiveEditorApi } from '../editor/CodeEditor';
 import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
+import { encodeUtf8Base64 } from '../lib/encoding';
+import { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT } from '../lib/constants';
 import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } from '../workspace/WorkspaceManager';
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { debugLog } from '../lib/debug-log';
@@ -442,10 +445,24 @@ export function App() {
             context={activeTab === 'terminal' ? 'terminal' : 'code-editor'}
             onKeyPress={(data) => {
               if (activeTab === 'terminal') {
+                // Send directly to SSH (bypasses xterm paste bracketing)
                 const session = terminalManager.getActiveSession();
-                if (session?.terminal) session.terminal.paste(data);
+                if (session?.channelId) {
+                  Ssh.writeToShell({ channelId: session.channelId, data: encodeUtf8Base64(data) }).catch(() => {});
+                }
+              } else if (activeTab === 'editor') {
+                const editor = getActiveEditorApi();
+                if (!editor) return;
+                if (data === 'save') editor.save();
+                else if (data === 'undo') editor.undo();
+                else if (data === 'redo') editor.redo();
+                else if (data === 'tab') editor.insertText('\t');
+                else if (data === KEY_UP) editor.cursorUp();
+                else if (data === KEY_DOWN) editor.cursorDown();
+                else if (data === KEY_LEFT) editor.cursorLeft();
+                else if (data === KEY_RIGHT) editor.cursorRight();
+                else editor.insertText(data);
               }
-              // Editor keys (undo/redo/save) are handled by CodeEditor's keymap
             }}
           />
         )}
