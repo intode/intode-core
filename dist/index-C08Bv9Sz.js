@@ -23318,7 +23318,7 @@ const TC = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-C-epSXfP.js").then((t) => t.jinja());
+      return import("./index-D6DrJcHr.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23340,14 +23340,14 @@ const TC = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-BUola8sY.js").then((t) => t.less());
+      return import("./index-B9_xiaW6.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ G.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-CoWuQNL5.js").then((t) => t.liquid());
+      return import("./index-CWDdqbRT.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23414,14 +23414,14 @@ const TC = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-DfWRs-dS.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-D6SsOdGp.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ G.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-DfWRs-dS.js").then((t) => t.sass());
+      return import("./index-D6SsOdGp.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23456,7 +23456,7 @@ const TC = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-C_xfU23F.js").then((t) => t.wast());
+      return import("./index-D1nW9Gkj.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -24261,13 +24261,13 @@ const TC = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index--NGoky7f.js").then((t) => t.vue());
+      return import("./index-CX5tIxVy.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ G.of({
     name: "Angular Template",
     load() {
-      return import("./index-DkA6vw4D.js").then((t) => t.angular());
+      return import("./index-CaUWp3So.js").then((t) => t.angular());
     }
   })
 ], XC = ["md", "mdx", "markdown"], RC = [
@@ -59035,7 +59035,10 @@ function ghe({ sessionId: t, defaultPath: e, visible: i }) {
       });
       y.attach(_), a.current = y;
       const { cols: S, rows: g } = $.terminal;
-      await ic.attachShell($, t, S, g, e);
+      await ic.attachShell($, t, S, g, e), e && e !== "~" && setTimeout(() => {
+        d || $.terminal.paste(`cd ${e}
+`);
+      }, 500);
       const w = new ResizeObserver(() => {
         const b = n.current;
         b && (b.fitAddon.fit(), pi(`resize cols=${b.terminal.cols} rows=${b.terminal.rows}`), Oi.resizeShell({ channelId: b.channelId, cols: b.terminal.cols, rows: b.terminal.rows }));

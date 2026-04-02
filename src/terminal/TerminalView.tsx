@@ -59,6 +59,13 @@ export function TerminalView({ sessionId, defaultPath, visible }: TerminalViewPr
       const { cols, rows } = session.terminal;
       await manager.attachShell(session, sessionId, cols, rows, defaultPath);
 
+      // cd to workspace path after shell is ready
+      if (defaultPath && defaultPath !== '~') {
+        setTimeout(() => {
+          if (!cancelled) session.terminal.paste(`cd ${defaultPath}\n`);
+        }, 500);
+      }
+
       const observer = new ResizeObserver(() => {
         const s = sessionRef.current;
         if (!s) return;
