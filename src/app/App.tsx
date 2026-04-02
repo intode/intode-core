@@ -56,6 +56,7 @@ function useKeyboardHeight() {
 function WorkspaceEditor({ ftm, sftpId }: { ftm: FileTabManager; sftpId: string | null }) {
   const [tabs, setTabs] = useState<FileTab[]>([]);
   const [active, setActive] = useState<FileTab | null>(null);
+  const [mdPreview, setMdPreview] = useState(false);
 
   useEffect(() => {
     const sync = () => {
@@ -67,15 +68,39 @@ function WorkspaceEditor({ ftm, sftpId }: { ftm: FileTabManager; sftpId: string 
     return () => ftm.setOnChange(() => {});
   }, [ftm]);
 
+  // Reset preview mode when switching files
+  useEffect(() => { setMdPreview(false); }, [active?.id]);
+
+  const isMd = active?.type === 'markdown';
+
   return (
     <>
-      <EditorTabs
-        tabs={tabs}
-        activeTabId={active?.id ?? null}
-        onSelect={(id) => ftm.setActiveTab(id)}
-        onClose={(id) => ftm.closeTab(id)}
-      />
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <EditorTabs
+            tabs={tabs}
+            activeTabId={active?.id ?? null}
+            onSelect={(id) => ftm.setActiveTab(id)}
+            onClose={(id) => ftm.closeTab(id)}
+          />
+        </div>
+        {isMd && active?.content != null && (
+          <button
+            onClick={() => setMdPreview((v) => !v)}
+            style={{
+              background: 'none', border: 'none', color: mdPreview ? 'var(--accent-blue)' : 'var(--text-muted)',
+              fontSize: 11, fontWeight: 700, padding: '6px 10px', cursor: 'pointer', flexShrink: 0,
+              letterSpacing: 0.5,
+            }}
+          >
+            {mdPreview ? 'EDIT' : 'PREVIEW'}
+          </button>
+        )}
+      </div>
       {active?.content != null ? (
+        isMd && mdPreview ? (
+          <MarkdownPreview content={active.content} visible={true} />
+        ) : (
           <CodeEditor
             content={active.content}
             fileName={active.fileName}
@@ -83,6 +108,7 @@ function WorkspaceEditor({ ftm, sftpId }: { ftm: FileTabManager; sftpId: string 
             onContentChange={(c) => ftm.updateContent(active.id, c)}
             onSave={() => { if (sftpId) ftm.saveFile(sftpId, active.id).catch(() => {}); }}
           />
+        )
       ) : active?.isLoading ? (
         <div style={styles.placeholder}>
           <span style={{ color: 'var(--text-muted)' }}>Loading...</span>
@@ -103,6 +129,13 @@ export function App() {
   const [screen, setScreen] = useState<Screen>('workspace-list');
   const [activeTab, setActiveTab] = useState<string>('terminal');
   const [debugEnabled, setDebugEnabled] = useState(() => localStorage.getItem('intode_debug') === 'true');
+
+  // Prevent Android native context menu (복사/번역/모두선택 popup)
+  useEffect(() => {
+    const prevent = (e: Event) => e.preventDefault();
+    document.addEventListener('contextmenu', prevent);
+    return () => document.removeEventListener('contextmenu', prevent);
+  }, []);
 
   const toggleDebug = useCallback((enabled: boolean) => {
     setDebugEnabled(enabled);

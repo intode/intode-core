@@ -3,6 +3,7 @@ import { TerminalManager, TerminalSession } from './TerminalManager';
 import { TerminalSelection, HandlePositions } from './TerminalSelection';
 import { PinchZoom } from '../gestures/PinchZoom';
 import { Ssh } from '../ssh/index';
+import { encodeUtf8Base64 } from '../lib/encoding';
 import { TERMINAL_FONT_SIZE } from '../lib/constants';
 
 export interface TerminalViewProps {
@@ -54,6 +55,14 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
           } else {
             setHandlePos(sel.getHandlePositions());
           }
+        },
+        onMouseWheel: (direction) => {
+          if (!session.channelId) return;
+          const col = Math.floor(session.terminal.cols / 2);
+          const row = Math.floor(session.terminal.rows / 2);
+          const btn = direction === 'up' ? 64 : 65;
+          const seq = `\x1b[<${btn};${col};${row}M`;
+          Ssh.writeToShell({ channelId: session.channelId, data: encodeUtf8Base64(seq) }).catch(() => {});
         },
       });
       sel.attach(container);

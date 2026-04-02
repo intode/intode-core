@@ -57,6 +57,22 @@
   --neon-glow: 0 0 10px rgba(0, 255, 102, 0.3);
 }
 
+/* Global: prevent long-press text selection (allow only in editor/terminal) */
+* {
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cm-content {
+  -webkit-user-select: text;
+  user-select: text;
+}
+/* Prevent browser from hijacking touch gestures on terminal canvas.
+   We handle scroll (TerminalSelection), zoom (PinchZoom), and selection ourselves.
+   Taps/focus/keyboard still work — touch-action only affects pan/zoom defaults. */
+.xterm-screen {
+  touch-action: none;
+}
+
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);

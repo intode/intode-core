@@ -24,15 +24,17 @@ const TERMINAL_KEYS: KeyDef[] = [
   { label: 'C-z', value: '\x1a' },
   { label: 'C-a', value: '\x01' },
   { label: 'C-l', value: '\x0c' },
-  { label: '\u2191', value: KEY_UP },
-  { label: '\u2193', value: KEY_DOWN },
-  { label: '\u2190', value: KEY_LEFT },
-  { label: '\u2192', value: KEY_RIGHT },
+  { label: 'C-b', value: '\x02' },
   { label: '~', value: '~' },
   { label: '/', value: '/' },
   { label: '|', value: '|' },
   { label: '-', value: '-' },
   { label: '_', value: '_' },
+  // Arrow keys handled separately as dpad
+  { label: '\u2191', value: KEY_UP },
+  { label: '\u2193', value: KEY_DOWN },
+  { label: '\u2190', value: KEY_LEFT },
+  { label: '\u2192', value: KEY_RIGHT },
 ];
 
 const EDITOR_KEYS: KeyDef[] = [
@@ -40,10 +42,6 @@ const EDITOR_KEYS: KeyDef[] = [
   { label: 'Undo', value: 'undo' },
   { label: 'Redo', value: 'redo' },
   { label: 'Tab', value: 'tab' },
-  { label: '\u2191', value: KEY_UP },
-  { label: '\u2193', value: KEY_DOWN },
-  { label: '\u2190', value: KEY_LEFT },
-  { label: '\u2192', value: KEY_RIGHT },
   { label: '{', value: '{' },
   { label: '}', value: '}' },
   { label: '(', value: '(' },
@@ -52,18 +50,22 @@ const EDITOR_KEYS: KeyDef[] = [
   { label: ']', value: ']' },
   { label: '"', value: '"' },
   { label: "'", value: "'" },
+  // Arrow keys handled separately as dpad
+  { label: '\u2191', value: KEY_UP },
+  { label: '\u2193', value: KEY_DOWN },
+  { label: '\u2190', value: KEY_LEFT },
+  { label: '\u2192', value: KEY_RIGHT },
 ];
 
+const ARROW_VALUES = new Set([KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT]);
 const MOVE_THRESHOLD = 8;
 
 function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
   const startPos = useRef<{ x: number; y: number } | null>(null);
-
   return (
     <button
-      onPointerDown={(e) => {
-        startPos.current = { x: e.clientX, y: e.clientY };
-      }}
+      tabIndex={-1}
+      onPointerDown={(e) => { e.preventDefault(); startPos.current = { x: e.clientX, y: e.clientY }; }}
       onPointerUp={(e) => {
         if (!startPos.current) return;
         const dx = e.clientX - startPos.current.x;
@@ -82,29 +84,81 @@ function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) =
   );
 }
 
+function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
+  return (
+    <button
+      tabIndex={-1}
+      onPointerDown={(e) => { e.preventDefault(); onPress(keyDef.value); }}
+      style={dpadKeyStyle}
+    >
+      {keyDef.label}
+    </button>
+  );
+}
+
 export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
-  const keys = context === 'terminal' ? TERMINAL_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
-  if (keys.length === 0) return null;
+  const allKeys = context === 'terminal' ? TERMINAL_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
+  if (allKeys.length === 0) return null;
+
+  const otherKeys = allKeys.filter((k) => !ARROW_VALUES.has(k.value));
+  const upKey = allKeys.find((k) => k.value === KEY_UP)!;
+  const downKey = allKeys.find((k) => k.value === KEY_DOWN)!;
+  const leftKey = allKeys.find((k) => k.value === KEY_LEFT)!;
+  const rightKey = allKeys.find((k) => k.value === KEY_RIGHT)!;
 
   return (
-    <div style={barStyle}>
-      {keys.map((key) => (
-        <KeyButton key={key.label} keyDef={key} onPress={onKeyPress} />
-      ))}
+    <div style={containerStyle}>
+      {/* Scrollable key area */}
+      <div style={scrollAreaStyle}>
+        {otherKeys.map((key) => (
+          <KeyButton key={key.label} keyDef={key} onPress={onKeyPress} />
+        ))}
+      </div>
+
+      {/* Fixed dpad */}
+      <div style={dpadStyle}>
+        <div />
+        <DpadButton keyDef={upKey} onPress={onKeyPress} />
+        <div />
+        <DpadButton keyDef={leftKey} onPress={onKeyPress} />
+        <div />
+        <DpadButton keyDef={rightKey} onPress={onKeyPress} />
+        <div />
+        <DpadButton keyDef={downKey} onPress={onKeyPress} />
+        <div />
+      </div>
     </div>
   );
 }
 
-const barStyle: React.CSSProperties = {
+const containerStyle: React.CSSProperties = {
   display: 'flex',
-  flexWrap: 'wrap',
-  gap: 3,
-  padding: '6px',
+  flexDirection: 'row',
   backgroundColor: 'var(--bg-crust)',
   borderTop: '2px solid var(--bg-surface0)',
   flexShrink: 0,
+};
+
+const scrollAreaStyle: React.CSSProperties = {
+  flex: 1,
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 3,
+  padding: 6,
   overflowY: 'auto',
   maxHeight: 84,
+  alignContent: 'flex-start',
+};
+
+const dpadStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(3, 30px)',
+  gridTemplateRows: 'repeat(3, 26px)',
+  gap: 2,
+  padding: 4,
+  flexShrink: 0,
+  alignSelf: 'center',
+  borderLeft: '1px solid var(--bg-surface0)',
 };
 
 const keyStyle: React.CSSProperties = {
@@ -116,13 +170,29 @@ const keyStyle: React.CSSProperties = {
   backgroundColor: 'var(--bg-mantle)',
   color: 'var(--text-secondary)',
   fontSize: 11,
-  fontFamily: 'Chakra Petch',
   fontWeight: 700,
   cursor: 'pointer',
   touchAction: 'manipulation',
-  textTransform: 'uppercase' as const,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  ...NO_TAP_HIGHLIGHT,
+};
+
+const dpadKeyStyle: React.CSSProperties = {
+  width: '100%',
+  height: '100%',
+  border: '1px solid var(--bg-surface1)',
+  borderRadius: 2,
+  backgroundColor: 'var(--bg-mantle)',
+  color: 'var(--text-secondary)',
+  fontSize: 13,
+  fontWeight: 700,
+  cursor: 'pointer',
+  touchAction: 'manipulation',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
   ...NO_TAP_HIGHLIGHT,
 };

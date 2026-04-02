@@ -2,6 +2,8 @@ import type { Terminal } from '@xterm/xterm';
 import { LONG_PRESS_DELAY_MS } from '../lib/constants';
 
 const MOVE_THRESHOLD = 10;
+const MOMENTUM_FRICTION = 0.92;
+const MOMENTUM_MIN = 0.5;
 
 export interface HandlePositions {
   start: { x: number; y: number };
@@ -11,13 +13,20 @@ export interface HandlePositions {
 export interface SelectionCallbacks {
   onSelectionStart: () => void;
   onSelectionChange: (hasSelection: boolean) => void;
+  /** Called when scrolling in mouse tracking mode (tmux). Parent sends wheel escape sequences. */
+  onMouseWheel?: (direction: 'up' | 'down') => void;
 }
 
 export class TerminalSelection {
   private longPressTimer: number | null = null;
   private isDragging = false;
   private wasMoved = false;
+  private isScrolling = false;
   private startTouch: { x: number; y: number } | null = null;
+  private lastTouchY = 0;
+  private scrollVelocity = 0;
+  private scrollAccum = 0;
+  private momentumFrame = 0;
   private anchorCol = 0;
   private anchorRow = 0;
   private selStartCol = 0;
@@ -27,7 +36,6 @@ export class TerminalSelection {
   private containerEl: HTMLElement | null = null;
   private disposables: (() => void)[] = [];
 
-  /** Set true during handle drag to suppress terminal touch events */
   isHandleDrag = false;
 
   constructor(
@@ -60,7 +68,7 @@ export class TerminalSelection {
 
   dispose(): void {
     this.cancelLongPress();
-    this.restoreKeyboard();
+    this.stopMomentum();
     for (const fn of this.disposables) fn();
     this.disposables = [];
     this.containerEl = null;
@@ -74,10 +82,15 @@ export class TerminalSelection {
       this.cancelLongPress();
       return;
     }
+    this.stopMomentum();
     const t = e.touches[0];
     this.startTouch = { x: t.clientX, y: t.clientY };
+    this.lastTouchY = t.clientY;
     this.wasMoved = false;
     this.isDragging = false;
+    this.isScrolling = false;
+    this.scrollVelocity = 0;
+    this.scrollAccum = 0;
 
     this.longPressTimer = window.setTimeout(() => {
       this.beginSelection(t.clientX, t.clientY);
@@ -88,53 +101,99 @@ export class TerminalSelection {
     if (this.isHandleDrag) return;
     if (!this.startTouch || e.touches.length !== 1) return;
     const t = e.touches[0];
-    const dx = t.clientX - this.startTouch.x;
-    const dy = t.clientY - this.startTouch.y;
 
-    if (!this.isDragging) {
-      if (Math.sqrt(dx * dx + dy * dy) > MOVE_THRESHOLD) {
-        this.cancelLongPress();
-        this.wasMoved = true;
-      }
+    // Selection drag mode (after long press)
+    if (this.isDragging) {
+      e.preventDefault();
+      this.extendTo(t.clientX, t.clientY);
       return;
     }
 
-    e.preventDefault();
-    this.extendTo(t.clientX, t.clientY);
+    const dx = t.clientX - this.startTouch.x;
+    const dy = t.clientY - this.startTouch.y;
+
+    // Detect scroll start
+    if (!this.isScrolling && !this.wasMoved) {
+      if (Math.sqrt(dx * dx + dy * dy) > MOVE_THRESHOLD) {
+        this.cancelLongPress();
+        this.wasMoved = true;
+        this.isScrolling = true;
+        // Don't update lastTouchY here — use startTouch.y so first delta includes full displacement
+      } else {
+        return;
+      }
+    }
+
+    // Scrolling (falls through from detection above for immediate first delta)
+    if (this.isScrolling) {
+      const deltaY = this.lastTouchY - t.clientY;
+      this.lastTouchY = t.clientY;
+      this.scrollVelocity = deltaY;
+      this.handleScroll(deltaY);
+      e.preventDefault();
+    }
   }
 
   private onTouchEnd() {
     if (this.isHandleDrag) return;
     const wasSelecting = this.isDragging;
+    const wasScrolling = this.isScrolling;
     this.cancelLongPress();
     this.isDragging = false;
+    this.isScrolling = false;
+
+    if (wasScrolling) {
+      this.startMomentum();
+      return;
+    }
 
     if (!wasSelecting && !this.wasMoved && this.terminal.hasSelection()) {
       this.terminal.clearSelection();
     }
   }
 
+  // --- Scroll ---
+
+  private handleScroll(deltaY: number) {
+    if ((this.terminal as any).modes?.mouseTrackingMode !== 'none') {
+      // Mouse tracking active (tmux) — convert to wheel events
+      const cellH = this.getCellDims()?.cellH ?? 16;
+      this.scrollAccum += deltaY;
+      while (Math.abs(this.scrollAccum) >= cellH) {
+        const dir = this.scrollAccum > 0 ? 'down' : 'up';
+        this.callbacks.onMouseWheel?.(dir);
+        this.scrollAccum -= this.scrollAccum > 0 ? cellH : -cellH;
+      }
+    } else {
+      // Normal mode — scroll viewport
+      const vp = this.terminal.element?.querySelector('.xterm-viewport') as HTMLElement | null;
+      if (vp) vp.scrollTop += deltaY;
+    }
+  }
+
+  private startMomentum() {
+    const step = () => {
+      if (Math.abs(this.scrollVelocity) < MOMENTUM_MIN) return;
+      this.scrollVelocity *= MOMENTUM_FRICTION;
+      this.handleScroll(this.scrollVelocity);
+      this.momentumFrame = requestAnimationFrame(step);
+    };
+    this.momentumFrame = requestAnimationFrame(step);
+  }
+
+  private stopMomentum() {
+    if (this.momentumFrame) {
+      cancelAnimationFrame(this.momentumFrame);
+      this.momentumFrame = 0;
+    }
+  }
+
   // --- Selection logic ---
-
-  private getTextarea(): HTMLTextAreaElement | null {
-    return this.terminal.element?.querySelector('textarea.xterm-helper-textarea') as HTMLTextAreaElement | null;
-  }
-
-  private suppressKeyboard() {
-    const ta = this.getTextarea();
-    if (ta) { ta.readOnly = true; ta.blur(); }
-  }
-
-  private restoreKeyboard() {
-    const ta = this.getTextarea();
-    if (ta) ta.readOnly = false;
-  }
 
   private beginSelection(clientX: number, clientY: number) {
     const pos = this.toBufPos(clientX, clientY);
     if (!pos) return;
 
-    this.suppressKeyboard();
     navigator.vibrate?.(30);
 
     const { start, length } = this.wordAt(pos.col, pos.bufRow);
@@ -229,7 +288,7 @@ export class TerminalSelection {
     }
   }
 
-  // --- Handle positions (relative to container) ---
+  // --- Handle positions ---
 
   getHandlePositions(): HandlePositions | null {
     if (!this.terminal.hasSelection()) return null;
@@ -246,14 +305,8 @@ export class TerminalSelection {
     const oy = sr.top - cr.top;
 
     return {
-      start: {
-        x: ox + this.selStartCol * dims.cellW,
-        y: oy + (this.selStartRow + 1) * dims.cellH,
-      },
-      end: {
-        x: ox + (this.selEndCol + 1) * dims.cellW,
-        y: oy + (this.selEndRow + 1) * dims.cellH,
-      },
+      start: { x: ox + this.selStartCol * dims.cellW, y: oy + (this.selStartRow + 1) * dims.cellH },
+      end: { x: ox + (this.selEndCol + 1) * dims.cellW, y: oy + (this.selEndRow + 1) * dims.cellH },
     };
   }
 
@@ -261,21 +314,13 @@ export class TerminalSelection {
     const pos = this.toBufPos(clientX, clientY);
     if (!pos) return;
 
-    if (which === 'start') {
-      this.selStartCol = pos.col;
-      this.selStartRow = pos.vpRow;
-    } else {
-      this.selEndCol = pos.col;
-      this.selEndRow = pos.vpRow;
-    }
+    if (which === 'start') { this.selStartCol = pos.col; this.selStartRow = pos.vpRow; }
+    else { this.selEndCol = pos.col; this.selEndRow = pos.vpRow; }
 
-    // Ensure start <= end
-    if (this.selStartRow > this.selEndRow ||
-        (this.selStartRow === this.selEndRow && this.selStartCol > this.selEndCol)) {
+    if (this.selStartRow > this.selEndRow || (this.selStartRow === this.selEndRow && this.selStartCol > this.selEndCol)) {
       [this.selStartCol, this.selEndCol] = [this.selEndCol, this.selStartCol];
       [this.selStartRow, this.selEndRow] = [this.selEndRow, this.selStartRow];
     }
-
     this.applySelection();
   }
 
@@ -290,7 +335,6 @@ export class TerminalSelection {
 
   clearSelection(): void {
     this.terminal.clearSelection();
-    this.restoreKeyboard();
   }
 
   selectAll(): void {
