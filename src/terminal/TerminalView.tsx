@@ -96,10 +96,6 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
   useEffect(() => {
     if (sessionRef.current && visible) {
       sessionRef.current.fitAddon.fit();
-      setTimeout(() => {
-        const el = containerRef.current?.querySelector('textarea.xterm-helper-textarea');
-        if (el instanceof HTMLTextAreaElement) el.focus();
-      }, 50);
     }
   }, [visible]);
 

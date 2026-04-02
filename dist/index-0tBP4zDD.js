@@ -23318,7 +23318,7 @@ const vE = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-Cye3UW-O.js").then((t) => t.jinja());
+      return import("./index-CqY2oH7_.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ j.of({
@@ -23340,14 +23340,14 @@ const vE = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-CEk52DkX.js").then((t) => t.less());
+      return import("./index-j-5AHg1c.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ j.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-DZIgdRZu.js").then((t) => t.liquid());
+      return import("./index-ucf_ETvk.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ j.of({
@@ -23414,14 +23414,14 @@ const vE = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-CRBWFBzy.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-D9PBSvOV.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ j.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-CRBWFBzy.js").then((t) => t.sass());
+      return import("./index-D9PBSvOV.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ j.of({
@@ -23456,7 +23456,7 @@ const vE = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-DgX3mhML.js").then((t) => t.wast());
+      return import("./index-Dc31aVCP.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ j.of({
@@ -24261,13 +24261,13 @@ const vE = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-q5BacKCH.js").then((t) => t.vue());
+      return import("./index-EY1FaARj.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ j.of({
     name: "Angular Template",
     load() {
-      return import("./index-eQX-TLZI.js").then((t) => t.angular());
+      return import("./index-DkbrTOx8.js").then((t) => t.angular());
     }
   })
 ], xE = ["md", "mdx", "markdown"], TE = [
@@ -57114,11 +57114,7 @@ function uhe({ sessionId: t, defaultPath: e, terminalId: i, visible: r }) {
       f = !0, (_ = o.current) == null || _.disconnect(), (y = a.current) == null || y.dispose(), a.current = null, s.current && (tc.destroySession(s.current.id), s.current = null);
     };
   }, [t]), Si(() => {
-    s.current && r && (s.current.fitAddon.fit(), setTimeout(() => {
-      var g;
-      const f = (g = n.current) == null ? void 0 : g.querySelector("textarea.xterm-helper-textarea");
-      f instanceof HTMLTextAreaElement && f.focus();
-    }, 50));
+    s.current && r && s.current.fitAddon.fit();
   }, [r]);
   const d = ii(() => {
     var f, g;
