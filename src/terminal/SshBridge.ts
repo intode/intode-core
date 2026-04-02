@@ -7,6 +7,7 @@ export class SshBridge {
   private onDataDisposable: { dispose: () => void } | null = null;
   private channelId: string | null = null;
   private dataCount = 0;
+  private decoder = new TextDecoder('utf-8');
 
   constructor(private terminal: Terminal) {}
 
@@ -19,11 +20,12 @@ export class SshBridge {
       if (match) {
         try {
           const binaryStr = atob(event.data);
-          // Convert Latin1 binary string to Uint8Array for correct UTF-8 decoding
           const bytes = new Uint8Array(binaryStr.length);
           for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-          debugLog(`terminal.write ${bytes.length}b cols=${this.terminal.cols} rows=${this.terminal.rows}`);
-          this.terminal.write(bytes);
+          // TextDecoder: UTF-8 → string (Korean safe), stream handles split sequences
+          const text = this.decoder.decode(bytes, { stream: true });
+          debugLog(`terminal.write ${text.length}ch cols=${this.terminal.cols} rows=${this.terminal.rows}`);
+          this.terminal.write(text);
         } catch (e) {
           debugLog(`decode error: ${e}`);
         }
