@@ -67,10 +67,11 @@ export function TerminalView({ sessionId, defaultPath, visible }: TerminalViewPr
 
       const observer = new ResizeObserver(() => {
         const s = sessionRef.current;
-        if (!s) return;
+        if (!s || !container.offsetParent) return; // skip when hidden (display:none)
         s.fitAddon.fit();
-        debugLog(`resize cols=${s.terminal.cols} rows=${s.terminal.rows}`);
-        Ssh.resizeShell({ channelId: s.channelId, cols: s.terminal.cols, rows: s.terminal.rows });
+        if (s.terminal.cols > 0 && s.terminal.rows > 0) {
+          Ssh.resizeShell({ channelId: s.channelId, cols: s.terminal.cols, rows: s.terminal.rows });
+        }
       });
       observer.observe(container);
       resizeObserverRef.current = observer;
