@@ -17,6 +17,9 @@ export interface AppPolicy {
   canCustomKeys: boolean;
   canSnippets: boolean;
   mdRenderers: string[];
+
+  // === UI config (injectable by Pro) ===
+  showDebugToggle: boolean;
 }
 
 export const DEFAULT_POLICY: AppPolicy = {
@@ -35,6 +38,7 @@ export const DEFAULT_POLICY: AppPolicy = {
   canCustomKeys: false,
   canSnippets: false,
   mdRenderers: ['gfm'],
+  showDebugToggle: true,
 };
 
 export type LimitHandler = (type: string, currentCount: number, max: number) => void;

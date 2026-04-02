@@ -1,18 +1,25 @@
 import React from 'react';
+import { getPolicy } from '../policies/provider';
 
 export interface SettingsScreenProps {
   appVersion: string;
   buildNumber: string;
-  onBack: () => void;
+  onBack?: () => void;
+  debugEnabled: boolean;
+  onDebugToggle: (enabled: boolean) => void;
 }
 
-export function SettingsScreen({ appVersion, buildNumber, onBack }: SettingsScreenProps) {
+export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, onDebugToggle }: SettingsScreenProps) {
+  const { showDebugToggle } = getPolicy();
+
   return (
     <div style={styles.container}>
-      <div style={styles.header}>
-        <button onClick={onBack} style={styles.backBtn}>←</button>
-        <span style={styles.title}>Settings</span>
-      </div>
+      {onBack && (
+        <div style={styles.header}>
+          <button onClick={onBack} style={styles.backBtn}>{'\u2190'}</button>
+          <span style={styles.title}>Settings</span>
+        </div>
+      )}
       <div style={styles.content}>
         <div style={styles.section}>
           <span style={styles.sectionTitle}>About</span>
@@ -25,6 +32,27 @@ export function SettingsScreen({ appVersion, buildNumber, onBack }: SettingsScre
             <span style={styles.value}>{buildNumber}</span>
           </div>
         </div>
+
+        {showDebugToggle && (
+          <div style={styles.section}>
+            <span style={styles.sectionTitle}>Developer</span>
+            <div style={styles.row}>
+              <span style={styles.label}>Debug Console</span>
+              <button
+                onClick={() => onDebugToggle(!debugEnabled)}
+                style={{
+                  ...styles.toggle,
+                  backgroundColor: debugEnabled ? 'var(--accent-blue)' : 'var(--bg-surface1)',
+                }}
+              >
+                <div style={{
+                  ...styles.toggleKnob,
+                  transform: debugEnabled ? 'translateX(20px)' : 'translateX(0)',
+                }} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -41,4 +69,16 @@ const styles: Record<string, React.CSSProperties> = {
   row: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--bg-surface0)' },
   label: { fontSize: 15, color: 'var(--text-primary)' },
   value: { fontSize: 14, color: 'var(--text-muted)' },
+  toggle: {
+    width: 48, height: 28, borderRadius: 14,
+    border: 'none', padding: 4, cursor: 'pointer',
+    transition: 'background-color 0.2s',
+    display: 'flex', alignItems: 'center',
+  },
+  toggleKnob: {
+    width: 20, height: 20, borderRadius: '50%',
+    backgroundColor: 'white',
+    transition: 'transform 0.2s',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+  },
 };

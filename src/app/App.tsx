@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { TabBar, TabId } from './TabBar';
+import { TabBar } from './TabBar';
+import { getExtraTabs, getTabRenderer } from './tab-registry';
 import { WorkspaceListScreen } from '../workspace/WorkspaceListScreen';
 import { WorkspaceAddScreen } from '../workspace/WorkspaceAddScreen';
 import { WorkspaceDropdown } from '../workspace/WorkspaceDropdown';
@@ -94,7 +95,13 @@ function WorkspaceEditor({ ftm }: { ftm: FileTabManager }) {
 export function App() {
   const keyboardHeight = useKeyboardHeight();
   const [screen, setScreen] = useState<Screen>('workspace-list');
-  const [activeTab, setActiveTab] = useState<TabId>('terminal');
+  const [activeTab, setActiveTab] = useState<string>('terminal');
+  const [debugEnabled, setDebugEnabled] = useState(() => localStorage.getItem('intode_debug') === 'true');
+
+  const toggleDebug = useCallback((enabled: boolean) => {
+    setDebugEnabled(enabled);
+    localStorage.setItem('intode_debug', String(enabled));
+  }, []);
 
   const [connections, setConnections] = useState<ConnectedWorkspace[]>([]);
   const [activeWsId, setActiveWsId] = useState<string | null>(null);
@@ -269,8 +276,10 @@ export function App() {
             appVersion={APP_VERSION}
             buildNumber={BUILD_NUMBER}
             onBack={() => setScreen(hasConnections ? 'workspace-view' : 'workspace-list')}
+            debugEnabled={debugEnabled}
+            onDebugToggle={toggleDebug}
           />
-          <DebugOverlay />
+          <DebugOverlay enabled={debugEnabled} />
         </div>
       )}
 
@@ -291,7 +300,7 @@ export function App() {
             }}
             onSettings={() => setScreen('settings')}
           />
-          <DebugOverlay />
+          <DebugOverlay enabled={debugEnabled} />
         </div>
       )}
 
@@ -400,12 +409,31 @@ export function App() {
               </React.Fragment>
             );
           })}
+          {/* Settings tab */}
+          <div style={{ ...styles.tabContent, display: activeTab === 'settings' ? 'flex' : 'none' }}>
+            <SettingsScreen
+              appVersion={APP_VERSION}
+              buildNumber={BUILD_NUMBER}
+              debugEnabled={debugEnabled}
+              onDebugToggle={toggleDebug}
+            />
+          </div>
+
+          {/* Extra tabs from Pro plugins */}
+          {getExtraTabs().map((tab) => {
+            const Renderer = getTabRenderer(tab.id);
+            return Renderer ? (
+              <div key={tab.id} style={{ ...styles.tabContent, display: activeTab === tab.id ? 'flex' : 'none' }}>
+                <Renderer visible={activeTab === tab.id} />
+              </div>
+            ) : null;
+          })}
         </div>
 
         {activeTab === 'terminal' && <ExtraKeyBar context="terminal" onKeyPress={() => {}} />}
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+        <TabBar activeTab={activeTab} onTabChange={setActiveTab} extraTabs={getExtraTabs()} />
       </div>
-      <DebugOverlay />
+      <DebugOverlay enabled={debugEnabled} />
     </div>
       )}
     </>

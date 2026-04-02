@@ -8,6 +8,10 @@ export type { AppPolicy, LimitHandler } from './policies/types';
 export { DEFAULT_POLICY } from './policies/types';
 export { setPolicy, getPolicy, setLimitHandler, checkLimit } from './policies/provider';
 
+// Tab Registry (Pro can inject custom tabs)
+export type { TabDefinition, TabRenderer } from './app/tab-registry';
+export { registerTab, getExtraTabs, getTabRenderer } from './app/tab-registry';
+
 // Plugins
 export type { MarkdownPlugin, EditorPlugin } from './plugins/types';
 export {

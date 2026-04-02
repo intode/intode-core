@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getDebugLogs, setDebugLogListener } from '../lib/debug-log';
 
-export function DebugOverlay() {
+export interface DebugOverlayProps {
+  enabled: boolean;
+}
+
+export function DebugOverlay({ enabled }: DebugOverlayProps) {
   const [visible, setVisible] = useState(false);
   const [logs, setLogs] = useState(getDebugLogs());
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -18,6 +22,8 @@ export function DebugOverlay() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [logs]);
+
+  if (!enabled) return null;
 
   return (
     <>
