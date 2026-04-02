@@ -1,6 +1,6 @@
 var Mb = Object.defineProperty;
 var Gb = (t, e, i) => e in t ? Mb(t, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : t[e] = i;
-var Be = (t, e, i) => Gb(t, typeof e != "symbol" ? e + "" : e, i);
+var Fe = (t, e, i) => Gb(t, typeof e != "symbol" ? e + "" : e, i);
 import Xh, { useState as Ze, useEffect as Ti, useRef as Qr, useCallback as ti } from "react";
 function Oa(t) {
   return t && t.__esModule && Object.prototype.hasOwnProperty.call(t, "default") ? t.default : t;
@@ -11137,10 +11137,10 @@ class ts {
   }
 }
 const Ya = /* @__PURE__ */ new WeakMap(), Jd = /* @__PURE__ */ new WeakMap();
-var Fe;
+var Be;
 (function(t) {
   t[t.ExcludeBuffers = 1] = "ExcludeBuffers", t[t.IncludeAnonymous = 2] = "IncludeAnonymous", t[t.IgnoreMounts = 4] = "IgnoreMounts", t[t.IgnoreOverlays = 8] = "IgnoreOverlays", t[t.EnterBracketed = 16] = "EnterBracketed";
-})(Fe || (Fe = {}));
+})(Be || (Be = {}));
 class We {
   /**
   Construct a new tree. See also [`Tree.build`](#common.Tree^build).
@@ -11234,8 +11234,8 @@ class We {
   not have its children iterated over (or `leave` called).
   */
   iterate(e) {
-    let { enter: i, leave: r, from: n = 0, to: s = this.length } = e, o = e.mode || 0, a = (o & Fe.IncludeAnonymous) > 0;
-    for (let l = this.cursor(o | Fe.IncludeAnonymous); ; ) {
+    let { enter: i, leave: r, from: n = 0, to: s = this.length } = e, o = e.mode || 0, a = (o & Be.IncludeAnonymous) > 0;
+    for (let l = this.cursor(o | Be.IncludeAnonymous); ; ) {
       let O = !1;
       if (l.from <= s && l.to >= n && (!a && l.type.isAnonymous || i(l) !== !1)) {
         if (l.firstChild())
@@ -11390,7 +11390,7 @@ function Ns(t, e, i, r) {
       return t;
     t = o;
   }
-  let s = r ? 0 : Fe.IgnoreOverlays;
+  let s = r ? 0 : Be.IgnoreOverlays;
   if (r)
     for (let o = t, a = o.parent; a; o = a, a = o.parent)
       o instanceof Ft && o.index < 0 && ((n = a.enter(e, i, s)) === null || n === void 0 ? void 0 : n.from) != o.from && (t = a);
@@ -11455,23 +11455,23 @@ class Ft extends X_ {
     for (let o = this; ; ) {
       for (let { children: a, positions: l } = o._tree, O = i > 0 ? a.length : -1; e != O; e += i) {
         let h = a[e], c = l[e] + o.from, u;
-        if (!(!(s & Fe.EnterBracketed && h instanceof We && (u = Un.get(h)) && !u.overlay && u.bracketed && r >= c && r <= c + h.length) && !T_(n, r, c, c + h.length))) {
+        if (!(!(s & Be.EnterBracketed && h instanceof We && (u = Un.get(h)) && !u.overlay && u.bracketed && r >= c && r <= c + h.length) && !T_(n, r, c, c + h.length))) {
           if (h instanceof Dr) {
-            if (s & Fe.ExcludeBuffers)
+            if (s & Be.ExcludeBuffers)
               continue;
             let d = h.findChild(0, h.buffer.length, i, r - c, n);
             if (d > -1)
               return new rr(new v1(o, h, e, c), null, d);
-          } else if (s & Fe.IncludeAnonymous || !h.type.isAnonymous || Fh(h)) {
+          } else if (s & Be.IncludeAnonymous || !h.type.isAnonymous || Fh(h)) {
             let d;
-            if (!(s & Fe.IgnoreMounts) && (d = Un.get(h)) && !d.overlay)
+            if (!(s & Be.IgnoreMounts) && (d = Un.get(h)) && !d.overlay)
               return new Ft(d.tree, c, e, o);
             let $ = new Ft(h, c, e, o);
-            return s & Fe.IncludeAnonymous || !$.type.isAnonymous ? $ : $.nextChild(i < 0 ? h.children.length - 1 : 0, i, r, n, s);
+            return s & Be.IncludeAnonymous || !$.type.isAnonymous ? $ : $.nextChild(i < 0 ? h.children.length - 1 : 0, i, r, n, s);
           }
         }
       }
-      if (s & Fe.IncludeAnonymous || !o.type.isAnonymous || (o.index >= 0 ? e = o.index + i : e = i < 0 ? -1 : o._parent._tree.children.length, o = o._parent, !o))
+      if (s & Be.IncludeAnonymous || !o.type.isAnonymous || (o.index >= 0 ? e = o.index + i : e = i < 0 ? -1 : o._parent._tree.children.length, o = o._parent, !o))
         return null;
     }
   }
@@ -11516,8 +11516,8 @@ class Ft extends X_ {
   }
   enter(e, i, r = 0) {
     let n;
-    if (!(r & Fe.IgnoreOverlays) && (n = Un.get(this._tree)) && n.overlay) {
-      let s = e - this.from, o = r & Fe.EnterBracketed && n.bracketed;
+    if (!(r & Be.IgnoreOverlays) && (n = Un.get(this._tree)) && n.overlay) {
+      let s = e - this.from, o = r & Be.EnterBracketed && n.bracketed;
       for (let { from: a, to: l } of n.overlay)
         if ((i > 0 || o ? a <= s : a < s) && (i < 0 || o ? l >= s : l > s))
           return new Ft(n.tree, n.overlay[0].from + this.from, -1, this);
@@ -11650,7 +11650,7 @@ class rr extends X_ {
     return this.type.prop(e);
   }
   enter(e, i, r = 0) {
-    if (r & Fe.ExcludeBuffers)
+    if (r & Be.ExcludeBuffers)
       return null;
     let { buffer: n } = this.context, s = n.findChild(this.index + 4, n.buffer[this.index + 3], i > 0 ? 1 : -1, e - this.context.start, i);
     return s < 0 ? null : new rr(this.context, this, s);
@@ -11745,7 +11745,7 @@ class Ao {
   @internal
   */
   constructor(e, i = 0) {
-    if (this.buffer = null, this.stack = [], this.index = 0, this.bufferNode = null, this.mode = i & ~Fe.EnterBracketed, e instanceof Ft)
+    if (this.buffer = null, this.stack = [], this.index = 0, this.bufferNode = null, this.mode = i & ~Be.EnterBracketed, e instanceof Ft)
       this.yieldNode(e);
     else {
       this._tree = e.context.parent, this.buffer = e.context;
@@ -11836,17 +11836,17 @@ class Ao {
   set to false.
   */
   enter(e, i, r = this.mode) {
-    return this.buffer ? r & Fe.ExcludeBuffers ? !1 : this.enterChild(1, e, i) : this.yield(this._tree.enter(e, i, r));
+    return this.buffer ? r & Be.ExcludeBuffers ? !1 : this.enterChild(1, e, i) : this.yield(this._tree.enter(e, i, r));
   }
   /**
   Move to the node's parent node, if this isn't the top node.
   */
   parent() {
     if (!this.buffer)
-      return this.yieldNode(this.mode & Fe.IncludeAnonymous ? this._tree._parent : this._tree.parent);
+      return this.yieldNode(this.mode & Be.IncludeAnonymous ? this._tree._parent : this._tree.parent);
     if (this.stack.length)
       return this.yieldBuf(this.stack.pop());
-    let e = this.mode & Fe.IncludeAnonymous ? this.buffer.parent : this.buffer.parent.nextSignificantParent();
+    let e = this.mode & Be.IncludeAnonymous ? this.buffer.parent : this.buffer.parent.nextSignificantParent();
     return this.buffer = null, this.yieldNode(e);
   }
   /**
@@ -11903,7 +11903,7 @@ class Ao {
       if (i > -1)
         for (let s = i + e, o = e < 0 ? -1 : r._tree.children.length; s != o; s += e) {
           let a = r._tree.children[s];
-          if (this.mode & Fe.IncludeAnonymous || a instanceof Dr || !a.type.isAnonymous || Fh(a))
+          if (this.mode & Be.IncludeAnonymous || a instanceof Dr || !a.type.isAnonymous || Fh(a))
             return !1;
         }
     return !0;
@@ -12424,7 +12424,7 @@ class E1 {
         this.inner[i].parse.stopAt(e);
   }
   startInner() {
-    let e = new Z1(this.fragments), i = null, r = null, n = new Ao(new Ft(this.baseTree, this.ranges[0].from, 0, null), Fe.IncludeAnonymous | Fe.IgnoreMounts);
+    let e = new Z1(this.fragments), i = null, r = null, n = new Ao(new Ft(this.baseTree, this.ranges[0].from, 0, null), Be.IncludeAnonymous | Be.IgnoreMounts);
     e: for (let s, o; ; ) {
       let a = !0, l;
       if (this.stoppedAt != null && n.from >= this.stoppedAt)
@@ -12506,13 +12506,13 @@ function Y1(t) {
 }
 class af {
   constructor(e, i) {
-    this.offset = i, this.done = !1, this.cursor = e.cursor(Fe.IncludeAnonymous | Fe.IgnoreMounts);
+    this.offset = i, this.done = !1, this.cursor = e.cursor(Be.IncludeAnonymous | Be.IgnoreMounts);
   }
   // Move to the first node (in pre-order) that starts at or after `pos`.
   moveTo(e) {
     let { cursor: i } = this, r = e - this.offset;
     for (; !this.done && i.from < r; )
-      i.to >= e && i.enter(r, 1, Fe.IgnoreOverlays | Fe.ExcludeBuffers) || i.next(!1) || (this.done = !0);
+      i.to >= e && i.enter(r, 1, Be.IgnoreOverlays | Be.ExcludeBuffers) || i.next(!1) || (this.done = !0);
   }
   hasNode(e) {
     if (this.moveTo(e.from), !this.done && this.cursor.from + this.offset == e.from && this.cursor.tree)
@@ -13337,7 +13337,7 @@ yi.setState = /* @__PURE__ */ mt.define();
 function hf(t, e, i) {
   let r = t.facet(Nn), n = ft(t).topNode;
   if (!r || r.allowsNesting)
-    for (let s = n; s; s = s.enter(e, i, Fe.ExcludeBuffers | Fe.EnterBracketed))
+    for (let s = n; s; s = s.enter(e, i, Be.ExcludeBuffers | Be.EnterBracketed))
       s.type.isTop && (n = s);
   return n;
 }
@@ -14999,7 +14999,7 @@ function cP(t, e, i, r) {
 const gi = typeof process < "u" && process.env && /\bparse\b/.test(process.env.LOG);
 let tO = null;
 function Qf(t, e, i) {
-  let r = t.cursor(Fe.IncludeAnonymous);
+  let r = t.cursor(Be.IncludeAnonymous);
   for (r.moveTo(e); ; )
     if (!(i < 0 ? r.childBefore(e) : r.childAfter(e)))
       for (; ; ) {
@@ -16282,7 +16282,7 @@ function B_(t, e) {
     let l = t.sliceString(o.from, o.to);
     r.push({ label: l, type: a });
   }
-  return e.cursor(Fe.IncludeAnonymous).iterate((o) => {
+  return e.cursor(Be.IncludeAnonymous).iterate((o) => {
     if (n)
       n = !1;
     else if (o.name) {
@@ -16842,7 +16842,7 @@ function c$(t, e) {
     let l = t.sliceString(o.from, o.to);
     r.push({ label: l, type: a });
   }
-  return e.cursor(Fe.IncludeAnonymous).iterate((o) => {
+  return e.cursor(Be.IncludeAnonymous).iterate((o) => {
     if (o.name) {
       let a = x0[o.name];
       if (a && a(o, s, n) || !n && O$.has(o.name))
@@ -17762,7 +17762,7 @@ function Q$(t, e) {
     let l = t.sliceString(o.from, o.to);
     r.push({ label: l, type: a });
   }
-  return e.cursor(Fe.IncludeAnonymous).iterate((o) => {
+  return e.cursor(Be.IncludeAnonymous).iterate((o) => {
     if (n)
       n = !1;
     else if (o.name) {
@@ -19011,7 +19011,7 @@ function q$(t, e, i) {
     let r = op.get(e);
     if (r)
       return r;
-    let n = [], s = /* @__PURE__ */ new Set(), o = e.cursor(Fe.IncludeAnonymous);
+    let n = [], s = /* @__PURE__ */ new Set(), o = e.cursor(Be.IncludeAnonymous);
     if (o.firstChild())
       do
         for (let a of q$(t, o.node, i))
@@ -23318,7 +23318,7 @@ const vE = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-B0pUoRzb.js").then((t) => t.jinja());
+      return import("./index-DbaWl41b.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ j.of({
@@ -23340,14 +23340,14 @@ const vE = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-D8so3ohF.js").then((t) => t.less());
+      return import("./index-C0TFzGUo.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ j.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-BIMKVNN6.js").then((t) => t.liquid());
+      return import("./index-CFmZRZc1.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ j.of({
@@ -23414,14 +23414,14 @@ const vE = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-VbAClsOA.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-CCk3O9zX.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ j.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-VbAClsOA.js").then((t) => t.sass());
+      return import("./index-CCk3O9zX.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ j.of({
@@ -23456,7 +23456,7 @@ const vE = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-CcvnFboo.js").then((t) => t.wast());
+      return import("./index-CswAuEbU.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ j.of({
@@ -24261,13 +24261,13 @@ const vE = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-2tPh6BWR.js").then((t) => t.vue());
+      return import("./index-Cgv1j5Zv.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ j.of({
     name: "Angular Template",
     load() {
-      return import("./index-SHHig1Oa.js").then((t) => t.angular());
+      return import("./index-Dec1n0hv.js").then((t) => t.angular());
     }
   })
 ], xE = ["md", "mdx", "markdown"], TE = [
@@ -56836,10 +56836,9 @@ function ohe(t = {}) {
 }
 class lhe {
   constructor(e) {
-    Be(this, "dataListener", null);
-    Be(this, "onDataDisposable", null);
-    Be(this, "channelId", null);
-    Be(this, "decoder", new TextDecoder("utf-8"));
+    Fe(this, "dataListener", null);
+    Fe(this, "onDataDisposable", null);
+    Fe(this, "channelId", null);
     this.terminal = e;
   }
   async registerListener() {
@@ -56848,7 +56847,7 @@ class lhe {
         try {
           const i = atob(e.data), r = new Uint8Array(i.length);
           for (let n = 0; n < i.length; n++) r[n] = i.charCodeAt(n);
-          this.terminal.write(this.decoder.decode(r, { stream: !0 }));
+          this.terminal.write(r);
         } catch {
         }
     });
@@ -56872,8 +56871,8 @@ class lhe {
 }
 class Ohe {
   constructor() {
-    Be(this, "sessions", /* @__PURE__ */ new Map());
-    Be(this, "activeSessionId", null);
+    Fe(this, "sessions", /* @__PURE__ */ new Map());
+    Fe(this, "activeSessionId", null);
   }
   async createSession(e) {
     const { maxTerminals: i } = Rh();
@@ -56921,20 +56920,20 @@ class Ohe {
 const che = 10;
 class hhe {
   constructor(e, i) {
-    Be(this, "longPressTimer", null);
-    Be(this, "isDragging", !1);
-    Be(this, "wasMoved", !1);
-    Be(this, "startTouch", null);
-    Be(this, "anchorCol", 0);
-    Be(this, "anchorRow", 0);
-    Be(this, "selStartCol", 0);
-    Be(this, "selStartRow", 0);
-    Be(this, "selEndCol", 0);
-    Be(this, "selEndRow", 0);
-    Be(this, "containerEl", null);
-    Be(this, "disposables", []);
+    Fe(this, "longPressTimer", null);
+    Fe(this, "isDragging", !1);
+    Fe(this, "wasMoved", !1);
+    Fe(this, "startTouch", null);
+    Fe(this, "anchorCol", 0);
+    Fe(this, "anchorRow", 0);
+    Fe(this, "selStartCol", 0);
+    Fe(this, "selStartRow", 0);
+    Fe(this, "selEndCol", 0);
+    Fe(this, "selEndRow", 0);
+    Fe(this, "containerEl", null);
+    Fe(this, "disposables", []);
     /** Set true during handle drag to suppress terminal touch events */
-    Be(this, "isHandleDrag", !1);
+    Fe(this, "isHandleDrag", !1);
     this.terminal = e, this.callbacks = i;
   }
   attach(e) {
@@ -57472,9 +57471,9 @@ function vhe(t) {
 }
 class xhe {
   constructor() {
-    Be(this, "tabs", []);
-    Be(this, "activeTabId", null);
-    Be(this, "onChange", null);
+    Fe(this, "tabs", []);
+    Fe(this, "activeTabId", null);
+    Fe(this, "onChange", null);
   }
   setOnChange(e) {
     this.onChange = e;
@@ -57786,15 +57785,15 @@ function Hhe() {
 }
 class Khe {
   constructor(e) {
-    Be(this, "fontSize");
-    Be(this, "minSize");
-    Be(this, "maxSize");
-    Be(this, "startDistance", 0);
-    Be(this, "startFontSize", 0);
-    Be(this, "isPinching", !1);
-    Be(this, "handleTouchStart");
-    Be(this, "handleTouchMove");
-    Be(this, "handleTouchEnd");
+    Fe(this, "fontSize");
+    Fe(this, "minSize");
+    Fe(this, "maxSize");
+    Fe(this, "startDistance", 0);
+    Fe(this, "startFontSize", 0);
+    Fe(this, "isPinching", !1);
+    Fe(this, "handleTouchStart");
+    Fe(this, "handleTouchMove");
+    Fe(this, "handleTouchEnd");
     this.config = e, this.fontSize = e.initialFontSize, this.minSize = e.minFontSize ?? aS, this.maxSize = e.maxFontSize ?? oS, this.handleTouchStart = (i) => {
       i.touches.length === 2 && (this.isPinching = !0, this.startDistance = this.getDistance(i.touches[0], i.touches[1]), this.startFontSize = this.fontSize);
     }, this.handleTouchMove = (i) => {

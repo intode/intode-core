@@ -5,8 +5,6 @@ export class SshBridge {
   private dataListener: { remove: () => Promise<void> } | null = null;
   private onDataDisposable: { dispose: () => void } | null = null;
   private channelId: string | null = null;
-  private decoder = new TextDecoder('utf-8');
-
   constructor(private terminal: Terminal) {}
 
   async registerListener(): Promise<void> {
@@ -16,7 +14,8 @@ export class SshBridge {
         const bin = atob(event.data);
         const bytes = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        this.terminal.write(this.decoder.decode(bytes, { stream: true }));
+        // Uint8Array → xterm.js handles UTF-8 decoding internally (including split sequences)
+        this.terminal.write(bytes);
       } catch { /* prevent propagation */ }
     });
   }
