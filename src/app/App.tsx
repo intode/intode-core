@@ -13,7 +13,7 @@ import { EditorTabs } from '../editor/EditorTabs';
 import { TerminalTabs } from '../terminal/TerminalTabs';
 import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
-import { createWorkspace, Workspace, CreateWorkspaceData } from '../workspace/WorkspaceManager';
+import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } from '../workspace/WorkspaceManager';
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { debugLog } from '../lib/debug-log';
 import '../themes/dark.css';
@@ -181,6 +181,52 @@ export function App() {
       setScreen('workspace-list');
     }
   }, [activeConn, connections]);
+
+  // --- Auto-reconnect on app resume ---
+  const connectionsRef = useRef(connections);
+  connectionsRef.current = connections;
+
+  useEffect(() => {
+    const handler = async () => {
+      if (document.visibilityState !== 'visible') return;
+      const conns = connectionsRef.current;
+      if (conns.length === 0) return;
+
+      for (const conn of conns) {
+        try {
+          const { status } = await Ssh.getStatus({ sessionId: conn.sessionId });
+          if (status === 'connected') continue;
+        } catch {
+          /* status check failed — assume dead */
+        }
+
+        // Reconnect
+        try {
+          const password = await getWorkspaceStore().getPassword(conn.wsId);
+          const { sessionId } = await Ssh.connect({
+            host: conn.workspace.host,
+            port: conn.workspace.port,
+            username: conn.workspace.username,
+            password: password ?? undefined,
+          });
+          let sftpId: string | null = null;
+          try {
+            const res = await Ssh.openSftp({ sessionId });
+            sftpId = res.sftpId;
+          } catch { /* sftp optional */ }
+
+          setConnections((prev) =>
+            prev.map((c) => (c.wsId === conn.wsId ? { ...c, sessionId, sftpId, sftpError: null } : c)),
+          );
+        } catch {
+          /* reconnect failed — user will see dead terminal */
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
 
   const handleSaveWorkspace = useCallback(
     async (data: CreateWorkspaceData, password: string) => {

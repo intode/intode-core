@@ -59,12 +59,11 @@ export function TerminalView({ sessionId, defaultPath, visible }: TerminalViewPr
       const { cols, rows } = session.terminal;
       await manager.attachShell(session, sessionId, cols, rows, defaultPath);
 
-      // cd to workspace path after shell is ready
-      if (defaultPath && defaultPath !== '~') {
-        setTimeout(() => {
-          if (!cancelled) session.terminal.paste(`cd ${defaultPath}\r`);
-        }, 500);
-      }
+      // Focus terminal after init (visible effect can't — sessionRef is null on first render)
+      setTimeout(() => {
+        const el = container.querySelector('textarea.xterm-helper-textarea');
+        if (el instanceof HTMLTextAreaElement) el.focus();
+      }, 100);
 
       const observer = new ResizeObserver(() => {
         const s = sessionRef.current;
