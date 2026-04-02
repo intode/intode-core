@@ -24405,7 +24405,7 @@ const RY = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-Do-XgiW0.js").then((t) => t.jinja());
+      return import("./index-Uv2YpxRo.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24427,14 +24427,14 @@ const RY = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-jpYEn4KD.js").then((t) => t.less());
+      return import("./index--fafVh0u.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-DPGBd4hz.js").then((t) => t.liquid());
+      return import("./index-j8tWnhkg.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24501,14 +24501,14 @@ const RY = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-DM0M3bzI.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-msWpm5YR.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ L.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-DM0M3bzI.js").then((t) => t.sass());
+      return import("./index-msWpm5YR.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24543,7 +24543,7 @@ const RY = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-Be3gV-lo.js").then((t) => t.wast());
+      return import("./index-BZK8l2Q1.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -25348,13 +25348,13 @@ const RY = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-tWkLXTHW.js").then((t) => t.vue());
+      return import("./index-DtRloH6Y.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Angular Template",
     load() {
-      return import("./index-C4DTyKJ1.js").then((t) => t.angular());
+      return import("./index-IefOwLP-.js").then((t) => t.angular());
     }
   })
 ], zY = ["md", "mdx", "markdown"], EY = [
@@ -32274,7 +32274,7 @@ class tZ {
     );
   }
   dispose() {
-    this.cancelLongPress();
+    this.cancelLongPress(), this.restoreKeyboard();
     for (const e of this.disposables) e();
     this.disposables = [], this.containerEl = null;
   }
@@ -32305,11 +32305,23 @@ class tZ {
     this.cancelLongPress(), this.isDragging = !1, !e && !this.wasMoved && this.terminal.hasSelection() && this.terminal.clearSelection();
   }
   // --- Selection logic ---
+  getTextarea() {
+    var e;
+    return (e = this.terminal.element) == null ? void 0 : e.querySelector("textarea.xterm-helper-textarea");
+  }
+  suppressKeyboard() {
+    const e = this.getTextarea();
+    e && (e.readOnly = !0, e.blur());
+  }
+  restoreKeyboard() {
+    const e = this.getTextarea();
+    e && (e.readOnly = !1);
+  }
   beginSelection(e, r) {
     var a;
     const i = this.toBufPos(e, r);
     if (!i) return;
-    (a = navigator.vibrate) == null || a.call(navigator, 30);
+    this.suppressKeyboard(), (a = navigator.vibrate) == null || a.call(navigator, 30);
     const { start: n, length: s } = this.wordAt(i.col, i.bufRow);
     this.anchorCol = n, this.anchorRow = i.vpRow, this.selStartCol = n, this.selStartRow = i.vpRow, this.selEndCol = n + s - 1, this.selEndRow = i.vpRow, this.terminal.select(n, i.vpRow, s), this.isDragging = !0, this.callbacks.onSelectionStart();
   }
@@ -32378,12 +32390,14 @@ class tZ {
   }
   // --- Public actions ---
   copySelection() {
-    const e = this.terminal.getSelection();
-    return e && navigator.clipboard.writeText(e).catch(() => {
-    }), e;
+    const r = this.terminal.getSelection().split(`
+`).map((i) => i.trimEnd()).join(`
+`);
+    return r && navigator.clipboard.writeText(r).catch(() => {
+    }), r;
   }
   clearSelection() {
-    this.terminal.clearSelection();
+    this.terminal.clearSelection(), this.restoreKeyboard();
   }
   selectAll() {
     this.terminal.selectAll(), this.selStartCol = 0, this.selStartRow = 0, this.selEndCol = this.terminal.cols - 1, this.selEndRow = this.terminal.rows - 1;

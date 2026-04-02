@@ -60,6 +60,7 @@ export class TerminalSelection {
 
   dispose(): void {
     this.cancelLongPress();
+    this.restoreKeyboard();
     for (const fn of this.disposables) fn();
     this.disposables = [];
     this.containerEl = null;
@@ -115,10 +116,25 @@ export class TerminalSelection {
 
   // --- Selection logic ---
 
+  private getTextarea(): HTMLTextAreaElement | null {
+    return this.terminal.element?.querySelector('textarea.xterm-helper-textarea') as HTMLTextAreaElement | null;
+  }
+
+  private suppressKeyboard() {
+    const ta = this.getTextarea();
+    if (ta) { ta.readOnly = true; ta.blur(); }
+  }
+
+  private restoreKeyboard() {
+    const ta = this.getTextarea();
+    if (ta) ta.readOnly = false;
+  }
+
   private beginSelection(clientX: number, clientY: number) {
     const pos = this.toBufPos(clientX, clientY);
     if (!pos) return;
 
+    this.suppressKeyboard();
     navigator.vibrate?.(30);
 
     const { start, length } = this.wordAt(pos.col, pos.bufRow);
@@ -266,13 +282,15 @@ export class TerminalSelection {
   // --- Public actions ---
 
   copySelection(): string {
-    const text = this.terminal.getSelection();
+    const raw = this.terminal.getSelection();
+    const text = raw.split('\n').map((line) => line.trimEnd()).join('\n');
     if (text) navigator.clipboard.writeText(text).catch(() => {});
     return text;
   }
 
   clearSelection(): void {
     this.terminal.clearSelection();
+    this.restoreKeyboard();
   }
 
   selectAll(): void {
