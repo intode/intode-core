@@ -57,6 +57,24 @@ const EDITOR_KEYS: KeyDef[] = [
   { label: '\u2192', value: KEY_RIGHT },
 ];
 
+const MD_KEYS: KeyDef[] = [
+  { label: 'Save', value: 'save' },
+  { label: 'Undo', value: 'undo' },
+  { label: 'Redo', value: 'redo' },
+  { label: '#', value: 'md:heading' },
+  { label: 'B', value: 'md:bold' },
+  { label: 'I', value: 'md:italic' },
+  { label: '```', value: 'md:code' },
+  { label: '-', value: 'md:list' },
+  { label: '>', value: 'md:quote' },
+  { label: '[]', value: 'md:link' },
+  { label: '![]', value: 'md:image' },
+  { label: '\u2191', value: KEY_UP },
+  { label: '\u2193', value: KEY_DOWN },
+  { label: '\u2190', value: KEY_LEFT },
+  { label: '\u2192', value: KEY_RIGHT },
+];
+
 const ARROW_VALUES = new Set([KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT]);
 const MOVE_THRESHOLD = 8;
 
@@ -102,7 +120,7 @@ function DpadButton({ keyDef, onPress, onSuppress }: { keyDef: KeyDef; onPress: 
 }
 
 export function ExtraKeyBar({ context, onKeyPress, onSuppressKeyboard }: ExtraKeyBarProps) {
-  const allKeys = context === 'terminal' ? TERMINAL_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
+  const allKeys = context === 'terminal' ? TERMINAL_KEYS : context === 'md-editor' ? MD_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
   if (allKeys.length === 0) return null;
 
   const otherKeys = allKeys.filter((k) => !ARROW_VALUES.has(k.value));

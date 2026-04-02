@@ -81,7 +81,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body::before {
+body.theme-dark::before {
   content: '';
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
@@ -91,14 +91,20 @@ body::before {
   pointer-events: none;
 }
 
-/* HUD Scanline Effect */
-body::after {
+/* HUD Scanline Effect (dark theme only) */
+body.theme-dark::after {
   content: '';
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) 1px, transparent 1px, transparent 2px);
   z-index: 1000;
   pointer-events: none;
+}
+
+/* Light theme: no grid/scanline */
+body.theme-light::before,
+body.theme-light::after {
+  display: none;
 }
 
 button {

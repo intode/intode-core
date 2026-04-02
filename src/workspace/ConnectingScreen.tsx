@@ -18,15 +18,21 @@ export function ConnectingScreen({ workspace, onConnected, onFailed, onCancel }:
 
     async function connect() {
       try {
-        const password = await getWorkspaceStore().getPassword(workspace.id);
-        if (cancelled) return;
-
-        const { sessionId } = await Ssh.connect({
+        const connectOpts: import('../ssh/plugin-api').ConnectOptions = {
           host: workspace.host,
           port: workspace.port,
           username: workspace.username,
-          password: password ?? undefined,
-        });
+        };
+
+        if (workspace.authType === 'key' && workspace.keyId) {
+          connectOpts.keyId = workspace.keyId;
+        } else {
+          const password = await getWorkspaceStore().getPassword(workspace.id);
+          if (cancelled) return;
+          connectOpts.password = password ?? undefined;
+        }
+
+        const { sessionId } = await Ssh.connect(connectOpts);
 
         if (cancelled) return;
         onConnected(sessionId);

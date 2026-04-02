@@ -60,3 +60,26 @@ export const XTERM_THEME = {
   brightCyan: '#94e2d5',
   brightWhite: '#a6adc8',
 } as const;
+
+export const XTERM_LIGHT_THEME = {
+  background: '#f5f5f5',
+  foreground: '#1a1a1a',
+  cursor: '#0066cc',
+  selectionBackground: '#0066cc33',
+  black: '#1a1a1a',
+  red: '#dc3545',
+  green: '#28a745',
+  yellow: '#e6a817',
+  blue: '#0066cc',
+  magenta: '#6f42c1',
+  cyan: '#17a2b8',
+  white: '#e0e0e0',
+  brightBlack: '#555555',
+  brightRed: '#dc3545',
+  brightGreen: '#28a745',
+  brightYellow: '#e6a817',
+  brightBlue: '#0066cc',
+  brightMagenta: '#6f42c1',
+  brightCyan: '#17a2b8',
+  brightWhite: '#f5f5f5',
+} as const;

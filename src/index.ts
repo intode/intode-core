@@ -24,7 +24,7 @@ export {
 
 // SSH
 export { Ssh } from './ssh/index';
-export type { SshPlugin, ConnectOptions, ConnectionStatus, SftpEntry, SftpStat } from './ssh/index';
+export type { SshPlugin, ConnectOptions, ConnectionStatus, SftpEntry, SftpStat, SshKey } from './ssh/index';
 
 // Workspace
 export type { Workspace, CreateWorkspaceData, WorkspaceStore } from './workspace/WorkspaceManager';
@@ -54,3 +54,6 @@ export { PinchZoom } from './gestures/PinchZoom';
 
 // Themes
 export { DARK_THEME, applyTheme } from './themes/dark';
+export { LIGHT_THEME } from './themes/light';
+export { initTheme, setThemeMode, getThemeMode, getXtermTheme, onThemeChange } from './themes/theme-manager';
+export type { ThemeMode } from './themes/theme-manager';

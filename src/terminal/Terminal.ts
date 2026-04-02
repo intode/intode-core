@@ -9,8 +9,8 @@ import {
   TERMINAL_SCROLLBACK,
   TERMINAL_SCROLL_SENSITIVITY,
   TERMINAL_MIN_CONTRAST_RATIO,
-  XTERM_THEME,
 } from '../lib/constants';
+import { getXtermTheme } from '../themes/theme-manager';
 import '@xterm/xterm/css/xterm.css';
 
 export interface TerminalConfig {
@@ -35,7 +35,7 @@ export function createTerminal(config: TerminalConfig = {}): {
     allowProposedApi: true,
     minimumContrastRatio: TERMINAL_MIN_CONTRAST_RATIO,
     convertEol: false,
-    theme: { ...XTERM_THEME, ...config.theme },
+    theme: { ...getXtermTheme(), ...config.theme },
   });
 
   const fitAddon = new FitAddon();

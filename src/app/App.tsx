@@ -21,7 +21,10 @@ import { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT } from '../lib/constants';
 import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } from '../workspace/WorkspaceManager';
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { debugLog } from '../lib/debug-log';
+import { initTheme } from '../themes/theme-manager';
 import '../themes/dark.css';
+
+initTheme();
 
 type Screen = 'workspace-list' | 'workspace-add' | 'connecting' | 'workspace-view' | 'settings';
 
@@ -248,13 +251,18 @@ export function App() {
 
         // Reconnect
         try {
-          const password = await getWorkspaceStore().getPassword(conn.wsId);
-          const { sessionId } = await Ssh.connect({
+          const connectOpts: import('../ssh/plugin-api').ConnectOptions = {
             host: conn.workspace.host,
             port: conn.workspace.port,
             username: conn.workspace.username,
-            password: password ?? undefined,
-          });
+          };
+          if (conn.workspace.authType === 'key' && conn.workspace.keyId) {
+            connectOpts.keyId = conn.workspace.keyId;
+          } else {
+            const password = await getWorkspaceStore().getPassword(conn.wsId);
+            connectOpts.password = password ?? undefined;
+          }
+          const { sessionId } = await Ssh.connect(connectOpts);
           let sftpId: string | null = null;
           try {
             const res = await Ssh.openSftp({ sessionId });
@@ -407,6 +415,7 @@ export function App() {
                     <FileTree
                       sftpId={conn.sftpId}
                       rootPath={conn.workspace.defaultPath}
+                      sessionId={conn.sessionId}
                       onFileSelect={async (path) => {
                         const type = detectFileType(path.split('/').pop() ?? '');
                         if (type === 'binary') return;
@@ -473,7 +482,7 @@ export function App() {
 
         {(activeTab === 'terminal' || activeTab === 'editor') && (
           <ExtraKeyBar
-            context={activeTab === 'terminal' ? 'terminal' : 'code-editor'}
+            context={activeTab === 'terminal' ? 'terminal' : (activeConn && getFileTabMgr(activeConn.wsId).getActiveTab()?.type === 'markdown' ? 'md-editor' : 'code-editor')}
             onSuppressKeyboard={() => {
               // Android WebView ignores JS preventDefault for keyboard.
               // 1) Blur active element  2) Call Capacitor Keyboard.hide() if available
@@ -509,6 +518,15 @@ export function App() {
                 else if (data === KEY_DOWN) editor.cursorDown();
                 else if (data === KEY_LEFT) editor.cursorLeft();
                 else if (data === KEY_RIGHT) editor.cursorRight();
+                // MD-specific commands
+                else if (data === 'md:heading') editor.prependLine('# ');
+                else if (data === 'md:bold') editor.wrapSelection('**', '**');
+                else if (data === 'md:italic') editor.wrapSelection('_', '_');
+                else if (data === 'md:code') editor.wrapSelection('```\n', '\n```');
+                else if (data === 'md:list') editor.prependLine('- ');
+                else if (data === 'md:quote') editor.prependLine('> ');
+                else if (data === 'md:link') editor.wrapSelection('[', '](url)');
+                else if (data === 'md:image') editor.wrapSelection('![', '](url)');
                 else editor.insertText(data);
               }
             }}

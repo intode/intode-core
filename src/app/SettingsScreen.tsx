@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getPolicy } from '../policies/provider';
+import { SshKeyList } from '../ssh/components/SshKeyList';
+import { getThemeMode, setThemeMode, onThemeChange, type ThemeMode } from '../themes/theme-manager';
 
 export interface SettingsScreenProps {
   appVersion: string;
@@ -11,6 +13,14 @@ export interface SettingsScreenProps {
 
 export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, onDebugToggle }: SettingsScreenProps) {
   const { showDebugToggle } = getPolicy();
+  const [theme, setTheme] = useState<ThemeMode>(getThemeMode);
+
+  useEffect(() => onThemeChange(setTheme), []);
+
+  const handleTheme = (mode: ThemeMode) => {
+    setThemeMode(mode);
+    setTheme(mode);
+  };
 
   return (
     <div style={styles.container}>
@@ -21,6 +31,32 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
         </div>
       )}
       <div style={styles.content}>
+        {/* Appearance */}
+        <div style={styles.section}>
+          <span style={styles.sectionTitle}>Appearance</span>
+          <div style={styles.row}>
+            <span style={styles.label}>Theme</span>
+            <div style={styles.themeToggle}>
+              {(['system', 'dark', 'light'] as ThemeMode[]).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => handleTheme(m)}
+                  style={theme === m ? styles.themeActive : styles.themeInactive}
+                >
+                  {m === 'system' ? 'Auto' : m === 'dark' ? 'Dark' : 'Light'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* SSH Keys */}
+        <div style={styles.section}>
+          <span style={styles.sectionTitle}>SSH Keys</span>
+          <SshKeyList />
+        </div>
+
+        {/* About */}
         <div style={styles.section}>
           <span style={styles.sectionTitle}>About</span>
           <div style={styles.row}>
@@ -69,6 +105,15 @@ const styles: Record<string, React.CSSProperties> = {
   row: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: '1px solid var(--bg-surface0)' },
   label: { fontSize: 14, color: 'var(--text-primary)' },
   value: { fontSize: 13, color: 'var(--text-muted)', fontFamily: 'monospace' },
+  themeToggle: { display: 'flex', gap: 0, borderRadius: 6, overflow: 'hidden', border: '1px solid var(--bg-surface1)' },
+  themeActive: {
+    padding: '6px 12px', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+    backgroundColor: 'var(--accent-blue)', color: 'var(--bg-base)',
+  },
+  themeInactive: {
+    padding: '6px 12px', border: 'none', fontSize: 12, fontWeight: 500, cursor: 'pointer',
+    backgroundColor: 'var(--bg-surface0)', color: 'var(--text-secondary)',
+  },
   toggle: {
     width: 48, height: 28, borderRadius: 14,
     border: 'none', padding: 4, cursor: 'pointer',

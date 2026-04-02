@@ -8,6 +8,7 @@ export interface Workspace {
   port: number;
   username: string;
   authType: 'password' | 'key';
+  keyId?: string;
   defaultPath: string;
   lastConnectedAt: number | null;
   createdAt: number;

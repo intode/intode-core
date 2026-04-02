@@ -28,6 +28,8 @@ export interface CodeEditorRef {
   cursorDown(): void;
   cursorLeft(): void;
   cursorRight(): void;
+  wrapSelection(before: string, after: string): void;
+  prependLine(prefix: string): void;
 }
 
 // Global ref for active editor — used by ExtraKeyBar routing in App.tsx
@@ -99,6 +101,54 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
       cursorDown() { if (viewRef.current) cursorLineDown(viewRef.current); },
       cursorLeft() { if (viewRef.current) cursorCharLeft(viewRef.current); },
       cursorRight() { if (viewRef.current) cursorCharRight(viewRef.current); },
+      wrapSelection(before: string, after: string) {
+        const view = viewRef.current;
+        if (!view) return;
+        const { from, to } = view.state.selection.main;
+        if (from === to) {
+          // No selection: insert before+after and place cursor between
+          view.dispatch({
+            changes: { from, insert: before + after },
+            selection: { anchor: from + before.length },
+          });
+        } else {
+          // Wrap selection
+          const selected = view.state.sliceDoc(from, to);
+          view.dispatch({
+            changes: { from, to, insert: before + selected + after },
+            selection: { anchor: from + before.length, head: from + before.length + selected.length },
+          });
+        }
+        view.focus();
+      },
+      prependLine(prefix: string) {
+        const view = viewRef.current;
+        if (!view) return;
+        const line = view.state.doc.lineAt(view.state.selection.main.head);
+        const text = line.text;
+        // Cycle heading levels: # → ## → ### → #### → #
+        if (prefix === '# ') {
+          const match = text.match(/^(#{1,4})\s/);
+          if (match) {
+            const level = match[1].length;
+            const next = level >= 4 ? 1 : level + 1;
+            const newPrefix = '#'.repeat(next) + ' ';
+            view.dispatch({ changes: { from: line.from, to: line.from + match[0].length, insert: newPrefix } });
+          } else {
+            view.dispatch({ changes: { from: line.from, insert: prefix } });
+          }
+        } else if (text.startsWith(prefix)) {
+          // Already has prefix: for list items, indent; for others, toggle off
+          if (prefix === '- ' || prefix === '> ') {
+            view.dispatch({ changes: { from: line.from, insert: '  ' } });
+          } else {
+            view.dispatch({ changes: { from: line.from, to: line.from + prefix.length, insert: '' } });
+          }
+        } else {
+          view.dispatch({ changes: { from: line.from, insert: prefix } });
+        }
+        view.focus();
+      },
     };
 
     useImperativeHandle(ref, () => api);

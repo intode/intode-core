@@ -5,8 +5,17 @@ export interface ConnectOptions {
   port: number;
   username: string;
   password?: string;
-  privateKey?: string;
+  keyId?: string;
   passphrase?: string;
+}
+
+export interface SshKey {
+  id: string;
+  name: string;
+  type: 'ed25519' | 'rsa' | 'ecdsa';
+  fingerprint: string;
+  publicKey: string;
+  createdAt: number;
 }
 
 export type ConnectionStatus =
@@ -62,6 +71,13 @@ export interface SshPlugin {
   sftpRead(options: { sftpId: string; path: string }): Promise<{ content: string; size: number }>;
   sftpWrite(options: { sftpId: string; path: string; content: string }): Promise<void>;
   sftpStat(options: { sftpId: string; path: string }): Promise<{ stat: SftpStat }>;
+
+  // SSH key management
+  generateSshKey(options: { name: string; type: 'ed25519' | 'rsa' }): Promise<SshKey>;
+  importSshKey(options: { name: string; keyData: string; passphrase?: string }): Promise<SshKey>;
+  listSshKeys(): Promise<{ keys: SshKey[] }>;
+  getPublicKey(options: { keyId: string }): Promise<{ publicKey: string }>;
+  deleteSshKey(options: { keyId: string }): Promise<void>;
 
   addListener(
     eventName: 'shellData',

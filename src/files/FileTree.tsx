@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Ssh, SftpEntry } from '../ssh/index';
+import { INPUT_FIELD } from '../lib/styles';
 
 export interface FileTreeNode {
   name: string;
@@ -16,6 +17,7 @@ export interface FileTreeProps {
   sftpId: string;
   rootPath: string;
   onFileSelect: (path: string) => void;
+  sessionId?: string;
 }
 
 function sortEntries(entries: SftpEntry[]): SftpEntry[] {
@@ -38,34 +40,50 @@ function toNode(entry: SftpEntry): FileTreeNode {
   };
 }
 
+// Collect all files from loaded tree
+function collectFiles(nodes: FileTreeNode[]): FileTreeNode[] {
+  const result: FileTreeNode[] = [];
+  for (const node of nodes) {
+    if (!node.isDirectory) result.push(node);
+    if (node.children) result.push(...collectFiles(node.children));
+  }
+  return result;
+}
+
+// Simple fuzzy match: all chars of query appear in order in name
+function fuzzyMatch(name: string, query: string): { match: boolean; score: number } {
+  const lower = name.toLowerCase();
+  const q = query.toLowerCase();
+  let qi = 0;
+  let score = 0;
+  let prevMatch = -1;
+  for (let i = 0; i < lower.length && qi < q.length; i++) {
+    if (lower[i] === q[qi]) {
+      score += (i === prevMatch + 1) ? 2 : 1; // consecutive bonus
+      if (i === 0 || name[i - 1] === '/' || name[i - 1] === '.' || name[i - 1] === '_' || name[i - 1] === '-') {
+        score += 3; // word boundary bonus
+      }
+      prevMatch = i;
+      qi++;
+    }
+  }
+  return { match: qi === q.length, score };
+}
+
 function FileTreeItem({
-  node,
-  depth,
-  onToggle,
-  onFileSelect,
+  node, depth, onToggle, onFileSelect,
 }: {
-  node: FileTreeNode;
-  depth: number;
-  onToggle: (path: string) => void;
-  onFileSelect: (path: string) => void;
+  node: FileTreeNode; depth: number;
+  onToggle: (path: string) => void; onFileSelect: (path: string) => void;
 }) {
   const handleTap = () => {
-    if (node.isDirectory) {
-      onToggle(node.path);
-    } else {
-      onFileSelect(node.path);
-    }
+    if (node.isDirectory) onToggle(node.path);
+    else onFileSelect(node.path);
   };
 
   return (
     <>
-      <div
-        onClick={handleTap}
-        style={{
-          ...styles.item,
-          paddingLeft: 12 + depth * 16,
-        }}
-      >
+      <div onClick={handleTap} style={{ ...styles.item, paddingLeft: 12 + depth * 16 }}>
         <span style={styles.icon}>
           {node.isDirectory ? (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: node.isExpanded ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
@@ -79,24 +97,42 @@ function FileTreeItem({
           )}
         </span>
         <span style={styles.name}>{node.name}</span>
-        {node.isLoading && <span style={styles.spinner}>⟳</span>}
+        {node.isLoading && <span style={styles.spinner}>{'\u27F3'}</span>}
       </div>
       {node.isExpanded && node.children?.map((child) => (
-        <FileTreeItem
-          key={child.path}
-          node={child}
-          depth={depth + 1}
-          onToggle={onToggle}
-          onFileSelect={onFileSelect}
-        />
+        <FileTreeItem key={child.path} node={child} depth={depth + 1} onToggle={onToggle} onFileSelect={onFileSelect} />
       ))}
     </>
   );
 }
 
-export function FileTree({ sftpId, rootPath, onFileSelect }: FileTreeProps) {
+// Search result item (flat list)
+function SearchResultItem({ node, rootPath, onSelect }: { node: FileTreeNode; rootPath: string; onSelect: () => void }) {
+  const relative = node.path.startsWith(rootPath)
+    ? node.path.slice(rootPath.length).replace(/^\//, '')
+    : node.path;
+  const dir = relative.includes('/') ? relative.slice(0, relative.lastIndexOf('/')) : '';
+
+  return (
+    <div onClick={onSelect} style={styles.item}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}>
+        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+        <path d="M13 2v7h7" />
+      </svg>
+      <div style={{ overflow: 'hidden', flex: 1 }}>
+        <div style={styles.name}>{node.name}</div>
+        {dir && <div style={styles.searchDir}>{dir}</div>}
+      </div>
+    </div>
+  );
+}
+
+export function FileTree({ sftpId, rootPath, onFileSelect, sessionId }: FileTreeProps) {
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<FileTreeNode[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     if (!sftpId) return;
@@ -107,18 +143,69 @@ export function FileTree({ sftpId, rootPath, onFileSelect }: FileTreeProps) {
     }).catch(() => setLoading(false));
   }, [sftpId, rootPath]);
 
+  // Local fuzzy search on cached tree
+  const localResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const files = collectFiles(nodes);
+    return files
+      .map((f) => ({ node: f, ...fuzzyMatch(f.name, searchQuery.trim()) }))
+      .filter((r) => r.match)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 30)
+      .map((r) => r.node);
+  }, [nodes, searchQuery]);
+
+  // Remote search via SSH find (when local results are sparse)
+  useEffect(() => {
+    if (!searchQuery.trim() || !sessionId) {
+      setSearchResults([]);
+      return;
+    }
+    if (localResults.length >= 5) {
+      setSearchResults(localResults);
+      return;
+    }
+
+    setSearching(true);
+    const q = searchQuery.trim().replace(/['"\\]/g, '');
+    const escapedPath = rootPath.replace(/'/g, "'\\''");
+    Ssh.exec({
+      sessionId,
+      command: `find '${escapedPath}' -maxdepth 5 -iname "*${q}*" -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | head -30`,
+      timeout: 8000,
+    }).then(({ stdout }) => {
+      const paths = stdout.trim().split('\n').filter(Boolean);
+      const remoteNodes: FileTreeNode[] = paths.map((p) => ({
+        name: p.split('/').pop() ?? p,
+        path: p,
+        isDirectory: false,
+        size: 0,
+        modifiedAt: 0,
+      }));
+      // Merge local + remote, deduplicate by path
+      const seen = new Set(localResults.map((n) => n.path));
+      const merged = [...localResults];
+      for (const n of remoteNodes) {
+        if (!seen.has(n.path)) {
+          merged.push(n);
+          seen.add(n.path);
+        }
+      }
+      setSearchResults(merged.slice(0, 30));
+      setSearching(false);
+    }).catch(() => {
+      setSearchResults(localResults);
+      setSearching(false);
+    });
+  }, [searchQuery, sessionId, localResults, rootPath]);
+
   const handleToggle = useCallback(async (path: string) => {
     setNodes((prev) => updateNode(prev, path, (node) => {
-      if (node.isExpanded) {
-        return { ...node, isExpanded: false };
-      }
-      if (node.children !== undefined) {
-        return { ...node, isExpanded: true };
-      }
+      if (node.isExpanded) return { ...node, isExpanded: false };
+      if (node.children !== undefined) return { ...node, isExpanded: true };
       return { ...node, isLoading: true, isExpanded: true };
     }));
 
-    // Lazy load children
     const target = findNode(nodes, path);
     if (target && target.children === undefined) {
       try {
@@ -135,25 +222,51 @@ export function FileTree({ sftpId, rootPath, onFileSelect }: FileTreeProps) {
     }
   }, [sftpId, nodes]);
 
+  const isSearching = searchQuery.trim().length > 0;
+  const displayResults = isSearching ? (searchResults.length > 0 ? searchResults : localResults) : [];
+
   if (loading) {
     return <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Loading...</span></div>;
   }
 
-  if (nodes.length === 0) {
-    return <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Empty directory</span></div>;
-  }
-
   return (
     <div style={styles.container}>
-      {nodes.map((node) => (
-        <FileTreeItem
-          key={node.path}
-          node={node}
-          depth={0}
-          onToggle={handleToggle}
-          onFileSelect={onFileSelect}
+      <div style={styles.searchBar}>
+        <input
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search files..."
+          style={styles.searchInput}
+          autoComplete="off"
+          spellCheck={false}
         />
-      ))}
+        {searchQuery && (
+          <button onClick={() => setSearchQuery('')} style={styles.clearBtn}>{'\u2715'}</button>
+        )}
+      </div>
+
+      {isSearching ? (
+        <div style={styles.resultsList}>
+          {searching && <div style={styles.searchHint}>Searching...</div>}
+          {displayResults.length === 0 && !searching && (
+            <div style={styles.searchHint}>No files found</div>
+          )}
+          {displayResults.map((node) => (
+            <SearchResultItem
+              key={node.path}
+              node={node}
+              rootPath={rootPath}
+              onSelect={() => { onFileSelect(node.path); setSearchQuery(''); }}
+            />
+          ))}
+        </div>
+      ) : nodes.length === 0 ? (
+        <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Empty directory</span></div>
+      ) : (
+        nodes.map((node) => (
+          <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} />
+        ))
+      )}
     </div>
   );
 }
@@ -176,9 +289,7 @@ function updateNode(
 ): FileTreeNode[] {
   return nodes.map((node) => {
     if (node.path === path) return updater(node);
-    if (node.children) {
-      return { ...node, children: updateNode(node.children, path, updater) };
-    }
+    if (node.children) return { ...node, children: updateNode(node.children, path, updater) };
     return node;
   });
 }
@@ -186,8 +297,37 @@ function updateNode(
 const styles: Record<string, React.CSSProperties> = {
   container: {
     height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  searchBar: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 12px',
+    borderBottom: '1px solid var(--bg-surface0)',
+    flexShrink: 0,
+  },
+  searchInput: {
+    ...INPUT_FIELD,
+    flex: 1,
+    padding: '8px 10px',
+    fontSize: 13,
+  },
+  clearBtn: {
+    background: 'none', border: 'none', color: 'var(--text-muted)',
+    fontSize: 14, cursor: 'pointer', padding: '4px 8px', marginLeft: 4,
+  },
+  resultsList: {
+    flex: 1,
     overflowY: 'auto',
     WebkitOverflowScrolling: 'touch',
+  },
+  searchHint: {
+    padding: '16px', textAlign: 'center', fontSize: 13, color: 'var(--text-muted)',
+  },
+  searchDir: {
+    fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden',
+    textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   },
   item: {
     display: 'flex',
@@ -221,6 +361,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
+    flex: 1,
+    fontSize: 16,
   },
 };
