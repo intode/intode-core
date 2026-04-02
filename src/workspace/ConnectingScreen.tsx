@@ -59,8 +59,8 @@ export function ConnectingScreen({ workspace, onConnected, onFailed, onCancel }:
   return (
     <div style={styles.container}>
       <div style={styles.spinner}>⟳</div>
-      <p style={styles.connectingText}>Connecting...</p>
-      <p style={styles.hostText}>{workspace.host}:{workspace.port}</p>
+      <p style={styles.connectingText}>ACCESSING_SERVER<span className="blink">...</span></p>
+      <p style={styles.hostText}>{workspace.host.toUpperCase()} // PORT_{workspace.port}</p>
       <button onClick={onCancel} style={styles.cancelBtn}>Cancel</button>
     </div>
   );
@@ -71,14 +71,14 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
     height: '100%', backgroundColor: 'var(--bg-base)', gap: 12, padding: 24,
   },
-  spinner: { fontSize: 40, color: 'var(--accent-blue)', animation: 'spin 1s linear infinite' },
-  connectingText: { fontSize: 16, color: 'var(--text-primary)', fontWeight: 500 },
-  hostText: { fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace' },
-  cancelBtn: { marginTop: 16, background: 'none', border: '1px solid var(--bg-surface1)', borderRadius: 8, padding: '10px 20px', color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer' },
-  errorIcon: { fontSize: 40, color: 'var(--accent-red)', fontWeight: 700 },
-  errorTitle: { fontSize: 16, color: 'var(--accent-red)', fontWeight: 600 },
-  errorMsg: { fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', wordBreak: 'break-all', maxWidth: '80%' },
-  buttonRow: { display: 'flex', gap: 12, marginTop: 16 },
-  secondaryBtn: { background: 'none', border: '1px solid var(--bg-surface1)', borderRadius: 8, padding: '12px 20px', color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer' },
-  primaryBtn: { backgroundColor: 'var(--accent-blue)', color: 'var(--bg-base)', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+  spinner: { fontSize: 48, color: 'var(--accent-green)', textShadow: 'var(--neon-glow)', animation: 'spin 1s linear infinite', marginBottom: 16 },
+  connectingText: { fontSize: 13, color: 'var(--accent-green)', fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, letterSpacing: 1 },
+  hostText: { fontSize: 11, color: 'var(--text-muted)', fontFamily: 'IBM Plex Mono' },
+  cancelBtn: { marginTop: 24, background: 'none', border: '1px solid var(--text-muted)', borderRadius: 2, padding: '8px 24px', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, cursor: 'pointer', letterSpacing: 1 },
+  errorIcon: { fontSize: 40, color: 'var(--accent-red)', fontWeight: 700, textShadow: '0 0 10px rgba(255, 51, 0, 0.4)' },
+  errorTitle: { fontSize: 14, color: 'var(--accent-red)', fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, letterSpacing: 1 },
+  errorMsg: { fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', wordBreak: 'break-all', maxWidth: '80%', fontFamily: 'IBM Plex Mono' },
+  buttonRow: { display: 'flex', gap: 12, marginTop: 24 },
+  secondaryBtn: { background: 'none', border: '1px solid var(--text-muted)', borderRadius: 2, padding: '10px 20px', color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, cursor: 'pointer', letterSpacing: 1 },
+  primaryBtn: { backgroundColor: 'transparent', border: '1px solid var(--accent-green)', color: 'var(--accent-green)', borderRadius: 2, padding: '10px 20px', fontSize: 11, fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, cursor: 'pointer', letterSpacing: 1, boxShadow: 'var(--neon-glow)' },
 };

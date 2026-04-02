@@ -1,34 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
 :root {
-  /* Background / Foreground — Catppuccin Mocha */
-  --bg-base: #1e1e2e;
-  --bg-mantle: #181825;
-  --bg-crust: #11111b;
-  --bg-surface0: #313244;
-  --bg-surface1: #45475a;
-  --bg-surface2: #585b70;
+  /* Background / Foreground — Cyberpunk Obsidian */
+  --bg-base: #030303;
+  --bg-mantle: #0a0c0a;
+  --bg-crust: #000000;
+  --bg-surface0: #1a241c;
+  --bg-surface1: #2a3a2e;
+  --bg-surface2: #3d5242;
 
   /* Text */
-  --text-primary: #cdd6f4;
-  --text-secondary: #bac2de;
-  --text-tertiary: #a6adc8;
-  --text-muted: #6c7086;
+  --text-primary: #e6e6e6;
+  --text-secondary: #8b928c;
+  --text-tertiary: #6c756e;
+  --text-muted: #525a54;
 
-  /* Accent */
-  --accent-blue: #89b4fa;
-  --accent-green: #a6e3a1;
-  --accent-red: #f38ba8;
-  --accent-yellow: #f9e2af;
-  --accent-mauve: #cba6f7;
-  --accent-peach: #fab387;
+  /* Accent — Neon Green & Cyber Orange */
+  --accent-blue: #00ff66;
+  --accent-green: #00ff66;
+  --accent-red: #ff3300;
+  --accent-yellow: #ffcc00;
+  --accent-mauve: #00ff66;
+  --accent-peach: #ff3300;
 
   /* Terminal */
-  --term-bg: #1e1e2e;
-  --term-fg: #cdd6f4;
-  --term-cursor: #f5e0dc;
-  --term-selection: #45475a;
+  --term-bg: #030303;
+  --term-fg: #00ff66;
+  --term-cursor: #00ff66;
+  --term-selection: rgba(0, 255, 102, 0.2);
 
   /* Typography */
-  --font-xs: 11px;
+  --font-xs: 10px;
   --font-sm: 12px;
   --font-base: 14px;
   --font-md: 15px;
@@ -43,22 +45,73 @@
   --sp-5: 20px;
   --sp-6: 24px;
 
-  /* Radius */
-  --radius-sm: 4px;
-  --radius: 8px;
-  --radius-md: 12px;
+  /* Radius — Harder edges for industrial feel */
+  --radius-sm: 2px;
+  --radius: 4px;
+  --radius-md: 6px;
   --radius-full: 9999px;
 
   /* Transitions */
-  --transition: 150ms ease;
+  --transition: 100ms linear;
+
+  --neon-glow: 0 0 10px rgba(0, 255, 102, 0.3);
 }
 
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);
+  font-family: 'IBM Plex Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background-image: linear-gradient(var(--bg-surface0) 1px, transparent 1px), linear-gradient(90deg, var(--bg-surface0) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* HUD Scanline Effect */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) 1px, transparent 1px, transparent 2px);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+button {
+  font-family: 'Chakra Petch', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input, textarea {
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-crust);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface1);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-green);
 }

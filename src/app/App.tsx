@@ -342,6 +342,7 @@ export function App() {
     <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight, display: showWorkspaceView ? 'flex' : 'none' }}>
       <div style={styles.container}>
         <div style={styles.statusBar}>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 1, background: 'var(--accent-green)' }} />
           {activeConn && (
             <WorkspaceDropdown
               current={activeConn.workspace}
@@ -354,9 +355,10 @@ export function App() {
               }}
             />
           )}
-          <span style={{ color: 'var(--accent-green)', fontSize: 10, flexShrink: 0 }}>{'\u25cf'}</span>
+          <span className="blink" style={{ color: 'var(--accent-green)', fontSize: 10, flexShrink: 0, textShadow: 'var(--neon-glow)' }}>{'\u25cf'}</span>
+          <div style={{ flex: 1 }} />
           <button onClick={handleDisconnect} style={styles.disconnectBtn}>
-            Disconnect
+            HALT_SESSION
           </button>
         </div>
 
@@ -511,15 +513,17 @@ const styles: Record<string, React.CSSProperties> = {
   },
   disconnectBtn: {
     background: 'none',
-    border: '1px solid var(--bg-surface1)',
-    borderRadius: 8,
-    padding: '5px 12px',
-    color: 'var(--text-muted)',
-    fontSize: 11,
-    fontWeight: 500,
+    border: '1px solid var(--accent-red)',
+    borderRadius: 2,
+    padding: '3px 10px',
+    color: 'var(--accent-red)',
+    fontSize: 10,
+    fontFamily: 'Chakra Petch',
+    fontWeight: 700,
     cursor: 'pointer',
     flexShrink: 0,
-    letterSpacing: 0.3,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   content: {
     flex: 1,

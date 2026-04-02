@@ -37,21 +37,27 @@ export function TabBar({ activeTab, onTabChange, extraTabs = [] }: TabBarProps) 
             style={{
               ...styles.button,
               color: active ? 'var(--accent-blue)' : 'var(--text-muted)',
+              borderTop: active ? '1px solid var(--accent-blue)' : '1px solid transparent',
+              textShadow: active ? 'var(--neon-glow)' : 'none',
             }}
           >
             <svg
-              width="22"
-              height="22"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth={active ? "2.5" : "2"}
               strokeLinecap="round"
               strokeLinejoin="round"
+              style={{ filter: active ? 'drop-shadow(var(--neon-glow))' : 'none' }}
             >
               <path d={icon} />
             </svg>
-            <span style={styles.label}>{label}</span>
+            <span style={{
+              ...styles.label,
+              color: active ? 'var(--accent-blue)' : 'var(--text-muted)',
+            }}>{label}</span>
           </button>
         );
       })}
@@ -84,9 +90,10 @@ const styles: Record<string, React.CSSProperties> = {
     WebkitTapHighlightColor: 'transparent',
   },
   label: {
-    fontSize: 10,
-    fontWeight: 600,
-    letterSpacing: 0.3,
+    fontSize: 9,
+    fontWeight: 700,
+    letterSpacing: 1,
     textTransform: 'uppercase' as const,
+    marginTop: 2,
   },
 };

@@ -67,7 +67,16 @@ function FileTreeItem({
         }}
       >
         <span style={styles.icon}>
-          {node.isDirectory ? (node.isExpanded ? '📂' : '📁') : '📄'}
+          {node.isDirectory ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: node.isExpanded ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill={node.isExpanded ? 'rgba(0,255,102,0.1)' : 'none'} />
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-tertiary)' }}>
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+              <path d="M13 2v7h7" />
+            </svg>
+          )}
         </span>
         <span style={styles.name}>{node.name}</span>
         {node.isLoading && <span style={styles.spinner}>⟳</span>}
@@ -194,11 +203,13 @@ const styles: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   name: {
-    fontSize: 14,
+    fontSize: 13,
+    fontFamily: 'IBM Plex Mono',
     color: 'var(--text-primary)',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    letterSpacing: -0.2,
   },
   spinner: {
     fontSize: 14,
