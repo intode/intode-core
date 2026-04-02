@@ -29,7 +29,7 @@ export function EditorTabs({ tabs, activeTabId, onSelect, onClose }: EditorTabsP
               ...styles.tabName,
               color: active ? 'var(--text-primary)' : 'var(--text-muted)',
             }}>
-              {tab.fileName}
+              {tab.isDirty ? '\u2022 ' : ''}{tab.fileName}
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); onClose(tab.id); }}

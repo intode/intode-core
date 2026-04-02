@@ -1,6 +1,6 @@
 import { Ssh } from '../ssh/index';
 import { getPolicy, checkLimit } from '../policies/provider';
-import { decodeBase64Utf8 } from '../lib/encoding';
+import { decodeBase64Utf8, encodeUtf8Base64 } from '../lib/encoding';
 import { detectFileType, getFileName } from '../lib/file-utils';
 import { MAX_FILE_SIZE } from '../lib/constants';
 
@@ -12,7 +12,9 @@ export interface FileTab {
   fileName: string;
   type: 'code' | 'markdown';
   content: string | null;
+  originalContent: string | null;
   isLoading: boolean;
+  isDirty: boolean;
 }
 
 export class FileTabManager {
@@ -43,7 +45,9 @@ export class FileTabManager {
       fileName,
       type: type as 'code' | 'markdown',
       content: null,
+      originalContent: null,
       isLoading: true,
+      isDirty: false,
     };
     this.tabs.push(tab);
     this.activeTabId = tab.id;
@@ -60,6 +64,7 @@ export class FileTabManager {
 
       const { content } = await Ssh.sftpRead({ sftpId, path });
       tab.content = decodeBase64Utf8(content);
+      tab.originalContent = tab.content;
       tab.isLoading = false;
     } catch (e: unknown) {
       tab.isLoading = false;
@@ -67,6 +72,24 @@ export class FileTabManager {
     }
     this.onChange?.();
     return tab;
+  }
+
+  updateContent(tabId: string, newContent: string): void {
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (!tab) return;
+    tab.content = newContent;
+    tab.isDirty = newContent !== tab.originalContent;
+    this.onChange?.();
+  }
+
+  async saveFile(sftpId: string, tabId: string): Promise<boolean> {
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (!tab || !tab.content || !tab.isDirty) return false;
+    await Ssh.sftpWrite({ sftpId, path: tab.path, content: encodeUtf8Base64(tab.content) });
+    tab.originalContent = tab.content;
+    tab.isDirty = false;
+    this.onChange?.();
+    return true;
   }
 
   getActiveTab(): FileTab | null {

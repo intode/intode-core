@@ -8,10 +8,11 @@ import { ConnectingScreen } from '../workspace/ConnectingScreen';
 import { SettingsScreen } from './SettingsScreen';
 import { DebugOverlay } from './DebugOverlay';
 import { FileTree } from '../files/FileTree';
-import { CodeViewer } from '../editor/CodeViewer';
+import { CodeEditor } from '../editor/CodeEditor';
 import { MarkdownPreview } from '../md-preview/MarkdownPreview';
 import { EditorTabs } from '../editor/EditorTabs';
 import { TerminalTabs } from '../terminal/TerminalTabs';
+import { terminalManager } from '../terminal/TerminalView';
 import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
 import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } from '../workspace/WorkspaceManager';
@@ -49,7 +50,7 @@ function useKeyboardHeight() {
 
 // --- Per-workspace Editor panel (self-contained state) ---
 
-function WorkspaceEditor({ ftm }: { ftm: FileTabManager }) {
+function WorkspaceEditor({ ftm, sftpId }: { ftm: FileTabManager; sftpId: string | null }) {
   const [tabs, setTabs] = useState<FileTab[]>([]);
   const [active, setActive] = useState<FileTab | null>(null);
 
@@ -75,7 +76,13 @@ function WorkspaceEditor({ ftm }: { ftm: FileTabManager }) {
         active.type === 'markdown' ? (
           <MarkdownPreview content={active.content} visible={true} />
         ) : (
-          <CodeViewer content={active.content} fileName={active.fileName} visible={true} />
+          <CodeEditor
+            content={active.content}
+            fileName={active.fileName}
+            visible={true}
+            onContentChange={(c) => ftm.updateContent(active.id, c)}
+            onSave={() => { if (sftpId) ftm.saveFile(sftpId, active.id).catch(() => {}); }}
+          />
         )
       ) : active?.isLoading ? (
         <div style={styles.placeholder}>
@@ -395,7 +402,7 @@ export function App() {
                     flexDirection: 'column',
                   }}
                 >
-                  <WorkspaceEditor ftm={ftm} />
+                  <WorkspaceEditor ftm={ftm} sftpId={conn.sftpId} />
                 </div>
 
                 {/* Terminal — per workspace, always mounted */}
@@ -430,7 +437,18 @@ export function App() {
           })}
         </div>
 
-        {activeTab === 'terminal' && <ExtraKeyBar context="terminal" onKeyPress={() => {}} />}
+        {(activeTab === 'terminal' || activeTab === 'editor') && (
+          <ExtraKeyBar
+            context={activeTab === 'terminal' ? 'terminal' : 'code-editor'}
+            onKeyPress={(data) => {
+              if (activeTab === 'terminal') {
+                const session = terminalManager.getActiveSession();
+                if (session?.terminal) session.terminal.paste(data);
+              }
+              // Editor keys (undo/redo/save) are handled by CodeEditor's keymap
+            }}
+          />
+        )}
         <TabBar activeTab={activeTab} onTabChange={setActiveTab} extraTabs={getExtraTabs()} />
       </div>
       <DebugOverlay enabled={debugEnabled} />

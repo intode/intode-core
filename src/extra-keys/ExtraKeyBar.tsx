@@ -6,7 +6,7 @@ import {
 } from '../lib/constants';
 import { NO_TAP_HIGHLIGHT, TOUCH_SCROLL } from '../lib/styles';
 
-export type ExtraKeysContext = 'terminal' | 'code-viewer' | 'md-editor';
+export type ExtraKeysContext = 'terminal' | 'code-editor' | 'md-editor';
 type ModifierState = 'inactive' | 'active' | 'locked';
 
 export interface ExtraKeyBarProps {
@@ -26,13 +26,28 @@ const TERMINAL_KEYS: KeyDef[] = [
   { label: 'Ctrl', value: '', type: 'modifier', modifier: 'ctrl' },
   { label: 'Alt', value: '', type: 'modifier', modifier: 'alt' },
   { label: 'Tab', value: KEY_TAB, type: 'key' },
-  { label: '↑', value: KEY_UP, type: 'key' },
-  { label: '↓', value: KEY_DOWN, type: 'key' },
-  { label: '←', value: KEY_LEFT, type: 'key' },
-  { label: '→', value: KEY_RIGHT, type: 'key' },
+  { label: '\u2191', value: KEY_UP, type: 'key' },
+  { label: '\u2193', value: KEY_DOWN, type: 'key' },
+  { label: '\u2190', value: KEY_LEFT, type: 'key' },
+  { label: '\u2192', value: KEY_RIGHT, type: 'key' },
   { label: '~', value: '~', type: 'key' },
   { label: '/', value: '/', type: 'key' },
   { label: '|', value: '|', type: 'key' },
+];
+
+const EDITOR_KEYS: KeyDef[] = [
+  { label: 'Tab', value: 'tab', type: 'key' },
+  { label: 'Undo', value: 'undo', type: 'key' },
+  { label: 'Redo', value: 'redo', type: 'key' },
+  { label: 'Save', value: 'save', type: 'key' },
+  { label: '\u2191', value: KEY_UP, type: 'key' },
+  { label: '\u2193', value: KEY_DOWN, type: 'key' },
+  { label: '\u2190', value: KEY_LEFT, type: 'key' },
+  { label: '\u2192', value: KEY_RIGHT, type: 'key' },
+  { label: '{', value: '{', type: 'key' },
+  { label: '}', value: '}', type: 'key' },
+  { label: '(', value: '(', type: 'key' },
+  { label: ')', value: ')', type: 'key' },
 ];
 
 export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
@@ -41,7 +56,8 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
   const [lastCtrlTap, setLastCtrlTap] = useState(0);
   const [lastAltTap, setLastAltTap] = useState(0);
 
-  if (context !== 'terminal') return null;
+  const keys = context === 'terminal' ? TERMINAL_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
+  if (keys.length === 0) return null;
 
   const handleModifierTap = useCallback(
     (modifier: 'ctrl' | 'alt') => {
@@ -75,15 +91,16 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
 
       let data = key.value;
 
-      if (ctrlState !== 'inactive' && data.length === 1) {
-        const code = data.toUpperCase().charCodeAt(0);
-        if (code >= CTRL_CODE_A && code <= CTRL_CODE_Z) {
-          data = String.fromCharCode(code - CTRL_OFFSET);
+      if (context === 'terminal') {
+        if (ctrlState !== 'inactive' && data.length === 1) {
+          const code = data.toUpperCase().charCodeAt(0);
+          if (code >= CTRL_CODE_A && code <= CTRL_CODE_Z) {
+            data = String.fromCharCode(code - CTRL_OFFSET);
+          }
         }
-      }
-
-      if (altState !== 'inactive') {
-        data = KEY_ESC + data;
+        if (altState !== 'inactive') {
+          data = KEY_ESC + data;
+        }
       }
 
       onKeyPress(data);
@@ -91,12 +108,12 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
       if (ctrlState === 'active') setCtrlState('inactive');
       if (altState === 'active') setAltState('inactive');
     },
-    [ctrlState, altState, onKeyPress, handleModifierTap],
+    [context, ctrlState, altState, onKeyPress, handleModifierTap],
   );
 
   return (
     <div style={styles.bar}>
-      {TERMINAL_KEYS.map((key) => {
+      {keys.map((key) => {
         const isCtrlKey = key.modifier === 'ctrl';
         const isAltKey = key.modifier === 'alt';
         const modState = isCtrlKey ? ctrlState : isAltKey ? altState : 'inactive';

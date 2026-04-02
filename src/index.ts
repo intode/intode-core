@@ -39,7 +39,7 @@ export { FileTree } from './files/FileTree';
 export { FileTabManager, detectFileType } from './files/TabManager';
 
 // Editor
-export { CodeViewer } from './editor/CodeViewer';
+export { CodeEditor, CodeEditor as CodeViewer } from './editor/CodeEditor';
 
 // Markdown
 export { MarkdownPreview } from './md-preview/MarkdownPreview';

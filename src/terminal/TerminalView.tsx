@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { TerminalManager, TerminalSession } from './TerminalManager';
 import { TerminalSelection, HandlePositions } from './TerminalSelection';
+import { PinchZoom } from '../gestures/PinchZoom';
 import { Ssh } from '../ssh/index';
-import { debugLog } from '../lib/debug-log';
+import { TERMINAL_FONT_SIZE } from '../lib/constants';
 
 export interface TerminalViewProps {
   sessionId: string;
@@ -17,6 +18,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<TerminalSession | null>(null);
   const selectionRef = useRef<TerminalSelection | null>(null);
+  const pinchRef = useRef<PinchZoom | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [showCopyBar, setShowCopyBar] = useState(false);
   const [handlePos, setHandlePos] = useState<HandlePositions | null>(null);
@@ -61,6 +63,21 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
       const tmuxId = terminalId?.substring(0, 8);
       await manager.attachShell(session, sessionId, cols, rows, defaultPath, tmuxId);
 
+      // Pinch zoom for font size
+      const pinch = new PinchZoom({
+        element: container,
+        initialFontSize: TERMINAL_FONT_SIZE,
+        onFontSizeChange: (size) => {
+          session.terminal.options.fontSize = size;
+          session.fitAddon.fit();
+          if (container.offsetParent && session.terminal.cols > 0 && session.terminal.rows > 0) {
+            Ssh.resizeShell({ channelId: session.channelId, cols: session.terminal.cols, rows: session.terminal.rows });
+          }
+        },
+      });
+      pinch.attach();
+      pinchRef.current = pinch;
+
       // Focus terminal after init (visible effect can't — sessionRef is null on first render)
       setTimeout(() => {
         const el = container.querySelector('textarea.xterm-helper-textarea');
@@ -86,6 +103,8 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
       resizeObserverRef.current?.disconnect();
       selectionRef.current?.dispose();
       selectionRef.current = null;
+      pinchRef.current?.detach();
+      pinchRef.current = null;
       if (sessionRef.current) {
         manager.destroySession(sessionRef.current.id);
         sessionRef.current = null;

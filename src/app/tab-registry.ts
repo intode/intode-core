@@ -4,6 +4,8 @@ export interface TabDefinition {
   id: string;
   label: string;
   icon: string;
+  /** Sort order — core tabs use 0/10/20, settings=90. Place yours in between. */
+  order?: number;
 }
 
 export type TabRenderer = React.ComponentType<{ visible: boolean }>;

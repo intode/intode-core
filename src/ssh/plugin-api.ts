@@ -60,6 +60,7 @@ export interface SshPlugin {
   closeSftp(options: { sftpId: string }): Promise<void>;
   sftpLs(options: { sftpId: string; path: string }): Promise<{ entries: SftpEntry[] }>;
   sftpRead(options: { sftpId: string; path: string }): Promise<{ content: string; size: number }>;
+  sftpWrite(options: { sftpId: string; path: string; content: string }): Promise<void>;
   sftpStat(options: { sftpId: string; path: string }): Promise<{ stat: SftpStat }>;
 
   addListener(
