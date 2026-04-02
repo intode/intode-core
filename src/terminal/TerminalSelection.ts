@@ -2,8 +2,8 @@ import type { Terminal } from '@xterm/xterm';
 import { LONG_PRESS_DELAY_MS } from '../lib/constants';
 
 const MOVE_THRESHOLD = 10;
-const MOMENTUM_FRICTION = 0.92;
-const MOMENTUM_MIN = 0.5;
+const MOMENTUM_FRICTION = 0.96;
+const MOMENTUM_MIN = 0.3;
 
 export interface HandlePositions {
   start: { x: number; y: number };
@@ -50,7 +50,7 @@ export class TerminalSelection {
     const onTouchMove = (e: TouchEvent) => this.onTouchMove(e);
     const onTouchEnd = () => this.onTouchEnd();
 
-    element.addEventListener('touchstart', onTouchStart, { passive: true });
+    element.addEventListener('touchstart', onTouchStart, { passive: false });
     element.addEventListener('touchmove', onTouchMove, { passive: false });
     element.addEventListener('touchend', onTouchEnd, { passive: true });
 
@@ -82,6 +82,7 @@ export class TerminalSelection {
       this.cancelLongPress();
       return;
     }
+    e.preventDefault(); // Prevent keyboard show/hide on touch
     this.stopMomentum();
     const t = e.touches[0];
     this.startTouch = { x: t.clientX, y: t.clientY };
