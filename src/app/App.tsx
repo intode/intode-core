@@ -339,7 +339,7 @@ export function App() {
               }}
             />
           )}
-          <span style={{ color: '#a6e3a1', fontSize: 10, flexShrink: 0 }}>{'\u25cf'}</span>
+          <span style={{ color: 'var(--accent-green)', fontSize: 10, flexShrink: 0 }}>{'\u25cf'}</span>
           <button onClick={handleDisconnect} style={styles.disconnectBtn}>
             Disconnect
           </button>

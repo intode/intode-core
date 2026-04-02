@@ -41,15 +41,15 @@ export function DebugOverlay() {
             maxHeight: '40vh', zIndex: 998,
             backgroundColor: 'rgba(0,0,0,0.9)', borderRadius: 8,
             padding: 8, overflowY: 'auto', fontSize: 11,
-            fontFamily: 'monospace', color: '#a6e3a1',
+            fontFamily: 'monospace', color: 'var(--accent-green)',
           }}
         >
           {logs.map((l, i) => (
             <div key={i} style={{ marginBottom: 2, wordBreak: 'break-all' }}>
-              <span style={{ color: '#6c7086' }}>{l.time}</span> {l.msg}
+              <span style={{ color: 'var(--text-muted)' }}>{l.time}</span> {l.msg}
             </div>
           ))}
-          {logs.length === 0 && <div style={{ color: '#6c7086' }}>No logs yet</div>}
+          {logs.length === 0 && <div style={{ color: 'var(--text-muted)' }}>No logs yet</div>}
         </div>
       )}
     </>

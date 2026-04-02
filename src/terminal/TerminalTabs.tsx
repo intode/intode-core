@@ -104,8 +104,8 @@ const rootStyle: React.CSSProperties = {
 const barStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  backgroundColor: '#181825',
-  borderBottom: '1px solid #313244',
+  backgroundColor: 'var(--bg-mantle)',
+  borderBottom: '1px solid var(--bg-surface0)',
   flexShrink: 0,
   height: 32,
   overflowX: 'auto',
@@ -121,7 +121,7 @@ const tabStyle: React.CSSProperties = {
   fontSize: 12,
   border: 'none',
   background: 'none',
-  color: '#a6adc8',
+  color: 'var(--text-tertiary)',
   cursor: 'pointer',
   whiteSpace: 'nowrap',
   borderBottom: '2px solid transparent',
@@ -130,8 +130,8 @@ const tabStyle: React.CSSProperties = {
 };
 
 const activeTabStyle: React.CSSProperties = {
-  color: '#cdd6f4',
-  borderBottomColor: '#89b4fa',
+  color: 'var(--text-primary)',
+  borderBottomColor: 'var(--accent-blue)',
 };
 
 const closeStyle: React.CSSProperties = {
@@ -144,7 +144,7 @@ const addStyle: React.CSSProperties = {
   padding: '0 12px',
   height: 32,
   fontSize: 16,
-  color: '#a6adc8',
+  color: 'var(--text-tertiary)',
   background: 'none',
   border: 'none',
   cursor: 'pointer',

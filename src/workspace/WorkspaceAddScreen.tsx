@@ -50,9 +50,9 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
       });
       await Ssh.disconnect({ sessionId });
       setTestStatus('success');
-    } catch (e: any) {
+    } catch (e: unknown) {
       setTestStatus('fail');
-      setTestError(e?.message ?? String(e));
+      setTestError(e instanceof Error ? e.message : String(e));
     }
   };
 
@@ -127,11 +127,7 @@ const styles: Record<string, React.CSSProperties> = {
   form: { flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 },
   field: { display: 'flex', flexDirection: 'column', gap: 4 },
   label: { fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 },
-  input: {
-    backgroundColor: 'var(--bg-surface0)', border: '1px solid var(--bg-surface1)',
-    borderRadius: 8, padding: '10px 12px', color: 'var(--text-primary)',
-    fontSize: 15, outline: 'none',
-  },
+  input: INPUT_FIELD,
   testBtn: {
     padding: '10px', backgroundColor: 'transparent', color: 'var(--accent-blue)',
     border: '1px solid var(--accent-blue)', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer',

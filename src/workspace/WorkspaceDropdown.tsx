@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Workspace, getWorkspaceStore } from './WorkspaceManager';
 
-interface Props {
+interface WorkspaceDropdownProps {
   current: Workspace;
   connectedIds: Set<string>;
   onSwitch: (ws: Workspace) => void;
   onAdd: () => void;
 }
 
-export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: Props) {
+export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: WorkspaceDropdownProps) {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<Workspace[]>([]);
 
@@ -85,7 +85,7 @@ const triggerStyle: React.CSSProperties = {
 const nameStyle: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 500,
-  color: '#cdd6f4',
+  color: 'var(--text-primary)',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -93,7 +93,7 @@ const nameStyle: React.CSSProperties = {
 
 const chevronStyle: React.CSSProperties = {
   fontSize: 10,
-  color: '#a6adc8',
+  color: 'var(--text-tertiary)',
   flexShrink: 0,
 };
 
@@ -114,7 +114,7 @@ const panelStyle: React.CSSProperties = {
   width: 260,
   maxHeight: 320,
   overflowY: 'auto',
-  backgroundColor: '#313244',
+  backgroundColor: 'var(--bg-surface0)',
   borderRadius: 10,
   padding: 4,
   boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
@@ -137,7 +137,7 @@ const itemStyle: React.CSSProperties = {
 };
 
 const activeStyle: React.CSSProperties = {
-  backgroundColor: '#45475a',
+  backgroundColor: 'var(--bg-surface1)',
 };
 
 const itemInfoStyle: React.CSSProperties = {
@@ -148,7 +148,7 @@ const itemInfoStyle: React.CSSProperties = {
 const itemNameStyle: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 500,
-  color: '#cdd6f4',
+  color: 'var(--text-primary)',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -156,7 +156,7 @@ const itemNameStyle: React.CSSProperties = {
 
 const itemHostStyle: React.CSSProperties = {
   fontSize: 11,
-  color: '#a6adc8',
+  color: 'var(--text-tertiary)',
   marginTop: 2,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
@@ -164,14 +164,14 @@ const itemHostStyle: React.CSSProperties = {
 };
 
 const dotStyle: React.CSSProperties = {
-  color: '#a6e3a1',
+  color: 'var(--accent-green)',
   fontSize: 10,
   flexShrink: 0,
 };
 
 const sepStyle: React.CSSProperties = {
   height: 1,
-  backgroundColor: '#45475a',
+  backgroundColor: 'var(--bg-surface1)',
   margin: '4px 8px',
 };
 
@@ -183,7 +183,7 @@ const addBtnStyle: React.CSSProperties = {
   border: 'none',
   borderRadius: 8,
   fontSize: 13,
-  color: '#89b4fa',
+  color: 'var(--accent-blue)',
   fontWeight: 500,
   textAlign: 'left',
   cursor: 'pointer',

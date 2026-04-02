@@ -173,7 +173,7 @@ export { manager as terminalManager };
 
 // --- Selection Handle ---
 
-const HANDLE_COLOR = '#89b4fa';
+const HANDLE_COLOR = 'var(--accent-blue)';
 const HANDLE_SIZE = 18;
 const STEM_H = 8;
 const HIT_SIZE = 44;
@@ -234,7 +234,7 @@ const copyBarStyle: React.CSSProperties = {
   transform: 'translateX(-50%)',
   display: 'flex',
   alignItems: 'center',
-  backgroundColor: '#313244',
+  backgroundColor: 'var(--bg-surface0)',
   borderRadius: 8,
   padding: '2px 4px',
   boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
@@ -244,7 +244,7 @@ const copyBarStyle: React.CSSProperties = {
 const btnStyle: React.CSSProperties = {
   background: 'none',
   border: 'none',
-  color: '#cdd6f4',
+  color: 'var(--text-primary)',
   padding: '8px 16px',
   fontSize: 13,
   fontWeight: 500,
@@ -257,5 +257,5 @@ const btnStyle: React.CSSProperties = {
 const dividerStyle: React.CSSProperties = {
   width: 1,
   height: 16,
-  backgroundColor: '#45475a',
+  backgroundColor: 'var(--bg-surface1)',
 };
