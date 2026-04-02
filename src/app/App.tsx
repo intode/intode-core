@@ -254,77 +254,77 @@ export function App() {
   );
 
   // --- Screens ---
+  // Workspace view stays mounted when connections exist (preserves terminal sessions).
+  // Other screens render as overlays on top.
 
-  if (screen === 'settings') {
-    return (
-      <div style={styles.safeArea}>
-        <SettingsScreen
-          appVersion={APP_VERSION}
-          buildNumber={BUILD_NUMBER}
-          onBack={() => setScreen(connections.length > 0 ? 'workspace-view' : 'workspace-list')}
-        />
-        <DebugOverlay />
-      </div>
-    );
-  }
+  const hasConnections = connections.length > 0;
+  const showWorkspaceView = screen === 'workspace-view';
 
-  if (screen === 'workspace-list') {
-    return (
-      <div style={styles.safeArea}>
-        <WorkspaceListScreen
-          key={listKey}
-          onSelectWorkspace={handleSelectWorkspace}
-          onAddWorkspace={() => {
-            setEditingWorkspace(null);
-            setAddReturnTo('list');
-            setScreen('workspace-add');
-          }}
-          onEditWorkspace={(ws) => {
-            setEditingWorkspace(ws);
-            setAddReturnTo('list');
-            setScreen('workspace-add');
-          }}
-          onSettings={() => setScreen('settings')}
-        />
-        <DebugOverlay />
-      </div>
-    );
-  }
-
-  if (screen === 'workspace-add') {
-    return (
-      <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight }}>
-        <WorkspaceAddScreen
-          onSave={handleSaveWorkspace}
-          onCancel={() => {
-            setEditingWorkspace(null);
-            setScreen(addReturnTo === 'view' ? 'workspace-view' : 'workspace-list');
-          }}
-          editWorkspace={editingWorkspace ?? undefined}
-        />
-      </div>
-    );
-  }
-
-  if (screen === 'connecting' && connectingWorkspace) {
-    return (
-      <div style={styles.safeArea}>
-        <ConnectingScreen
-          workspace={connectingWorkspace}
-          onConnected={handleConnected}
-          onFailed={() => {}}
-          onCancel={() => {
-            setConnectingWorkspace(null);
-            setScreen(connections.length > 0 ? 'workspace-view' : 'workspace-list');
-          }}
-        />
-      </div>
-    );
-  }
-
-  // --- Workspace view: ALL workspaces stay mounted ---
   return (
-    <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight }}>
+    <>
+      {/* Overlay screens */}
+      {screen === 'settings' && (
+        <div style={styles.overlay}>
+          <SettingsScreen
+            appVersion={APP_VERSION}
+            buildNumber={BUILD_NUMBER}
+            onBack={() => setScreen(hasConnections ? 'workspace-view' : 'workspace-list')}
+          />
+          <DebugOverlay />
+        </div>
+      )}
+
+      {screen === 'workspace-list' && (
+        <div style={styles.overlay}>
+          <WorkspaceListScreen
+            key={listKey}
+            onSelectWorkspace={handleSelectWorkspace}
+            onAddWorkspace={() => {
+              setEditingWorkspace(null);
+              setAddReturnTo('list');
+              setScreen('workspace-add');
+            }}
+            onEditWorkspace={(ws) => {
+              setEditingWorkspace(ws);
+              setAddReturnTo('list');
+              setScreen('workspace-add');
+            }}
+            onSettings={() => setScreen('settings')}
+          />
+          <DebugOverlay />
+        </div>
+      )}
+
+      {screen === 'workspace-add' && (
+        <div style={{ ...styles.overlay, paddingBottom: keyboardHeight }}>
+          <WorkspaceAddScreen
+            onSave={handleSaveWorkspace}
+            onCancel={() => {
+              setEditingWorkspace(null);
+              setScreen(addReturnTo === 'view' ? 'workspace-view' : 'workspace-list');
+            }}
+            editWorkspace={editingWorkspace ?? undefined}
+          />
+        </div>
+      )}
+
+      {screen === 'connecting' && connectingWorkspace && (
+        <div style={styles.overlay}>
+          <ConnectingScreen
+            workspace={connectingWorkspace}
+            onConnected={handleConnected}
+            onFailed={() => {}}
+            onCancel={() => {
+              setConnectingWorkspace(null);
+              setScreen(hasConnections ? 'workspace-view' : 'workspace-list');
+            }}
+          />
+        </div>
+      )}
+
+      {/* Workspace view — always mounted if connected, hidden behind overlays */}
+      {hasConnections && (
+    <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight, display: showWorkspaceView ? 'flex' : 'none' }}>
       <div style={styles.container}>
         <div style={styles.statusBar}>
           {activeConn && (
@@ -407,10 +407,25 @@ export function App() {
       </div>
       <DebugOverlay />
     </div>
+      )}
+    </>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 50,
+    height: '100%',
+    paddingTop: 'env(safe-area-inset-top, 0px)',
+    backgroundColor: 'var(--bg-base)',
+    display: 'flex',
+    flexDirection: 'column',
+  },
   safeArea: {
     height: '100%',
     paddingTop: 'env(safe-area-inset-top, 0px)',
