@@ -23318,7 +23318,7 @@ const TC = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-2UkJjz2p.js").then((t) => t.jinja());
+      return import("./index-CBMRWUXI.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23340,14 +23340,14 @@ const TC = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-DS8Cl65G.js").then((t) => t.less());
+      return import("./index-BtCp7KG1.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ G.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-I5-8l0TI.js").then((t) => t.liquid());
+      return import("./index-BrmFSjyx.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23414,14 +23414,14 @@ const TC = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-BTrYQ_ri.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-BlUJZyFa.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ G.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-BTrYQ_ri.js").then((t) => t.sass());
+      return import("./index-BlUJZyFa.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23456,7 +23456,7 @@ const TC = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-CakAyhzJ.js").then((t) => t.wast());
+      return import("./index-C1oPfuKj.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -24261,13 +24261,13 @@ const TC = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-CeEBf3Zc.js").then((t) => t.vue());
+      return import("./index-UOfXxo0s.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ G.of({
     name: "Angular Template",
     load() {
-      return import("./index-B9TH2CDA.js").then((t) => t.angular());
+      return import("./index-7s2LpjEH.js").then((t) => t.angular());
     }
   })
 ], XC = ["md", "mdx", "markdown"], RC = [
@@ -59032,8 +59032,7 @@ function ghe({ sessionId: t, defaultPath: e, visible: i }) {
       y.attach(_), a.current = y;
       const { cols: S, rows: g } = $.terminal;
       await ic.attachShell($, t, S, g, e), e && e !== "~" && setTimeout(() => {
-        d || $.terminal.paste(`cd ${e}
-`);
+        d || $.terminal.paste(`cd ${e}\r`);
       }, 500);
       const w = new ResizeObserver(() => {
         const b = n.current;

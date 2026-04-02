@@ -62,7 +62,7 @@ export function TerminalView({ sessionId, defaultPath, visible }: TerminalViewPr
       // cd to workspace path after shell is ready
       if (defaultPath && defaultPath !== '~') {
         setTimeout(() => {
-          if (!cancelled) session.terminal.paste(`cd ${defaultPath}\n`);
+          if (!cancelled) session.terminal.paste(`cd ${defaultPath}\r`);
         }, 500);
       }
 
