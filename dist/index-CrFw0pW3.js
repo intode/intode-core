@@ -751,7 +751,7 @@ const rS = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   createWorkspace: hm,
   getWorkspaceStore: jn,
   setWorkspaceStore: iS
-}, Symbol.toStringTag, { value: "Module" })), um = '"Fira Code", "Source Code Pro", "Menlo", monospace', dm = 14, nS = 1.2, sS = 1e3, aS = 3, oS = 4.5, lS = 8, OS = 32, Cl = 22, cS = 10485760, hS = 300, fm = 500, pm = "\x1B", uS = "	", dS = "\x1B[A", fS = "\x1B[B", pS = "\x1B[D", gS = "\x1B[C", mS = 65, _S = 90, $S = 64, QS = {
+}, Symbol.toStringTag, { value: "Module" })), um = '"Fira Code", "Source Code Pro", "Menlo", monospace, "Noto Sans CJK KR", sans-serif', dm = 14, nS = 1.2, sS = 1e3, aS = 3, oS = 4.5, lS = 8, OS = 32, Cl = 22, cS = 10485760, hS = 300, fm = 500, pm = "\x1B", uS = "	", dS = "\x1B[A", fS = "\x1B[B", pS = "\x1B[D", gS = "\x1B[C", mS = 65, _S = 90, $S = 64, QS = {
   background: "#1e1e2e",
   foreground: "#cdd6f4",
   cursor: "#f5e0dc",
@@ -23318,7 +23318,7 @@ const TC = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-CZMkqmp7.js").then((t) => t.jinja());
+      return import("./index-C-epSXfP.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23340,14 +23340,14 @@ const TC = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-pybhlH8I.js").then((t) => t.less());
+      return import("./index-BUola8sY.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ G.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-B-W85RTF.js").then((t) => t.liquid());
+      return import("./index-CoWuQNL5.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23414,14 +23414,14 @@ const TC = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-_NOIB5Cm.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-DfWRs-dS.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ G.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-_NOIB5Cm.js").then((t) => t.sass());
+      return import("./index-DfWRs-dS.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -23456,7 +23456,7 @@ const TC = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-RL37EEYF.js").then((t) => t.wast());
+      return import("./index-C_xfU23F.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ G.of({
@@ -24261,13 +24261,13 @@ const TC = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-yLkzm0vP.js").then((t) => t.vue());
+      return import("./index--NGoky7f.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ G.of({
     name: "Angular Template",
     load() {
-      return import("./index-CTlXn6Wl.js").then((t) => t.angular());
+      return import("./index-DkA6vw4D.js").then((t) => t.angular());
     }
   })
 ], XC = ["md", "mdx", "markdown"], RC = [
@@ -58781,8 +58781,9 @@ class uhe {
       const i = this.channelId && e.channelId === this.channelId;
       if (pi(`shellData #${this.dataCount} match=${i} len=${((r = e.data) == null ? void 0 : r.length) ?? 0}`), i)
         try {
-          const n = atob(e.data), a = n.slice(0, 40).replace(/[\x00-\x1f]/g, ".");
-          pi(`terminal.write ${n.length}b cols=${this.terminal.cols} rows=${this.terminal.rows} "${a}"`), this.terminal.write(n);
+          const n = atob(e.data), a = new Uint8Array(n.length);
+          for (let o = 0; o < n.length; o++) a[o] = n.charCodeAt(o);
+          pi(`terminal.write ${a.length}b cols=${this.terminal.cols} rows=${this.terminal.rows}`), this.terminal.write(a);
         } catch (n) {
           pi(`decode error: ${n}`);
         }

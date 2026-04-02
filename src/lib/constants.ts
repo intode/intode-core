@@ -1,5 +1,5 @@
 // === Font ===
-export const FONT_MONO = '"Fira Code", "Source Code Pro", "Menlo", monospace';
+export const FONT_MONO = '"Fira Code", "Source Code Pro", "Menlo", monospace, "Noto Sans CJK KR", sans-serif';
 
 // === Terminal ===
 export const TERMINAL_FONT_SIZE = 14;

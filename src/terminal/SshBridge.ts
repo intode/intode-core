@@ -19,9 +19,11 @@ export class SshBridge {
       if (match) {
         try {
           const binaryStr = atob(event.data);
-          const preview = binaryStr.slice(0, 40).replace(/[\x00-\x1f]/g, '.');
-          debugLog(`terminal.write ${binaryStr.length}b cols=${this.terminal.cols} rows=${this.terminal.rows} "${preview}"`);
-          this.terminal.write(binaryStr);
+          // Convert Latin1 binary string to Uint8Array for correct UTF-8 decoding
+          const bytes = new Uint8Array(binaryStr.length);
+          for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+          debugLog(`terminal.write ${bytes.length}b cols=${this.terminal.cols} rows=${this.terminal.rows}`);
+          this.terminal.write(bytes);
         } catch (e) {
           debugLog(`decode error: ${e}`);
         }
