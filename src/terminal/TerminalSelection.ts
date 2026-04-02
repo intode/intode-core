@@ -3,6 +3,11 @@ import { LONG_PRESS_DELAY_MS } from '../lib/constants';
 
 const MOVE_THRESHOLD = 10;
 
+export interface HandlePositions {
+  start: { x: number; y: number };
+  end: { x: number; y: number };
+}
+
 export interface SelectionCallbacks {
   onSelectionStart: () => void;
   onSelectionChange: (hasSelection: boolean) => void;
@@ -15,7 +20,15 @@ export class TerminalSelection {
   private startTouch: { x: number; y: number } | null = null;
   private anchorCol = 0;
   private anchorRow = 0;
+  private selStartCol = 0;
+  private selStartRow = 0;
+  private selEndCol = 0;
+  private selEndRow = 0;
+  private containerEl: HTMLElement | null = null;
   private disposables: (() => void)[] = [];
+
+  /** Set true during handle drag to suppress terminal touch events */
+  isHandleDrag = false;
 
   constructor(
     private terminal: Terminal,
@@ -23,6 +36,8 @@ export class TerminalSelection {
   ) {}
 
   attach(element: HTMLElement): void {
+    this.containerEl = element;
+
     const onTouchStart = (e: TouchEvent) => this.onTouchStart(e);
     const onTouchMove = (e: TouchEvent) => this.onTouchMove(e);
     const onTouchEnd = () => this.onTouchEnd();
@@ -47,11 +62,13 @@ export class TerminalSelection {
     this.cancelLongPress();
     for (const fn of this.disposables) fn();
     this.disposables = [];
+    this.containerEl = null;
   }
 
   // --- Touch handlers ---
 
   private onTouchStart(e: TouchEvent) {
+    if (this.isHandleDrag) return;
     if (e.touches.length !== 1) {
       this.cancelLongPress();
       return;
@@ -67,6 +84,7 @@ export class TerminalSelection {
   }
 
   private onTouchMove(e: TouchEvent) {
+    if (this.isHandleDrag) return;
     if (!this.startTouch || e.touches.length !== 1) return;
     const t = e.touches[0];
     const dx = t.clientX - this.startTouch.x;
@@ -85,11 +103,11 @@ export class TerminalSelection {
   }
 
   private onTouchEnd() {
+    if (this.isHandleDrag) return;
     const wasSelecting = this.isDragging;
     this.cancelLongPress();
     this.isDragging = false;
 
-    // Single tap (no movement, no drag) dismisses selection
     if (!wasSelecting && !this.wasMoved && this.terminal.hasSelection()) {
       this.terminal.clearSelection();
     }
@@ -106,6 +124,10 @@ export class TerminalSelection {
     const { start, length } = this.wordAt(pos.col, pos.bufRow);
     this.anchorCol = start;
     this.anchorRow = pos.vpRow;
+    this.selStartCol = start;
+    this.selStartRow = pos.vpRow;
+    this.selEndCol = start + length - 1;
+    this.selEndRow = pos.vpRow;
     this.terminal.select(start, pos.vpRow, length);
 
     this.isDragging = true;
@@ -116,21 +138,24 @@ export class TerminalSelection {
     const pos = this.toBufPos(clientX, clientY);
     if (!pos) return;
 
-    let startCol: number, startRow: number, endCol: number, endRow: number;
     if (pos.vpRow < this.anchorRow || (pos.vpRow === this.anchorRow && pos.col < this.anchorCol)) {
-      startCol = pos.col;
-      startRow = pos.vpRow;
-      endCol = this.anchorCol;
-      endRow = this.anchorRow;
+      this.selStartCol = pos.col;
+      this.selStartRow = pos.vpRow;
+      this.selEndCol = this.anchorCol;
+      this.selEndRow = this.anchorRow;
     } else {
-      startCol = this.anchorCol;
-      startRow = this.anchorRow;
-      endCol = pos.col;
-      endRow = pos.vpRow;
+      this.selStartCol = this.anchorCol;
+      this.selStartRow = this.anchorRow;
+      this.selEndCol = pos.col;
+      this.selEndRow = pos.vpRow;
     }
 
-    const len = (endRow - startRow) * this.terminal.cols + (endCol - startCol) + 1;
-    this.terminal.select(startCol, startRow, Math.max(1, len));
+    this.applySelection();
+  }
+
+  private applySelection(): void {
+    const len = (this.selEndRow - this.selStartRow) * this.terminal.cols + (this.selEndCol - this.selStartCol) + 1;
+    this.terminal.select(this.selStartCol, this.selStartRow, Math.max(1, len));
   }
 
   private wordAt(col: number, bufRow: number): { start: number; length: number } {
@@ -154,12 +179,17 @@ export class TerminalSelection {
 
   // --- Coordinate conversion ---
 
+  private getCellDims(): { cellW: number; cellH: number } | null {
+    const core = (this.terminal as any)._core;
+    const dims = core?._renderService?.dimensions;
+    if (!dims) return null;
+    return { cellW: dims.css.cell.width, cellH: dims.css.cell.height };
+  }
+
   private toBufPos(clientX: number, clientY: number): { col: number; vpRow: number; bufRow: number } | null {
     const el = this.terminal.element;
     if (!el) return null;
-
-    const core = (this.terminal as any)._core;
-    const dims = core?._renderService?.dimensions;
+    const dims = this.getCellDims();
     if (!dims) return null;
 
     const screen = el.querySelector('.xterm-screen');
@@ -169,8 +199,8 @@ export class TerminalSelection {
     const x = clientX - rect.left;
     const y = clientY - rect.top;
 
-    const col = Math.max(0, Math.min(this.terminal.cols - 1, Math.floor(x / dims.css.cell.width)));
-    const vpRow = Math.max(0, Math.min(this.terminal.rows - 1, Math.floor(y / dims.css.cell.height)));
+    const col = Math.max(0, Math.min(this.terminal.cols - 1, Math.floor(x / dims.cellW)));
+    const vpRow = Math.max(0, Math.min(this.terminal.rows - 1, Math.floor(y / dims.cellH)));
     const bufRow = vpRow + this.terminal.buffer.active.viewportY;
 
     return { col, vpRow, bufRow };
@@ -181,6 +211,56 @@ export class TerminalSelection {
       clearTimeout(this.longPressTimer);
       this.longPressTimer = null;
     }
+  }
+
+  // --- Handle positions (relative to container) ---
+
+  getHandlePositions(): HandlePositions | null {
+    if (!this.terminal.hasSelection()) return null;
+    const dims = this.getCellDims();
+    if (!dims) return null;
+
+    const screen = this.terminal.element?.querySelector('.xterm-screen');
+    const container = this.containerEl;
+    if (!screen || !container) return null;
+
+    const sr = screen.getBoundingClientRect();
+    const cr = container.getBoundingClientRect();
+    const ox = sr.left - cr.left;
+    const oy = sr.top - cr.top;
+
+    return {
+      start: {
+        x: ox + this.selStartCol * dims.cellW,
+        y: oy + (this.selStartRow + 1) * dims.cellH,
+      },
+      end: {
+        x: ox + (this.selEndCol + 1) * dims.cellW,
+        y: oy + (this.selEndRow + 1) * dims.cellH,
+      },
+    };
+  }
+
+  moveHandle(which: 'start' | 'end', clientX: number, clientY: number): void {
+    const pos = this.toBufPos(clientX, clientY);
+    if (!pos) return;
+
+    if (which === 'start') {
+      this.selStartCol = pos.col;
+      this.selStartRow = pos.vpRow;
+    } else {
+      this.selEndCol = pos.col;
+      this.selEndRow = pos.vpRow;
+    }
+
+    // Ensure start <= end
+    if (this.selStartRow > this.selEndRow ||
+        (this.selStartRow === this.selEndRow && this.selStartCol > this.selEndCol)) {
+      [this.selStartCol, this.selEndCol] = [this.selEndCol, this.selStartCol];
+      [this.selStartRow, this.selEndRow] = [this.selEndRow, this.selStartRow];
+    }
+
+    this.applySelection();
   }
 
   // --- Public actions ---
@@ -197,6 +277,10 @@ export class TerminalSelection {
 
   selectAll(): void {
     this.terminal.selectAll();
+    this.selStartCol = 0;
+    this.selStartRow = 0;
+    this.selEndCol = this.terminal.cols - 1;
+    this.selEndRow = this.terminal.rows - 1;
   }
 
   async paste(): Promise<void> {

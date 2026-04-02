@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { TerminalManager, TerminalSession } from './TerminalManager';
-import { TerminalSelection } from './TerminalSelection';
+import { TerminalSelection, HandlePositions } from './TerminalSelection';
 import { Ssh } from '../ssh/index';
 import { debugLog } from '../lib/debug-log';
 
@@ -17,10 +17,14 @@ export function TerminalView({ sessionId, visible }: TerminalViewProps) {
   const selectionRef = useRef<TerminalSelection | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [showCopyBar, setShowCopyBar] = useState(false);
+  const [handlePos, setHandlePos] = useState<HandlePositions | null>(null);
+
+  const refreshHandles = useCallback(() => {
+    setHandlePos(selectionRef.current?.getHandlePositions() ?? null);
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || !sessionId) return;
-
     let cancelled = false;
 
     async function init() {
@@ -34,10 +38,19 @@ export function TerminalView({ sessionId, visible }: TerminalViewProps) {
       session.terminal.open(container);
       session.fitAddon.fit();
 
-      // Touch selection
       const sel = new TerminalSelection(session.terminal, {
-        onSelectionStart: () => setShowCopyBar(true),
-        onSelectionChange: (has) => { if (!has) setShowCopyBar(false); },
+        onSelectionStart: () => {
+          setShowCopyBar(true);
+          requestAnimationFrame(() => setHandlePos(sel.getHandlePositions()));
+        },
+        onSelectionChange: (has) => {
+          if (!has) {
+            setShowCopyBar(false);
+            setHandlePos(null);
+          } else {
+            setHandlePos(sel.getHandlePositions());
+          }
+        },
       });
       sel.attach(container);
       selectionRef.current = sel;
@@ -80,28 +93,59 @@ export function TerminalView({ sessionId, visible }: TerminalViewProps) {
     selectionRef.current?.copySelection();
     selectionRef.current?.clearSelection();
     setShowCopyBar(false);
+    setHandlePos(null);
   }, []);
 
   const handlePaste = useCallback(() => {
     selectionRef.current?.paste();
     selectionRef.current?.clearSelection();
     setShowCopyBar(false);
+    setHandlePos(null);
   }, []);
 
   const handleSelectAll = useCallback(() => {
     selectionRef.current?.selectAll();
+    refreshHandles();
+  }, [refreshHandles]);
+
+  const startHandleDrag = useCallback((which: 'start' | 'end') => {
+    const sel = selectionRef.current;
+    if (!sel) return;
+    sel.isHandleDrag = true;
+
+    const onMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      sel.moveHandle(which, t.clientX, t.clientY);
+      requestAnimationFrame(() => setHandlePos(sel.getHandlePositions()));
+    };
+
+    const onEnd = () => {
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onEnd);
+      sel.isHandleDrag = false;
+    };
+
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onEnd);
   }, []);
 
   return (
     <div style={wrapperStyle}>
       <div
         ref={containerRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'var(--term-bg)',
-        }}
+        style={{ width: '100%', height: '100%', backgroundColor: 'var(--term-bg)' }}
       />
+
+      {handlePos && (
+        <>
+          <Handle x={handlePos.start.x} y={handlePos.start.y} side="start"
+            onDragStart={() => startHandleDrag('start')} />
+          <Handle x={handlePos.end.x} y={handlePos.end.y} side="end"
+            onDragStart={() => startHandleDrag('end')} />
+        </>
+      )}
+
       {showCopyBar && (
         <div style={copyBarStyle}>
           <button onClick={handleCopy} style={btnStyle}>Copy</button>
@@ -116,6 +160,56 @@ export function TerminalView({ sessionId, visible }: TerminalViewProps) {
 }
 
 export { manager as terminalManager };
+
+// --- Selection Handle ---
+
+const HANDLE_COLOR = '#89b4fa';
+const HANDLE_SIZE = 18;
+const STEM_H = 8;
+const HIT_SIZE = 44;
+
+function Handle({ x, y, side, onDragStart }: {
+  x: number; y: number; side: 'start' | 'end'; onDragStart: () => void;
+}) {
+  const offset = side === 'start' ? -(HANDLE_SIZE / 2) : 0;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: x - HIT_SIZE / 2,
+        top: y,
+        width: HIT_SIZE,
+        height: HIT_SIZE,
+        zIndex: 101,
+        touchAction: 'none',
+      }}
+      onTouchStart={(e) => { e.stopPropagation(); onDragStart(); }}
+    >
+      {/* Stem */}
+      <div style={{
+        position: 'absolute',
+        left: (HIT_SIZE - 2) / 2,
+        top: 0,
+        width: 2,
+        height: STEM_H,
+        backgroundColor: HANDLE_COLOR,
+      }} />
+      {/* Circle */}
+      <div style={{
+        position: 'absolute',
+        left: (HIT_SIZE - HANDLE_SIZE) / 2 + offset,
+        top: STEM_H,
+        width: HANDLE_SIZE,
+        height: HANDLE_SIZE,
+        borderRadius: '50%',
+        backgroundColor: HANDLE_COLOR,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+      }} />
+    </div>
+  );
+}
+
+// --- Styles ---
 
 const wrapperStyle: React.CSSProperties = {
   width: '100%',
