@@ -475,8 +475,19 @@ export function App() {
           <ExtraKeyBar
             context={activeTab === 'terminal' ? 'terminal' : 'code-editor'}
             onKeyPress={(data) => {
+              // Keyboard toggle
+              if (data === 'keyboard') {
+                if (activeTab === 'terminal') {
+                  const el = document.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
+                  if (el) { if (document.activeElement === el) el.blur(); else el.focus(); }
+                } else if (activeTab === 'editor') {
+                  const cm = document.querySelector('.cm-content') as HTMLElement | null;
+                  if (cm) { if (document.activeElement === cm) cm.blur(); else cm.focus(); }
+                }
+                return;
+              }
+
               if (activeTab === 'terminal') {
-                // Send directly to SSH (bypasses xterm paste bracketing)
                 const session = terminalManager.getActiveSession();
                 if (session?.channelId) {
                   Ssh.writeToShell({ channelId: session.channelId, data: encodeUtf8Base64(data) }).catch(() => {});

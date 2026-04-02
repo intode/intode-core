@@ -24428,7 +24428,7 @@ const XY = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-IgwM5CNk.js").then((t) => t.jinja());
+      return import("./index-DfzPe061.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24450,14 +24450,14 @@ const XY = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-B1w-eEfm.js").then((t) => t.less());
+      return import("./index-Bgsx9SCA.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-1Hl3xHhI.js").then((t) => t.liquid());
+      return import("./index-Dlx6S5XJ.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24524,14 +24524,14 @@ const XY = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-KJWEve0_.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-HRh_dlwx.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ L.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-KJWEve0_.js").then((t) => t.sass());
+      return import("./index-HRh_dlwx.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24566,7 +24566,7 @@ const XY = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-D_n-g8gb.js").then((t) => t.wast());
+      return import("./index-diQBjzw_.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -25371,13 +25371,13 @@ const XY = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-DOmh0-5F.js").then((t) => t.vue());
+      return import("./index-DtOzcZkA.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Angular Template",
     load() {
-      return import("./index-BAz09nEP.js").then((t) => t.angular());
+      return import("./index-DRH-fbVk.js").then((t) => t.angular());
     }
   })
 ], RY = ["md", "mdx", "markdown"], zY = [
@@ -58651,6 +58651,7 @@ const Sfe = {
   flex: 1,
   position: "relative"
 }, Xfe = [
+  { label: "⌨", value: "keyboard" },
   { label: "Esc", value: Fk },
   { label: "Tab", value: Hk },
   { label: "C-c", value: "" },
@@ -58670,6 +58671,7 @@ const Sfe = {
   { label: "←", value: ka },
   { label: "→", value: wa }
 ], Rfe = [
+  { label: "⌨", value: "keyboard" },
   { label: "Save", value: "save" },
   { label: "Undo", value: "undo" },
   { label: "Redo", value: "redo" },
@@ -58694,6 +58696,7 @@ function Cfe({ keyDef: t, onPress: e }) {
     "button",
     {
       tabIndex: -1,
+      onMouseDown: (i) => i.preventDefault(),
       onPointerDown: (i) => {
         i.preventDefault(), r.current = { x: i.clientX, y: i.clientY };
       },
@@ -58715,6 +58718,7 @@ function xo({ keyDef: t, onPress: e }) {
     "button",
     {
       tabIndex: -1,
+      onMouseDown: (r) => r.preventDefault(),
       onPointerDown: (r) => {
         r.preventDefault(), e(t.value);
       },
@@ -59152,6 +59156,16 @@ function npe() {
           {
             context: i === "terminal" ? "terminal" : "code-editor",
             onKeyPress: (Z) => {
+              if (Z === "keyboard") {
+                if (i === "terminal") {
+                  const j = document.querySelector(".xterm-helper-textarea");
+                  j && (document.activeElement === j ? j.blur() : j.focus());
+                } else if (i === "editor") {
+                  const j = document.querySelector(".cm-content");
+                  j && (document.activeElement === j ? j.blur() : j.focus());
+                }
+                return;
+              }
               if (i === "terminal") {
                 const j = Fo.getActiveSession();
                 j != null && j.channelId && _t.writeToShell({ channelId: j.channelId, data: sO(Z) }).catch(() => {

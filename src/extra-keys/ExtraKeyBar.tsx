@@ -17,6 +17,7 @@ interface KeyDef {
 }
 
 const TERMINAL_KEYS: KeyDef[] = [
+  { label: '\u2328', value: 'keyboard' },
   { label: 'Esc', value: KEY_ESC },
   { label: 'Tab', value: KEY_TAB },
   { label: 'C-c', value: '\x03' },
@@ -38,6 +39,7 @@ const TERMINAL_KEYS: KeyDef[] = [
 ];
 
 const EDITOR_KEYS: KeyDef[] = [
+  { label: '\u2328', value: 'keyboard' },
   { label: 'Save', value: 'save' },
   { label: 'Undo', value: 'undo' },
   { label: 'Redo', value: 'redo' },
@@ -65,6 +67,7 @@ function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) =
   return (
     <button
       tabIndex={-1}
+      onMouseDown={(e) => e.preventDefault()}
       onPointerDown={(e) => { e.preventDefault(); startPos.current = { x: e.clientX, y: e.clientY }; }}
       onPointerUp={(e) => {
         if (!startPos.current) return;
@@ -88,6 +91,7 @@ function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) 
   return (
     <button
       tabIndex={-1}
+      onMouseDown={(e) => e.preventDefault()}
       onPointerDown={(e) => { e.preventDefault(); onPress(keyDef.value); }}
       style={dpadKeyStyle}
     >
