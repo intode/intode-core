@@ -76,9 +76,6 @@ function WorkspaceEditor({ ftm, sftpId }: { ftm: FileTabManager; sftpId: string 
         onClose={(id) => ftm.closeTab(id)}
       />
       {active?.content != null ? (
-        active.type === 'markdown' ? (
-          <MarkdownPreview content={active.content} visible={true} />
-        ) : (
           <CodeEditor
             content={active.content}
             fileName={active.fileName}
@@ -86,7 +83,6 @@ function WorkspaceEditor({ ftm, sftpId }: { ftm: FileTabManager; sftpId: string 
             onContentChange={(c) => ftm.updateContent(active.id, c)}
             onSave={() => { if (sftpId) ftm.saveFile(sftpId, active.id).catch(() => {}); }}
           />
-        )
       ) : active?.isLoading ? (
         <div style={styles.placeholder}>
           <span style={{ color: 'var(--text-muted)' }}>Loading...</span>

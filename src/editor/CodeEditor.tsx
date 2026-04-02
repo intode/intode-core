@@ -3,7 +3,7 @@ import { EditorState, Extension, Compartment } from '@codemirror/state';
 import { EditorView, lineNumbers, highlightActiveLine, keymap } from '@codemirror/view';
 import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import {
-  defaultKeymap, indentWithTab, undo, redo,
+  defaultKeymap, historyKeymap, indentWithTab, history, undo, redo,
   cursorLineUp, cursorLineDown, cursorCharLeft, cursorCharRight,
 } from '@codemirror/commands';
 import { getLanguageExtension } from './languages';
@@ -124,8 +124,10 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
           darkTheme,
           fontSizeCompartment.of(makeFontSizeTheme(TERMINAL_FONT_SIZE)),
           EditorView.lineWrapping,
+          history(),
           keymap.of([
             ...defaultKeymap,
+            ...historyKeymap,
             indentWithTab,
             { key: 'Mod-s', run: () => { onSaveRef.current?.(); return true; } },
           ]),
