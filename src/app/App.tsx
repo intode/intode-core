@@ -19,8 +19,8 @@ import '../themes/dark.css';
 
 type Screen = 'workspace-list' | 'workspace-add' | 'connecting' | 'workspace-view' | 'settings';
 
-export const APP_VERSION = '1.0.6';
-export const BUILD_NUMBER = '7';
+export const APP_VERSION = __APP_VERSION__;
+export const BUILD_NUMBER = __BUILD_NUMBER__;
 
 const fileTabManager = new FileTabManager();
 

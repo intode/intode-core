@@ -19,12 +19,9 @@ export class SshBridge {
       if (match) {
         try {
           const binaryStr = atob(event.data);
-          const bytes = new Uint8Array(binaryStr.length);
-          for (let i = 0; i < binaryStr.length; i++) {
-            bytes[i] = binaryStr.charCodeAt(i);
-          }
-          debugLog(`terminal.write ${bytes.length} bytes`);
-          this.terminal.write(bytes);
+          const preview = binaryStr.slice(0, 40).replace(/[\x00-\x1f]/g, '.');
+          debugLog(`terminal.write ${binaryStr.length}b cols=${this.terminal.cols} rows=${this.terminal.rows} "${preview}"`);
+          this.terminal.write(binaryStr);
         } catch (e) {
           debugLog(`decode error: ${e}`);
         }
@@ -37,8 +34,15 @@ export class SshBridge {
     this.channelId = channelId;
     debugLog(`SshBridge: attached channelId=${channelId}`);
     this.onDataDisposable = this.terminal.onData((data) => {
-      debugLog(`terminal.onData: ${data.length} chars → writeToShell`);
-      Ssh.writeToShell({ channelId, data: btoa(data) });
+      const hex = Array.from(data).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+      debugLog(`onData ${data.length}ch [${hex}] → write`);
+      // Encode as UTF-8 bytes then base64 (btoa only supports Latin1)
+      const bytes = new TextEncoder().encode(data);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+      Ssh.writeToShell({ channelId, data: btoa(binary) }).then((r: any) => {
+        if (r?.diag) debugLog(`write ok: ${r.diag}`);
+      }).catch((e: any) => debugLog(`write err: ${e}`));
     });
   }
 
