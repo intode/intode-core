@@ -3,11 +3,12 @@ import { Workspace, getWorkspaceStore } from './WorkspaceManager';
 
 interface Props {
   current: Workspace;
+  connectedIds: Set<string>;
   onSwitch: (ws: Workspace) => void;
   onAdd: () => void;
 }
 
-export function WorkspaceDropdown({ current, onSwitch, onAdd }: Props) {
+export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: Props) {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<Workspace[]>([]);
 
@@ -44,7 +45,7 @@ export function WorkspaceDropdown({ current, onSwitch, onAdd }: Props) {
                     {ws.username}@{ws.host}
                   </div>
                 </div>
-                {ws.id === current.id && <span style={dotStyle}>{'\u25cf'}</span>}
+                {connectedIds.has(ws.id) && <span style={dotStyle}>{'\u25cf'}</span>}
               </button>
             ))}
             <div style={sepStyle} />

@@ -10,7 +10,7 @@ import { FileTree } from '../files/FileTree';
 import { CodeViewer } from '../editor/CodeViewer';
 import { MarkdownPreview } from '../md-preview/MarkdownPreview';
 import { EditorTabs } from '../editor/EditorTabs';
-import { TerminalView } from '../terminal/TerminalView';
+import { TerminalTabs } from '../terminal/TerminalTabs';
 import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
 import { createWorkspace, Workspace, CreateWorkspaceData } from '../workspace/WorkspaceManager';
@@ -23,7 +23,13 @@ type Screen = 'workspace-list' | 'workspace-add' | 'connecting' | 'workspace-vie
 export const APP_VERSION = __APP_VERSION__;
 export const BUILD_NUMBER = __BUILD_NUMBER__;
 
-const fileTabManager = new FileTabManager();
+interface ConnectedWorkspace {
+  wsId: string;
+  workspace: Workspace;
+  sessionId: string;
+  sftpId: string | null;
+  sftpError: string | null;
+}
 
 function useKeyboardHeight() {
   const [height, setHeight] = useState(0);
@@ -44,149 +50,181 @@ export function App() {
   const keyboardHeight = useKeyboardHeight();
   const [screen, setScreen] = useState<Screen>('workspace-list');
   const [activeTab, setActiveTab] = useState<TabId>('terminal');
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [sftpId, setSftpId] = useState<string | null>(null);
-  const [sftpError, setSftpError] = useState<string | null>(null);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
+
+  // Multi-workspace: keep all connections alive
+  const [connections, setConnections] = useState<ConnectedWorkspace[]>([]);
+  const [activeWsId, setActiveWsId] = useState<string | null>(null);
+  const [connectingWorkspace, setConnectingWorkspace] = useState<Workspace | null>(null);
+
   const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(null);
+  const [addReturnTo, setAddReturnTo] = useState<'list' | 'view'>('list');
   const [listKey, setListKey] = useState(0);
+
+  // Per-workspace FileTabManagers
+  const ftmRef = useRef(new Map<string, FileTabManager>());
   const [fileTabs, setFileTabs] = useState<FileTab[]>([]);
   const [activeFileTab, setActiveFileTab] = useState<FileTab | null>(null);
-  const [addReturnTo, setAddReturnTo] = useState<'list' | 'view'>('list');
-  const terminalContainerRef = useRef<HTMLDivElement>(null);
 
-  // FileTabManager change listener
+  // Derived
+  const activeConn = connections.find((c) => c.wsId === activeWsId) ?? null;
+  const connectedIds = new Set(connections.map((c) => c.wsId));
+
+  const getFileTabMgr = useCallback((wsId: string): FileTabManager => {
+    let mgr = ftmRef.current.get(wsId);
+    if (!mgr) {
+      mgr = new FileTabManager();
+      ftmRef.current.set(wsId, mgr);
+    }
+    return mgr;
+  }, []);
+
+  // Sync file tab state when active workspace changes
   useEffect(() => {
-    fileTabManager.setOnChange(() => {
-      setFileTabs([...fileTabManager.getTabs()]);
-      setActiveFileTab(fileTabManager.getActiveTab());
-    });
-  }, []);
-
-  // Auto-focus terminal on tab switch to show keyboard
-  useEffect(() => {
-    if (activeTab === 'terminal' && screen === 'workspace-view') {
-      setTimeout(() => {
-        const el = terminalContainerRef.current?.querySelector('textarea.xterm-helper-textarea');
-        if (el instanceof HTMLTextAreaElement) el.focus();
-      }, 100);
+    if (!activeWsId) {
+      setFileTabs([]);
+      setActiveFileTab(null);
+      return;
     }
-  }, [activeTab, screen]);
+    const mgr = getFileTabMgr(activeWsId);
+    const sync = () => {
+      setFileTabs([...mgr.getTabs()]);
+      setActiveFileTab(mgr.getActiveTab());
+    };
+    mgr.setOnChange(sync);
+    sync();
+    return () => mgr.setOnChange(() => {});
+  }, [activeWsId, getFileTabMgr]);
 
-  const handleSelectWorkspace = useCallback((ws: Workspace) => {
-    setSelectedWorkspace(ws);
-    setScreen('connecting');
-  }, []);
+  // --- Handlers ---
 
-  const handleConnected = useCallback(async (sid: string) => {
-    debugLog(`Connected sessionId=${sid}`);
-    setSessionId(sid);
-    setSftpError(null);
-    try {
-      const { sftpId: id } = await Ssh.openSftp({ sessionId: sid });
-      debugLog(`SFTP opened sftpId=${id}`);
-      setSftpId(id);
-    } catch (e) {
-      debugLog(`SFTP error: ${e}`);
-      setSftpError(String(e));
-    }
-    setScreen('workspace-view');
-    setActiveTab('terminal');
-  }, []);
-
-  const handleSwitchWorkspace = useCallback(async (ws: Workspace) => {
-    if (ws.id === selectedWorkspace?.id) return;
-    // Disconnect current
-    if (sessionId) {
-      try {
-        if (sftpId) await Ssh.closeSftp({ sftpId });
-        await Ssh.disconnect({ sessionId });
-      } catch { /* ignore */ }
-    }
-    setSessionId(null);
-    setSftpId(null);
-    setSftpError(null);
-    for (const tab of fileTabManager.getTabs()) fileTabManager.closeTab(tab.id);
-    // Connect to new
-    setSelectedWorkspace(ws);
-    setScreen('connecting');
-  }, [sessionId, sftpId, selectedWorkspace]);
-
-  const handleSaveWorkspace = useCallback(async (data: CreateWorkspaceData, password: string) => {
-    let newWs: Workspace | null = null;
-    if (editingWorkspace) {
-      const store = (await import('../workspace/WorkspaceManager')).getWorkspaceStore();
-      await store.update(editingWorkspace.id, data);
-      if (password) await store.savePassword(editingWorkspace.id, password);
-      setEditingWorkspace(null);
-    } else {
-      newWs = await createWorkspace(data, password);
-    }
-    setListKey(k => k + 1);
-
-    if (addReturnTo === 'view' && newWs) {
-      // Disconnect current and connect to newly created workspace
-      if (sessionId) {
-        try {
-          if (sftpId) await Ssh.closeSftp({ sftpId });
-          await Ssh.disconnect({ sessionId });
-        } catch { /* ignore */ }
+  const handleSelectWorkspace = useCallback(
+    (ws: Workspace) => {
+      const existing = connections.find((c) => c.wsId === ws.id);
+      if (existing) {
+        setActiveWsId(ws.id);
+        if (screen !== 'workspace-view') setScreen('workspace-view');
+        return;
       }
-      setSessionId(null);
-      setSftpId(null);
-      setSftpError(null);
-      for (const tab of fileTabManager.getTabs()) fileTabManager.closeTab(tab.id);
-      setSelectedWorkspace(newWs);
+      setConnectingWorkspace(ws);
       setScreen('connecting');
-    } else if (addReturnTo === 'view') {
+    },
+    [connections, screen],
+  );
+
+  const handleConnected = useCallback(
+    async (sid: string) => {
+      const ws = connectingWorkspace;
+      if (!ws) return;
+      debugLog(`Connected sessionId=${sid}`);
+
+      let sftpId: string | null = null;
+      let sftpError: string | null = null;
+      try {
+        const res = await Ssh.openSftp({ sessionId: sid });
+        sftpId = res.sftpId;
+        debugLog(`SFTP opened sftpId=${sftpId}`);
+      } catch (e) {
+        debugLog(`SFTP error: ${e}`);
+        sftpError = String(e);
+      }
+
+      setConnections((prev) => [...prev, { wsId: ws.id, workspace: ws, sessionId: sid, sftpId, sftpError }]);
+      setActiveWsId(ws.id);
+      setConnectingWorkspace(null);
       setScreen('workspace-view');
-    } else {
-      setScreen('workspace-list');
-    }
-  }, [editingWorkspace, addReturnTo, sessionId, sftpId]);
-
-  const handleFileSelect = useCallback(async (path: string) => {
-    if (!sftpId) return;
-    const type = detectFileType(path.split('/').pop() ?? '');
-    if (type === 'binary') return;
-
-    await fileTabManager.openFile(sftpId, path);
-    setActiveTab('editor');
-  }, [sftpId]);
+      setActiveTab('terminal');
+    },
+    [connectingWorkspace],
+  );
 
   const handleDisconnect = useCallback(async () => {
-    if (sessionId) {
-      try {
-        if (sftpId) await Ssh.closeSftp({ sftpId });
-        await Ssh.disconnect({ sessionId });
-      } catch { /* ignore */ }
+    if (!activeConn) return;
+    try {
+      if (activeConn.sftpId) await Ssh.closeSftp({ sftpId: activeConn.sftpId });
+      await Ssh.disconnect({ sessionId: activeConn.sessionId });
+    } catch {
+      /* ignore */
     }
-    setSessionId(null);
-    setSftpId(null);
-    setSftpError(null);
-    for (const tab of fileTabManager.getTabs()) fileTabManager.closeTab(tab.id);
-    setScreen('workspace-list');
-  }, [sessionId, sftpId]);
 
-  // --- Settings ---
+    ftmRef.current.delete(activeConn.wsId);
+    const remaining = connections.filter((c) => c.wsId !== activeConn.wsId);
+    setConnections(remaining);
+
+    if (remaining.length > 0) {
+      setActiveWsId(remaining[0].wsId);
+    } else {
+      setActiveWsId(null);
+      setScreen('workspace-list');
+    }
+  }, [activeConn, connections]);
+
+  const handleSaveWorkspace = useCallback(
+    async (data: CreateWorkspaceData, password: string) => {
+      let newWs: Workspace | null = null;
+      if (editingWorkspace) {
+        const store = (await import('../workspace/WorkspaceManager')).getWorkspaceStore();
+        await store.update(editingWorkspace.id, data);
+        if (password) await store.savePassword(editingWorkspace.id, password);
+        setEditingWorkspace(null);
+      } else {
+        newWs = await createWorkspace(data, password);
+      }
+      setListKey((k) => k + 1);
+
+      if (addReturnTo === 'view' && newWs) {
+        setConnectingWorkspace(newWs);
+        setScreen('connecting');
+      } else if (addReturnTo === 'view') {
+        setScreen('workspace-view');
+      } else {
+        setScreen('workspace-list');
+      }
+    },
+    [editingWorkspace, addReturnTo],
+  );
+
+  const handleFileSelect = useCallback(
+    async (path: string) => {
+      if (!activeConn?.sftpId || !activeWsId) return;
+      const type = detectFileType(path.split('/').pop() ?? '');
+      if (type === 'binary') return;
+      await getFileTabMgr(activeWsId).openFile(activeConn.sftpId, path);
+      setActiveTab('editor');
+    },
+    [activeConn, activeWsId, getFileTabMgr],
+  );
+
+  // --- Screens ---
+
   if (screen === 'settings') {
     return (
       <div style={styles.safeArea}>
-        <SettingsScreen appVersion={APP_VERSION} buildNumber={BUILD_NUMBER} onBack={() => setScreen('workspace-list')} />
+        <SettingsScreen
+          appVersion={APP_VERSION}
+          buildNumber={BUILD_NUMBER}
+          onBack={() => setScreen(connections.length > 0 ? 'workspace-view' : 'workspace-list')}
+        />
         <DebugOverlay />
       </div>
     );
   }
 
-  // --- Workspace list ---
   if (screen === 'workspace-list') {
     return (
       <div style={styles.safeArea}>
         <WorkspaceListScreen
           key={listKey}
           onSelectWorkspace={handleSelectWorkspace}
-          onAddWorkspace={() => { setEditingWorkspace(null); setAddReturnTo('list'); setScreen('workspace-add'); }}
-          onEditWorkspace={(ws) => { setEditingWorkspace(ws); setAddReturnTo('list'); setScreen('workspace-add'); }}
+          onAddWorkspace={() => {
+            setEditingWorkspace(null);
+            setAddReturnTo('list');
+            setScreen('workspace-add');
+          }}
+          onEditWorkspace={(ws) => {
+            setEditingWorkspace(ws);
+            setAddReturnTo('list');
+            setScreen('workspace-add');
+          }}
           onSettings={() => setScreen('settings')}
         />
         <DebugOverlay />
@@ -194,7 +232,6 @@ export function App() {
     );
   }
 
-  // --- Add/Edit workspace ---
   if (screen === 'workspace-add') {
     return (
       <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight }}>
@@ -210,51 +247,56 @@ export function App() {
     );
   }
 
-  // --- Connecting ---
-  if (screen === 'connecting' && selectedWorkspace) {
+  if (screen === 'connecting' && connectingWorkspace) {
     return (
       <div style={styles.safeArea}>
         <ConnectingScreen
-          workspace={selectedWorkspace}
+          workspace={connectingWorkspace}
           onConnected={handleConnected}
           onFailed={() => {}}
-          onCancel={() => setScreen('workspace-list')}
+          onCancel={() => {
+            setConnectingWorkspace(null);
+            setScreen(connections.length > 0 ? 'workspace-view' : 'workspace-list');
+          }}
         />
       </div>
     );
   }
 
-  // --- Workspace view (3 tabs) ---
+  // --- Workspace view ---
   return (
     <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight }}>
       <div style={styles.container}>
         {/* Status bar */}
         <div style={styles.statusBar}>
-          {selectedWorkspace && (
+          {activeConn && (
             <WorkspaceDropdown
-              current={selectedWorkspace}
-              onSwitch={handleSwitchWorkspace}
-              onAdd={() => { setEditingWorkspace(null); setAddReturnTo('view'); setScreen('workspace-add'); }}
+              current={activeConn.workspace}
+              connectedIds={connectedIds}
+              onSwitch={handleSelectWorkspace}
+              onAdd={() => {
+                setEditingWorkspace(null);
+                setAddReturnTo('view');
+                setScreen('workspace-add');
+              }}
             />
           )}
           <span style={{ color: '#a6e3a1', fontSize: 10, flexShrink: 0 }}>{'\u25cf'}</span>
-          <button onClick={handleDisconnect} style={styles.disconnectBtn}>Disconnect</button>
+          <button onClick={handleDisconnect} style={styles.disconnectBtn}>
+            Disconnect
+          </button>
         </div>
 
         <div style={styles.content}>
-          {/* Files tab — always mounted, toggled via display (state preserved) */}
+          {/* Files — active workspace only */}
           <div style={{ ...styles.tabContent, display: activeTab === 'files' ? 'flex' : 'none' }}>
-            {sftpId && selectedWorkspace ? (
-              <FileTree
-                sftpId={sftpId}
-                rootPath={selectedWorkspace.defaultPath}
-                onFileSelect={handleFileSelect}
-              />
-            ) : sftpError ? (
+            {activeConn?.sftpId ? (
+              <FileTree sftpId={activeConn.sftpId} rootPath={activeConn.workspace.defaultPath} onFileSelect={handleFileSelect} />
+            ) : activeConn?.sftpError ? (
               <div style={styles.placeholder}>
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ color: 'var(--accent-red)', marginBottom: 8 }}>SFTP connection failed</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{sftpError}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{activeConn.sftpError}</p>
                 </div>
               </div>
             ) : (
@@ -264,13 +306,13 @@ export function App() {
             )}
           </div>
 
-          {/* Editor tab — always mounted, toggled via display */}
+          {/* Editor — active workspace only */}
           <div style={{ ...styles.tabContent, display: activeTab === 'editor' ? 'flex' : 'none', flexDirection: 'column' }}>
             <EditorTabs
               tabs={fileTabs}
               activeTabId={activeFileTab?.id ?? null}
-              onSelect={(id) => fileTabManager.setActiveTab(id)}
-              onClose={(id) => fileTabManager.closeTab(id)}
+              onSelect={(id) => activeWsId && getFileTabMgr(activeWsId).setActiveTab(id)}
+              onClose={(id) => activeWsId && getFileTabMgr(activeWsId).closeTab(id)}
             />
             {activeFileTab?.content != null ? (
               activeFileTab.type === 'markdown' ? (
@@ -279,24 +321,35 @@ export function App() {
                 <CodeViewer content={activeFileTab.content} fileName={activeFileTab.fileName} visible={true} />
               )
             ) : activeFileTab?.isLoading ? (
-              <div style={styles.placeholder}><span style={{ color: 'var(--text-muted)' }}>Loading...</span></div>
+              <div style={styles.placeholder}>
+                <span style={{ color: 'var(--text-muted)' }}>Loading...</span>
+              </div>
             ) : (
-              <div style={styles.placeholder}><span style={{ color: 'var(--text-muted)' }}>Select a file</span></div>
+              <div style={styles.placeholder}>
+                <span style={{ color: 'var(--text-muted)' }}>Select a file</span>
+              </div>
             )}
           </div>
 
-          {/* Terminal tab */}
-          <div ref={terminalContainerRef} style={{ ...styles.tabContent, display: activeTab === 'terminal' ? 'flex' : 'none' }}>
-            {sessionId && (
-              <TerminalView sessionId={sessionId} visible={activeTab === 'terminal'} />
-            )}
-          </div>
+          {/* Terminals — ALL workspaces stay mounted (sessions preserved) */}
+          {connections.map((conn) => (
+            <div
+              key={`term-${conn.wsId}`}
+              style={{
+                ...styles.tabContent,
+                display: conn.wsId === activeWsId && activeTab === 'terminal' ? 'flex' : 'none',
+              }}
+            >
+              <TerminalTabs
+                sessionId={conn.sessionId}
+                defaultPath={conn.workspace.defaultPath}
+                visible={conn.wsId === activeWsId && activeTab === 'terminal'}
+              />
+            </div>
+          ))}
         </div>
 
-        {activeTab === 'terminal' && (
-          <ExtraKeyBar context="terminal" onKeyPress={() => {}} />
-        )}
-
+        {activeTab === 'terminal' && <ExtraKeyBar context="terminal" onKeyPress={() => {}} />}
         <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
       <DebugOverlay />
@@ -346,7 +399,10 @@ const styles: Record<string, React.CSSProperties> = {
   },
   tabContent: {
     position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     flexDirection: 'column',
   },
   placeholder: {

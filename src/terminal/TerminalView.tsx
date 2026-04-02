@@ -6,12 +6,13 @@ import { debugLog } from '../lib/debug-log';
 
 export interface TerminalViewProps {
   sessionId: string;
+  defaultPath?: string;
   visible: boolean;
 }
 
 const manager = new TerminalManager();
 
-export function TerminalView({ sessionId, visible }: TerminalViewProps) {
+export function TerminalView({ sessionId, defaultPath, visible }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<TerminalSession | null>(null);
   const selectionRef = useRef<TerminalSelection | null>(null);
@@ -58,6 +59,11 @@ export function TerminalView({ sessionId, visible }: TerminalViewProps) {
       const { cols, rows } = session.terminal;
       await manager.attachShell(session, sessionId, cols, rows);
 
+      // cd to workspace default path
+      if (defaultPath && defaultPath !== '~') {
+        setTimeout(() => session.terminal.paste(`cd ${defaultPath}\n`), 300);
+      }
+
       const observer = new ResizeObserver(() => {
         const s = sessionRef.current;
         if (!s) return;
@@ -86,6 +92,10 @@ export function TerminalView({ sessionId, visible }: TerminalViewProps) {
   useEffect(() => {
     if (sessionRef.current && visible) {
       sessionRef.current.fitAddon.fit();
+      setTimeout(() => {
+        const el = containerRef.current?.querySelector('textarea.xterm-helper-textarea');
+        if (el instanceof HTMLTextAreaElement) el.focus();
+      }, 50);
     }
   }, [visible]);
 
