@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { TabBar, TabId } from './TabBar';
 import { WorkspaceListScreen } from '../workspace/WorkspaceListScreen';
 import { WorkspaceAddScreen } from '../workspace/WorkspaceAddScreen';
+import { WorkspaceDropdown } from '../workspace/WorkspaceDropdown';
 import { ConnectingScreen } from '../workspace/ConnectingScreen';
 import { SettingsScreen } from './SettingsScreen';
 import { DebugOverlay } from './DebugOverlay';
@@ -51,6 +52,7 @@ export function App() {
   const [listKey, setListKey] = useState(0);
   const [fileTabs, setFileTabs] = useState<FileTab[]>([]);
   const [activeFileTab, setActiveFileTab] = useState<FileTab | null>(null);
+  const [addReturnTo, setAddReturnTo] = useState<'list' | 'view'>('list');
   const terminalContainerRef = useRef<HTMLDivElement>(null);
 
   // FileTabManager change listener
@@ -92,18 +94,56 @@ export function App() {
     setActiveTab('terminal');
   }, []);
 
+  const handleSwitchWorkspace = useCallback(async (ws: Workspace) => {
+    if (ws.id === selectedWorkspace?.id) return;
+    // Disconnect current
+    if (sessionId) {
+      try {
+        if (sftpId) await Ssh.closeSftp({ sftpId });
+        await Ssh.disconnect({ sessionId });
+      } catch { /* ignore */ }
+    }
+    setSessionId(null);
+    setSftpId(null);
+    setSftpError(null);
+    for (const tab of fileTabManager.getTabs()) fileTabManager.closeTab(tab.id);
+    // Connect to new
+    setSelectedWorkspace(ws);
+    setScreen('connecting');
+  }, [sessionId, sftpId, selectedWorkspace]);
+
   const handleSaveWorkspace = useCallback(async (data: CreateWorkspaceData, password: string) => {
+    let newWs: Workspace | null = null;
     if (editingWorkspace) {
       const store = (await import('../workspace/WorkspaceManager')).getWorkspaceStore();
       await store.update(editingWorkspace.id, data);
       if (password) await store.savePassword(editingWorkspace.id, password);
       setEditingWorkspace(null);
     } else {
-      await createWorkspace(data, password);
+      newWs = await createWorkspace(data, password);
     }
     setListKey(k => k + 1);
-    setScreen('workspace-list');
-  }, [editingWorkspace]);
+
+    if (addReturnTo === 'view' && newWs) {
+      // Disconnect current and connect to newly created workspace
+      if (sessionId) {
+        try {
+          if (sftpId) await Ssh.closeSftp({ sftpId });
+          await Ssh.disconnect({ sessionId });
+        } catch { /* ignore */ }
+      }
+      setSessionId(null);
+      setSftpId(null);
+      setSftpError(null);
+      for (const tab of fileTabManager.getTabs()) fileTabManager.closeTab(tab.id);
+      setSelectedWorkspace(newWs);
+      setScreen('connecting');
+    } else if (addReturnTo === 'view') {
+      setScreen('workspace-view');
+    } else {
+      setScreen('workspace-list');
+    }
+  }, [editingWorkspace, addReturnTo, sessionId, sftpId]);
 
   const handleFileSelect = useCallback(async (path: string) => {
     if (!sftpId) return;
@@ -124,6 +164,7 @@ export function App() {
     setSessionId(null);
     setSftpId(null);
     setSftpError(null);
+    for (const tab of fileTabManager.getTabs()) fileTabManager.closeTab(tab.id);
     setScreen('workspace-list');
   }, [sessionId, sftpId]);
 
@@ -144,8 +185,8 @@ export function App() {
         <WorkspaceListScreen
           key={listKey}
           onSelectWorkspace={handleSelectWorkspace}
-          onAddWorkspace={() => { setEditingWorkspace(null); setScreen('workspace-add'); }}
-          onEditWorkspace={(ws) => { setEditingWorkspace(ws); setScreen('workspace-add'); }}
+          onAddWorkspace={() => { setEditingWorkspace(null); setAddReturnTo('list'); setScreen('workspace-add'); }}
+          onEditWorkspace={(ws) => { setEditingWorkspace(ws); setAddReturnTo('list'); setScreen('workspace-add'); }}
           onSettings={() => setScreen('settings')}
         />
         <DebugOverlay />
@@ -159,7 +200,10 @@ export function App() {
       <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight }}>
         <WorkspaceAddScreen
           onSave={handleSaveWorkspace}
-          onCancel={() => { setEditingWorkspace(null); setScreen('workspace-list'); }}
+          onCancel={() => {
+            setEditingWorkspace(null);
+            setScreen(addReturnTo === 'view' ? 'workspace-view' : 'workspace-list');
+          }}
           editWorkspace={editingWorkspace ?? undefined}
         />
       </div>
@@ -186,8 +230,14 @@ export function App() {
       <div style={styles.container}>
         {/* Status bar */}
         <div style={styles.statusBar}>
-          <span style={styles.statusName}>{selectedWorkspace?.name}</span>
-          <span style={{ color: 'var(--accent-green)', fontSize: 12 }}>● Connected</span>
+          {selectedWorkspace && (
+            <WorkspaceDropdown
+              current={selectedWorkspace}
+              onSwitch={handleSwitchWorkspace}
+              onAdd={() => { setEditingWorkspace(null); setAddReturnTo('view'); setScreen('workspace-add'); }}
+            />
+          )}
+          <span style={{ color: '#a6e3a1', fontSize: 10, flexShrink: 0 }}>{'\u25cf'}</span>
           <button onClick={handleDisconnect} style={styles.disconnectBtn}>Disconnect</button>
         </div>
 
@@ -276,15 +326,8 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: 'var(--bg-mantle)',
     borderBottom: '1px solid var(--bg-surface0)',
     flexShrink: 0,
-  },
-  statusName: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: 500,
-    color: 'var(--text-primary)',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    position: 'relative',
+    zIndex: 10,
   },
   disconnectBtn: {
     background: 'none',
@@ -294,6 +337,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'var(--text-muted)',
     fontSize: 12,
     cursor: 'pointer',
+    flexShrink: 0,
   },
   content: {
     flex: 1,
