@@ -703,8 +703,10 @@ const nO = {
     WebkitTapHighlightColor: "transparent"
   },
   label: {
-    fontSize: 11,
-    fontWeight: 500
+    fontSize: 10,
+    fontWeight: 600,
+    letterSpacing: 0.3,
+    textTransform: "uppercase"
   }
 }, c_ = [], h_ = /* @__PURE__ */ new Map();
 function qfe(t, e) {
@@ -901,10 +903,10 @@ function tw({ onSelectWorkspace: t, onAddWorkspace: e, onEditWorkspace: r, onSet
   ] });
 }
 const ct = {
-  container: { height: "100%", backgroundColor: "var(--bg-base)", position: "relative" },
+  container: { height: "100%", backgroundColor: "var(--bg-base)", position: "relative", display: "flex", flexDirection: "column" },
   center: { display: "flex", alignItems: "center", justifyContent: "center", height: "100%" },
   header: { padding: "16px 20px", borderBottom: "1px solid var(--bg-surface0)", display: "flex", justifyContent: "space-between", alignItems: "center" },
-  title: { fontSize: 20, fontWeight: 600, color: "var(--text-primary)" },
+  title: { fontSize: 18, fontWeight: 600, color: "var(--text-primary)", letterSpacing: -0.3 },
   settingsBtn: { background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 4 },
   list: { overflowY: "auto", padding: "12px 16px", flex: 1 },
   card: {
@@ -916,22 +918,24 @@ const ct = {
     backgroundColor: "var(--bg-surface0)",
     borderRadius: 12,
     cursor: "pointer",
-    WebkitTapHighlightColor: "transparent"
+    WebkitTapHighlightColor: "transparent",
+    transition: "background-color var(--transition)"
   },
   cardDot: {
-    width: 10,
-    height: 10,
+    width: 8,
+    height: 8,
     borderRadius: "50%",
-    backgroundColor: "var(--text-muted)",
-    flexShrink: 0
+    backgroundColor: "var(--accent-blue)",
+    flexShrink: 0,
+    opacity: 0.6
   },
-  cardInfo: { display: "flex", flexDirection: "column", gap: 2, minWidth: 0 },
-  cardName: { fontSize: 16, fontWeight: 500, color: "var(--text-primary)" },
-  cardHost: { fontSize: 13, color: "var(--text-secondary)" },
-  cardPath: { fontSize: 12, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  cardInfo: { display: "flex", flexDirection: "column", gap: 3, minWidth: 0 },
+  cardName: { fontSize: 15, fontWeight: 600, color: "var(--text-primary)", letterSpacing: -0.2 },
+  cardHost: { fontSize: 12, color: "var(--text-tertiary)", fontFamily: "monospace" },
+  cardPath: { fontSize: 12, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "monospace" },
   emptyState: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: 8 },
   emptyIcon: { fontSize: 48, color: "var(--text-muted)", fontFamily: "monospace", marginBottom: 16 },
-  emptyText: { fontSize: 16, color: "var(--text-muted)", margin: 0 },
+  emptyText: { fontSize: 14, color: "var(--text-muted)", margin: 0 },
   ctaButton: {
     marginTop: 20,
     padding: "12px 24px",
@@ -939,7 +943,7 @@ const ct = {
     color: "var(--bg-base)",
     border: "none",
     borderRadius: 8,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 600,
     cursor: "pointer"
   },
@@ -947,19 +951,19 @@ const ct = {
     position: "absolute",
     bottom: 24,
     right: 24,
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: "50%",
     backgroundColor: "var(--accent-blue)",
     color: "var(--bg-base)",
     border: "none",
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 300,
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+    boxShadow: "0 4px 16px rgba(137, 180, 250, 0.25)"
   },
   overlay: ew,
   menu: {
@@ -1419,14 +1423,14 @@ function zn({ label: t, value: e, onChange: r, placeholder: i, type: n, inputMod
 const ni = {
   container: { height: "100%", backgroundColor: "var(--bg-base)", display: "flex", flexDirection: "column" },
   header: { display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid var(--bg-surface0)" },
-  closeBtn: { background: "none", border: "none", color: "var(--text-primary)", fontSize: 20, cursor: "pointer", padding: 4 },
-  title: { fontSize: 18, fontWeight: 600, color: "var(--text-primary)" },
+  closeBtn: { background: "none", border: "none", color: "var(--text-primary)", fontSize: 18, cursor: "pointer", padding: 4 },
+  title: { fontSize: 18, fontWeight: 600, color: "var(--text-primary)", letterSpacing: -0.3 },
   form: { flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 },
-  field: { display: "flex", flexDirection: "column", gap: 4 },
-  label: { fontSize: 13, color: "var(--text-secondary)", fontWeight: 500 },
+  field: { display: "flex", flexDirection: "column", gap: 6 },
+  label: { fontSize: 12, color: "var(--text-tertiary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 },
   input: Jk,
   testBtn: {
-    padding: "10px",
+    padding: "12px",
     backgroundColor: "transparent",
     color: "var(--accent-blue)",
     border: "1px solid var(--accent-blue)",
@@ -1437,12 +1441,12 @@ const ni = {
   },
   saveBtn: {
     marginTop: 4,
-    padding: "14px",
+    padding: "12px",
     backgroundColor: "var(--accent-blue)",
     color: "var(--bg-base)",
     border: "none",
     borderRadius: 8,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 600,
     cursor: "pointer"
   }
@@ -1653,16 +1657,16 @@ const Tr = {
     gap: 12,
     padding: 24
   },
-  spinner: { fontSize: 48, color: "var(--accent-blue)", animation: "spin 1s linear infinite" },
-  connectingText: { fontSize: 18, color: "var(--text-primary)", fontWeight: 500 },
-  hostText: { fontSize: 14, color: "var(--text-muted)" },
-  cancelBtn: { marginTop: 16, background: "none", border: "1px solid var(--bg-surface1)", borderRadius: 8, padding: "8px 24px", color: "var(--text-secondary)", fontSize: 14, cursor: "pointer" },
-  errorIcon: { fontSize: 48, color: "var(--accent-red)", fontWeight: 700 },
-  errorTitle: { fontSize: 18, color: "var(--accent-red)", fontWeight: 600 },
-  errorMsg: { fontSize: 13, color: "var(--text-muted)", textAlign: "center", wordBreak: "break-all", maxWidth: "80%" },
+  spinner: { fontSize: 40, color: "var(--accent-blue)", animation: "spin 1s linear infinite" },
+  connectingText: { fontSize: 16, color: "var(--text-primary)", fontWeight: 500 },
+  hostText: { fontSize: 12, color: "var(--text-muted)", fontFamily: "monospace" },
+  cancelBtn: { marginTop: 16, background: "none", border: "1px solid var(--bg-surface1)", borderRadius: 8, padding: "10px 20px", color: "var(--text-secondary)", fontSize: 14, cursor: "pointer" },
+  errorIcon: { fontSize: 40, color: "var(--accent-red)", fontWeight: 700 },
+  errorTitle: { fontSize: 16, color: "var(--accent-red)", fontWeight: 600 },
+  errorMsg: { fontSize: 12, color: "var(--text-muted)", textAlign: "center", wordBreak: "break-all", maxWidth: "80%" },
   buttonRow: { display: "flex", gap: 12, marginTop: 16 },
-  secondaryBtn: { background: "none", border: "1px solid var(--bg-surface1)", borderRadius: 8, padding: "10px 20px", color: "var(--text-secondary)", fontSize: 14, cursor: "pointer" },
-  primaryBtn: { backgroundColor: "var(--accent-blue)", color: "var(--bg-base)", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer" }
+  secondaryBtn: { background: "none", border: "1px solid var(--bg-surface1)", borderRadius: 8, padding: "12px 20px", color: "var(--text-secondary)", fontSize: 14, cursor: "pointer" },
+  primaryBtn: { backgroundColor: "var(--accent-blue)", color: "var(--bg-base)", border: "none", borderRadius: 8, padding: "12px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer" }
 };
 function Nd({ appVersion: t, buildNumber: e, onBack: r, debugEnabled: i, onDebugToggle: n }) {
   const { showDebugToggle: s } = wl();
@@ -1709,14 +1713,14 @@ function Nd({ appVersion: t, buildNumber: e, onBack: r, debugEnabled: i, onDebug
 const Rt = {
   container: { height: "100%", backgroundColor: "var(--bg-base)", display: "flex", flexDirection: "column" },
   header: { display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid var(--bg-surface0)" },
-  backBtn: { background: "none", border: "none", color: "var(--text-primary)", fontSize: 20, cursor: "pointer", padding: 4 },
-  title: { fontSize: 18, fontWeight: 600, color: "var(--text-primary)" },
+  backBtn: { background: "none", border: "none", color: "var(--text-primary)", fontSize: 18, cursor: "pointer", padding: 4 },
+  title: { fontSize: 18, fontWeight: 600, color: "var(--text-primary)", letterSpacing: -0.3 },
   content: { flex: 1, overflowY: "auto", padding: "16px 20px" },
   section: { marginBottom: 24 },
-  sectionTitle: { fontSize: 13, fontWeight: 600, color: "var(--accent-blue)", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 12 },
-  row: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid var(--bg-surface0)" },
-  label: { fontSize: 15, color: "var(--text-primary)" },
-  value: { fontSize: 14, color: "var(--text-muted)" },
+  sectionTitle: { fontSize: 11, fontWeight: 700, color: "var(--accent-blue)", textTransform: "uppercase", letterSpacing: 1.2, display: "block", marginBottom: 12 },
+  row: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid var(--bg-surface0)" },
+  label: { fontSize: 14, color: "var(--text-primary)" },
+  value: { fontSize: 13, color: "var(--text-muted)", fontFamily: "monospace" },
   toggle: {
     width: 48,
     height: 28,
@@ -24403,7 +24407,7 @@ const TY = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-BJui-RkB.js").then((t) => t.jinja());
+      return import("./index-DTybWSih.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24425,14 +24429,14 @@ const TY = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-BiLtSaIC.js").then((t) => t.less());
+      return import("./index-D93p3nxK.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-CPsjVkEK.js").then((t) => t.liquid());
+      return import("./index-DJC4rABJ.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24499,14 +24503,14 @@ const TY = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-BB0AxB39.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-qmz46_Pt.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ L.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-BB0AxB39.js").then((t) => t.sass());
+      return import("./index-qmz46_Pt.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24541,7 +24545,7 @@ const TY = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-DKvXuccm.js").then((t) => t.wast());
+      return import("./index-B6anUkTg.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -25346,13 +25350,13 @@ const TY = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-DDAjp40D.js").then((t) => t.vue());
+      return import("./index-DxdpbnFA.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Angular Template",
     load() {
-      return import("./index-JHp4s9_S.js").then((t) => t.angular());
+      return import("./index-COniRmzT.js").then((t) => t.angular());
     }
   })
 ], XY = ["md", "mdx", "markdown"], RY = [
@@ -25669,10 +25673,12 @@ const oo = {
     cursor: "pointer",
     flexShrink: 0,
     borderBottom: "2px solid transparent",
-    WebkitTapHighlightColor: "transparent"
+    WebkitTapHighlightColor: "transparent",
+    transition: "color 150ms ease"
   },
   tabName: {
-    fontSize: 13,
+    fontSize: 12,
+    fontWeight: 500,
     whiteSpace: "nowrap",
     maxWidth: 120,
     overflow: "hidden",
@@ -25682,11 +25688,12 @@ const oo = {
     background: "none",
     border: "none",
     color: "var(--text-muted)",
-    fontSize: 11,
+    fontSize: 10,
     padding: "2px 4px",
     cursor: "pointer",
-    borderRadius: 4,
-    lineHeight: 1
+    borderRadius: 8,
+    lineHeight: 1,
+    opacity: 0.6
   }
 };
 var ic = { exports: {} }, Ng;
@@ -32682,6 +32689,7 @@ const nZ = {
   padding: "0 10px",
   height: 32,
   fontSize: 12,
+  fontWeight: 500,
   border: "none",
   background: "none",
   color: "var(--text-tertiary)",
@@ -32689,18 +32697,19 @@ const nZ = {
   whiteSpace: "nowrap",
   borderBottom: "2px solid transparent",
   touchAction: "manipulation",
-  WebkitTapHighlightColor: "transparent"
+  WebkitTapHighlightColor: "transparent",
+  transition: "color 150ms ease"
 }, oZ = {
   color: "var(--text-primary)",
   borderBottomColor: "var(--accent-blue)"
 }, lZ = {
-  fontSize: 14,
-  opacity: 0.5,
+  fontSize: 12,
+  opacity: 0.4,
   padding: "0 2px"
 }, OZ = {
   padding: "0 12px",
   height: 32,
-  fontSize: 16,
+  fontSize: 14,
   color: "var(--text-tertiary)",
   background: "none",
   border: "none",
@@ -33165,7 +33174,7 @@ const Zt = {
     display: "flex",
     alignItems: "center",
     gap: 8,
-    padding: "8px 16px",
+    padding: "6px 16px",
     backgroundColor: "var(--bg-mantle)",
     borderBottom: "1px solid var(--bg-surface0)",
     flexShrink: 0,
@@ -33175,12 +33184,14 @@ const Zt = {
   disconnectBtn: {
     background: "none",
     border: "1px solid var(--bg-surface1)",
-    borderRadius: 6,
-    padding: "4px 10px",
+    borderRadius: 8,
+    padding: "5px 12px",
     color: "var(--text-muted)",
-    fontSize: 12,
+    fontSize: 11,
+    fontWeight: 500,
     cursor: "pointer",
-    flexShrink: 0
+    flexShrink: 0,
+    letterSpacing: 0.3
   },
   content: {
     flex: 1,

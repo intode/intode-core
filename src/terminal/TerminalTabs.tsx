@@ -119,6 +119,7 @@ const tabStyle: React.CSSProperties = {
   padding: '0 10px',
   height: 32,
   fontSize: 12,
+  fontWeight: 500,
   border: 'none',
   background: 'none',
   color: 'var(--text-tertiary)',
@@ -127,6 +128,7 @@ const tabStyle: React.CSSProperties = {
   borderBottom: '2px solid transparent',
   touchAction: 'manipulation',
   WebkitTapHighlightColor: 'transparent',
+  transition: 'color 150ms ease',
 };
 
 const activeTabStyle: React.CSSProperties = {
@@ -135,15 +137,15 @@ const activeTabStyle: React.CSSProperties = {
 };
 
 const closeStyle: React.CSSProperties = {
-  fontSize: 14,
-  opacity: 0.5,
+  fontSize: 12,
+  opacity: 0.4,
   padding: '0 2px',
 };
 
 const addStyle: React.CSSProperties = {
   padding: '0 12px',
   height: 32,
-  fontSize: 16,
+  fontSize: 14,
   color: 'var(--text-tertiary)',
   background: 'none',
   border: 'none',

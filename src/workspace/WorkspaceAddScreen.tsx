@@ -122,18 +122,18 @@ function Field({ label, value, onChange, placeholder, type, inputMode }: {
 const styles: Record<string, React.CSSProperties> = {
   container: { height: '100%', backgroundColor: 'var(--bg-base)', display: 'flex', flexDirection: 'column' },
   header: { display: 'flex', alignItems: 'center', gap: 12, padding: '16px 20px', borderBottom: '1px solid var(--bg-surface0)' },
-  closeBtn: { background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: 20, cursor: 'pointer', padding: 4 },
-  title: { fontSize: 18, fontWeight: 600, color: 'var(--text-primary)' },
+  closeBtn: { background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: 18, cursor: 'pointer', padding: 4 },
+  title: { fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: -0.3 },
   form: { flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 },
-  field: { display: 'flex', flexDirection: 'column', gap: 4 },
-  label: { fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 },
+  field: { display: 'flex', flexDirection: 'column', gap: 6 },
+  label: { fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: 0.5 },
   input: INPUT_FIELD,
   testBtn: {
-    padding: '10px', backgroundColor: 'transparent', color: 'var(--accent-blue)',
+    padding: '12px', backgroundColor: 'transparent', color: 'var(--accent-blue)',
     border: '1px solid var(--accent-blue)', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer',
   },
   saveBtn: {
-    marginTop: 4, padding: '14px', backgroundColor: 'var(--accent-blue)', color: 'var(--bg-base)',
-    border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 600, cursor: 'pointer',
+    marginTop: 4, padding: '12px', backgroundColor: 'var(--accent-blue)', color: 'var(--bg-base)',
+    border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer',
   },
 };

@@ -84,7 +84,9 @@ const styles: Record<string, React.CSSProperties> = {
     WebkitTapHighlightColor: 'transparent',
   },
   label: {
-    fontSize: 11,
-    fontWeight: 500,
+    fontSize: 10,
+    fontWeight: 600,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase' as const,
   },
 };
