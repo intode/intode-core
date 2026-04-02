@@ -17,7 +17,6 @@ interface KeyDef {
 }
 
 const TERMINAL_KEYS: KeyDef[] = [
-  { label: '\u2328', value: 'keyboard' },
   { label: 'Esc', value: KEY_ESC },
   { label: 'Tab', value: KEY_TAB },
   { label: 'C-c', value: '\x03' },
@@ -39,7 +38,6 @@ const TERMINAL_KEYS: KeyDef[] = [
 ];
 
 const EDITOR_KEYS: KeyDef[] = [
-  { label: '\u2328', value: 'keyboard' },
   { label: 'Save', value: 'save' },
   { label: 'Undo', value: 'undo' },
   { label: 'Redo', value: 'redo' },
@@ -67,6 +65,7 @@ function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) =
   return (
     <button
       tabIndex={-1}
+      onTouchStart={(e) => e.preventDefault()}
       onMouseDown={(e) => e.preventDefault()}
       onPointerDown={(e) => { e.preventDefault(); startPos.current = { x: e.clientX, y: e.clientY }; }}
       onPointerUp={(e) => {
@@ -91,6 +90,7 @@ function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) 
   return (
     <button
       tabIndex={-1}
+      onTouchStart={(e) => e.preventDefault()}
       onMouseDown={(e) => e.preventDefault()}
       onPointerDown={(e) => { e.preventDefault(); onPress(keyDef.value); }}
       style={dpadKeyStyle}
@@ -119,17 +119,20 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
         ))}
       </div>
 
-      {/* Fixed dpad */}
-      <div style={dpadStyle}>
-        <div />
-        <DpadButton keyDef={upKey} onPress={onKeyPress} />
-        <div />
-        <DpadButton keyDef={leftKey} onPress={onKeyPress} />
-        <div />
-        <DpadButton keyDef={rightKey} onPress={onKeyPress} />
-        <div />
-        <DpadButton keyDef={downKey} onPress={onKeyPress} />
-        <div />
+      {/* Fixed: keyboard toggle + dpad */}
+      <div style={fixedAreaStyle}>
+        <DpadButton keyDef={{ label: '\u2328', value: 'keyboard' }} onPress={onKeyPress} />
+        <div style={dpadStyle}>
+          <div />
+          <DpadButton keyDef={upKey} onPress={onKeyPress} />
+          <div />
+          <DpadButton keyDef={leftKey} onPress={onKeyPress} />
+          <div />
+          <DpadButton keyDef={rightKey} onPress={onKeyPress} />
+          <div />
+          <DpadButton keyDef={downKey} onPress={onKeyPress} />
+          <div />
+        </div>
       </div>
     </div>
   );
@@ -154,15 +157,21 @@ const scrollAreaStyle: React.CSSProperties = {
   alignContent: 'flex-start',
 };
 
+const fixedAreaStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 3,
+  padding: 4,
+  flexShrink: 0,
+  borderLeft: '1px solid var(--bg-surface0)',
+};
+
 const dpadStyle: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 30px)',
   gridTemplateRows: 'repeat(3, 26px)',
   gap: 2,
-  padding: 4,
-  flexShrink: 0,
-  alignSelf: 'center',
-  borderLeft: '1px solid var(--bg-surface0)',
 };
 
 const keyStyle: React.CSSProperties = {

@@ -2,10 +2,10 @@ var Tk = Object.defineProperty;
 var Xk = (t, e, r) => e in t ? Tk(t, e, { enumerable: !0, configurable: !0, writable: !0, value: r }) : t[e] = r;
 var Ve = (t, e, r) => Xk(t, typeof e != "symbol" ? e + "" : e, r);
 import du, { useState as qe, useEffect as er, useRef as or, useCallback as dr, forwardRef as Rk, useImperativeHandle as zk } from "react";
-function ya(t) {
+function ba(t) {
   return t && t.__esModule && Object.prototype.hasOwnProperty.call(t, "default") ? t.default : t;
 }
-var Da = { exports: {} }, bs = {};
+var ja = { exports: {} }, bs = {};
 /**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -631,7 +631,7 @@ React keys must be passed directly to JSX without using spread:
 }
 var Ld;
 function Yk() {
-  return Ld || (Ld = 1, process.env.NODE_ENV === "production" ? Da.exports = Ek() : Da.exports = Ck()), Da.exports;
+  return Ld || (Ld = 1, process.env.NODE_ENV === "production" ? ja.exports = Ek() : ja.exports = Ck()), ja.exports;
 }
 var q = Yk();
 const Zk = [
@@ -716,7 +716,7 @@ const cO = {
     marginTop: 2
   }
 }, h_ = [], u_ = /* @__PURE__ */ new Map();
-function Mfe(t, e) {
+function Gfe(t, e) {
   h_.push(t), u_.set(t.id, e);
 }
 function Id() {
@@ -746,13 +746,13 @@ const Wk = {
 let d_ = Wk, f_ = (t, e, r) => {
   console.warn(`[Policy] Limit reached: ${t} (${e}/${r})`);
 };
-function Gfe(t) {
+function Bfe(t) {
   d_ = t;
 }
 function Xl() {
   return d_;
 }
-function Bfe(t) {
+function Nfe(t) {
   f_ = t;
 }
 function fu(t, e, r) {
@@ -777,7 +777,7 @@ const Dk = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   createWorkspace: p_,
   getWorkspaceStore: mn,
   setWorkspaceStore: Vk
-}, Symbol.toStringTag, { value: "Module" })), g_ = '"Fira Code", "Source Code Pro", "Menlo", monospace, "Noto Sans CJK KR", sans-serif', Ho = 14, jk = 1.2, Lk = 1e3, Ik = 3, Mk = 4.5, Gk = 8, Bk = 32, hO = 22, Nk = 10485760, m_ = 500, Fk = "\x1B", Hk = "	", ba = "\x1B[A", Sa = "\x1B[B", ka = "\x1B[D", wa = "\x1B[C", Kk = {
+}, Symbol.toStringTag, { value: "Module" })), g_ = '"Fira Code", "Source Code Pro", "Menlo", monospace, "Noto Sans CJK KR", sans-serif', Ho = 14, jk = 1.2, Lk = 1e3, Ik = 3, Mk = 4.5, Gk = 8, Bk = 32, hO = 22, Nk = 10485760, m_ = 500, Fk = "\x1B", Hk = "	", Sa = "\x1B[A", ka = "\x1B[B", wa = "\x1B[D", Pa = "\x1B[C", Kk = {
   background: "#1e1e2e",
   foreground: "#cdd6f4",
   cursor: "#f5e0dc",
@@ -2106,7 +2106,7 @@ let He = class w_ {
       return !0;
     if (e.length != this.length || e.lines != this.lines)
       return !1;
-    let r = this.scanIdentical(e, 1), i = this.length - this.scanIdentical(e, -1), n = new As(this), s = new As(e);
+    let r = this.scanIdentical(e, 1), i = this.length - this.scanIdentical(e, -1), n = new Ws(this), s = new Ws(e);
     for (let a = r, o = r; ; ) {
       if (n.next(a), s.next(a), a = 0, n.lineBreak != s.lineBreak || n.done != s.done || n.value != s.value)
         return !1;
@@ -2120,7 +2120,7 @@ let He = class w_ {
   them as separate strings.
   */
   iter(e = 1) {
-    return new As(this, e);
+    return new Ws(this, e);
   }
   /**
   Iterate over a range of the text. When `from` > `to`, the
@@ -2352,7 +2352,7 @@ function zo(t, e, r = 0, i = 1e9) {
 function sf(t, e, r) {
   return zo(t, [""], e, r);
 }
-class As {
+class Ws {
   constructor(e, r = 1) {
     this.dir = r, this.done = !1, this.lineBreak = !1, this.value = "", this.nodes = [e], this.offsets = [r > 0 ? 1 : (e instanceof bt ? e.text.length : e.children.length) << 1];
   }
@@ -2385,7 +2385,7 @@ class As {
 }
 class P_ {
   constructor(e, r, i) {
-    this.value = "", this.done = !1, this.cursor = new As(e, r > i ? -1 : 1), this.pos = r > i ? e.length : 0, this.from = Math.min(r, i), this.to = Math.max(r, i);
+    this.value = "", this.done = !1, this.cursor = new Ws(e, r > i ? -1 : 1), this.pos = r > i ? e.length : 0, this.from = Math.min(r, i), this.to = Math.max(r, i);
   }
   nextInner(e, r) {
     if (r < 0 ? this.pos <= this.from : this.pos >= this.to)
@@ -2417,7 +2417,7 @@ class v_ {
 }
 typeof Symbol < "u" && (He.prototype[Symbol.iterator] = function() {
   return this.iter();
-}, As.prototype[Symbol.iterator] = P_.prototype[Symbol.iterator] = v_.prototype[Symbol.iterator] = function() {
+}, Ws.prototype[Symbol.iterator] = P_.prototype[Symbol.iterator] = v_.prototype[Symbol.iterator] = function() {
   return this;
 });
 let Uw = class {
@@ -2705,7 +2705,7 @@ class zt extends ui {
   @internal
   */
   filter(e) {
-    let r = [], i = [], n = [], s = new Js(this);
+    let r = [], i = [], n = [], s = new ea(this);
     e: for (let a = 0, o = 0; ; ) {
       let l = a == e.length ? 1e9 : e[a++];
       for (; o < l || o == l && s.len == 0; ) {
@@ -2845,7 +2845,7 @@ function Vc(t, e, r) {
   }
 }
 function Dc(t, e, r, i = !1) {
-  let n = [], s = i ? [] : null, a = new Js(t), o = new Js(e);
+  let n = [], s = i ? [] : null, a = new ea(t), o = new ea(e);
   for (let l = -1; ; ) {
     if (a.done && o.len || o.done && a.len)
       throw new Error("Mismatched change set lengths");
@@ -2878,7 +2878,7 @@ function Dc(t, e, r, i = !1) {
   }
 }
 function x_(t, e, r = !1) {
-  let i = [], n = r ? [] : null, s = new Js(t), a = new Js(e);
+  let i = [], n = r ? [] : null, s = new ea(t), a = new ea(e);
   for (let o = !1; ; ) {
     if (s.done && a.done)
       return n ? zt.createSet(i, n) : ui.create(i);
@@ -2900,7 +2900,7 @@ function x_(t, e, r = !1) {
     }
   }
 }
-class Js {
+class ea {
   constructor(e) {
     this.set = e, this.i = 0, this.next();
   }
@@ -3249,7 +3249,7 @@ function af(t, e, r) {
 function jc(t, e) {
   let r = !1;
   for (let i of e)
-    Ws(t, i) & 1 && (r = !0);
+    Vs(t, i) & 1 && (r = !0);
   return r;
 }
 function Dw(t, e, r) {
@@ -3269,7 +3269,7 @@ function Dw(t, e, r) {
   return {
     create(l) {
       for (let O of i)
-        Ws(l, O);
+        Vs(l, O);
       return l.values[a] = o(l), 1;
     },
     update(l, O) {
@@ -3287,7 +3287,7 @@ function Dw(t, e, r) {
     }
   };
 }
-const ja = /* @__PURE__ */ me.define({ static: !0 });
+const La = /* @__PURE__ */ me.define({ static: !0 });
 class Zi {
   constructor(e, r, i, n, s) {
     this.id = e, this.createF = r, this.updateF = i, this.compareF = n, this.spec = s, this.provides = void 0;
@@ -3300,7 +3300,7 @@ class Zi {
     return e.provide && (r.provides = e.provide(r)), r;
   }
   create(e) {
-    let r = e.facet(ja).find((i) => i.field == this);
+    let r = e.facet(La).find((i) => i.field == this);
     return ((r == null ? void 0 : r.create) || this.createF)(e);
   }
   /**
@@ -3315,7 +3315,7 @@ class Zi {
         return this.compareF(s, a) ? 0 : (i.values[r] = a, 1);
       },
       reconfigure: (i, n) => {
-        let s = i.facet(ja), a = n.facet(ja), o;
+        let s = i.facet(La), a = n.facet(La), o;
         return (o = s.find((l) => l.field == this)) && o != a.find((l) => l.field == this) ? (i.values[r] = o.create(i), 1) : n.config.address[this.id] != null ? (i.values[r] = n.field(this), 0) : (i.values[r] = this.create(i), 1);
       }
     };
@@ -3326,7 +3326,7 @@ class Zi {
   non-default starting value for the field.
   */
   init(e) {
-    return [this, ja.of({ field: this, create: e })];
+    return [this, La.of({ field: this, create: e })];
   }
   /**
   State field instances can be used as
@@ -3341,7 +3341,7 @@ const cn = { lowest: 4, low: 3, default: 2, high: 1, highest: 0 };
 function ks(t) {
   return (e) => new X_(e, t);
 }
-const Pa = {
+const va = {
   /**
   The highest precedence level, for extensions that should end up
   near the start of the precedence ordering.
@@ -3372,7 +3372,7 @@ class X_ {
     this.inner = e, this.prec = r;
   }
 }
-class va {
+class xa {
   /**
   Create an instance of this compartment to add to your [state
   configuration](https://codemirror.net/6/docs/ref/#state.EditorStateConfig.extensions).
@@ -3385,7 +3385,7 @@ class va {
   reconfigures this compartment.
   */
   reconfigure(e) {
-    return va.reconfigure.of({ compartment: this, extension: e });
+    return xa.reconfigure.of({ compartment: this, extension: e });
   }
   /**
   Get the current content of the compartment in the state, or
@@ -3475,7 +3475,7 @@ function jw(t, e, r) {
   }
   return s(t, cn.default), i.reduce((a, o) => a.concat(o));
 }
-function Ws(t, e) {
+function Vs(t, e) {
   if (e & 1)
     return 2;
   let r = e >> 1, i = t.status[r];
@@ -3781,7 +3781,7 @@ class Ke {
   constructor(e, r, i, n, s, a) {
     this.config = e, this.doc = r, this.selection = i, this.values = n, this.status = e.statusTemplate.slice(), this.computeSlot = s, a && (a._state = this);
     for (let o = 0; o < this.config.dynamicSlots.length; o++)
-      Ws(this, o << 1);
+      Vs(this, o << 1);
     this.computeSlot = null;
   }
   field(e, r = !0) {
@@ -3791,7 +3791,7 @@ class Ke {
         throw new RangeError("Field is not present in this state");
       return;
     }
-    return Ws(this, i), Jo(this, i);
+    return Vs(this, i), Jo(this, i);
   }
   /**
   Create a [transaction](https://codemirror.net/6/docs/ref/#state.Transaction) that updates this
@@ -3817,7 +3817,7 @@ class Ke {
   applyTransaction(e) {
     let r = this.config, { base: i, compartments: n } = r;
     for (let o of e.effects)
-      o.is(va.reconfigure) ? (r && (n = /* @__PURE__ */ new Map(), r.compartments.forEach((l, O) => n.set(O, l)), r = null), n.set(o.value.compartment, o.value.extension)) : o.is(ut.reconfigure) ? (r = null, i = o.value) : o.is(ut.appendConfig) && (r = null, i = In(i).concat(o.value));
+      o.is(xa.reconfigure) ? (r && (n = /* @__PURE__ */ new Map(), r.compartments.forEach((l, O) => n.set(O, l)), r = null), n.set(o.value.compartment, o.value.extension)) : o.is(ut.reconfigure) ? (r = null, i = o.value) : o.is(ut.appendConfig) && (r = null, i = In(i).concat(o.value));
     let s;
     r ? s = e.startState.values.slice() : (r = Ko.resolve(i, n, this), s = new Ke(r, this.doc, this.selection, r.dynamicSlots.map(() => null), (l, O) => O.reconfigure(l, this), null).values);
     let a = e.startState.facet(Ic) ? e.newSelection : e.newSelection.asSingle();
@@ -3886,7 +3886,7 @@ class Ke {
   */
   facet(e) {
     let r = this.config.address[e.id];
-    return r == null ? e.default : (Ws(this, r), Jo(this, r));
+    return r == null ? e.default : (Vs(this, r), Jo(this, r));
   }
   /**
   Convert this state to a JSON-serializable object. When custom
@@ -4060,7 +4060,7 @@ Ke.languageData = R_;
 Ke.changeFilter = E_;
 Ke.transactionFilter = C_;
 Ke.transactionExtender = Y_;
-va.reconfigure = /* @__PURE__ */ ut.define();
+xa.reconfigure = /* @__PURE__ */ ut.define();
 function A_(t, e, r = {}) {
   let i = {};
   for (let n of t)
@@ -4204,7 +4204,7 @@ class Be {
       return this;
     if (i && (r = r.slice().sort(Nc)), this.isEmpty)
       return r.length ? Be.of(r) : this;
-    let o = new V_(this, null, -1).goto(0), l = 0, O = [], h = new ea();
+    let o = new V_(this, null, -1).goto(0), l = 0, O = [], h = new ta();
     for (; o.value || l < r.length; )
       if (l < r.length && (o.from - r[l].from || o.startSide - r[l].value.startSide) >= 0) {
         let c = r[l++];
@@ -4252,7 +4252,7 @@ class Be {
   ranges that end at or after `from`.
   */
   iter(e = 0) {
-    return ta.from([this]).goto(e);
+    return ra.from([this]).goto(e);
   }
   /**
   @internal
@@ -4265,7 +4265,7 @@ class Be {
   starting from `from`.
   */
   static iter(e, r = 0) {
-    return ta.from(e).goto(r);
+    return ra.from(e).goto(r);
   }
   /**
   Iterate over two groups of sets, calling methods on `comparator`
@@ -4323,7 +4323,7 @@ class Be {
   cause the method to sort them.
   */
   static of(e, r = !1) {
-    let i = new ea();
+    let i = new ta();
     for (let n of e instanceof Bc ? [e] : r ? Jw(e) : e)
       i.add(n.from, n.to, n.value);
     return i.finish();
@@ -4353,7 +4353,7 @@ function Jw(t) {
   return t;
 }
 Be.empty.nextLayer = Be.empty;
-class ea {
+class ta {
   finishChunk(e) {
     this.chunks.push(new $u(this.from, this.to, this.value, this.maxPoint)), this.chunkPos.push(this.chunkStart), this.chunkStart = -1, this.setMaxPoint = Math.max(this.setMaxPoint, this.maxPoint), this.maxPoint = -1, e && (this.from = [], this.to = [], this.value = []);
   }
@@ -4368,7 +4368,7 @@ class ea {
   `value.startSide`) order.
   */
   add(e, r, i) {
-    this.addInner(e, r, i) || (this.nextLayer || (this.nextLayer = new ea())).add(e, r, i);
+    this.addInner(e, r, i) || (this.nextLayer || (this.nextLayer = new ta())).add(e, r, i);
   }
   /**
   @internal
@@ -4475,7 +4475,7 @@ class V_ {
     return this.from - e.from || this.startSide - e.startSide || this.rank - e.rank || this.to - e.to || this.endSide - e.endSide;
   }
 }
-class ta {
+class ra {
   constructor(e) {
     this.heap = e;
   }
@@ -4484,7 +4484,7 @@ class ta {
     for (let s = 0; s < e.length; s++)
       for (let a = e[s]; !a.isEmpty; a = a.nextLayer)
         a.maxPoint >= i && n.push(new V_(a, r, i, s));
-    return n.length == 1 ? n[0] : new ta(n);
+    return n.length == 1 ? n[0] : new ra(n);
   }
   get startSide() {
     return this.value ? this.value.startSide : 0;
@@ -4525,7 +4525,7 @@ function gO(t, e) {
 }
 class ws {
   constructor(e, r, i) {
-    this.minPoint = i, this.active = [], this.activeTo = [], this.activeRank = [], this.minActive = -1, this.point = null, this.pointFrom = 0, this.pointRank = 0, this.to = -1e9, this.endSide = 0, this.openStart = -1, this.cursor = ta.from(e, r, i);
+    this.minPoint = i, this.active = [], this.activeTo = [], this.activeRank = [], this.minActive = -1, this.point = null, this.pointFrom = 0, this.pointRank = 0, this.to = -1e9, this.endSide = 0, this.openStart = -1, this.cursor = ra.from(e, r, i);
   }
   goto(e, r = -1e9) {
     return this.cursor.goto(e, r), this.active.length = this.activeTo.length = this.activeRank.length = 0, this.minActive = -1, this.to = e, this.endSide = r, this.openStart = -1, this.next(), this;
@@ -4536,13 +4536,13 @@ class ws {
     this.cursor.forward(e, r);
   }
   removeActive(e) {
-    La(this.active, e), La(this.activeTo, e), La(this.activeRank, e), this.minActive = Of(this.active, this.activeTo);
+    Ia(this.active, e), Ia(this.activeTo, e), Ia(this.activeRank, e), this.minActive = Of(this.active, this.activeTo);
   }
   addActive(e) {
     let r = 0, { value: i, to: n, rank: s } = this.cursor;
     for (; r < this.activeRank.length && (s - this.activeRank[r] || n - this.activeTo[r]) > 0; )
       r++;
-    Ia(this.active, r, i), Ia(this.activeTo, r, n), Ia(this.activeRank, r, s), e && Ia(e, r, this.cursor.from), this.minActive = Of(this.active, this.activeTo);
+    Ma(this.active, r, i), Ma(this.activeTo, r, n), Ma(this.activeRank, r, s), e && Ma(e, r, this.cursor.from), this.minActive = Of(this.active, this.activeTo);
   }
   // After calling this, if `this.point` != null, the next range is a
   // point. Otherwise, it's a regular range, covered by `this.active`.
@@ -4557,7 +4557,7 @@ class ws {
           this.to = this.activeTo[n], this.endSide = this.active[n].endSide;
           break;
         }
-        this.removeActive(n), i && La(i, n);
+        this.removeActive(n), i && Ia(i, n);
       } else if (this.cursor.value)
         if (this.cursor.from > e) {
           this.to = this.cursor.from, this.endSide = this.cursor.startSide;
@@ -4617,12 +4617,12 @@ function Fc(t, e) {
       return !1;
   return !0;
 }
-function La(t, e) {
+function Ia(t, e) {
   for (let r = e, i = t.length - 1; r < i; r++)
     t[r] = t[r + 1];
   t.pop();
 }
-function Ia(t, e, r) {
+function Ma(t, e, r) {
   for (let i = t.length - 1; i >= e; i--)
     t[i + 1] = t[i];
   t[e] = r;
@@ -4808,7 +4808,7 @@ var Fi = {
   220: "\\",
   221: "]",
   222: "'"
-}, ra = {
+}, ia = {
   48: ")",
   49: "!",
   50: "@",
@@ -4837,10 +4837,10 @@ var Fi = {
 for (var Lt = 0; Lt < 10; Lt++) Fi[48 + Lt] = Fi[96 + Lt] = String(Lt);
 for (var Lt = 1; Lt <= 24; Lt++) Fi[Lt + 111] = "F" + Lt;
 for (var Lt = 65; Lt <= 90; Lt++)
-  Fi[Lt] = String.fromCharCode(Lt + 32), ra[Lt] = String.fromCharCode(Lt);
-for (var mO in Fi) ra.hasOwnProperty(mO) || (ra[mO] = Fi[mO]);
+  Fi[Lt] = String.fromCharCode(Lt + 32), ia[Lt] = String.fromCharCode(Lt);
+for (var mO in Fi) ia.hasOwnProperty(mO) || (ia[mO] = Fi[mO]);
 function n1(t) {
-  var e = r1 && t.metaKey && t.shiftKey && !t.ctrlKey && !t.altKey || i1 && t.shiftKey && t.key && t.key.length == 1 || t.key == "Unidentified", r = !e && t.key || (t.shiftKey ? ra : Fi)[t.keyCode] || t.key || "Unidentified";
+  var e = r1 && t.metaKey && t.shiftKey && !t.ctrlKey && !t.altKey || i1 && t.shiftKey && t.key && t.key.length == 1 || t.key == "Unidentified", r = !e && t.key || (t.shiftKey ? ia : Fi)[t.keyCode] || t.key || "Unidentified";
   return r == "Esc" && (r = "Escape"), r == "Del" && (r = "Delete"), r == "Left" && (r = "ArrowLeft"), r == "Up" && (r = "ArrowUp"), r == "Right" && (r = "ArrowRight"), r == "Down" && (r = "ArrowDown"), r;
 }
 let ar = typeof navigator < "u" ? navigator : { userAgent: "", vendor: "", platform: "" }, Jc = typeof document < "u" ? document : { documentElement: { style: {} } };
@@ -4908,7 +4908,7 @@ function o1(t) {
   }
   return e;
 }
-class xa {
+class Ta {
   /**
   Compare this instance to another instance of the same type.
   (TypeScript can't express this, but only instances of the same
@@ -5015,7 +5015,7 @@ class dt extends Bi {
   of lower-precedence decorations.
   */
   static mark(e) {
-    return new Ta(e);
+    return new Xa(e);
   }
   /**
   Create a widget decoration, which displays a DOM element at the
@@ -5044,7 +5044,7 @@ class dt extends Bi {
   line starting at the given position.
   */
   static line(e) {
-    return new Xa(e);
+    return new Ra(e);
   }
   /**
   Build a [`DecorationSet`](https://codemirror.net/6/docs/ref/#view.DecorationSet) from the given
@@ -5062,13 +5062,13 @@ class dt extends Bi {
   }
 }
 dt.none = Be.empty;
-class Ta extends dt {
+class Xa extends dt {
   constructor(e) {
     let { start: r, end: i } = j_(e);
     super(r ? -1 : 5e8, i ? 1 : -6e8, null, e), this.tagName = e.tagName || "span", this.attrs = e.class && e.attributes ? Qu(e.attributes, { class: e.class }) : e.class ? { class: e.class } : e.attributes || el;
   }
   eq(e) {
-    return this == e || e instanceof Ta && this.tagName == e.tagName && yu(this.attrs, e.attrs);
+    return this == e || e instanceof Xa && this.tagName == e.tagName && yu(this.attrs, e.attrs);
   }
   range(e, r = e) {
     if (e >= r)
@@ -5076,13 +5076,13 @@ class Ta extends dt {
     return super.range(e, r);
   }
 }
-Ta.prototype.point = !1;
-class Xa extends dt {
+Xa.prototype.point = !1;
+class Ra extends dt {
   constructor(e) {
     super(-2e8, -2e8, null, e);
   }
   eq(e) {
-    return e instanceof Xa && this.spec.class == e.spec.class && yu(this.spec.attributes, e.spec.attributes);
+    return e instanceof Ra && this.spec.class == e.spec.class && yu(this.spec.attributes, e.spec.attributes);
   }
   range(e, r = e) {
     if (r != e)
@@ -5090,8 +5090,8 @@ class Xa extends dt {
     return super.range(e, r);
   }
 }
-Xa.prototype.mapMode = lr.TrackBefore;
-Xa.prototype.point = !0;
+Ra.prototype.mapMode = lr.TrackBefore;
+Ra.prototype.point = !0;
 class _n extends dt {
   constructor(e, r, i, n, s, a) {
     super(r, i, s, e), this.block = n, this.isReplace = a, this.mapMode = n ? r <= 0 ? lr.TrackBefore : lr.TrackAfter : lr.TrackDel;
@@ -5126,19 +5126,19 @@ function Mn(t, e, r, i = 0) {
   let n = r.length - 1;
   n >= 0 && r[n] + i >= t ? r[n] = Math.max(r[n], e) : r.push(t, e);
 }
-class ia extends Bi {
+class na extends Bi {
   constructor(e, r) {
     super(), this.tagName = e, this.attributes = r;
   }
   eq(e) {
-    return e == this || e instanceof ia && this.tagName == e.tagName && yu(this.attributes, e.attributes);
+    return e == this || e instanceof na && this.tagName == e.tagName && yu(this.attributes, e.attributes);
   }
   /**
   Create a block wrapper object with the given tag name and
   attributes.
   */
   static create(e) {
-    return new ia(e.tagName, e.attributes || el);
+    return new na(e.tagName, e.attributes || el);
   }
   /**
   Create a range set from the given block wrapper ranges.
@@ -5147,15 +5147,15 @@ class ia extends Bi {
     return Be.of(e, r);
   }
 }
-ia.prototype.startSide = ia.prototype.endSide = -1;
-function na(t) {
+na.prototype.startSide = na.prototype.endSide = -1;
+function sa(t) {
   let e;
   return t.nodeType == 11 ? e = t.getSelection ? t : t.ownerDocument : e = t, e.getSelection();
 }
 function ih(t, e) {
   return e ? t == e || t.contains(e.nodeType != 1 ? e.parentNode : e) : !1;
 }
-function Vs(t, e) {
+function Ds(t, e) {
   if (!e.anchorNode)
     return !1;
   try {
@@ -5165,9 +5165,9 @@ function Vs(t, e) {
   }
 }
 function Co(t) {
-  return t.nodeType == 3 ? sa(t, 0, t.nodeValue.length).getClientRects() : t.nodeType == 1 ? t.getClientRects() : [];
+  return t.nodeType == 3 ? aa(t, 0, t.nodeValue.length).getClientRects() : t.nodeType == 1 ? t.getClientRects() : [];
 }
-function Ds(t, e, r, i) {
+function js(t, e, r, i) {
   return r ? gf(t, e, r, i, -1) || gf(t, e, r, i, 1) : !1;
 }
 function Hi(t) {
@@ -5331,7 +5331,7 @@ function M_(t) {
   }
 }
 let mf;
-function sa(t, e, r = e) {
+function aa(t, e, r = e) {
   let i = mf || (mf = document.createRange());
   return i.setEnd(t, r), i.setStart(t, e), i;
 }
@@ -5709,7 +5709,7 @@ class Bn {
     return this.range.to <= e.doc.length ? this : new Bn(K.cursor(e.doc.length), this.y, this.x, this.yMargin, this.xMargin, this.isSnapshot);
   }
 }
-const Ma = /* @__PURE__ */ ut.define({ map: (t, e) => t.map(e) }), O$ = /* @__PURE__ */ ut.define();
+const Ga = /* @__PURE__ */ ut.define({ map: (t, e) => t.map(e) }), O$ = /* @__PURE__ */ ut.define();
 function Oi(t, e, r) {
   let i = t.facet(n$);
   i.length ? i[0](e) : window.onerror && window.onerror(String(e), r, void 0, void 0, e) || (r ? console.error(r + ":", e) : console.error(e));
@@ -5802,7 +5802,7 @@ class $O {
     this.spec = this.value = null;
   }
 }
-const c$ = /* @__PURE__ */ me.define(), wu = /* @__PURE__ */ me.define(), El = /* @__PURE__ */ me.define(), h$ = /* @__PURE__ */ me.define(), Pu = /* @__PURE__ */ me.define(), Ra = /* @__PURE__ */ me.define(), u$ = /* @__PURE__ */ me.define();
+const c$ = /* @__PURE__ */ me.define(), wu = /* @__PURE__ */ me.define(), El = /* @__PURE__ */ me.define(), h$ = /* @__PURE__ */ me.define(), Pu = /* @__PURE__ */ me.define(), za = /* @__PURE__ */ me.define(), u$ = /* @__PURE__ */ me.define();
 function _f(t, e) {
   let r = t.state.facet(u$);
   if (!r.length)
@@ -5834,7 +5834,7 @@ function f$(t) {
   }
   return { left: e, right: r, top: i, bottom: n };
 }
-const Zs = /* @__PURE__ */ me.define();
+const Us = /* @__PURE__ */ me.define();
 class Rr {
   constructor(e, r, i, n) {
     this.fromA = e, this.toA = r, this.fromB = i, this.toB = n;
@@ -6253,7 +6253,7 @@ class pn extends $t {
     e > i && (e = i);
     let n = e, s = e, a = 0;
     e == 0 && r < 0 || e == i && r >= 0 ? fe.chrome || fe.gecko || (e ? (n--, a = 1) : s < i && (s++, a = -1)) : r < 0 ? n-- : s < i && s++;
-    let o = sa(this.dom, n, s).getClientRects();
+    let o = aa(this.dom, n, s).getClientRects();
     if (!o.length)
       return null;
     let l = o[(a ? a < 0 : r >= 0) ? 0 : o.length - 1];
@@ -6730,7 +6730,7 @@ class E1 {
       let s = $t.get(n);
       if (n == this.view.contentDOM)
         break;
-      s instanceof fr ? r.push(s) : s != null && s.isLine() ? i = s : s instanceof Xi || (n.nodeName == "DIV" && !i && n != this.view.contentDOM ? i = new ts(n, p$) : i || r.push(fr.of(new Ta({ tagName: n.nodeName.toLowerCase(), attributes: o1(n) }), n)));
+      s instanceof fr ? r.push(s) : s != null && s.isLine() ? i = s : s instanceof Xi || (n.nodeName == "DIV" && !i && n != this.view.contentDOM ? i = new ts(n, p$) : i || r.push(fr.of(new Xa({ tagName: n.nodeName.toLowerCase(), attributes: o1(n) }), n)));
     }
     return { line: i, marks: r };
   }
@@ -6765,7 +6765,7 @@ function QO(t) {
   let e = $t.get(t);
   return e && e.setDOM(t.cloneNode()), t;
 }
-class rs extends xa {
+class rs extends Ta {
   constructor(e) {
     super(), this.tag = e;
   }
@@ -6784,7 +6784,7 @@ class rs extends xa {
 }
 rs.inline = /* @__PURE__ */ new rs("span");
 rs.block = /* @__PURE__ */ new rs("div");
-const yO = /* @__PURE__ */ new class extends xa {
+const yO = /* @__PURE__ */ new class extends Ta {
   toDOM() {
     return document.createElement("br");
   }
@@ -6852,7 +6852,7 @@ class yf {
   // Sync the DOM selection to this.state.selection
   updateSelection(e = !1, r = !1) {
     (e || !this.view.observer.selectionRange.focusNode) && this.view.observer.readSelectionRange();
-    let { dom: i } = this.tile, n = this.view.root.activeElement, s = n == i, a = !s && !(this.view.state.facet(xi) || i.tabIndex > -1) && Vs(i, this.view.observer.selectionRange) && !(n && i.contains(n));
+    let { dom: i } = this.tile, n = this.view.root.activeElement, s = n == i, a = !s && !(this.view.state.facet(xi) || i.tabIndex > -1) && Ds(i, this.view.observer.selectionRange) && !(n && i.contains(n));
     if (!(s || r || a))
       return;
     let o = this.forceSelection;
@@ -6863,9 +6863,9 @@ class yf {
       this.view.observer.ignore(() => O.node.insertBefore(u, O.node.childNodes[O.offset] || null)), O = h = new Vr(u, 0), o = !0;
     }
     let c = this.view.observer.selectionRange;
-    (o || !c.focusNode || (!Ds(O.node, O.offset, c.anchorNode, c.anchorOffset) || !Ds(h.node, h.offset, c.focusNode, c.focusOffset)) && !this.suppressWidgetCursorChange(c, l)) && (this.view.observer.ignore(() => {
+    (o || !c.focusNode || (!js(O.node, O.offset, c.anchorNode, c.anchorOffset) || !js(h.node, h.offset, c.focusNode, c.focusOffset)) && !this.suppressWidgetCursorChange(c, l)) && (this.view.observer.ignore(() => {
       fe.android && fe.chrome && i.contains(c.focusNode) && L1(c.focusNode, i) && (i.blur(), i.focus({ preventScroll: !0 }));
-      let u = na(this.view.root);
+      let u = sa(this.view.root);
       if (u) if (l.empty) {
         if (fe.gecko) {
           let d = A1(O.node, O.offset);
@@ -6892,12 +6892,12 @@ class yf {
   // composition, avoid moving it across it and disrupting the
   // composition.
   suppressWidgetCursorChange(e, r) {
-    return this.hasComposition && r.empty && Ds(e.focusNode, e.focusOffset, e.anchorNode, e.anchorOffset) && this.posFromDOM(e.focusNode, e.focusOffset) == r.head;
+    return this.hasComposition && r.empty && js(e.focusNode, e.focusOffset, e.anchorNode, e.anchorOffset) && this.posFromDOM(e.focusNode, e.focusOffset) == r.head;
   }
   enforceCursorAssoc() {
     if (this.hasComposition)
       return;
-    let { view: e } = this, r = e.state.selection.main, i = na(e.root), { anchorNode: n, anchorOffset: s } = e.observer.selectionRange;
+    let { view: e } = this, r = e.state.selection.main, i = sa(e.root), { anchorNode: n, anchorOffset: s } = e.observer.selectionRange;
     if (!i || !r.empty || !r.assoc || !i.modify)
       return;
     let a = this.lineAt(r.head, r.assoc);
@@ -6992,7 +6992,7 @@ class yf {
         let o = Ht(s.text, a);
         if (o == a)
           return null;
-        let l = sa(s.dom, a, o).getClientRects();
+        let l = aa(s.dom, a, o).getClientRects();
         for (let O = 0; O < l.length; O++) {
           let h = l[O];
           if (O == l.length - 1 || h.top < h.bottom && h.left < h.right)
@@ -7219,7 +7219,7 @@ function I1(t, e) {
     i < e.to && n > e.from && (r = !0);
   }), r;
 }
-class bO extends xa {
+class bO extends Ta {
   constructor(e) {
     super(), this.height = e;
   }
@@ -7352,7 +7352,7 @@ function H1(t, e, r, i) {
       return K.cursor(f.pos, f.assoc, void 0, a);
   }
 }
-function js(t, e, r) {
+function Ls(t, e, r) {
   for (; ; ) {
     let i = 0;
     for (let n of t)
@@ -7371,10 +7371,10 @@ function m$(t, e) {
   for (let i = 0; i < e.ranges.length; i++) {
     let n = e.ranges[i], s = null;
     if (n.empty) {
-      let a = js(t, n.from, 0);
+      let a = Ls(t, n.from, 0);
       a != n.from && (s = K.cursor(a, -1));
     } else {
-      let a = js(t, n.from, -1), o = js(t, n.to, 1);
+      let a = Ls(t, n.from, -1), o = Ls(t, n.to, 1);
       (a != n.from || o != n.to) && (s = K.range(n.from == n.anchor ? a : o, n.from == n.head ? a : o));
     }
     s && (r || (r = e.ranges.slice()), r[i] = s);
@@ -7382,7 +7382,7 @@ function m$(t, e) {
   return r ? K.create(r, e.mainIndex) : e;
 }
 function SO(t, e, r) {
-  let i = js(t.state.facet(Ra).map((n) => n(t)), r.from, e.head > r.from ? -1 : 1);
+  let i = Ls(t.state.facet(za).map((n) => n(t)), r.from, e.head > r.from ? -1 : 1);
   return i == r.from ? r : K.cursor(i, i < r.from ? 1 : -1);
 }
 class oi {
@@ -7507,7 +7507,7 @@ class K1 {
     i.push(r + e.length);
     let n = this.scan(i, (s) => {
       let a = i[s] - r, o = i[s + 1] - r;
-      return sa(e.dom, a, o).getClientRects();
+      return aa(e.dom, a, o).getClientRects();
     });
     return n.after ? new oi(i[n.i + 1], -1) : new oi(i[n.i], 1);
   }
@@ -7526,7 +7526,7 @@ class K1 {
       i.push(l += e.children[o].length);
     let n = this.scan(i, (o) => {
       let l = e.children[o];
-      return l.flags & 48 ? null : (l.dom.nodeType == 1 ? l.dom : sa(l.dom, 0, l.length)).getClientRects();
+      return l.flags & 48 ? null : (l.dom.nodeType == 1 ? l.dom : aa(l.dom, 0, l.length)).getClientRects();
     }), s = e.children[n.i], a = i[n.i];
     return s.isText() ? this.scanText(s, a) : s.isComposite() ? this.scanTile(s, a) : n.after ? new oi(i[n.i + 1], -1) : new oi(a, 1);
   }
@@ -7694,7 +7694,7 @@ function $$(t, e) {
     return vu(t, r, i, a);
   if (i && !al(i, s)) {
     let o = !1, l = "select";
-    return t.inputState.lastSelectionTime > Date.now() - 50 && (t.inputState.lastSelectionOrigin == "select" && (o = !0), l = t.inputState.lastSelectionOrigin, l == "select.pointer" && (i = m$(n.facet(Ra).map((O) => O(t)), i))), t.dispatch({ selection: i, scrollIntoView: o, userEvent: l }), !0;
+    return t.inputState.lastSelectionTime > Date.now() - 50 && (t.inputState.lastSelectionOrigin == "select" && (o = !0), l = t.inputState.lastSelectionOrigin, l == "select.pointer" && (i = m$(n.facet(za).map((O) => O(t)), i))), t.dispatch({ selection: i, scrollIntoView: o, userEvent: l }), !0;
   } else
     return !1;
 }
@@ -7714,7 +7714,7 @@ function vu(t, e, r, i = -1) {
 function iP(t, e, r) {
   let i, n = t.state, s = n.selection.main, a = -1;
   if (e.from == e.to && e.from < s.from || e.from > s.to) {
-    let l = e.from < s.from ? -1 : 1, O = l < 0 ? s.from : s.to, h = js(n.facet(Ra).map((c) => c(t)), O, l);
+    let l = e.from < s.from ? -1 : 1, O = l < 0 ? s.from : s.to, h = Ls(n.facet(za).map((c) => c(t)), O, l);
     e.from == h && (a = h);
   }
   if (a > -1)
@@ -7897,8 +7897,8 @@ const y$ = [
   { key: "Enter", keyCode: 13, inputType: "insertParagraph" },
   { key: "Enter", keyCode: 13, inputType: "insertLineBreak" },
   { key: "Delete", keyCode: 46, inputType: "deleteContentForward" }
-], lP = "dthko", b$ = [16, 17, 18, 20, 91, 92, 224, 225], Ga = 6;
-function Ba(t) {
+], lP = "dthko", b$ = [16, 17, 18, 20, 91, 92, 224, 225], Ba = 6;
+function Na(t) {
   return Math.max(0, t) * 0.7 + 8;
 }
 function OP(t, e) {
@@ -7906,7 +7906,7 @@ function OP(t, e) {
 }
 class cP {
   constructor(e, r, i, n) {
-    this.view = e, this.startEvent = r, this.style = i, this.mustSelect = n, this.scrollSpeed = { x: 0, y: 0 }, this.scrolling = -1, this.lastEvent = r, this.scrollParents = I_(e.contentDOM), this.atoms = e.state.facet(Ra).map((a) => a(e));
+    this.view = e, this.startEvent = r, this.style = i, this.mustSelect = n, this.scrollSpeed = { x: 0, y: 0 }, this.scrolling = -1, this.lastEvent = r, this.scrollParents = I_(e.contentDOM), this.atoms = e.state.facet(za).map((a) => a(e));
     let s = e.contentDOM.ownerDocument;
     s.addEventListener("mousemove", this.move = this.move.bind(this)), s.addEventListener("mouseup", this.up = this.up.bind(this)), this.extend = r.shiftKey, this.multiple = e.state.facet(Ke.allowMultipleSelections) && hP(e, r), this.dragging = dP(e, r) && w$(r) == 1 ? null : !1;
   }
@@ -7922,7 +7922,7 @@ class cP {
     let r = 0, i = 0, n = 0, s = 0, a = this.view.win.innerWidth, o = this.view.win.innerHeight;
     this.scrollParents.x && ({ left: n, right: a } = this.scrollParents.x.getBoundingClientRect()), this.scrollParents.y && ({ top: s, bottom: o } = this.scrollParents.y.getBoundingClientRect());
     let l = f$(this.view);
-    e.clientX - l.left <= n + Ga ? r = -Ba(n - e.clientX) : e.clientX + l.right >= a - Ga && (r = Ba(e.clientX - a)), e.clientY - l.top <= s + Ga ? i = -Ba(s - e.clientY) : e.clientY + l.bottom >= o - Ga && (i = Ba(e.clientY - o)), this.setScrollSpeed(r, i);
+    e.clientX - l.left <= n + Ba ? r = -Na(n - e.clientX) : e.clientX + l.right >= a - Ba && (r = Na(e.clientX - a)), e.clientY - l.top <= s + Ba ? i = -Na(s - e.clientY) : e.clientY + l.bottom >= o - Ba && (i = Na(e.clientY - o)), this.setScrollSpeed(r, i);
   }
   up(e) {
     this.dragging == null && this.select(this.lastEvent), this.dragging || e.preventDefault(), this.destroy();
@@ -7962,7 +7962,7 @@ function dP(t, e) {
   let { main: r } = t.state.selection;
   if (r.empty)
     return !1;
-  let i = na(t.root);
+  let i = sa(t.root);
   if (!i || i.rangeCount == 0)
     return !0;
   let n = i.getRangeAt(0).getClientRects();
@@ -8182,7 +8182,7 @@ function QP(t) {
 }
 let ch = null;
 jr.copy = jr.cut = (t, e) => {
-  if (!Vs(t.contentDOM, t.observer.selectionRange))
+  if (!Ds(t.contentDOM, t.observer.selectionRange))
     return !1;
   let { text: r, ranges: i, linewise: n } = QP(t.state);
   if (!r && !n)
@@ -8772,7 +8772,7 @@ class kO {
     }).range(this.from, this.to);
   }
 }
-class zP extends xa {
+class zP extends Ta {
   constructor(e, r) {
     super(), this.size = e, this.vertical = r;
   }
@@ -8802,7 +8802,7 @@ class Cf {
       let n = i ? r.head : r.anchor;
       if (!e.some(({ from: s, to: a }) => n >= s && n <= a)) {
         let { from: s, to: a } = this.lineBlockAt(n);
-        e.push(new Na(s, a));
+        e.push(new Fa(s, a));
       }
     }
     return this.viewports = e.sort((i, n) => i.from - n.from), this.updateScaler();
@@ -8813,7 +8813,7 @@ class Cf {
   }
   updateViewportLines() {
     this.viewportLines = [], this.heightMap.forEachLine(this.viewport.from, this.viewport.to, this.heightOracle.setDoc(this.state.doc), 0, 0, (e) => {
-      this.viewportLines.push(Us(e, this.scaler));
+      this.viewportLines.push(qs(e, this.scaler));
     });
   }
   update(e, r = null) {
@@ -8872,19 +8872,19 @@ class Cf {
     return this.scaler.fromDOM(this.pixelViewport.bottom);
   }
   getViewport(e, r) {
-    let i = 0.5 - Math.max(-0.5, Math.min(0.5, e / 1e3 / 2)), n = this.heightMap, s = this.heightOracle, { visibleTop: a, visibleBottom: o } = this, l = new Na(n.lineAt(a - i * 1e3, Ot.ByHeight, s, 0, 0).from, n.lineAt(o + (1 - i) * 1e3, Ot.ByHeight, s, 0, 0).to);
+    let i = 0.5 - Math.max(-0.5, Math.min(0.5, e / 1e3 / 2)), n = this.heightMap, s = this.heightOracle, { visibleTop: a, visibleBottom: o } = this, l = new Fa(n.lineAt(a - i * 1e3, Ot.ByHeight, s, 0, 0).from, n.lineAt(o + (1 - i) * 1e3, Ot.ByHeight, s, 0, 0).to);
     if (r) {
       let { head: O } = r.range;
       if (O < l.from || O > l.to) {
         let h = Math.min(this.editorHeight, this.pixelViewport.bottom - this.pixelViewport.top), c = n.lineAt(O, Ot.ByPos, s, 0, 0), u;
-        r.y == "center" ? u = (c.top + c.bottom) / 2 - h / 2 : r.y == "start" || r.y == "nearest" && O < l.from ? u = c.top : u = c.bottom - h, l = new Na(n.lineAt(u - 1e3 / 2, Ot.ByHeight, s, 0, 0).from, n.lineAt(u + h + 1e3 / 2, Ot.ByHeight, s, 0, 0).to);
+        r.y == "center" ? u = (c.top + c.bottom) / 2 - h / 2 : r.y == "start" || r.y == "nearest" && O < l.from ? u = c.top : u = c.bottom - h, l = new Fa(n.lineAt(u - 1e3 / 2, Ot.ByHeight, s, 0, 0).from, n.lineAt(u + h + 1e3 / 2, Ot.ByHeight, s, 0, 0).to);
       }
     }
     return l;
   }
   mapViewport(e, r) {
     let i = r.mapPos(e.from, -1), n = r.mapPos(e.to, 1);
-    return new Na(this.heightMap.lineAt(i, Ot.ByPos, this.heightOracle, 0, 0).from, this.heightMap.lineAt(n, Ot.ByPos, this.heightOracle, 0, 0).to);
+    return new Fa(this.heightMap.lineAt(i, Ot.ByPos, this.heightOracle, 0, 0).from, this.heightMap.lineAt(n, Ot.ByPos, this.heightOracle, 0, 0).to);
   }
   // Checks if a given viewport covers the visible part of the
   // document and not too much beyond that.
@@ -8951,11 +8951,11 @@ class Cf {
       if (i) {
         let Q = n / this.heightOracle.lineLength * this.heightOracle.lineHeight, f, p;
         if (u != null) {
-          let g = Ha(c, u), _ = ((this.visibleBottom - this.visibleTop) / 2 + Q) / h.height;
+          let g = Ka(c, u), _ = ((this.visibleBottom - this.visibleTop) / 2 + Q) / h.height;
           f = g - _, p = g + _;
         } else
           f = (this.visibleTop - h.top - Q) / h.height, p = (this.visibleBottom - h.top + Q) / h.height;
-        d = Fa(c, f), $ = Fa(c, p);
+        d = Ha(c, f), $ = Ha(c, p);
       } else {
         let Q = c.total * this.heightOracle.charWidth, f = n * this.heightOracle.charWidth, p = 0;
         if (Q > 2e6)
@@ -8963,11 +8963,11 @@ class Cf {
             m.from >= h.from && m.from < h.to && m.size != m.displaySize && m.from * this.heightOracle.charWidth + p < this.pixelViewport.left && (p = m.size - m.displaySize);
         let g = this.pixelViewport.left + p, _ = this.pixelViewport.right + p, y, b;
         if (u != null) {
-          let m = Ha(c, u), k = ((_ - g) / 2 + f) / Q;
+          let m = Ka(c, u), k = ((_ - g) / 2 + f) / Q;
           y = m - k, b = m + k;
         } else
           y = (g - f) / Q, b = (_ + f) / Q;
-        d = Fa(c, y), $ = Fa(c, b);
+        d = Ha(c, y), $ = Ha(c, b);
       }
       d > h.from && l(h.from, d, h, c), $ < h.to && l($, h.to, h, c);
     };
@@ -8976,7 +8976,7 @@ class Cf {
     return o;
   }
   gapSize(e, r, i, n) {
-    let s = Ha(n, i) - Ha(n, r);
+    let s = Ka(n, i) - Ka(n, r);
     return this.heightOracle.lineWrapping ? e.height * s : n.total * this.heightOracle.charWidth * s;
   }
   updateLineGaps(e) {
@@ -9004,10 +9004,10 @@ class Cf {
     return this.visibleRanges = i, n;
   }
   lineBlockAt(e) {
-    return e >= this.viewport.from && e <= this.viewport.to && this.viewportLines.find((r) => r.from <= e && r.to >= e) || Us(this.heightMap.lineAt(e, Ot.ByPos, this.heightOracle, 0, 0), this.scaler);
+    return e >= this.viewport.from && e <= this.viewport.to && this.viewportLines.find((r) => r.from <= e && r.to >= e) || qs(this.heightMap.lineAt(e, Ot.ByPos, this.heightOracle, 0, 0), this.scaler);
   }
   lineBlockAtHeight(e) {
-    return e >= this.viewportLines[0].top && e <= this.viewportLines[this.viewportLines.length - 1].bottom && this.viewportLines.find((r) => r.top <= e && r.bottom >= e) || Us(this.heightMap.lineAt(this.scaler.fromDOM(e), Ot.ByHeight, this.heightOracle, 0, 0), this.scaler);
+    return e >= this.viewportLines[0].top && e <= this.viewportLines[this.viewportLines.length - 1].bottom && this.viewportLines.find((r) => r.top <= e && r.bottom >= e) || qs(this.heightMap.lineAt(this.scaler.fromDOM(e), Ot.ByHeight, this.heightOracle, 0, 0), this.scaler);
   }
   getScrollOffset() {
     return (this.scrollParent == this.view.scrollDOM ? this.scrollParent.scrollTop : (this.scrollParent ? this.scrollParent.getBoundingClientRect().top : 0) - this.view.contentDOM.getBoundingClientRect().top) * this.scaleY;
@@ -9017,7 +9017,7 @@ class Cf {
     return r.from >= this.viewport.from || this.viewportLines[0].top - e > 200 ? r : this.viewportLines[0];
   }
   elementAtHeight(e) {
-    return Us(this.heightMap.blockAt(this.scaler.fromDOM(e), this.heightOracle, 0, 0), this.scaler);
+    return qs(this.heightMap.blockAt(this.scaler.fromDOM(e), this.heightOracle, 0, 0), this.scaler);
   }
   get docHeight() {
     return this.scaler.toDOM(this.heightMap.height);
@@ -9026,7 +9026,7 @@ class Cf {
     return this.docHeight + this.paddingTop + this.paddingBottom;
   }
 }
-class Na {
+class Fa {
   constructor(e, r) {
     this.from = e, this.to = r;
   }
@@ -9041,7 +9041,7 @@ function EP(t, e, r) {
     }
   }, 20), n < e && (i.push({ from: n, to: e }), s += e - n), { total: s, ranges: i };
 }
-function Fa({ total: t, ranges: e }, r) {
+function Ha({ total: t, ranges: e }, r) {
   if (r <= 0)
     return e[0].from;
   if (r >= 1)
@@ -9054,7 +9054,7 @@ function Fa({ total: t, ranges: e }, r) {
     i -= o;
   }
 }
-function Ha(t, e) {
+function Ka(t, e) {
   let r = 0;
   for (let { from: i, to: n } of t.ranges) {
     if (e <= n) {
@@ -9120,13 +9120,13 @@ class Tu {
     return e instanceof Tu ? this.scale == e.scale && this.viewports.length == e.viewports.length && this.viewports.every((r, i) => r.from == e.viewports[i].from && r.to == e.viewports[i].to) : !1;
   }
 }
-function Us(t, e) {
+function qs(t, e) {
   if (e.scale == 1)
     return t;
   let r = e.toDOM(t.top), i = e.toDOM(t.bottom);
-  return new Wr(t.from, t.length, r, i - r, Array.isArray(t._content) ? t._content.map((n) => Us(n, e)) : t._content);
+  return new Wr(t.from, t.length, r, i - r, Array.isArray(t._content) ? t._content.map((n) => qs(n, e)) : t._content);
 }
-const Ka = /* @__PURE__ */ me.define({ combine: (t) => t.join(" ") }), hh = /* @__PURE__ */ me.define({ combine: (t) => t.indexOf(!0) > -1 }), uh = /* @__PURE__ */ Ni.newName(), X$ = /* @__PURE__ */ Ni.newName(), R$ = /* @__PURE__ */ Ni.newName(), z$ = { "&light": "." + X$, "&dark": "." + R$ };
+const Ja = /* @__PURE__ */ me.define({ combine: (t) => t.join(" ") }), hh = /* @__PURE__ */ me.define({ combine: (t) => t.indexOf(!0) > -1 }), uh = /* @__PURE__ */ Ni.newName(), X$ = /* @__PURE__ */ Ni.newName(), R$ = /* @__PURE__ */ Ni.newName(), z$ = { "&light": "." + X$, "&dark": "." + R$ };
 function dh(t, e, r) {
   return new Ni(e, {
     finish(i) {
@@ -9481,7 +9481,7 @@ class UP {
     if (!this.readSelectionRange() || this.delayedAndroidKey)
       return;
     let { view: i } = this, n = this.selectionRange;
-    if (i.state.facet(xi) ? i.root.activeElement != this.dom : !Vs(this.dom, n))
+    if (i.state.facet(xi) ? i.root.activeElement != this.dom : !Ds(this.dom, n))
       return;
     let s = n.anchorNode && i.docView.tile.nearest(n.anchorNode);
     if (s && s.isWidget() && s.widget.ignoreEvent(e)) {
@@ -9489,16 +9489,16 @@ class UP {
       return;
     }
     (fe.ie && fe.ie_version <= 11 || fe.android && fe.chrome) && !i.state.selection.main.empty && // (Selection.isCollapsed isn't reliable on IE)
-    n.focusNode && Ds(n.focusNode, n.focusOffset, n.anchorNode, n.anchorOffset) ? this.flushSoon() : this.flush(!1);
+    n.focusNode && js(n.focusNode, n.focusOffset, n.anchorNode, n.anchorOffset) ? this.flushSoon() : this.flush(!1);
   }
   readSelectionRange() {
-    let { view: e } = this, r = na(e.root);
+    let { view: e } = this, r = sa(e.root);
     if (!r)
       return !1;
     let i = fe.safari && e.root.nodeType == 11 && e.root.activeElement == this.dom && qP(this.view, r) || r;
     if (!i || this.selectionRange.eq(i))
       return !1;
-    let n = Vs(this.dom, i);
+    let n = Ds(this.dom, i);
     return n && !this.selectionChanged && e.inputState.lastFocusTime > Date.now() - 200 && e.inputState.lastTouchTime < Date.now() - 300 && d1(this.dom, i) ? (this.view.inputState.lastFocusTime = 0, e.docView.updateSelection(), !1) : (this.selectionRange.setRange(i), n && (this.selectionChanged = !0), !0);
   }
   setSelectionRange(e, r) {
@@ -9597,7 +9597,7 @@ class UP {
     return { from: r, to: i, typeOver: n };
   }
   readChange() {
-    let { from: e, to: r, typeOver: i } = this.processRecords(), n = this.selectionChanged && Vs(this.dom, this.selectionRange);
+    let { from: e, to: r, typeOver: i } = this.processRecords(), n = this.selectionChanged && Ds(this.dom, this.selectionRange);
     if (e < 0 && !n)
       return null;
     e > -1 && (this.lastChange = Date.now()), this.view.inputState.lastFocusTime = 0, this.selectionChanged = !1;
@@ -9660,7 +9660,7 @@ function Uf(t, e, r) {
 }
 function qf(t, e) {
   let r = e.startContainer, i = e.startOffset, n = e.endContainer, s = e.endOffset, a = t.docView.domAtPos(t.state.selection.main.anchor, 1);
-  return Ds(a.node, a.offset, n, s) && ([r, i, n, s] = [n, s, r, i]), { anchorNode: r, anchorOffset: i, focusNode: n, focusOffset: s };
+  return js(a.node, a.offset, n, s) && ([r, i, n, s] = [n, s, r, i]), { anchorNode: r, anchorOffset: i, focusNode: n, focusOffset: s };
 }
 function qP(t, e) {
   if (e.getComposedRanges) {
@@ -9736,7 +9736,7 @@ class AP {
       r.addEventListener(i, this.handlers[i]);
     this.measureReq = { read: (i) => {
       this.editContext.updateControlBounds(i.contentDOM.getBoundingClientRect());
-      let n = na(i.root);
+      let n = sa(i.root);
       n && n.rangeCount && this.editContext.updateSelectionBounds(n.getRangeAt(0).getBoundingClientRect());
     } };
   }
@@ -9882,7 +9882,7 @@ class be {
     var r;
     this.plugins = [], this.pluginMap = /* @__PURE__ */ new Map(), this.editorAttrs = {}, this.contentAttrs = {}, this.bidiCache = [], this.destroyed = !1, this.updateState = 2, this.measureScheduled = -1, this.measureRequests = [], this.contentDOM = document.createElement("div"), this.scrollDOM = document.createElement("div"), this.scrollDOM.tabIndex = -1, this.scrollDOM.className = "cm-scroller", this.scrollDOM.appendChild(this.contentDOM), this.announceDOM = document.createElement("div"), this.announceDOM.className = "cm-announced", this.announceDOM.setAttribute("aria-live", "polite"), this.dom = document.createElement("div"), this.dom.appendChild(this.announceDOM), this.dom.appendChild(this.scrollDOM), e.parent && e.parent.appendChild(this.dom);
     let { dispatch: i } = e;
-    this.dispatchTransactions = e.dispatchTransactions || i && ((n) => n.forEach((s) => i(s, this))) || ((n) => this.update(n)), this.dispatch = this.dispatch.bind(this), this._root = e.root || u1(e.parent) || document, this.viewState = new Cf(this, e.state || Ke.create(e)), e.scrollTo && e.scrollTo.is(Ma) && (this.viewState.scrollTarget = e.scrollTo.value.clip(this.viewState.state)), this.plugins = this.state.facet(Dn).map((n) => new $O(n));
+    this.dispatchTransactions = e.dispatchTransactions || i && ((n) => n.forEach((s) => i(s, this))) || ((n) => this.update(n)), this.dispatch = this.dispatch.bind(this), this._root = e.root || u1(e.parent) || document, this.viewState = new Cf(this, e.state || Ke.create(e)), e.scrollTo && e.scrollTo.is(Ga) && (this.viewState.scrollTarget = e.scrollTo.value.clip(this.viewState.state)), this.plugins = this.state.facet(Dn).map((n) => new $O(n));
     for (let n of this.plugins)
       n.update(this);
     this.observer = new UP(this), this.inputState = new aP(this), this.inputState.ensureHandlers(this.plugins), this.docView = new yf(this), this.mountStyles(), this.updateAttrs(), this.updateState = 0, this.requestMeasure(), !((r = document.fonts) === null || r === void 0) && r.ready && document.fonts.ready.then(() => {
@@ -9929,13 +9929,13 @@ class be {
           c = new Bn(d.empty ? d : K.cursor(d.head, d.head > d.anchor ? -1 : 1), "nearest", "nearest", Q, $);
         }
         for (let d of u.effects)
-          d.is(Ma) && (c = d.value.clip(this.state));
+          d.is(Ga) && (c = d.value.clip(this.state));
       }
-      this.viewState.update(n, c), this.bidiCache = ll.update(this.bidiCache, n.changes), n.empty || (this.updatePlugins(n), this.inputState.update(n)), r = this.docView.update(n), this.state.facet(Zs) != this.styleModules && this.mountStyles(), i = this.updateAttrs(), this.showAnnouncements(e), this.docView.updateSelection(r, e.some((u) => u.isUserEvent("select.pointer")));
+      this.viewState.update(n, c), this.bidiCache = ll.update(this.bidiCache, n.changes), n.empty || (this.updatePlugins(n), this.inputState.update(n)), r = this.docView.update(n), this.state.facet(Us) != this.styleModules && this.mountStyles(), i = this.updateAttrs(), this.showAnnouncements(e), this.docView.updateSelection(r, e.some((u) => u.isUserEvent("select.pointer")));
     } finally {
       this.updateState = 0;
     }
-    if (n.startState.facet(Ka) != n.state.facet(Ka) && (this.viewState.mustMeasureContent = !0), (r || i || c || this.viewState.mustEnforceCursorAssoc || this.viewState.mustMeasureContent) && this.requestMeasure(), r && this.docViewUpdate(), !n.empty)
+    if (n.startState.facet(Ja) != n.state.facet(Ja) && (this.viewState.mustMeasureContent = !0), (r || i || c || this.viewState.mustEnforceCursorAssoc || this.viewState.mustMeasureContent) && this.requestMeasure(), r && this.docViewUpdate(), !n.empty)
       for (let u of this.state.facet(oh))
         try {
           u(n);
@@ -10082,7 +10082,7 @@ class be {
   Get the CSS classes for the currently active editor themes.
   */
   get themeClasses() {
-    return uh + " " + (this.state.facet(hh) ? R$ : X$) + " " + this.state.facet(Ka);
+    return uh + " " + (this.state.facet(hh) ? R$ : X$) + " " + this.state.facet(Ja);
   }
   updateAttrs() {
     let e = Wf(this, c$, {
@@ -10117,7 +10117,7 @@ class be {
         }
   }
   mountStyles() {
-    this.styleModules = this.state.facet(Zs);
+    this.styleModules = this.state.facet(Us);
     let e = this.state.facet(be.cspNonce);
     Ni.mount(this.root, this.styleModules.concat(YP).reverse(), e ? { nonce: e } : void 0);
   }
@@ -10450,7 +10450,7 @@ class be {
   */
   static scrollIntoView(e, r = {}) {
     var i, n, s, a;
-    return Ma.of(new Bn(typeof e == "number" ? K.cursor(e) : e, (i = r.y) !== null && i !== void 0 ? i : "nearest", (n = r.x) !== null && n !== void 0 ? n : "nearest", (s = r.yMargin) !== null && s !== void 0 ? s : 5, (a = r.xMargin) !== null && a !== void 0 ? a : 5));
+    return Ga.of(new Bn(typeof e == "number" ? K.cursor(e) : e, (i = r.y) !== null && i !== void 0 ? i : "nearest", (n = r.x) !== null && n !== void 0 ? n : "nearest", (s = r.yMargin) !== null && s !== void 0 ? s : 5, (a = r.xMargin) !== null && a !== void 0 ? a : 5));
   }
   /**
   Return an effect that resets the editor to its current (at the
@@ -10466,7 +10466,7 @@ class be {
   */
   scrollSnapshot() {
     let { scrollTop: e, scrollLeft: r } = this.scrollDOM, i = this.viewState.scrollAnchorAt(e);
-    return Ma.of(new Bn(K.cursor(i.from), "start", "start", i.top - e, r, !0));
+    return Ga.of(new Bn(K.cursor(i.from), "start", "start", i.top - e, r, !0));
   }
   /**
   Enable or disable tab-focus mode, which disables key bindings
@@ -10527,7 +10527,7 @@ class be {
   `&light` when a light theme is active).
   */
   static theme(e, r) {
-    let i = Ni.newName(), n = [Ka.of(i), Zs.of(dh(`.${i}`, e))];
+    let i = Ni.newName(), n = [Ja.of(i), Us.of(dh(`.${i}`, e))];
     return r && r.dark && n.push(hh.of(!0)), n;
   }
   /**
@@ -10538,7 +10538,7 @@ class be {
   target editors with a dark or light theme.
   */
   static baseTheme(e) {
-    return Pa.lowest(Zs.of(dh("." + uh, e, z$)));
+    return va.lowest(Us.of(dh("." + uh, e, z$)));
   }
   /**
   Retrieve an editor view instance from the view's DOM
@@ -10550,7 +10550,7 @@ class be {
     return ((r = n == null ? void 0 : n.root) === null || r === void 0 ? void 0 : r.view) || null;
   }
 }
-be.styleModule = Zs;
+be.styleModule = Us;
 be.inputHandler = s$;
 be.clipboardInputFilter = Su;
 be.clipboardOutputFilter = ku;
@@ -10566,7 +10566,7 @@ be.clickAddsSelectionRange = t$;
 be.decorations = El;
 be.blockWrappers = h$;
 be.outerDecorations = Pu;
-be.atomicRanges = Ra;
+be.atomicRanges = za;
 be.bidiIsolatedRanges = u$;
 be.cursorScrollMargin = /* @__PURE__ */ me.define({
   combine: (t) => {
@@ -10629,10 +10629,10 @@ function DP(t, e) {
   }
   return n && (i = "Alt-" + i), s && (i = "Ctrl-" + i), o && (i = "Meta-" + i), a && (i = "Shift-" + i), i;
 }
-function Ja(t, e, r) {
+function eo(t, e, r) {
   return e.altKey && (t = "Alt-" + t), e.ctrlKey && (t = "Ctrl-" + t), e.metaKey && (t = "Meta-" + t), r !== !1 && e.shiftKey && (t = "Shift-" + t), t;
 }
-const jP = /* @__PURE__ */ Pa.default(/* @__PURE__ */ be.domEventHandlers({
+const jP = /* @__PURE__ */ va.default(/* @__PURE__ */ be.domEventHandlers({
   keydown(t, e) {
     return GP(LP(e.state), t, e, "editor");
   }
@@ -10706,9 +10706,9 @@ function GP(t, e, r, i) {
     }
     return !1;
   }, d = t[i], $, Q;
-  return d && (u(d[o + Ja(n, e, !a)]) ? l = !0 : a && (e.altKey || e.metaKey || e.ctrlKey) && // Ctrl-Alt may be used for AltGr on Windows
+  return d && (u(d[o + eo(n, e, !a)]) ? l = !0 : a && (e.altKey || e.metaKey || e.ctrlKey) && // Ctrl-Alt may be used for AltGr on Windows
   !(fe.windows && e.ctrlKey && e.altKey) && // Alt-combinations on macOS tend to be typed characters
-  !(fe.mac && e.altKey && !(e.ctrlKey || e.metaKey)) && ($ = Fi[e.keyCode]) && $ != n ? (u(d[o + Ja($, e, !0)]) || e.shiftKey && (Q = ra[e.keyCode]) != n && Q != $ && u(d[o + Ja(Q, e, !1)])) && (l = !0) : a && e.shiftKey && u(d[o + Ja(n, e, !0)]) && (l = !0), !l && u(d._any) && (l = !0)), O && (l = !0), l && h && e.stopPropagation(), fh = null, l;
+  !(fe.mac && e.altKey && !(e.ctrlKey || e.metaKey)) && ($ = Fi[e.keyCode]) && $ != n ? (u(d[o + eo($, e, !0)]) || e.shiftKey && (Q = ia[e.keyCode]) != n && Q != $ && u(d[o + eo(Q, e, !1)])) && (l = !0) : a && e.shiftKey && u(d[o + eo(n, e, !0)]) && (l = !0), !l && u(d._any) && (l = !0)), O && (l = !0), l && h && e.stopPropagation(), fh = null, l;
 }
 function BP() {
   return FP;
@@ -11224,7 +11224,7 @@ class us {
     return new us(r);
   }
 }
-const eo = /* @__PURE__ */ new WeakMap(), Mf = /* @__PURE__ */ new WeakMap();
+const to = /* @__PURE__ */ new WeakMap(), Mf = /* @__PURE__ */ new WeakMap();
 var Fe;
 (function(t) {
   t[t.ExcludeBuffers = 1] = "ExcludeBuffers", t[t.IncludeAnonymous = 2] = "IncludeAnonymous", t[t.IgnoreMounts = 4] = "IgnoreMounts", t[t.IgnoreOverlays = 8] = "IgnoreOverlays", t[t.EnterBracketed = 16] = "EnterBracketed";
@@ -11268,8 +11268,8 @@ class Ae {
   [`moveTo`](#common.TreeCursor.moveTo).
   */
   cursorAt(e, r = 0, i = 0) {
-    let n = eo.get(this) || this.topNode, s = new Ol(n);
-    return s.moveTo(e, r), eo.set(this, s._tree), s;
+    let n = to.get(this) || this.topNode, s = new Ol(n);
+    return s.moveTo(e, r), to.set(this, s._tree), s;
   }
   /**
   Get a [syntax node](#common.SyntaxNode) object for the top of the
@@ -11290,8 +11290,8 @@ class Ae {
   [`resolveInner`](#common.Tree.resolveInner) instead.
   */
   resolve(e, r = 0) {
-    let i = aa(eo.get(this) || this.topNode, e, r, !1);
-    return eo.set(this, i), i;
+    let i = oa(to.get(this) || this.topNode, e, r, !1);
+    return to.set(this, i), i;
   }
   /**
   Like [`resolve`](#common.Tree.resolve), but will enter
@@ -11301,7 +11301,7 @@ class Ae {
   the host trees).
   */
   resolveInner(e, r = 0) {
-    let i = aa(Mf.get(this) || this.topNode, e, r, !0);
+    let i = oa(Mf.get(this) || this.topNode, e, r, !0);
     return Mf.set(this, i), i;
   }
   /**
@@ -11471,7 +11471,7 @@ function Y$(t, e, r, i) {
       return !0;
   }
 }
-function aa(t, e, r, i) {
+function oa(t, e, r, i) {
   for (var n; t.from == t.to || (r < 1 ? t.from >= e : t.from > e) || (r > -1 ? t.to <= e : t.to < e); ) {
     let a = !i && t instanceof Jt && t.index < 0 ? null : t.parent;
     if (!a)
@@ -11501,10 +11501,10 @@ class Z$ {
     return Gf(this, e, r, i);
   }
   resolve(e, r = 0) {
-    return aa(this, e, r, !1);
+    return oa(this, e, r, !1);
   }
   resolveInner(e, r = 0) {
-    return aa(this, e, r, !0);
+    return oa(this, e, r, !0);
   }
   matchContext(e) {
     return gh(this.parent, e);
@@ -11817,7 +11817,7 @@ function cv(t, e, r) {
       let a = Nn.get(s.tree);
       if (a && a.overlay && a.overlay[0].from <= e && a.overlay[a.overlay.length - 1].to >= e) {
         let o = new Jt(a.tree, a.overlay[0].from + s.from, -1, s);
-        (n || (n = [i])).push(aa(o, e, r, !1));
+        (n || (n = [i])).push(oa(o, e, r, !1));
       }
     }
   return n ? U$(n) : i;
@@ -12806,7 +12806,7 @@ function Gt(t) {
         let l = s.length - 1, O = s[l];
         if (!O)
           throw new RangeError("Invalid path: " + n);
-        let h = new oa(i, a, l > 0 ? s.slice(0, l) : null);
+        let h = new la(i, a, l > 0 ? s.slice(0, l) : null);
         e[O] = h.sort(e[O]);
       }
   }
@@ -12818,13 +12818,13 @@ const q$ = new xe({
     for (; t || e; ) {
       if (!t || e && t.depth >= e.depth ? (n = e, e = e.next) : (n = t, t = t.next), r && r.mode == n.mode && !n.context && !r.context)
         continue;
-      let s = new oa(n.tags, n.mode, n.context);
+      let s = new la(n.tags, n.mode, n.context);
       r ? r.next = s : i = s, r = s;
     }
     return i;
   }
 });
-class oa {
+class la {
   constructor(e, r, i, n) {
     this.tags = e, this.mode = r, this.context = i, this.next = n;
   }
@@ -12841,7 +12841,7 @@ class oa {
     return this.context ? this.context.length : 0;
   }
 }
-oa.empty = new oa([], 2, null);
+la.empty = new la([], 2, null);
 function A$(t, e) {
   let r = /* @__PURE__ */ Object.create(null);
   for (let s of t)
@@ -12894,7 +12894,7 @@ class wv {
     if (o >= i || l <= r)
       return;
     a.isTop && (s = this.highlighters.filter((d) => !d.scope || d.scope(a)));
-    let O = n, h = Pv(e) || oa.empty, c = Sv(s, h.tags);
+    let O = n, h = Pv(e) || la.empty, c = Sv(s, h.tags);
     if (c && (O && (O += " "), O += c, h.mode == 1 && (n += (n ? " " : "") + c)), this.startSpan(Math.max(r, o), O), h.opaque)
       return;
     let u = e.tree && e.tree.prop(xe.mounted);
@@ -12929,23 +12929,23 @@ function Pv(t) {
     e = e.next;
   return e || null;
 }
-const Oe = si.define, to = Oe(), ji = Oe(), tp = Oe(ji), rp = Oe(ji), Li = Oe(), ro = Oe(Li), TO = Oe(Li), ei = Oe(), nn = Oe(ei), Kr = Oe(), Jr = Oe(), $h = Oe(), Ps = Oe($h), io = Oe(), w = {
+const Oe = si.define, ro = Oe(), ji = Oe(), tp = Oe(ji), rp = Oe(ji), Li = Oe(), io = Oe(Li), TO = Oe(Li), ei = Oe(), nn = Oe(ei), Kr = Oe(), Jr = Oe(), $h = Oe(), Ps = Oe($h), no = Oe(), w = {
   /**
   A comment.
   */
-  comment: to,
+  comment: ro,
   /**
   A line [comment](#highlight.tags.comment).
   */
-  lineComment: Oe(to),
+  lineComment: Oe(ro),
   /**
   A block [comment](#highlight.tags.comment).
   */
-  blockComment: Oe(to),
+  blockComment: Oe(ro),
   /**
   A documentation [comment](#highlight.tags.comment).
   */
-  docComment: Oe(to),
+  docComment: Oe(ro),
   /**
   Any kind of identifier.
   */
@@ -12993,19 +12993,19 @@ const Oe = si.define, to = Oe(), ji = Oe(), tp = Oe(ji), rp = Oe(ji), Li = Oe(),
   /**
   A string [literal](#highlight.tags.literal).
   */
-  string: ro,
+  string: io,
   /**
   A documentation [string](#highlight.tags.string).
   */
-  docString: Oe(ro),
+  docString: Oe(io),
   /**
   A character literal (subtag of [string](#highlight.tags.string)).
   */
-  character: Oe(ro),
+  character: Oe(io),
   /**
   An attribute value (subtag of [string](#highlight.tags.string)).
   */
-  attributeValue: Oe(ro),
+  attributeValue: Oe(io),
   /**
   A number [literal](#highlight.tags.literal).
   */
@@ -13239,22 +13239,22 @@ const Oe = si.define, to = Oe(), ji = Oe(), tp = Oe(ji), rp = Oe(ji), Li = Oe(),
   /**
   Metadata or meta-instruction.
   */
-  meta: io,
+  meta: no,
   /**
   [Metadata](#highlight.tags.meta) that applies to the entire
   document.
   */
-  documentMeta: Oe(io),
+  documentMeta: Oe(no),
   /**
   [Metadata](#highlight.tags.meta) that annotates or adds
   attributes to a given syntactic element.
   */
-  annotation: Oe(io),
+  annotation: Oe(no),
   /**
   Processing instruction or preprocessor directive. Subtag of
   [meta](#highlight.tags.meta).
   */
-  processingInstruction: Oe(io),
+  processingInstruction: Oe(no),
   /**
   [Modifier](#highlight.Tag^defineModifier) that indicates that a
   given element is being defined. Expected to be used with the
@@ -13810,7 +13810,7 @@ class L {
     return null;
   }
 }
-const Tv = /* @__PURE__ */ me.define(), za = /* @__PURE__ */ me.define({
+const Tv = /* @__PURE__ */ me.define(), Ea = /* @__PURE__ */ me.define({
   combine: (t) => {
     if (!t.length)
       return "  ";
@@ -13821,11 +13821,11 @@ const Tv = /* @__PURE__ */ me.define(), za = /* @__PURE__ */ me.define({
   }
 });
 function Sn(t) {
-  let e = t.facet(za);
+  let e = t.facet(Ea);
   return e.charCodeAt(0) == 9 ? t.tabSize * e.length : e.length;
 }
 function hl(t, e) {
-  let r = "", i = t.tabSize, n = t.facet(za)[0];
+  let r = "", i = t.tabSize, n = t.facet(Ea)[0];
   if (n == "	") {
     for (; e >= i; )
       r += "	", e -= i;
@@ -14106,7 +14106,7 @@ class qv {
   buildDeco(e, r) {
     if (!r || !this.tree.length)
       return dt.none;
-    let i = new ea();
+    let i = new ta();
     for (let { from: n, to: s } of e.visibleRanges)
       kv(this.tree, r, (a, o, l) => {
         i.add(a, o, this.markCache[l] || (this.markCache[l] = dt.mark({ class: l })));
@@ -14114,7 +14114,7 @@ class qv {
     return i.finish();
   }
 }
-const Av = /* @__PURE__ */ Pa.high(/* @__PURE__ */ Ci.fromClass(qv, {
+const Av = /* @__PURE__ */ va.high(/* @__PURE__ */ Ci.fromClass(qv, {
   decorations: (t) => t.decorations
 })), Wv = /* @__PURE__ */ Ll.define([
   {
@@ -14611,7 +14611,7 @@ function G$(t, e, r) {
   }
   throw new Error("Stream parser failed to advance stream.");
 }
-const qu = /* @__PURE__ */ Object.create(null), la = [xt.none], Nv = /* @__PURE__ */ new us(la), op = [], lp = /* @__PURE__ */ Object.create(null), B$ = /* @__PURE__ */ Object.create(null);
+const qu = /* @__PURE__ */ Object.create(null), Oa = [xt.none], Nv = /* @__PURE__ */ new us(Oa), op = [], lp = /* @__PURE__ */ Object.create(null), B$ = /* @__PURE__ */ Object.create(null);
 for (let [t, e] of [
   ["variable", "variableName"],
   ["variable-2", "variableName.special"],
@@ -14656,18 +14656,18 @@ function F$(t, e) {
   if (s)
     return s.id;
   let a = lp[n] = xt.define({
-    id: la.length,
+    id: Oa.length,
     name: i,
     props: [Gt({ [i]: r })]
   });
-  return la.push(a), a.id;
+  return Oa.push(a), a.id;
 }
 function Hv(t, e) {
-  let r = xt.define({ id: la.length, name: "Document", props: [
+  let r = xt.define({ id: Oa.length, name: "Document", props: [
     Gi.add(() => t),
     tr.add(() => (i) => e.getIndent(i))
   ], top: !0 });
-  return la.push(r), r;
+  return Oa.push(r), r;
 }
 St.RTL, St.LTR;
 const Kv = (t) => {
@@ -15151,16 +15151,16 @@ const j0 = (t) => pQ(t, !1), L0 = (t) => pQ(t, !0), I0 = ({ state: t, dispatch: 
   let r = t.selection, i = null;
   return r.ranges.length > 1 ? i = K.create([r.main]) : r.main.empty || (i = K.create([K.cursor(r.main.head)])), i ? (e(Lr(t, i)), !0) : !1;
 };
-function Ea(t, e) {
+function Ca(t, e) {
   if (t.state.readOnly)
     return !1;
   let r = "delete.selection", { state: i } = t, n = i.changeByRange((s) => {
     let { from: a, to: o } = s;
     if (a == o) {
       let l = e(s);
-      l < a ? (r = "delete.backward", l = no(t, l, !1)) : l > a && (r = "delete.forward", l = no(t, l, !0)), a = Math.min(a, l), o = Math.max(o, l);
+      l < a ? (r = "delete.backward", l = so(t, l, !1)) : l > a && (r = "delete.forward", l = so(t, l, !0)), a = Math.min(a, l), o = Math.max(o, l);
     } else
-      a = no(t, a, !1), o = no(t, o, !0);
+      a = so(t, a, !1), o = so(t, o, !0);
     return a == o ? { range: s } : { changes: { from: a, to: o }, range: K.cursor(a, a < s.head ? -1 : 1) };
   });
   return n.changes.empty ? !1 : (t.dispatch(i.update(n, {
@@ -15169,7 +15169,7 @@ function Ea(t, e) {
     effects: r == "delete.selection" ? be.announce.of(i.phrase("Selection deleted")) : void 0
   })), !0);
 }
-function no(t, e, r) {
+function so(t, e, r) {
   if (t instanceof be)
     for (let i of t.state.facet(be.atomicRanges).map((n) => n(t)))
       i.between(e, e, (n, s) => {
@@ -15177,7 +15177,7 @@ function no(t, e, r) {
       });
   return e;
 }
-const gQ = (t, e, r) => Ea(t, (i) => {
+const gQ = (t, e, r) => Ca(t, (i) => {
   let n = i.from, { state: s } = t, a = s.doc.lineAt(n), o, l;
   if (r && !e && n > a.from && n < a.from + 200 && !/[^ \t]/.test(o = a.text.slice(0, n - a.from))) {
     if (o[o.length - 1] == "	")
@@ -15189,7 +15189,7 @@ const gQ = (t, e, r) => Ea(t, (i) => {
   } else
     l = Ht(a.text, n - a.from, e, e) + a.from, l == n && a.number != (e ? s.doc.lines : 1) ? l += e ? 1 : -1 : !e && /[\ufe00-\ufe0f]/.test(a.text.slice(l - a.from, n - a.from)) && (l = Ht(a.text, l - a.from, !1, !1) + a.from);
   return l;
-}), wh = (t) => gQ(t, !1, !0), mQ = (t) => gQ(t, !0, !1), _Q = (t, e) => Ea(t, (r) => {
+}), wh = (t) => gQ(t, !1, !0), mQ = (t) => gQ(t, !0, !1), _Q = (t, e) => Ca(t, (r) => {
   let i = r.head, { state: n } = t, s = n.doc.lineAt(i), a = n.charCategorizer(i);
   for (let o = null; ; ) {
     if (i == (e ? s.to : s.from)) {
@@ -15202,13 +15202,13 @@ const gQ = (t, e, r) => Ea(t, (i) => {
     (O != " " || i != r.head) && (o = h), i = l;
   }
   return i;
-}), $Q = (t) => _Q(t, !1), M0 = (t) => _Q(t, !0), G0 = (t) => Ea(t, (e) => {
+}), $Q = (t) => _Q(t, !1), M0 = (t) => _Q(t, !0), G0 = (t) => Ca(t, (e) => {
   let r = t.lineBlockAt(e.head).to;
   return e.head < r ? r : Math.min(t.state.doc.length, e.head + 1);
-}), B0 = (t) => Ea(t, (e) => {
+}), B0 = (t) => Ca(t, (e) => {
   let r = t.moveToLineBoundary(e, !1).head;
   return e.head > r ? r : Math.max(0, e.head - 1);
-}), N0 = (t) => Ea(t, (e) => {
+}), N0 = (t) => Ca(t, (e) => {
   let r = t.moveToLineBoundary(e, !0).head;
   return e.head < r ? r : Math.min(t.state.doc.length, e.head + 1);
 }), F0 = ({ state: t, dispatch: e }) => {
@@ -15357,7 +15357,7 @@ const sx = ({ state: t, dispatch: e }) => {
   });
   return n.changes.empty || e(t.update(n, { userEvent: "indent" })), !0;
 }, SQ = ({ state: t, dispatch: e }) => t.readOnly ? !1 : (e(t.update(Mu(t, (r, i) => {
-  i.push({ from: r.from, insert: t.facet(za) });
+  i.push({ from: r.from, insert: t.facet(Ea) });
 }), { userEvent: "input.indent" })), !0), kQ = ({ state: t, dispatch: e }) => t.readOnly ? !1 : (e(t.update(Mu(t, (r, i) => {
   let n = /^\s*/.exec(r.text)[0];
   if (!n)
@@ -15849,7 +15849,7 @@ class pl {
     return new pl(this.stack, this.pos, this.index);
   }
 }
-function qs(t, e = Uint16Array) {
+function As(t, e = Uint16Array) {
   if (typeof t != "string")
     return t;
   let r = null;
@@ -16035,7 +16035,7 @@ class Fn {
 Fn.prototype.contextual = Fn.prototype.fallback = Fn.prototype.extend = !1;
 class as {
   constructor(e, r, i) {
-    this.precTable = r, this.elseToken = i, this.data = typeof e == "string" ? qs(e) : e;
+    this.precTable = r, this.elseToken = i, this.data = typeof e == "string" ? As(e) : e;
   }
   token(e, r) {
     let i = e.pos, n = 0;
@@ -16500,11 +16500,11 @@ class Mt extends Al {
       error: l == 0,
       skipped: e.skippedNodes && e.skippedNodes.indexOf(l) > -1
     }))), e.propSources && (this.nodeSet = this.nodeSet.extend(...e.propSources)), this.strict = !1, this.bufferLength = C$;
-    let a = qs(e.tokenData);
+    let a = As(e.tokenData);
     this.context = e.context, this.specializerSpecs = e.specialized || [], this.specialized = new Uint16Array(this.specializerSpecs.length);
     for (let o = 0; o < this.specializerSpecs.length; o++)
       this.specialized[o] = this.specializerSpecs[o].term;
-    this.specializers = this.specializerSpecs.map(bp), this.states = qs(e.states, Uint32Array), this.data = qs(e.stateData), this.goto = qs(e.goto), this.maxTerm = e.maxTerm, this.tokenizers = e.tokenizers.map((o) => typeof o == "number" ? new Fn(a, o) : o), this.topRules = e.topRules, this.dialects = e.dialects || {}, this.dynamicPrecedences = e.dynamicPrecedences || null, this.tokenPrecTable = e.tokenPrec, this.termNames = e.termNames || null, this.maxNode = this.nodeSet.types.length - 1, this.dialect = this.parseDialect(), this.top = this.topRules[Object.keys(this.topRules)[0]];
+    this.specializers = this.specializerSpecs.map(bp), this.states = As(e.states, Uint32Array), this.data = As(e.stateData), this.goto = As(e.goto), this.maxTerm = e.maxTerm, this.tokenizers = e.tokenizers.map((o) => typeof o == "number" ? new Fn(a, o) : o), this.topRules = e.topRules, this.dialects = e.dialects || {}, this.dynamicPrecedences = e.dynamicPrecedences || null, this.tokenPrecTable = e.tokenPrec, this.termNames = e.termNames || null, this.maxNode = this.nodeSet.types.length - 1, this.dialect = this.parseDialect(), this.top = this.topRules[Object.keys(this.topRules)[0]];
   }
   createParse(e, r, i) {
     let n = new gx(this, e, r, i);
@@ -17126,7 +17126,7 @@ class Bu {
       if (i.length) {
         let O = a, h = /^\t*/.exec(l)[0].length;
         for (let c = 0; c < h; c++)
-          O += e.facet(za);
+          O += e.facet(Ea);
         n.push(r + O.length - h), l = O + l.slice(h);
       }
       i.push(l), r += l.length + 1;
@@ -17165,7 +17165,7 @@ class Bu {
     return new Bu(i, n);
   }
 }
-let rT = /* @__PURE__ */ dt.widget({ widget: /* @__PURE__ */ new class extends xa {
+let rT = /* @__PURE__ */ dt.widget({ widget: /* @__PURE__ */ new class extends Ta {
   toDOM() {
     let t = document.createElement("span");
     return t.className = "cm-snippetFieldPosition", t;
@@ -17192,17 +17192,17 @@ class ps {
     return e.ranges.every((r) => this.ranges.some((i) => i.field == this.active && i.from <= r.from && i.to >= r.to));
   }
 }
-const Ca = /* @__PURE__ */ ut.define({
+const Ya = /* @__PURE__ */ ut.define({
   map(t, e) {
     return t && t.map(e);
   }
-}), nT = /* @__PURE__ */ ut.define(), Oa = /* @__PURE__ */ Zi.define({
+}), nT = /* @__PURE__ */ ut.define(), ca = /* @__PURE__ */ Zi.define({
   create() {
     return null;
   },
   update(t, e) {
     for (let r of e.effects) {
-      if (r.is(Ca))
+      if (r.is(Ya))
         return r.value;
       if (r.is(nT) && t)
         return new ps(t.ranges, r.value);
@@ -17223,45 +17223,45 @@ function sT(t) {
       annotations: i ? [Jx.of(i), Pt.userEvent.of("input.complete")] : void 0
     };
     if (o.length && (O.selection = Nu(o, 0)), o.some((h) => h.field > 0)) {
-      let h = new ps(o, 0), c = O.effects = [Ca.of(h)];
-      r.state.field(Oa, !1) === void 0 && c.push(ut.appendConfig.of([Oa, cT, hT, eT]));
+      let h = new ps(o, 0), c = O.effects = [Ya.of(h)];
+      r.state.field(ca, !1) === void 0 && c.push(ut.appendConfig.of([ca, cT, hT, eT]));
     }
     r.dispatch(r.state.update(O));
   };
 }
 function vQ(t) {
   return ({ state: e, dispatch: r }) => {
-    let i = e.field(Oa, !1);
+    let i = e.field(ca, !1);
     if (!i || t < 0 && i.active == 0)
       return !1;
     let n = i.active + t, s = t > 0 && !i.ranges.some((a) => a.field == n + t);
     return r(e.update({
       selection: Nu(i.ranges, n),
-      effects: Ca.of(s ? null : new ps(i.ranges, n)),
+      effects: Ya.of(s ? null : new ps(i.ranges, n)),
       scrollIntoView: !0
     })), !0;
   };
 }
-const aT = ({ state: t, dispatch: e }) => t.field(Oa, !1) ? (e(t.update({ effects: Ca.of(null) })), !0) : !1, oT = /* @__PURE__ */ vQ(1), lT = /* @__PURE__ */ vQ(-1), OT = [
+const aT = ({ state: t, dispatch: e }) => t.field(ca, !1) ? (e(t.update({ effects: Ya.of(null) })), !0) : !1, oT = /* @__PURE__ */ vQ(1), lT = /* @__PURE__ */ vQ(-1), OT = [
   { key: "Tab", run: oT, shift: lT },
   { key: "Escape", run: aT }
 ], wp = /* @__PURE__ */ me.define({
   combine(t) {
     return t.length ? t[0] : OT;
   }
-}), cT = /* @__PURE__ */ Pa.highest(/* @__PURE__ */ Ul.compute([wp], (t) => t.facet(wp)));
+}), cT = /* @__PURE__ */ va.highest(/* @__PURE__ */ Ul.compute([wp], (t) => t.facet(wp)));
 function Ue(t, e) {
   return { ...e, apply: sT(t) };
 }
 const hT = /* @__PURE__ */ be.domEventHandlers({
   mousedown(t, e) {
-    let r = e.state.field(Oa, !1), i;
+    let r = e.state.field(ca, !1), i;
     if (!r || (i = e.posAtCoords({ x: t.clientX, y: t.clientY })) == null)
       return !1;
     let n = r.ranges.find((s) => s.from <= i && s.to >= i);
     return !n || n.field == r.active ? !1 : (e.dispatch({
       selection: Nu(r.ranges, n.field),
-      effects: Ca.of(r.ranges.some((s) => s.field > n.field) ? new ps(r.ranges, n.field) : null),
+      effects: Ya.of(r.ranges.some((s) => s.field > n.field) ? new ps(r.ranges, n.field) : null),
       scrollIntoView: !0
     }), !0);
   }
@@ -17664,7 +17664,7 @@ function QT(t, e, r) {
   }
   return n;
 }
-const so = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const ao = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   autoCloseTags: UQ,
   completionPath: EQ,
@@ -17678,7 +17678,7 @@ const so = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   tsxLanguage: ed,
   typescriptLanguage: Ku,
   typescriptSnippets: TQ
-}, Symbol.toStringTag, { value: "Module" })), yT = 1, qQ = 194, AQ = 195, bT = 196, Tp = 197, ST = 198, kT = 199, wT = 200, PT = 2, WQ = 3, Xp = 201, vT = 24, xT = 25, TT = 49, XT = 50, RT = 55, zT = 56, ET = 57, CT = 59, YT = 60, ZT = 61, UT = 62, qT = 63, AT = 65, WT = 238, VT = 71, DT = 241, jT = 242, LT = 243, IT = 244, MT = 245, GT = 246, BT = 247, NT = 248, VQ = 72, FT = 249, HT = 250, KT = 251, JT = 252, eX = 253, tX = 254, rX = 255, iX = 256, nX = 73, sX = 77, aX = 263, oX = 112, lX = 130, OX = 151, cX = 152, hX = 155, kn = 10, ca = 13, td = 32, Hl = 9, rd = 35, uX = 40, dX = 46, xh = 123, Rp = 125, DQ = 39, jQ = 34, zp = 92, fX = 111, pX = 120, gX = 78, mX = 117, _X = 85, $X = /* @__PURE__ */ new Set([
+}, Symbol.toStringTag, { value: "Module" })), yT = 1, qQ = 194, AQ = 195, bT = 196, Tp = 197, ST = 198, kT = 199, wT = 200, PT = 2, WQ = 3, Xp = 201, vT = 24, xT = 25, TT = 49, XT = 50, RT = 55, zT = 56, ET = 57, CT = 59, YT = 60, ZT = 61, UT = 62, qT = 63, AT = 65, WT = 238, VT = 71, DT = 241, jT = 242, LT = 243, IT = 244, MT = 245, GT = 246, BT = 247, NT = 248, VQ = 72, FT = 249, HT = 250, KT = 251, JT = 252, eX = 253, tX = 254, rX = 255, iX = 256, nX = 73, sX = 77, aX = 263, oX = 112, lX = 130, OX = 151, cX = 152, hX = 155, kn = 10, ha = 13, td = 32, Hl = 9, rd = 35, uX = 40, dX = 46, xh = 123, Rp = 125, DQ = 39, jQ = 34, zp = 92, fX = 111, pX = 120, gX = 78, mX = 117, _X = 85, $X = /* @__PURE__ */ new Set([
   xT,
   TT,
   XT,
@@ -17701,7 +17701,7 @@ const so = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   oX
 ]);
 function AO(t) {
-  return t == kn || t == ca;
+  return t == kn || t == ha;
 }
 function WO(t) {
   return t >= 48 && t <= 57 || t >= 65 && t <= 70 || t >= 97 && t <= 102;
@@ -17716,13 +17716,13 @@ const QX = new Ge((t, e) => {
     let i = 0;
     for (; t.next == td || t.next == Hl; )
       t.advance(), i++;
-    (t.next == kn || t.next == ca || t.next == rd) && t.acceptToken(Tp, -i);
+    (t.next == kn || t.next == ha || t.next == rd) && t.acceptToken(Tp, -i);
   } else AO(t.next) && t.acceptToken(bT, 1);
 }, { contextual: !0 }), yX = new Ge((t, e) => {
   let r = e.context;
   if (r.flags) return;
   let i = t.peek(-1);
-  if (i == kn || i == ca) {
+  if (i == kn || i == ha) {
     let n = 0, s = 0;
     for (; ; ) {
       if (t.next == td) n++;
@@ -17730,7 +17730,7 @@ const QX = new Ge((t, e) => {
       else break;
       t.advance(), s++;
     }
-    n != r.indent && t.next != kn && t.next != ca && t.next != rd && (n < r.indent ? t.acceptToken(AQ, -s) : t.acceptToken(qQ));
+    n != r.indent && t.next != kn && t.next != ha && t.next != rd && (n < r.indent ? t.acceptToken(AQ, -s) : t.acceptToken(qQ));
   }
 }), Ao = 1, LQ = 2, Si = 4, ki = 8, wi = 16, Pi = 32;
 function Wo(t, e, r) {
@@ -17780,7 +17780,7 @@ const Ep = new Map([
     for (let e = 0; ; e++) {
       let r = t.peek(e);
       if (!(r == td || r == Hl)) {
-        r != uX && r != dX && r != kn && r != ca && r != rd && t.acceptToken(yT);
+        r != uX && r != dX && r != kn && r != ha && r != rd && t.acceptToken(yT);
         return;
       }
     }
@@ -17902,7 +17902,7 @@ const xX = Gt({
   "ForStatement",
   "MatchClause"
 ]);
-function ao(t) {
+function oo(t) {
   return (e, r, i) => {
     if (i)
       return !1;
@@ -17911,8 +17911,8 @@ function ao(t) {
   };
 }
 const RX = {
-  FunctionDefinition: /* @__PURE__ */ ao("function"),
-  ClassDefinition: /* @__PURE__ */ ao("class"),
+  FunctionDefinition: /* @__PURE__ */ oo("function"),
+  ClassDefinition: /* @__PURE__ */ oo("class"),
   ForStatement(t, e, r) {
     if (r) {
       for (let i = t.node.firstChild; i; i = i.nextSibling)
@@ -17939,8 +17939,8 @@ const RX = {
     for (let r = null, i = t.node.firstChild; i; i = i.nextSibling)
       i.name == "VariableName" && (!r || !/\*|AssignOp/.test(r.name)) && e(i, "variable"), r = i;
   },
-  CapturePattern: /* @__PURE__ */ ao("variable"),
-  AsPattern: /* @__PURE__ */ ao("variable"),
+  CapturePattern: /* @__PURE__ */ oo("variable"),
+  AsPattern: /* @__PURE__ */ oo("variable"),
   __proto__: null
 };
 function MQ(t, e) {
@@ -18516,11 +18516,11 @@ const Wp = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   cpp: Un,
   cppLanguage: HQ
-}, Symbol.toStringTag, { value: "Module" })), aR = 1, oR = 2, lR = 3, OR = 4, cR = 5, Vp = 98, hR = 101, uR = 102, Dp = 114, dR = 69, oo = 48, jp = 46, fR = 43, pR = 45, Lp = 35, Ip = 34, gR = 124, mR = 60, _R = 62;
+}, Symbol.toStringTag, { value: "Module" })), aR = 1, oR = 2, lR = 3, OR = 4, cR = 5, Vp = 98, hR = 101, uR = 102, Dp = 114, dR = 69, lo = 48, jp = 46, fR = 43, pR = 45, Lp = 35, Ip = 34, gR = 124, mR = 60, _R = 62;
 function Rh(t) {
   return t >= 48 && t <= 57;
 }
-function lo(t) {
+function Oo(t) {
   return Rh(t) || t == 95;
 }
 const $R = new Ge((t, e) => {
@@ -18528,24 +18528,24 @@ const $R = new Ge((t, e) => {
     let r = !1;
     do
       t.advance();
-    while (lo(t.next));
+    while (Oo(t.next));
     if (t.next == jp) {
       if (r = !0, t.advance(), Rh(t.next))
         do
           t.advance();
-        while (lo(t.next));
+        while (Oo(t.next));
       else if (t.next == jp || t.next > 127 || /\w/.test(String.fromCharCode(t.next)))
         return;
     }
     if (t.next == hR || t.next == dR) {
-      if (r = !0, t.advance(), (t.next == fR || t.next == pR) && t.advance(), !lo(t.next)) return;
+      if (r = !0, t.advance(), (t.next == fR || t.next == pR) && t.advance(), !Oo(t.next)) return;
       do
         t.advance();
-      while (lo(t.next));
+      while (Oo(t.next));
     }
     if (t.next == uR) {
       let i = t.peek(1);
-      if (i == oo + 3 && t.peek(2) == oo + 2 || i == oo + 6 && t.peek(2) == oo + 4)
+      if (i == lo + 3 && t.peek(2) == lo + 2 || i == lo + 6 && t.peek(2) == lo + 4)
         t.advance(3), r = !0;
       else
         return;
@@ -19258,7 +19258,7 @@ const Wz = 135, ig = 1, Vz = 136, Dz = 137, gy = 2, jz = 138, Lz = 3, Iz = 4, my
   8287,
   12288
 ], Mz = 58, Gz = 40, _y = 95, Bz = 91, Lo = 45, Nz = 46, Fz = 35, Hz = 37, Kz = 38, Jz = 92, e5 = 10, t5 = 42;
-function ha(t) {
+function ua(t) {
   return t >= 65 && t <= 90 || t >= 97 && t <= 122 || t >= 161;
 }
 function ad(t) {
@@ -19270,7 +19270,7 @@ function ng(t) {
 const $y = (t, e, r) => (i, n) => {
   for (let s = !1, a = 0, o = 0; ; o++) {
     let { next: l } = i;
-    if (ha(l) || l == Lo || l == _y || s && ad(l))
+    if (ua(l) || l == Lo || l == _y || s && ad(l))
       !s && (l != Lo || o > 0) && (s = !0), a === o && l == Lo && a++, i.advance();
     else if (l == Jz && i.peek(1) != e5) {
       if (i.advance(), ng(i.next)) {
@@ -19296,15 +19296,15 @@ const $y = (t, e, r) => (i, n) => {
 ), n5 = new Ge((t) => {
   if (my.includes(t.peek(-1))) {
     let { next: e } = t;
-    (ha(e) || e == _y || e == Fz || e == Nz || e == t5 || e == Bz || e == Mz && ha(t.peek(1)) || e == Lo || e == Kz) && t.acceptToken(Wz);
+    (ua(e) || e == _y || e == Fz || e == Nz || e == t5 || e == Bz || e == Mz && ua(t.peek(1)) || e == Lo || e == Kz) && t.acceptToken(Wz);
   }
 }), s5 = new Ge((t) => {
   if (!my.includes(t.peek(-1))) {
     let { next: e } = t;
-    if (e == Hz && (t.advance(), t.acceptToken(ig)), ha(e)) {
+    if (e == Hz && (t.advance(), t.acceptToken(ig)), ua(e)) {
       do
         t.advance();
-      while (ha(t.next) || ad(t.next));
+      while (ua(t.next) || ad(t.next));
       t.acceptToken(ig);
     }
   }
@@ -20165,7 +20165,7 @@ const yy = (t) => (e) => {
     return null;
   let a = n.resolve(i), o = a.childBefore(i);
   return o && o.name == ":" && a.name == "PseudoClassSelector" ? { from: i, options: sg, validFor: bi } : o && o.name == ":" && a.name == "Declaration" || a.name == "ArgList" ? { from: i, options: ag, validFor: bi } : a.name == "Block" || a.name == "Styles" ? { from: i, options: MO(), validFor: bi } : null;
-}, by = /* @__PURE__ */ yy((t) => t.name == "VariableName"), ua = /* @__PURE__ */ It.define({
+}, by = /* @__PURE__ */ yy((t) => t.name == "VariableName"), da = /* @__PURE__ */ It.define({
   name: "css",
   parser: /* @__PURE__ */ u5.configure({
     props: [
@@ -20183,14 +20183,14 @@ const yy = (t) => (e) => {
     wordChars: "-"
   }
 });
-function Ls() {
-  return new Ut(ua, ua.data.of({ autocomplete: by }));
+function Is() {
+  return new Ut(da, da.data.of({ autocomplete: by }));
 }
 const $5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  css: Ls,
+  css: Is,
   cssCompletionSource: by,
-  cssLanguage: ua,
+  cssLanguage: da,
   defineCSSCompletionSource: yy
 }, Symbol.toStringTag, { value: "Module" })), Xs = ["_blank", "_self", "_top", "_parent"], GO = ["ascii", "utf-8", "utf-16", "latin1", "latin1"], BO = ["get", "post", "put", "delete"], NO = ["application/x-www-form-urlencoded", "multipart/form-data", "text/plain"], br = ["true", "false"], ge = {}, Q5 = {
   a: {
@@ -20613,12 +20613,12 @@ const $5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
 }, ky = /* @__PURE__ */ "beforeunload copy cut dragstart dragover dragleave dragenter dragend drag paste focus blur change click load mousedown mouseenter mouseleave mouseup keydown keyup resize scroll unload".split(" ").map((t) => "on" + t);
 for (let t of ky)
   Sy[t] = null;
-let da = class {
+let fa = class {
   constructor(e, r) {
     this.tags = { ...Q5, ...e }, this.globalAttrs = { ...Sy, ...r }, this.allTags = Object.keys(this.tags), this.globalAttrNames = Object.keys(this.globalAttrs);
   }
 };
-da.default = /* @__PURE__ */ new da();
+fa.default = /* @__PURE__ */ new fa();
 function os(t, e, r = t.length) {
   if (!e)
     return "";
@@ -20718,10 +20718,10 @@ function vy(t, e) {
   return n.name == "TagName" ? n.parent && /CloseTag$/.test(n.parent.name) ? Og(r, n, n.from, i) : lg(r, t, n, n.from, i) : n.name == "StartTag" || n.name == "IncompleteTag" ? lg(r, t, n, i, i) : n.name == "StartCloseTag" || n.name == "IncompleteCloseTag" ? Og(r, n, i, i) : n.name == "OpenTag" || n.name == "SelfClosingTag" || n.name == "AttributeName" ? b5(r, t, n, n.name == "AttributeName" ? n.from : i, i) : n.name == "Is" || n.name == "AttributeValue" || n.name == "UnquotedAttributeValue" ? S5(r, t, n, n.name == "Is" ? i : n.from, i) : e.explicit && (s.name == "Element" || s.name == "Text" || s.name == "Document") ? y5(r, t, n, i) : null;
 }
 function xy(t) {
-  return vy(da.default, t);
+  return vy(fa.default, t);
 }
 function Ty(t) {
-  let { extraTags: e, extraGlobalAttributes: r } = t, i = r || e ? new da(e, r) : da.default;
+  let { extraTags: e, extraGlobalAttributes: r } = t, i = r || e ? new fa(e, r) : fa.default;
   return (n) => vy(i, n);
 }
 const k5 = /* @__PURE__ */ Cr.parser.configure({ top: "SingleExpression" }), Xy = [
@@ -20759,12 +20759,12 @@ const k5 = /* @__PURE__ */ Cr.parser.configure({ top: "SingleExpression" }), Xy 
     attrs(t) {
       return (!t.lang || t.lang == "css") && (!t.type || /^(text\/)?(x-)?(stylesheet|css)$/i.test(t.type));
     },
-    parser: ua.parser
+    parser: da.parser
   }
 ], Ry = /* @__PURE__ */ [
   {
     name: "style",
-    parser: /* @__PURE__ */ ua.parser.configure({ top: "Styles" })
+    parser: /* @__PURE__ */ da.parser.configure({ top: "Styles" })
   }
 ].concat(/* @__PURE__ */ ky.map((t) => ({ name: t, parser: Cr.parser }))), zy = /* @__PURE__ */ It.define({
   name: "html",
@@ -20807,22 +20807,22 @@ const k5 = /* @__PURE__ */ Cr.parser.configure({ top: "SingleExpression" }), Xy 
     indentOnInput: /^\s*<\/\w+\W$/,
     wordChars: "-_"
   }
-}), Is = /* @__PURE__ */ zy.configure({
+}), Ms = /* @__PURE__ */ zy.configure({
   wrap: /* @__PURE__ */ py(Xy, Ry)
 });
-function fa(t = {}) {
+function pa(t = {}) {
   let e = "", r;
   t.matchClosingTags === !1 && (e = "noMatch"), t.selfClosingTags === !0 && (e = (e ? e + " " : "") + "selfClosing"), (t.nestedLanguages && t.nestedLanguages.length || t.nestedAttributes && t.nestedAttributes.length) && (r = py((t.nestedLanguages || []).concat(Xy), (t.nestedAttributes || []).concat(Ry)));
-  let i = r ? zy.configure({ wrap: r, dialect: e }) : e ? Is.configure({ dialect: e }) : Is;
+  let i = r ? zy.configure({ wrap: r, dialect: e }) : e ? Ms.configure({ dialect: e }) : Ms;
   return new Ut(i, [
-    Is.data.of({ autocomplete: Ty(t) }),
+    Ms.data.of({ autocomplete: Ty(t) }),
     t.autoCloseTags !== !1 ? Ey : [],
     ri().support,
-    Ls().support
+    Is().support
   ]);
 }
 const cg = /* @__PURE__ */ new Set(/* @__PURE__ */ "area base br col command embed frame hr img input keygen link meta param source track wbr menuitem".split(" ")), Ey = /* @__PURE__ */ be.inputHandler.of((t, e, r, i, n) => {
-  if (t.composing || t.state.readOnly || e != r || i != ">" && i != "/" || !Is.isActiveAt(t.state, e, -1))
+  if (t.composing || t.state.readOnly || e != r || i != ">" && i != "/" || !Ms.isActiveAt(t.state, e, -1))
     return !1;
   let s = n(), { state: a } = s, o = a.changeByRange((l) => {
     var O, h, c;
@@ -20855,10 +20855,10 @@ const cg = /* @__PURE__ */ new Set(/* @__PURE__ */ "area base br col command emb
 }), w5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   autoCloseTags: Ey,
-  html: fa,
+  html: pa,
   htmlCompletionSource: xy,
   htmlCompletionSourceWith: Ty,
-  htmlLanguage: Is
+  htmlLanguage: Ms
 }, Symbol.toStringTag, { value: "Module" })), P5 = Gt({
   String: w.string,
   Number: w.number,
@@ -20933,14 +20933,14 @@ const X5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   json: Ch,
   jsonLanguage: Cy,
   jsonParseLinter: x5
-}, Symbol.toStringTag, { value: "Module" })), qn = 63, hg = 64, R5 = 1, z5 = 2, Yy = 3, E5 = 4, Zy = 5, C5 = 6, Y5 = 7, Uy = 65, Z5 = 66, U5 = 8, q5 = 9, A5 = 10, W5 = 11, V5 = 12, qy = 13, D5 = 19, j5 = 20, L5 = 29, I5 = 33, M5 = 34, G5 = 47, B5 = 0, ld = 1, Yh = 2, pa = 3, Zh = 4;
+}, Symbol.toStringTag, { value: "Module" })), qn = 63, hg = 64, R5 = 1, z5 = 2, Yy = 3, E5 = 4, Zy = 5, C5 = 6, Y5 = 7, Uy = 65, Z5 = 66, U5 = 8, q5 = 9, A5 = 10, W5 = 11, V5 = 12, qy = 13, D5 = 19, j5 = 20, L5 = 29, I5 = 33, M5 = 34, G5 = 47, B5 = 0, ld = 1, Yh = 2, ga = 3, Zh = 4;
 let hn = class {
   constructor(e, r, i) {
     this.parent = e, this.depth = r, this.type = i, this.hash = (e ? e.hash + e.hash << 8 : 0) + r + (r << 4) + i;
   }
 };
 hn.top = new hn(null, -1, B5);
-function Ms(t, e) {
+function Gs(t, e) {
   for (let r = 0, i = e - t.pos - 1; ; i--, r++) {
     let n = t.peek(i);
     if (Yi(n) || n == -1) return r;
@@ -20961,17 +20961,17 @@ function gn(t) {
 const N5 = new fs({
   start: hn.top,
   reduce(t, e) {
-    return t.type == pa && (e == j5 || e == M5) ? t.parent : t;
+    return t.type == ga && (e == j5 || e == M5) ? t.parent : t;
   },
   shift(t, e, r, i) {
     if (e == Yy)
-      return new hn(t, Ms(i, i.pos), ld);
+      return new hn(t, Gs(i, i.pos), ld);
     if (e == Uy || e == Zy)
-      return new hn(t, Ms(i, i.pos), Yh);
+      return new hn(t, Gs(i, i.pos), Yh);
     if (e == qn)
       return t.parent;
     if (e == D5 || e == I5)
-      return new hn(t, 0, pa);
+      return new hn(t, 0, ga);
     if (e == qy && t.type == Zh)
       return t.parent;
     if (e == G5) {
@@ -20991,7 +20991,7 @@ const F5 = new Ge((t, e) => {
   if (t.next == -1 && e.canShift(hg))
     return t.acceptToken(hg);
   let r = t.peek(-1);
-  if ((Yi(r) || r < 0) && e.context.type != pa) {
+  if ((Yi(r) || r < 0) && e.context.type != ga) {
     if (Os(
       t,
       45
@@ -21013,14 +21013,14 @@ const F5 = new Ge((t, e) => {
     t.next != -1 && !Yi(t.next) && t.next != 35 && t.acceptToken(qn, -i);
   }
 }, { contextual: !0 }), H5 = new Ge((t, e) => {
-  if (e.context.type == pa) {
+  if (e.context.type == ga) {
     t.next == 63 && (t.advance(), gn(t.next) && t.acceptToken(Y5));
     return;
   }
   if (t.next == 45)
-    t.advance(), gn(t.next) && t.acceptToken(e.context.type == ld && e.context.depth == Ms(t, t.pos - 1) ? E5 : Yy);
+    t.advance(), gn(t.next) && t.acceptToken(e.context.type == ld && e.context.depth == Gs(t, t.pos - 1) ? E5 : Yy);
   else if (t.next == 63)
-    t.advance(), gn(t.next) && t.acceptToken(e.context.type == Yh && e.context.depth == Ms(t, t.pos - 1) ? C5 : Zy);
+    t.advance(), gn(t.next) && t.acceptToken(e.context.type == Yh && e.context.depth == Gs(t, t.pos - 1) ? C5 : Zy);
   else {
     let r = t.pos;
     for (; ; )
@@ -21048,7 +21048,7 @@ const F5 = new Ge((t, e) => {
     if (t.next == 58) {
       if (t.pos == r && e.canShift(L5)) return;
       let i = t.peek(1);
-      gn(i) && t.acceptTokenTo(e.context.type == Yh && e.context.depth == Ms(t, r) ? Z5 : Uy, r);
+      gn(i) && t.acceptTokenTo(e.context.type == Yh && e.context.depth == Gs(t, r) ? Z5 : Uy, r);
     }
   }
 }, { contextual: !0 });
@@ -21149,7 +21149,7 @@ const tE = new Ge((t, e) => {
   else if (t.next == 38 || t.next == 42) {
     let r = t.next == 38 ? A5 : W5;
     qh(t), t.acceptToken(r);
-  } else t.next == 39 || t.next == 34 ? (Od(t, !1), t.acceptToken(q5)) : Vy(t, !1, e.context.type == pa, e.context.depth) && t.acceptToken(U5);
+  } else t.next == 39 || t.next == 34 ? (Od(t, !1), t.acceptToken(q5)) : Vy(t, !1, e.context.type == ga, e.context.depth) && t.acceptToken(U5);
 }), rE = new Ge((t, e) => {
   let r = e.context.type == Zh ? e.context.depth : -1, i = t.pos;
   e: for (; ; ) {
@@ -21515,7 +21515,7 @@ function jh(t) {
     e.moveTo(e.from, -1);
   return e.node;
 }
-function ga(t, e) {
+function ma(t, e) {
   let r = t.sliceString(e.from, e.to), i = /^([`'"\[])(.*)([`'"\]])$/.exec(r);
   return i ? i[2] : r;
 }
@@ -21526,10 +21526,10 @@ function EE(t, e) {
   if (e.name == "CompositeIdentifier") {
     let r = [];
     for (let i = e.firstChild; i; i = i.nextSibling)
-      $l(i) && r.push(ga(t, i));
+      $l(i) && r.push(ma(t, i));
     return r;
   }
-  return [ga(t, e)];
+  return [ma(t, e)];
 }
 function Qg(t, e) {
   for (let r = []; ; ) {
@@ -21538,7 +21538,7 @@ function Qg(t, e) {
     let i = jh(e);
     if (!$l(i))
       return r;
-    r.unshift(ga(t, i)), e = jh(i);
+    r.unshift(ma(t, i)), e = jh(i);
   }
 }
 function CE(t, e) {
@@ -21564,11 +21564,11 @@ function ZE(t, e) {
     if (!s)
       s = o == "from";
     else if (o == "as" && a && $l(n.nextSibling))
-      l = ga(t, n.nextSibling);
+      l = ma(t, n.nextSibling);
     else {
       if (o && YE.has(o))
         break;
-      a && $l(n) && (l = ga(t, n));
+      a && $l(n) && (l = ma(t, n));
     }
     l && (i || (i = /* @__PURE__ */ Object.create(null)), i[l] = EE(t, a)), a = /Identifier$/.test(n.name) ? n : null;
   }
@@ -21889,7 +21889,7 @@ class rC {
   only space after `from`.
   */
   skipSpace(e) {
-    return Gs(this.text, e);
+    return Bs(this.text, e);
   }
   /**
   @internal
@@ -21975,7 +21975,7 @@ const eb = {
 function Ur(t) {
   return t == 32 || t == 9 || t == 10 || t == 13;
 }
-function Gs(t, e = 0) {
+function Bs(t, e = 0) {
   for (; e < t.length && Ur(t.charCodeAt(e)); )
     e++;
   return e;
@@ -22083,7 +22083,7 @@ function Wi(t, e, r) {
   let i = t.length - 1;
   i >= 0 && t[i].to == e && t[i].type == ie.CodeText ? t[i].to = r : t.push(Ie(ie.CodeText, e, r));
 }
-const Oo = {
+const co = {
   LinkReference: void 0,
   IndentedCode(t, e) {
     let r = e.baseIndent + 4;
@@ -22211,7 +22211,7 @@ class iC {
     return s > -1 && s < n.length ? this.complete(e, i, s) : !1;
   }
   finish(e, r) {
-    return (this.stage == 2 || this.stage == 3) && Gs(r.content, this.pos) == r.content.length ? this.complete(e, r, r.content.length) : !1;
+    return (this.stage == 2 || this.stage == 3) && Bs(r.content, this.pos) == r.content.length ? this.complete(e, r, r.content.length) : !1;
   }
   complete(e, r, i) {
     return e.addLeafElement(r, Ie(ie.LinkReference, this.start, this.start + i, this.elts)), !0;
@@ -22230,10 +22230,10 @@ class iC {
           return this.stage = -1;
         this.elts.push(Ie(ie.LinkMark, this.pos + this.start, this.pos + this.start + 1)), this.pos++;
       } else if (this.stage == 1) {
-        if (!this.nextStage(gb(e, Gs(e, this.pos), this.start)))
+        if (!this.nextStage(gb(e, Bs(e, this.pos), this.start)))
           return -1;
       } else if (this.stage == 2) {
-        let r = Gs(e, this.pos), i = 0;
+        let r = Bs(e, this.pos), i = 0;
         if (r > this.pos) {
           let n = mb(e, r, this.start);
           if (n) {
@@ -22590,7 +22590,7 @@ class Jl extends Al {
         if (d > -1)
           s[d] = u.parse, a[d] = u.leaf;
         else {
-          let $ = u.before ? co(o, u.before) : u.after ? co(o, u.after) + 1 : o.length - 1;
+          let $ = u.before ? ho(o, u.before) : u.after ? ho(o, u.after) + 1 : o.length - 1;
           s.splice($, 0, u.parse), a.splice($, 0, u.leaf), o.splice($, 0, u.name);
         }
         u.endLeaf && h.push(u.endLeaf);
@@ -22601,7 +22601,7 @@ class Jl extends Al {
         if (d > -1)
           l[d] = u.parse;
         else {
-          let $ = u.before ? co(O, u.before) : u.after ? co(O, u.after) + 1 : O.length - 1;
+          let $ = u.before ? ho(O, u.before) : u.after ? ho(O, u.after) + 1 : O.length - 1;
           l.splice($, 0, u.parse), O.splice($, 0, u.name);
         }
       }
@@ -22662,7 +22662,7 @@ function Mh(t) {
     wrap: n ? s ? (a, o, l, O) => n(s(a, o, l, O), o, l, O) : n : s
   };
 }
-function co(t, e) {
+function ho(t, e) {
   let r = t.indexOf(e);
   if (r < 0)
     throw new RangeError(`Position specified relative to unknown parser ${e}`);
@@ -22699,7 +22699,7 @@ class ub {
     });
   }
 }
-let ma = class {
+let _a = class {
   /**
   @internal
   */
@@ -22741,7 +22741,7 @@ class db {
   }
 }
 function Ie(t, e, r, i) {
-  return new ma(t, e, r, i);
+  return new _a(t, e, r, i);
 }
 const fb = { resolve: "Emphasis", mark: "EmphasisMark" }, pb = { resolve: "Emphasis", mark: "EmphasisMark" }, un = {}, yl = {};
 class wr {
@@ -22750,9 +22750,9 @@ class wr {
   }
 }
 const Pg = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-let _a = /[!"#$%&'()*+,\-.\/:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/;
+let $a = /[!"#$%&'()*+,\-.\/:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/;
 try {
-  _a = new RegExp("[\\p{S}|\\p{P}]", "u");
+  $a = new RegExp("[\\p{S}|\\p{P}]", "u");
 } catch {
 }
 const ec = {
@@ -22815,7 +22815,7 @@ const ec = {
     let i = r + 1;
     for (; t.char(i) == e; )
       i++;
-    let n = t.slice(r - 1, r), s = t.slice(i, i + 1), a = _a.test(n), o = _a.test(s), l = /\s|^$/.test(n), O = /\s|^$/.test(s), h = !O && (!o || l || a), c = !l && (!a || O || o), u = h && (e == 42 || !c || a), d = c && (e == 42 || !h || o);
+    let n = t.slice(r - 1, r), s = t.slice(i, i + 1), a = $a.test(n), o = $a.test(s), l = /\s|^$/.test(n), O = /\s|^$/.test(s), h = !O && (!o || l || a), c = !l && (!a || O || o), u = h && (e == 42 || !c || a), d = c && (e == 42 || !h || o);
     return t.append(new wr(e == 95 ? fb : pb, r, i, (u ? 1 : 0) | (d ? 2 : 0)));
   },
   HardBreak(t, e, r) {
@@ -23027,7 +23027,7 @@ class pd {
       }
       o.type.mark && h.push(this.elt(o.type.mark, c, o.to));
       for (let Q = l + 1; Q < i; Q++)
-        this.parts[Q] instanceof ma && h.push(this.parts[Q]), this.parts[Q] = null;
+        this.parts[Q] instanceof _a && h.push(this.parts[Q]), this.parts[Q] = null;
       n.type.mark && h.push(this.elt(n.type.mark, n.from, u));
       let d = this.elt(O, c, u, h);
       this.parts[l] = s && o.from != c ? new wr(o.type, o.from, c, o.side) : null, (this.parts[i] = s && n.to != u ? new wr(n.type, u, n.to, n.side) : null) ? this.parts.splice(i, 0, d) : this.parts[i] = d;
@@ -23035,7 +23035,7 @@ class pd {
     let r = [];
     for (let i = e; i < this.parts.length; i++) {
       let n = this.parts[i];
-      n instanceof ma && r.push(n);
+      n instanceof _a && r.push(n);
     }
     return r;
   }
@@ -23079,7 +23079,7 @@ class pd {
   section.
   */
   skipSpace(e) {
-    return Gs(this.text, e - this.offset) + this.offset;
+    return Bs(this.text, e - this.offset) + this.offset;
   }
   elt(e, r, i, n) {
     return typeof e == "string" ? Ie(this.parser.getNodeType(e), r, i, n) : new db(e, r);
@@ -23098,7 +23098,7 @@ function Gh(t, e) {
       i++;
     if (i < r.length && r[i].from < n.from) {
       let s = r[i];
-      s instanceof ma && (r[i] = new ma(s.type, s.from, s.to, Gh(s.children, [n])));
+      s instanceof _a && (r[i] = new _a(s.type, s.from, s.to, Gh(s.children, [n])));
     } else
       r.splice(i++, 0, n);
   }
@@ -23195,7 +23195,7 @@ const hC = Gt({
   "CodeInfo LinkLabel": w.labelName,
   LinkTitle: w.string,
   Paragraph: w.content
-}), uC = new Jl(new us(hb).extend(hC), Object.keys(Oo).map((t) => Oo[t]), Object.keys(Oo).map((t) => Ob[t]), Object.keys(Oo), sC, eb, Object.keys(ec).map((t) => ec[t]), Object.keys(ec), []);
+}), uC = new Jl(new us(hb).extend(hC), Object.keys(co).map((t) => co[t]), Object.keys(co).map((t) => Ob[t]), Object.keys(co), sC, eb, Object.keys(ec).map((t) => ec[t]), Object.keys(ec), []);
 function dC(t, e, r) {
   let i = [];
   for (let n = t.firstChild, s = e; ; n = n.nextSibling) {
@@ -23237,13 +23237,13 @@ const pC = { resolve: "Strikethrough", mark: "StrikethroughMark" }, gC = {
     parse(t, e, r) {
       if (e != 126 || t.char(r + 1) != 126 || t.char(r + 2) == 126)
         return -1;
-      let i = t.slice(r - 1, r), n = t.slice(r + 2, r + 3), s = /\s|^$/.test(i), a = /\s|^$/.test(n), o = _a.test(i), l = _a.test(n);
+      let i = t.slice(r - 1, r), n = t.slice(r + 2, r + 3), s = /\s|^$/.test(i), a = /\s|^$/.test(n), o = $a.test(i), l = $a.test(n);
       return t.addDelimiter(pC, r, r + 2, !a && (!l || s || o), !s && (!o || a || l));
     },
     after: "Emphasis"
   }]
 };
-function Bs(t, e, r = 0, i, n = 0) {
+function Ns(t, e, r = 0, i, n = 0) {
   let s = 0, a = !0, o = -1, l = -1, O = !1, h = () => {
     i.push(t.elt("TableCell", n + o, n + l, t.parser.parseInline(e.slice(o, l), n + o)));
   };
@@ -23273,14 +23273,14 @@ class xg {
       let n;
       if ((r.next == 45 || r.next == 58 || r.next == 124) && Qb.test(n = r.text.slice(r.pos))) {
         let s = [];
-        Bs(e, i.content, 0, s, i.start) == Bs(e, n, r.pos) && (this.rows = [
+        Ns(e, i.content, 0, s, i.start) == Ns(e, n, r.pos) && (this.rows = [
           e.elt("TableHeader", i.start, i.start + i.content.length, s),
           e.elt("TableDelimiter", e.lineStart + r.pos, e.lineStart + r.text.length)
         ]);
       }
     } else if (this.rows) {
       let n = [];
-      Bs(e, r.text, r.pos, n, e.lineStart), this.rows.push(e.elt("TableRow", e.lineStart + r.pos, e.lineStart + r.text.length, n));
+      Ns(e, r.text, r.pos, n, e.lineStart), this.rows.push(e.elt("TableRow", e.lineStart + r.pos, e.lineStart + r.text.length, n));
     }
     return !1;
   }
@@ -23305,7 +23305,7 @@ const mC = {
       if (r.parsers.some((n) => n instanceof xg) || !vg(e.text, e.basePos))
         return !1;
       let i = t.peekLine();
-      return Qb.test(i) && Bs(t, e.text, e.basePos) == Bs(t, i, e.basePos);
+      return Qb.test(i) && Ns(t, e.text, e.basePos) == Ns(t, i, e.basePos);
     },
     before: "SetextHeading"
   }]
@@ -23477,7 +23477,7 @@ const wb = /* @__PURE__ */ gd(kb), XC = /* @__PURE__ */ kb.configure([SC, wC, kC
       Table: (t, e) => ({ from: e.doc.lineAt(t.from).to, to: t.to })
     })
   ]
-}]), $a = /* @__PURE__ */ gd(XC);
+}]), Qa = /* @__PURE__ */ gd(XC);
 function RC(t, e) {
   return (r) => {
     if (r && t) {
@@ -23556,7 +23556,7 @@ function rc(t, e, r, i = 0) {
 }
 function md(t, e) {
   let r = /^[ \t]*/.exec(t)[0].length;
-  if (!r || e.facet(za) != "	")
+  if (!r || e.facet(Ea) != "	")
     return t;
   let i = zi(t, 4, r), n = "";
   for (let s = i; s > 0; )
@@ -23565,7 +23565,7 @@ function md(t, e) {
 }
 const xb = (t = {}) => ({ state: e, dispatch: r }) => {
   let i = it(e), { doc: n } = e, s = null, a = e.changeByRange((o) => {
-    if (!o.empty || !$a.isActiveAt(e, o.from, -1) && !$a.isActiveAt(e, o.from, 1))
+    if (!o.empty || !Qa.isActiveAt(e, o.from, -1) && !Qa.isActiveAt(e, o.from, 1))
       return s = { range: o };
     let l = o.from, O = n.lineAt(l), h = Pb(i.resolveInner(l, -1), n);
     for (; h.length && h[h.length - 1].from > l - O.from; )
@@ -23647,7 +23647,7 @@ function EC(t, e) {
 const Xb = ({ state: t, dispatch: e }) => {
   let r = it(t), i = null, n = t.changeByRange((s) => {
     let a = s.from, { doc: o } = t;
-    if (s.empty && $a.isActiveAt(t, s.from)) {
+    if (s.empty && Qa.isActiveAt(t, s.from)) {
       let l = o.lineAt(a), O = Pb(EC(r, a), o);
       if (O.length) {
         let h = O[O.length - 1], c = h.to - h.spaceAfter.length + (h.spaceAfter ? 1 : 0);
@@ -23679,7 +23679,7 @@ const Xb = ({ state: t, dispatch: e }) => {
 }, Rb = [
   { key: "Enter", run: Tb },
   { key: "Backspace", run: Xb }
-], zb = /* @__PURE__ */ fa({ matchClosingTags: !1 });
+], zb = /* @__PURE__ */ pa({ matchClosingTags: !1 });
 function Io(t = {}) {
   let { codeLanguages: e, defaultCodeLanguage: r, addKeymap: i = !0, base: { parser: n } = wb, completeHTMLTags: s = !0, pasteURLAsLink: a = !0, htmlTagLanguage: o = zb } = t;
   if (!(n instanceof Jl))
@@ -23687,7 +23687,7 @@ function Io(t = {}) {
   let l = t.extensions ? [t.extensions] : [], O = [o.support, TC], h;
   a && O.push(Eb), r instanceof Ut ? (O.push(r.support), h = r.language) : r && (h = r);
   let c = e || h ? RC(e, h) : void 0;
-  l.push(fC({ codeParser: c, htmlParser: o.language.parser })), i && O.push(Pa.high(Ul.of(Rb)));
+  l.push(fC({ codeParser: c, htmlParser: o.language.parser })), i && O.push(va.high(Ul.of(Rb)));
   let u = gd(n.configure(l));
   return s && O.push(u.data.of({ autocomplete: CC })), new Ut(u, O);
 }
@@ -23722,7 +23722,7 @@ const ZC = /code|horizontalrule|html|link|comment|processing|escape|entity|image
     if (i.empty)
       return !1;
     let n = (r = t.clipboardData) === null || r === void 0 ? void 0 : r.getData("text/plain");
-    if (!n || !/^(https?:\/\/|mailto:|xmpp:|www\.)/.test(n) || (/^www\./.test(n) && (n = "https://" + n), !$a.isActiveAt(e.state, i.from, 1)))
+    if (!n || !/^(https?:\/\/|mailto:|xmpp:|www\.)/.test(n) || (/^www\./.test(n) && (n = "https://" + n), !Qa.isActiveAt(e.state, i.from, 1)))
       return !1;
     let s = it(e.state), a = !1;
     return s.iterate({
@@ -23748,7 +23748,7 @@ const ZC = /code|horizontalrule|html|link|comment|processing|escape|entity|image
   insertNewlineContinueMarkupCommand: xb,
   markdown: Io,
   markdownKeymap: Rb,
-  markdownLanguage: $a,
+  markdownLanguage: Qa,
   pasteURLAsLink: Eb
 }, Symbol.toStringTag, { value: "Module" })), qC = 1, AC = 2, WC = 275, VC = 3, DC = 276, Ug = 277, jC = 278, LC = 4, IC = 5, MC = 6, GC = 7, qg = 8, BC = 9, NC = 10, FC = 11, HC = 12, KC = 13, JC = 14, e2 = 15, t2 = 16, r2 = 17, i2 = 18, n2 = 19, s2 = 20, a2 = 21, o2 = 22, l2 = 23, O2 = 24, c2 = 25, h2 = 26, u2 = 27, d2 = 28, f2 = 29, p2 = 30, g2 = 31, m2 = 32, _2 = 33, $2 = 34, Q2 = 35, y2 = 36, b2 = 37, S2 = 38, k2 = 39, w2 = 40, P2 = 41, v2 = 42, x2 = 43, T2 = 44, X2 = 45, R2 = 46, z2 = 47, E2 = 48, C2 = 49, Y2 = 50, Z2 = 51, U2 = 52, q2 = 53, A2 = 54, W2 = 55, V2 = 56, D2 = 57, j2 = 58, L2 = 59, I2 = 60, M2 = 61, G2 = 62, nc = 63, B2 = 64, N2 = 65, F2 = 66, H2 = {
   abstract: LC,
@@ -23829,7 +23829,7 @@ function Wg(t) {
 function Cb(t) {
   return t >= 97 && t <= 122 || t >= 65 && t <= 90;
 }
-function Ns(t) {
+function Fs(t) {
   return t == 95 || t >= 128 || Cb(t);
 }
 function sc(t) {
@@ -23862,9 +23862,9 @@ const K2 = {
     for (let i = 0; i < 3; i++) t.advance();
     for (; t.next == 32 || t.next == 9; ) t.advance();
     let e = t.next == 39;
-    if (e && t.advance(), !Ns(t.next)) return;
+    if (e && t.advance(), !Fs(t.next)) return;
     let r = String.fromCharCode(t.next);
-    for (; t.advance(), !(!Ns(t.next) && !(t.next >= 48 && t.next <= 55)); )
+    for (; t.advance(), !(!Fs(t.next) && !(t.next >= 48 && t.next <= 55)); )
       r += String.fromCharCode(t.next);
     if (e) {
       if (t.next != 39) return;
@@ -23914,14 +23914,14 @@ function rY(t) {
 }
 const iY = new Ge((t, e) => {
   let r = !1;
-  for (; !(t.next == 34 || t.next < 0 || t.next == 36 && (Ns(t.peek(1)) || t.peek(1) == 123) || t.next == 123 && t.peek(1) == 36); r = !0) {
+  for (; !(t.next == 34 || t.next < 0 || t.next == 36 && (Fs(t.peek(1)) || t.peek(1) == 123) || t.next == 123 && t.peek(1) == 36); r = !0) {
     if (t.next == 92) {
       let i = rY(t);
       if (i) {
         if (r) break;
         return t.acceptToken(VC, i);
       }
-    } else if (!r && (t.next == 91 || t.next == 45 && t.peek(1) == 62 && Ns(t.peek(2)) || t.next == 63 && t.peek(1) == 45 && t.peek(2) == 62 && Ns(t.peek(3))) && e.canShift(DC))
+    } else if (!r && (t.next == 91 || t.next == 45 && t.peek(1) == 62 && Fs(t.peek(2)) || t.next == 63 && t.peek(1) == 45 && t.peek(2) == 62 && Fs(t.peek(3))) && e.canShift(DC))
       break;
     t.advance();
   }
@@ -24034,7 +24034,7 @@ function Zb(t = {}) {
   if (t.baseLanguage !== null) if (t.baseLanguage)
     r = t.baseLanguage;
   else {
-    let i = fa({ matchClosingTags: !1 });
+    let i = pa({ matchClosingTags: !1 });
     e.push(i.support), r = i.language;
   }
   return new Ut(Yb.configure({
@@ -24421,14 +24421,14 @@ const XY = [
     alias: ["ecmascript", "js", "node"],
     extensions: ["js", "mjs", "cjs"],
     load() {
-      return Promise.resolve().then(() => so).then((t) => t.javascript());
+      return Promise.resolve().then(() => ao).then((t) => t.javascript());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-DfzPe061.js").then((t) => t.jinja());
+      return import("./index-CLYPpT-c.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24443,21 +24443,21 @@ const XY = [
     name: "JSX",
     extensions: ["jsx"],
     load() {
-      return Promise.resolve().then(() => so).then((t) => t.javascript({ jsx: !0 }));
+      return Promise.resolve().then(() => ao).then((t) => t.javascript({ jsx: !0 }));
     }
   }),
   /* @__PURE__ */ L.of({
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-Bgsx9SCA.js").then((t) => t.less());
+      return import("./index-9tDVC6T1.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-Dlx6S5XJ.js").then((t) => t.liquid());
+      return import("./index-CfP2TRsD.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24524,14 +24524,14 @@ const XY = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-HRh_dlwx.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-BXkk8t7v.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ L.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-HRh_dlwx.js").then((t) => t.sass());
+      return import("./index-BXkk8t7v.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24551,7 +24551,7 @@ const XY = [
     name: "TSX",
     extensions: ["tsx"],
     load() {
-      return Promise.resolve().then(() => so).then((t) => t.javascript({ jsx: !0, typescript: !0 }));
+      return Promise.resolve().then(() => ao).then((t) => t.javascript({ jsx: !0, typescript: !0 }));
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24559,14 +24559,14 @@ const XY = [
     alias: ["ts"],
     extensions: ["ts", "mts", "cts"],
     load() {
-      return Promise.resolve().then(() => so).then((t) => t.javascript({ typescript: !0 }));
+      return Promise.resolve().then(() => ao).then((t) => t.javascript({ typescript: !0 }));
     }
   }),
   /* @__PURE__ */ L.of({
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-diQBjzw_.js").then((t) => t.wast());
+      return import("./index-7pOI-NiS.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -25371,13 +25371,13 @@ const XY = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-DtOzcZkA.js").then((t) => t.vue());
+      return import("./index-CRSEMxUg.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Angular Template",
     load() {
-      return import("./index-DRH-fbVk.js").then((t) => t.angular());
+      return import("./index-DH_MVlcy.js").then((t) => t.angular());
     }
   })
 ], RY = ["md", "mdx", "markdown"], zY = [
@@ -25437,11 +25437,11 @@ const CY = {
   cc: () => Un(),
   go: () => sy(),
   rs: () => JQ(),
-  html: () => fa(),
-  htm: () => fa(),
-  css: () => Ls(),
-  scss: () => Ls(),
-  less: () => Ls(),
+  html: () => pa(),
+  htm: () => pa(),
+  css: () => Is(),
+  scss: () => Is(),
+  less: () => Is(),
   json: () => Ch(),
   jsonc: () => Ch(),
   yaml: () => Ah(),
@@ -25510,7 +25510,7 @@ let Go = null;
 function ZY() {
   return Go;
 }
-const Bg = new va();
+const Bg = new xa();
 function Ng(t) {
   return be.theme({
     ".cm-content": {
@@ -25685,7 +25685,7 @@ function AY() {
   }, Oc;
 }
 var WY = AY();
-const cc = /* @__PURE__ */ ya(WY);
+const cc = /* @__PURE__ */ ba(WY);
 function Kh(t) {
   if (typeof t != "object" || t === null)
     return !1;
@@ -25748,7 +25748,7 @@ function DY(t, e) {
     n(null, a);
   }
 }
-function Fs(t) {
+function Hs(t) {
   return !t || typeof t != "object" ? "" : "position" in t || "type" in t ? Kg(t.position) : "start" in t || "end" in t ? Kg(t) : "line" in t || "column" in t ? Jh(t) : "";
 }
 function Jh(t) {
@@ -25831,7 +25831,7 @@ class _r extends Error {
       l && (s.place = l.position);
     }
     const o = s.place && "start" in s.place ? s.place.start : s.place;
-    this.ancestors = s.ancestors || void 0, this.cause = s.cause || void 0, this.column = o ? o.column : void 0, this.fatal = void 0, this.file = "", this.message = n, this.line = o ? o.line : void 0, this.name = Fs(s.place) || "1:1", this.place = s.place || void 0, this.reason = this.message, this.ruleId = s.ruleId || void 0, this.source = s.source || void 0, this.stack = a && s.cause && typeof s.cause.stack == "string" ? s.cause.stack : "", this.actual = void 0, this.expected = void 0, this.note = void 0, this.url = void 0;
+    this.ancestors = s.ancestors || void 0, this.cause = s.cause || void 0, this.column = o ? o.column : void 0, this.fatal = void 0, this.file = "", this.message = n, this.line = o ? o.line : void 0, this.name = Hs(s.place) || "1:1", this.place = s.place || void 0, this.reason = this.message, this.ruleId = s.ruleId || void 0, this.source = s.source || void 0, this.stack = a && s.cause && typeof s.cause.stack == "string" ? s.cause.stack : "", this.actual = void 0, this.expected = void 0, this.note = void 0, this.url = void 0;
   }
 }
 _r.prototype.file = "";
@@ -25851,7 +25851,7 @@ const ii = { basename: jY, dirname: LY, extname: IY, join: MY, sep: "/" };
 function jY(t, e) {
   if (e !== void 0 && typeof e != "string")
     throw new TypeError('"ext" argument must be a string');
-  Ya(t);
+  Za(t);
   let r = 0, i = -1, n = t.length, s;
   if (e === void 0 || e.length === 0 || e.length > t.length) {
     for (; n--; )
@@ -25877,7 +25877,7 @@ function jY(t, e) {
   return r === i ? i = a : i < 0 && (i = t.length), t.slice(r, i);
 }
 function LY(t) {
-  if (Ya(t), t.length === 0)
+  if (Za(t), t.length === 0)
     return ".";
   let e = -1, r = t.length, i;
   for (; --r; )
@@ -25890,7 +25890,7 @@ function LY(t) {
   return e < 0 ? t.codePointAt(0) === 47 ? "/" : "." : e === 1 && t.codePointAt(0) === 47 ? "//" : t.slice(0, e);
 }
 function IY(t) {
-  Ya(t);
+  Za(t);
   let e = t.length, r = -1, i = 0, n = -1, s = 0, a;
   for (; e--; ) {
     const o = t.codePointAt(e);
@@ -25910,11 +25910,11 @@ function IY(t) {
 function MY(...t) {
   let e = -1, r;
   for (; ++e < t.length; )
-    Ya(t[e]), t[e] && (r = r === void 0 ? t[e] : r + "/" + t[e]);
+    Za(t[e]), t[e] && (r = r === void 0 ? t[e] : r + "/" + t[e]);
   return r === void 0 ? "." : GY(r);
 }
 function GY(t) {
-  Ya(t);
+  Za(t);
   const e = t.codePointAt(0) === 47;
   let r = BY(t, !e);
   return r.length === 0 && !e && (r = "."), r.length > 0 && t.codePointAt(t.length - 1) === 47 && (r += "/"), e ? "/" + r : r;
@@ -25950,7 +25950,7 @@ function BY(t, e) {
   }
   return r;
 }
-function Ya(t) {
+function Za(t) {
   if (typeof t != "string")
     throw new TypeError(
       "Path must be a string. Received " + JSON.stringify(t)
@@ -26563,7 +26563,7 @@ class $d extends tZ {
    */
   parse(e) {
     this.freeze();
-    const r = ho(e), i = this.parser || this.Parser;
+    const r = uo(e), i = this.parser || this.Parser;
     return fc("parse", i), i(String(r), r);
   }
   /**
@@ -26612,7 +26612,7 @@ class $d extends tZ {
     const i = this;
     return this.freeze(), fc("process", this.parser || this.Parser), pc("process", this.compiler || this.Compiler), r ? n(void 0, r) : new Promise(n);
     function n(s, a) {
-      const o = ho(e), l = (
+      const o = uo(e), l = (
         /** @type {HeadTree extends undefined ? Node : HeadTree} */
         /** @type {unknown} */
         i.parse(o)
@@ -26717,7 +26717,7 @@ class $d extends tZ {
     const n = this.transformers;
     return !i && typeof r == "function" && (i = r, r = void 0), i ? s(void 0, i) : new Promise(s);
     function s(a, o) {
-      const l = ho(r);
+      const l = uo(r);
       n.run(e, l, O);
       function O(h, c, u) {
         const d = (
@@ -26783,7 +26783,7 @@ class $d extends tZ {
    */
   stringify(e, r) {
     this.freeze();
-    const i = ho(r), n = this.compiler || this.Compiler;
+    const i = uo(r), n = this.compiler || this.Compiler;
     return pc("stringify", n), tm(e), n(e, i);
   }
   /**
@@ -26926,7 +26926,7 @@ function rm(t, e, r) {
       "`" + t + "` finished async. Use `" + e + "` instead"
     );
 }
-function ho(t) {
+function uo(t) {
   return nZ(t) ? t : new JY(t);
 }
 function nZ(t) {
@@ -27369,7 +27369,7 @@ function bZ(t, e, r) {
     return r(d);
   }
 }
-const Za = {
+const Ua = {
   partial: !0,
   tokenize: SZ
 };
@@ -27962,7 +27962,7 @@ function Hb(t, e, r, i, n, s) {
     return u === a || u === 92 ? (t.consume(u), h) : h(u);
   }
 }
-function Hs(t, e) {
+function Ks(t, e) {
   let r;
   return i;
   function i(n) {
@@ -27999,7 +27999,7 @@ function GZ(t, e, r) {
     return n = Dr(i.sliceSerialize(i.events[i.events.length - 1][1]).slice(1, -1)), d === 58 ? (t.enter("definitionMarker"), t.consume(d), t.exit("definitionMarker"), l) : r(d);
   }
   function l(d) {
-    return st(d) ? Hs(t, O)(d) : O(d);
+    return st(d) ? Ks(t, O)(d) : O(d);
   }
   function O(d) {
     return Nb(
@@ -28027,7 +28027,7 @@ function GZ(t, e, r) {
 function BZ(t, e, r) {
   return i;
   function i(o) {
-    return st(o) ? Hs(t, n)(o) : r(o);
+    return st(o) ? Ks(t, n)(o) : r(o);
   }
   function n(o) {
     return Hb(t, s, r, "definitionTitle", "definitionTitleMarker", "definitionTitleString")(o);
@@ -28290,7 +28290,7 @@ function aU(t, e, r) {
 function oU(t, e, r) {
   return i;
   function i(n) {
-    return t.enter("lineEnding"), t.consume(n), t.exit("lineEnding"), t.attempt(Za, e, r);
+    return t.enter("lineEnding"), t.consume(n), t.exit("lineEnding"), t.attempt(Ua, e, r);
   }
 }
 const lU = {
@@ -28488,13 +28488,13 @@ function gU(t, e, r) {
     return t.enter("resource"), t.enter("resourceMarker"), t.consume(c), t.exit("resourceMarker"), n;
   }
   function n(c) {
-    return st(c) ? Hs(t, s)(c) : s(c);
+    return st(c) ? Ks(t, s)(c) : s(c);
   }
   function s(c) {
     return c === 41 ? h(c) : Nb(t, a, o, "resourceDestination", "resourceDestinationLiteral", "resourceDestinationLiteralMarker", "resourceDestinationRaw", "resourceDestinationString", 32)(c);
   }
   function a(c) {
-    return st(c) ? Hs(t, l)(c) : h(c);
+    return st(c) ? Ks(t, l)(c) : h(c);
   }
   function o(c) {
     return r(c);
@@ -28503,7 +28503,7 @@ function gU(t, e, r) {
     return c === 34 || c === 39 || c === 40 ? Hb(t, O, r, "resourceTitle", "resourceTitleMarker", "resourceTitleString")(c) : h(c);
   }
   function O(c) {
-    return st(c) ? Hs(t, h)(c) : h(c);
+    return st(c) ? Ks(t, h)(c) : h(c);
   }
   function h(c) {
     return c === 41 ? (t.enter("resourceMarker"), t.consume(c), t.exit("resourceMarker"), t.exit("resource"), e) : r(c);
@@ -28629,7 +28629,7 @@ function vU(t, e, r) {
   }
   function O(d) {
     return t.enter("listItemMarker"), t.consume(d), t.exit("listItemMarker"), i.containerState.marker = i.containerState.marker || d, t.check(
-      Za,
+      Ua,
       // Can’t be empty when interrupting.
       i.interrupt ? r : h,
       t.attempt(wU, u, c)
@@ -28647,7 +28647,7 @@ function vU(t, e, r) {
 }
 function xU(t, e, r) {
   const i = this;
-  return i.containerState._closeFlow = void 0, t.check(Za, n, s);
+  return i.containerState._closeFlow = void 0, t.check(Ua, n, s);
   function n(o) {
     return i.containerState.furtherBlankLines = i.containerState.furtherBlankLines || i.containerState.initialBlankLine, Me(t, e, "listItemIndent", i.containerState.size + 1)(o);
   }
@@ -28735,7 +28735,7 @@ const CU = {
 function YU(t) {
   const e = this, r = t.attempt(
     // Try to parse a blank line.
-    Za,
+    Ua,
     i,
     // Try to parse initial flow (essentially, only code).
     t.attempt(this.parser.constructs.flowInitial, n, Me(t, t.attempt(this.parser.constructs.flow, n, t.attempt(WZ, n)), "linePrefix"))
@@ -29437,7 +29437,7 @@ function aq(t) {
     const $e = this.stack.pop(), Te = this.tokenStack.pop();
     if (Te)
       Te[0].type !== G.type && (te ? te.call(this, G, Te[0]) : (Te[1] || dm).call(this, G, Te[0]));
-    else throw new Error("Cannot close `" + G.type + "` (" + Fs({
+    else throw new Error("Cannot close `" + G.type + "` (" + Hs({
       start: G.start,
       end: G.end
     }) + "): it’s not open");
@@ -29761,13 +29761,13 @@ function oq(t, e) {
       }
 }
 function dm(t, e) {
-  throw t ? new Error("Cannot close `" + t.type + "` (" + Fs({
+  throw t ? new Error("Cannot close `" + t.type + "` (" + Hs({
     start: t.start,
     end: t.end
-  }) + "): a different token (`" + e.type + "`, " + Fs({
+  }) + "): a different token (`" + e.type + "`, " + Hs({
     start: e.start,
     end: e.end
-  }) + ") is open") : new Error("Cannot close document, a token (`" + e.type + "`, " + Fs({
+  }) + ") is open") : new Error("Cannot close document, a token (`" + e.type + "`, " + Hs({
     start: e.start,
     end: e.end
   }) + ") is still open");
@@ -29801,7 +29801,7 @@ function rS(t) {
     throw new TypeError("Expected a string");
   return t.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
 }
-const Ua = (
+const qa = (
   // Note: overloads in JSDoc can’t yet use different `@template`s.
   /**
    * @type {(
@@ -29839,7 +29839,7 @@ function Oq(t) {
   const e = [];
   let r = -1;
   for (; ++r < t.length; )
-    e[r] = Ua(t[r]);
+    e[r] = qa(t[r]);
   return rO(i);
   function i(...n) {
     let s = -1;
@@ -29893,7 +29893,7 @@ const iS = [], fq = !0, iu = !1, pq = "skip";
 function nS(t, e, r, i) {
   let n;
   typeof e == "function" && typeof r != "function" ? (i = r, r = e) : n = e;
-  const s = Ua(n), a = i ? -1 : 1;
+  const s = qa(n), a = i ? -1 : 1;
   o(t, void 0, [])();
   function o(l, O, h) {
     const c = (
@@ -29938,7 +29938,7 @@ function gq(t) {
   return Array.isArray(t) ? t : typeof t == "number" ? [fq, t] : t == null ? iS : [t];
 }
 function sS(t, e, r) {
-  const n = Ua((r || {}).ignore || []), s = mq(e);
+  const n = qa((r || {}).ignore || []), s = mq(e);
   let a = -1;
   for (; ++a < s.length; )
     nS(t, "text", o);
@@ -30485,7 +30485,7 @@ function O4(t) {
     );
   return e;
 }
-function Qa(t) {
+function ya(t) {
   return "&#x" + t.toString(16).toUpperCase() + ";";
 }
 function wl(t, e, r) {
@@ -30536,9 +30536,9 @@ function cS(t, e, r, i) {
     O,
     n
   );
-  h.inside && (l = Qa(O) + l.slice(1));
+  h.inside && (l = ya(O) + l.slice(1));
   const c = l.charCodeAt(l.length - 1), u = wl(i.after.charCodeAt(0), c, n);
-  u.inside && (l = l.slice(0, -1) + Qa(c));
+  u.inside && (l = l.slice(0, -1) + ya(c));
   const d = a.move(n);
   return s(), r.attentionEncodeSurroundingInfo = {
     after: u.outside,
@@ -30590,7 +30590,7 @@ function u4(t, e, r, i) {
 `,
     ...s.current()
   });
-  return /^[\t ]/.test(O) && (O = Qa(O.charCodeAt(0)) + O.slice(1)), O = O ? a + " " + O : a, r.options.closeAtx && (O += " " + a), l(), o(), O;
+  return /^[\t ]/.test(O) && (O = ya(O.charCodeAt(0)) + O.slice(1)), O = O ? a + " " + O : a, r.options.closeAtx && (O += " " + a), l(), o(), O;
 }
 hS.peek = d4;
 function hS(t) {
@@ -30848,7 +30848,7 @@ function k4(t, e, r, i) {
 }
 const w4 = (
   /** @type {(node?: unknown) => node is Exclude<PhrasingContent, Html>} */
-  Ua([
+  qa([
     "break",
     "delete",
     "emphasis",
@@ -30900,9 +30900,9 @@ function $S(t, e, r, i) {
     O,
     n
   );
-  h.inside && (l = Qa(O) + l.slice(1));
+  h.inside && (l = ya(O) + l.slice(1));
   const c = l.charCodeAt(l.length - 1), u = wl(i.after.charCodeAt(0), c, n);
-  u.inside && (l = l.slice(0, -1) + Qa(c));
+  u.inside && (l = l.slice(0, -1) + ya(c));
   const d = a.move(n + n);
   return s(), r.attentionEncodeSurroundingInfo = {
     after: u.outside,
@@ -31510,7 +31510,7 @@ function oA(t, e, r) {
   }
 }
 function lA(t, e, r) {
-  return t.check(Za, e, t.attempt(rA, e, r));
+  return t.check(Ua, e, t.attempt(rA, e, r));
 }
 function OA(t) {
   t.exit("gfmFootnoteDefinition");
@@ -31768,7 +31768,7 @@ function mA(t, e) {
       start: Object.assign({}, $.start),
       // Note: correct end is set later.
       end: Object.assign({}, $.end)
-    }, u.add(r, 0, [["enter", h, e]])), n = $.type === "tableDelimiterRow" ? 2 : h ? 3 : 1) : n && ($.type === "data" || $.type === "tableDelimiterMarker" || $.type === "tableDelimiterFiller") ? (i = !1, a[2] === 0 && (s[1] !== 0 && (a[0] = a[1], c = uo(u, e, s, n, void 0, c), s = [0, 0, 0, 0]), a[2] = r)) : $.type === "tableCellDivider" && (i ? i = !1 : (s[1] !== 0 && (a[0] = a[1], c = uo(u, e, s, n, void 0, c)), s = a, a = [s[1], r, 0, 0])) : $.type === "tableHead" ? (o = !0, l = r) : $.type === "tableRow" || $.type === "tableDelimiterRow" ? (l = r, s[1] !== 0 ? (a[0] = a[1], c = uo(u, e, s, n, r, c)) : a[1] !== 0 && (c = uo(u, e, a, n, r, c)), n = 0) : n && ($.type === "data" || $.type === "tableDelimiterMarker" || $.type === "tableDelimiterFiller") && (a[3] = r);
+    }, u.add(r, 0, [["enter", h, e]])), n = $.type === "tableDelimiterRow" ? 2 : h ? 3 : 1) : n && ($.type === "data" || $.type === "tableDelimiterMarker" || $.type === "tableDelimiterFiller") ? (i = !1, a[2] === 0 && (s[1] !== 0 && (a[0] = a[1], c = fo(u, e, s, n, void 0, c), s = [0, 0, 0, 0]), a[2] = r)) : $.type === "tableCellDivider" && (i ? i = !1 : (s[1] !== 0 && (a[0] = a[1], c = fo(u, e, s, n, void 0, c)), s = a, a = [s[1], r, 0, 0])) : $.type === "tableHead" ? (o = !0, l = r) : $.type === "tableRow" || $.type === "tableDelimiterRow" ? (l = r, s[1] !== 0 ? (a[0] = a[1], c = fo(u, e, s, n, r, c)) : a[1] !== 0 && (c = fo(u, e, a, n, r, c)), n = 0) : n && ($.type === "data" || $.type === "tableDelimiterMarker" || $.type === "tableDelimiterFiller") && (a[3] = r);
   }
   for (l !== 0 && Qm(u, e, l, O, h), u.consume(e.events), r = -1; ++r < e.events.length; ) {
     const d = e.events[r];
@@ -31776,7 +31776,7 @@ function mA(t, e) {
   }
   return t;
 }
-function uo(t, e, r, i, n, s) {
+function fo(t, e, r, i, n, s) {
   const a = i === 1 ? "tableHeader" : i === 2 ? "tableDelimiter" : "tableData", o = "tableContent";
   r[0] !== 0 && (s.end = Object.assign({}, An(e.events, r[0])), t.add(r[0], 0, [["exit", s, e]]));
   const l = An(e.events, r[1]);
@@ -31867,7 +31867,7 @@ function kA(t) {
   ), r = t || SA, i = e.data(), n = i.micromarkExtensions || (i.micromarkExtensions = []), s = i.fromMarkdownExtensions || (i.fromMarkdownExtensions = []), a = i.toMarkdownExtensions || (i.toMarkdownExtensions = []);
   n.push(bA(r)), s.push(j4()), a.push(L4(r));
 }
-var fo = { exports: {} }, ym;
+var po = { exports: {} }, ym;
 function wA() {
   return ym || (ym = 1, (function(t, e) {
     Object.defineProperty(e, "__esModule", { value: !0 });
@@ -32159,7 +32159,7 @@ function wA() {
         value: e.assert.null_
       }
     }), e.default = u, t.exports = u, t.exports.default = u, t.exports.assert = e.assert;
-  })(fo, fo.exports)), fo.exports;
+  })(po, po.exports)), po.exports;
 }
 var PA = /* @__PURE__ */ wA();
 const vA = { keywords: ["face", "smile", "happy", "joy", ":D", "grin"], char: "😀", fitzpatrick_scale: !1, category: "people" }, xA = { keywords: ["face", "grimace", "teeth"], char: "😬", fitzpatrick_scale: !1, category: "people" }, TA = { keywords: ["face", "happy", "smile", "joy", "kawaii"], char: "😁", fitzpatrick_scale: !1, category: "people" }, XA = { keywords: ["face", "cry", "tears", "weep", "happy", "happytears", "haha"], char: "😂", fitzpatrick_scale: !1, category: "people" }, RA = { keywords: ["face", "rolling", "floor", "laughing", "lol", "haha"], char: "🤣", fitzpatrick_scale: !1, category: "people" }, zA = { keywords: ["face", "celebration", "woohoo"], char: "🥳", fitzpatrick_scale: !1, category: "people" }, EA = { keywords: ["face", "happy", "joy", "haha", ":D", ":)", "smile", "funny"], char: "😃", fitzpatrick_scale: !1, category: "people" }, CA = { keywords: ["face", "happy", "joy", "funny", "haha", "laugh", "like", ":D", ":)"], char: "😄", fitzpatrick_scale: !1, category: "people" }, YA = { keywords: ["face", "hot", "happy", "laugh", "sweat", "smile", "relief"], char: "😅", fitzpatrick_scale: !1, category: "people" }, ZA = { keywords: ["happy", "joy", "lol", "satisfied", "haha", "face", "glad", "XD", "laugh"], char: "😆", fitzpatrick_scale: !1, category: "people" }, UA = { keywords: ["face", "angel", "heaven", "halo"], char: "😇", fitzpatrick_scale: !1, category: "people" }, qA = { keywords: ["face", "happy", "mischievous", "secret", ";)", "smile", "eye"], char: "😉", fitzpatrick_scale: !1, category: "people" }, AA = { keywords: ["face", "smile", "happy", "flushed", "crush", "embarrassed", "shy", "joy"], char: "😊", fitzpatrick_scale: !1, category: "people" }, WA = { keywords: ["face", "smile"], char: "🙂", fitzpatrick_scale: !1, category: "people" }, VA = { keywords: ["face", "flipped", "silly", "smile"], char: "🙃", fitzpatrick_scale: !1, category: "people" }, DA = { keywords: ["face", "blush", "massage", "happiness"], char: "☺️", fitzpatrick_scale: !1, category: "people" }, jA = { keywords: ["happy", "joy", "tongue", "smile", "face", "silly", "yummy", "nom", "delicious", "savouring"], char: "😋", fitzpatrick_scale: !1, category: "people" }, LA = { keywords: ["face", "relaxed", "phew", "massage", "happiness"], char: "😌", fitzpatrick_scale: !1, category: "people" }, IA = { keywords: ["face", "love", "like", "affection", "valentines", "infatuation", "crush", "heart"], char: "😍", fitzpatrick_scale: !1, category: "people" }, MA = { keywords: ["face", "love", "like", "affection", "valentines", "infatuation", "crush", "hearts", "adore"], char: "🥰", fitzpatrick_scale: !1, category: "people" }, GA = { keywords: ["face", "love", "like", "affection", "valentines", "infatuation", "kiss"], char: "😘", fitzpatrick_scale: !1, category: "people" }, BA = { keywords: ["love", "like", "face", "3", "valentines", "infatuation", "kiss"], char: "😗", fitzpatrick_scale: !1, category: "people" }, NA = { keywords: ["face", "affection", "valentines", "infatuation", "kiss"], char: "😙", fitzpatrick_scale: !1, category: "people" }, FA = { keywords: ["face", "love", "like", "affection", "valentines", "infatuation", "kiss"], char: "😚", fitzpatrick_scale: !1, category: "people" }, HA = { keywords: ["face", "prank", "childish", "playful", "mischievous", "smile", "wink", "tongue"], char: "😜", fitzpatrick_scale: !1, category: "people" }, KA = { keywords: ["face", "goofy", "crazy"], char: "🤪", fitzpatrick_scale: !1, category: "people" }, JA = { keywords: ["face", "distrust", "scepticism", "disapproval", "disbelief", "surprise"], char: "🤨", fitzpatrick_scale: !1, category: "people" }, eW = { keywords: ["face", "stuffy", "wealthy"], char: "🧐", fitzpatrick_scale: !1, category: "people" }, tW = { keywords: ["face", "prank", "playful", "mischievous", "smile", "tongue"], char: "😝", fitzpatrick_scale: !1, category: "people" }, rW = { keywords: ["face", "prank", "childish", "playful", "mischievous", "smile", "tongue"], char: "😛", fitzpatrick_scale: !1, category: "people" }, iW = { keywords: ["face", "rich", "dollar", "money"], char: "🤑", fitzpatrick_scale: !1, category: "people" }, nW = { keywords: ["face", "nerdy", "geek", "dork"], char: "🤓", fitzpatrick_scale: !1, category: "people" }, sW = { keywords: ["face", "cool", "smile", "summer", "beach", "sunglass"], char: "😎", fitzpatrick_scale: !1, category: "people" }, aW = { keywords: ["face", "smile", "starry", "eyes", "grinning"], char: "🤩", fitzpatrick_scale: !1, category: "people" }, oW = { keywords: ["face"], char: "🤡", fitzpatrick_scale: !1, category: "people" }, lW = { keywords: ["face", "cowgirl", "hat"], char: "🤠", fitzpatrick_scale: !1, category: "people" }, OW = { keywords: ["face", "smile", "hug"], char: "🤗", fitzpatrick_scale: !1, category: "people" }, cW = { keywords: ["face", "smile", "mean", "prank", "smug", "sarcasm"], char: "😏", fitzpatrick_scale: !1, category: "people" }, hW = { keywords: ["face", "hellokitty"], char: "😶", fitzpatrick_scale: !1, category: "people" }, uW = { keywords: ["indifference", "meh", ":|", "neutral"], char: "😐", fitzpatrick_scale: !1, category: "people" }, dW = { keywords: ["face", "indifferent", "-_-", "meh", "deadpan"], char: "😑", fitzpatrick_scale: !1, category: "people" }, fW = { keywords: ["indifference", "bored", "straight face", "serious", "sarcasm", "unimpressed", "skeptical", "dubious", "side_eye"], char: "😒", fitzpatrick_scale: !1, category: "people" }, pW = { keywords: ["face", "eyeroll", "frustrated"], char: "🙄", fitzpatrick_scale: !1, category: "people" }, gW = { keywords: ["face", "hmmm", "think", "consider"], char: "🤔", fitzpatrick_scale: !1, category: "people" }, mW = { keywords: ["face", "lie", "pinocchio"], char: "🤥", fitzpatrick_scale: !1, category: "people" }, _W = { keywords: ["face", "whoops", "shock", "surprise"], char: "🤭", fitzpatrick_scale: !1, category: "people" }, $W = { keywords: ["face", "quiet", "shhh"], char: "🤫", fitzpatrick_scale: !1, category: "people" }, QW = { keywords: ["face", "swearing", "cursing", "cussing", "profanity", "expletive"], char: "🤬", fitzpatrick_scale: !1, category: "people" }, yW = { keywords: ["face", "shocked", "mind", "blown"], char: "🤯", fitzpatrick_scale: !1, category: "people" }, bW = { keywords: ["face", "blush", "shy", "flattered"], char: "😳", fitzpatrick_scale: !1, category: "people" }, SW = { keywords: ["face", "sad", "upset", "depressed", ":("], char: "😞", fitzpatrick_scale: !1, category: "people" }, kW = { keywords: ["face", "concern", "nervous", ":("], char: "😟", fitzpatrick_scale: !1, category: "people" }, wW = { keywords: ["mad", "face", "annoyed", "frustrated"], char: "😠", fitzpatrick_scale: !1, category: "people" }, PW = { keywords: ["angry", "mad", "hate", "despise"], char: "😡", fitzpatrick_scale: !1, category: "people" }, vW = { keywords: ["face", "sad", "depressed", "upset"], char: "😔", fitzpatrick_scale: !1, category: "people" }, xW = { keywords: ["face", "indifference", "huh", "weird", "hmmm", ":/"], char: "😕", fitzpatrick_scale: !1, category: "people" }, TW = { keywords: ["face", "frowning", "disappointed", "sad", "upset"], char: "🙁", fitzpatrick_scale: !1, category: "people" }, XW = { keywords: ["face", "sad", "upset", "frown"], char: "☹", fitzpatrick_scale: !1, category: "people" }, RW = { keywords: ["face", "sick", "no", "upset", "oops"], char: "😣", fitzpatrick_scale: !1, category: "people" }, zW = { keywords: ["face", "confused", "sick", "unwell", "oops", ":S"], char: "😖", fitzpatrick_scale: !1, category: "people" }, EW = { keywords: ["sick", "whine", "upset", "frustrated"], char: "😫", fitzpatrick_scale: !1, category: "people" }, CW = { keywords: ["face", "tired", "sleepy", "sad", "frustrated", "upset"], char: "😩", fitzpatrick_scale: !1, category: "people" }, YW = { keywords: ["face", "begging", "mercy"], char: "🥺", fitzpatrick_scale: !1, category: "people" }, ZW = { keywords: ["face", "gas", "phew", "proud", "pride"], char: "😤", fitzpatrick_scale: !1, category: "people" }, UW = { keywords: ["face", "surprise", "impressed", "wow", "whoa", ":O"], char: "😮", fitzpatrick_scale: !1, category: "people" }, qW = { keywords: ["face", "munch", "scared", "omg"], char: "😱", fitzpatrick_scale: !1, category: "people" }, AW = { keywords: ["face", "scared", "terrified", "nervous", "oops", "huh"], char: "😨", fitzpatrick_scale: !1, category: "people" }, WW = { keywords: ["face", "nervous", "sweat"], char: "😰", fitzpatrick_scale: !1, category: "people" }, VW = { keywords: ["face", "woo", "shh"], char: "😯", fitzpatrick_scale: !1, category: "people" }, DW = { keywords: ["face", "aw", "what"], char: "😦", fitzpatrick_scale: !1, category: "people" }, jW = { keywords: ["face", "stunned", "nervous"], char: "😧", fitzpatrick_scale: !1, category: "people" }, LW = { keywords: ["face", "tears", "sad", "depressed", "upset", ":'("], char: "😢", fitzpatrick_scale: !1, category: "people" }, IW = { keywords: ["face", "phew", "sweat", "nervous"], char: "😥", fitzpatrick_scale: !1, category: "people" }, MW = { keywords: ["face"], char: "🤤", fitzpatrick_scale: !1, category: "people" }, GW = { keywords: ["face", "tired", "rest", "nap"], char: "😪", fitzpatrick_scale: !1, category: "people" }, BW = { keywords: ["face", "hot", "sad", "tired", "exercise"], char: "😓", fitzpatrick_scale: !1, category: "people" }, NW = { keywords: ["face", "feverish", "heat", "red", "sweating"], char: "🥵", fitzpatrick_scale: !1, category: "people" }, FW = { keywords: ["face", "blue", "freezing", "frozen", "frostbite", "icicles"], char: "🥶", fitzpatrick_scale: !1, category: "people" }, HW = { keywords: ["face", "cry", "tears", "sad", "upset", "depressed"], char: "😭", fitzpatrick_scale: !1, category: "people" }, KW = { keywords: ["spent", "unconscious", "xox", "dizzy"], char: "😵", fitzpatrick_scale: !1, category: "people" }, JW = { keywords: ["face", "xox", "surprised", "poisoned"], char: "😲", fitzpatrick_scale: !1, category: "people" }, eV = { keywords: ["face", "sealed", "zipper", "secret"], char: "🤐", fitzpatrick_scale: !1, category: "people" }, tV = { keywords: ["face", "vomit", "gross", "green", "sick", "throw up", "ill"], char: "🤢", fitzpatrick_scale: !1, category: "people" }, rV = { keywords: ["face", "gesundheit", "sneeze", "sick", "allergy"], char: "🤧", fitzpatrick_scale: !1, category: "people" }, iV = { keywords: ["face", "sick"], char: "🤮", fitzpatrick_scale: !1, category: "people" }, nV = { keywords: ["face", "sick", "ill", "disease"], char: "😷", fitzpatrick_scale: !1, category: "people" }, sV = { keywords: ["sick", "temperature", "thermometer", "cold", "fever"], char: "🤒", fitzpatrick_scale: !1, category: "people" }, aV = { keywords: ["injured", "clumsy", "bandage", "hurt"], char: "🤕", fitzpatrick_scale: !1, category: "people" }, oV = { keywords: ["face", "dizzy", "intoxicated", "tipsy", "wavy"], char: "🥴", fitzpatrick_scale: !1, category: "people" }, lV = { keywords: ["face", "tired", "sleepy", "night", "zzz"], char: "😴", fitzpatrick_scale: !1, category: "people" }, OV = { keywords: ["sleepy", "tired", "dream"], char: "💤", fitzpatrick_scale: !1, category: "people" }, cV = { keywords: ["hankey", "shitface", "fail", "turd", "shit"], char: "💩", fitzpatrick_scale: !1, category: "people" }, hV = { keywords: ["devil", "horns"], char: "😈", fitzpatrick_scale: !1, category: "people" }, uV = { keywords: ["devil", "angry", "horns"], char: "👿", fitzpatrick_scale: !1, category: "people" }, dV = { keywords: ["monster", "red", "mask", "halloween", "scary", "creepy", "devil", "demon", "japanese", "ogre"], char: "👹", fitzpatrick_scale: !1, category: "people" }, fV = { keywords: ["red", "evil", "mask", "monster", "scary", "creepy", "japanese", "goblin"], char: "👺", fitzpatrick_scale: !1, category: "people" }, pV = { keywords: ["dead", "skeleton", "creepy", "death"], char: "💀", fitzpatrick_scale: !1, category: "people" }, gV = { keywords: ["halloween", "spooky", "scary"], char: "👻", fitzpatrick_scale: !1, category: "people" }, mV = { keywords: ["UFO", "paul", "weird", "outer_space"], char: "👽", fitzpatrick_scale: !1, category: "people" }, _V = { keywords: ["computer", "machine", "bot"], char: "🤖", fitzpatrick_scale: !1, category: "people" }, $V = { keywords: ["animal", "cats", "happy", "smile"], char: "😺", fitzpatrick_scale: !1, category: "people" }, QV = { keywords: ["animal", "cats", "smile"], char: "😸", fitzpatrick_scale: !1, category: "people" }, yV = { keywords: ["animal", "cats", "haha", "happy", "tears"], char: "😹", fitzpatrick_scale: !1, category: "people" }, bV = { keywords: ["animal", "love", "like", "affection", "cats", "valentines", "heart"], char: "😻", fitzpatrick_scale: !1, category: "people" }, SV = { keywords: ["animal", "cats", "smirk"], char: "😼", fitzpatrick_scale: !1, category: "people" }, kV = { keywords: ["animal", "cats", "kiss"], char: "😽", fitzpatrick_scale: !1, category: "people" }, wV = { keywords: ["animal", "cats", "munch", "scared", "scream"], char: "🙀", fitzpatrick_scale: !1, category: "people" }, PV = { keywords: ["animal", "tears", "weep", "sad", "cats", "upset", "cry"], char: "😿", fitzpatrick_scale: !1, category: "people" }, vV = { keywords: ["animal", "cats"], char: "😾", fitzpatrick_scale: !1, category: "people" }, xV = { keywords: ["hands", "gesture", "cupped", "prayer"], char: "🤲", fitzpatrick_scale: !0, category: "people" }, TV = { keywords: ["gesture", "hooray", "yea", "celebration", "hands"], char: "🙌", fitzpatrick_scale: !0, category: "people" }, XV = { keywords: ["hands", "praise", "applause", "congrats", "yay"], char: "👏", fitzpatrick_scale: !0, category: "people" }, RV = { keywords: ["hands", "gesture", "goodbye", "solong", "farewell", "hello", "hi", "palm"], char: "👋", fitzpatrick_scale: !0, category: "people" }, zV = { keywords: ["hands", "gesture"], char: "🤙", fitzpatrick_scale: !0, category: "people" }, EV = { keywords: ["angry", "violence", "fist", "hit", "attack", "hand"], char: "👊", fitzpatrick_scale: !0, category: "people" }, CV = { keywords: ["fingers", "hand", "grasp"], char: "✊", fitzpatrick_scale: !0, category: "people" }, YV = { keywords: ["hand", "fistbump"], char: "🤛", fitzpatrick_scale: !0, category: "people" }, ZV = { keywords: ["hand", "fistbump"], char: "🤜", fitzpatrick_scale: !0, category: "people" }, UV = { keywords: ["fingers", "ohyeah", "hand", "peace", "victory", "two"], char: "✌", fitzpatrick_scale: !0, category: "people" }, qV = { keywords: ["fingers", "limbs", "perfect", "ok", "okay"], char: "👌", fitzpatrick_scale: !0, category: "people" }, AV = { keywords: ["fingers", "stop", "highfive", "palm", "ban"], char: "✋", fitzpatrick_scale: !0, category: "people" }, WV = { keywords: ["fingers", "raised", "backhand"], char: "🤚", fitzpatrick_scale: !0, category: "people" }, VV = { keywords: ["fingers", "butterfly", "hands", "open"], char: "👐", fitzpatrick_scale: !0, category: "people" }, DV = { keywords: ["arm", "flex", "hand", "summer", "strong", "biceps"], char: "💪", fitzpatrick_scale: !0, category: "people" }, jV = { keywords: ["please", "hope", "wish", "namaste", "highfive"], char: "🙏", fitzpatrick_scale: !0, category: "people" }, LV = { keywords: ["kick", "stomp"], char: "🦶", fitzpatrick_scale: !0, category: "people" }, IV = { keywords: ["kick", "limb"], char: "🦵", fitzpatrick_scale: !0, category: "people" }, MV = { keywords: ["agreement", "shake"], char: "🤝", fitzpatrick_scale: !1, category: "people" }, GV = { keywords: ["hand", "fingers", "direction", "up"], char: "☝", fitzpatrick_scale: !0, category: "people" }, BV = { keywords: ["fingers", "hand", "direction", "up"], char: "👆", fitzpatrick_scale: !0, category: "people" }, NV = { keywords: ["fingers", "hand", "direction", "down"], char: "👇", fitzpatrick_scale: !0, category: "people" }, FV = { keywords: ["direction", "fingers", "hand", "left"], char: "👈", fitzpatrick_scale: !0, category: "people" }, HV = { keywords: ["fingers", "hand", "direction", "right"], char: "👉", fitzpatrick_scale: !0, category: "people" }, KV = { keywords: ["hand", "fingers", "rude", "middle", "flipping"], char: "🖕", fitzpatrick_scale: !0, category: "people" }, JV = { keywords: ["hand", "fingers", "palm"], char: "🖐", fitzpatrick_scale: !0, category: "people" }, e3 = { keywords: ["hand", "fingers", "gesture"], char: "🤟", fitzpatrick_scale: !0, category: "people" }, t3 = { keywords: ["hand", "fingers", "evil_eye", "sign_of_horns", "rock_on"], char: "🤘", fitzpatrick_scale: !0, category: "people" }, r3 = { keywords: ["good", "lucky"], char: "🤞", fitzpatrick_scale: !0, category: "people" }, i3 = { keywords: ["hand", "fingers", "spock", "star trek"], char: "🖖", fitzpatrick_scale: !0, category: "people" }, n3 = { keywords: ["lower_left_ballpoint_pen", "stationery", "write", "compose"], char: "✍", fitzpatrick_scale: !0, category: "people" }, s3 = { keywords: ["camera", "phone"], char: "🤳", fitzpatrick_scale: !0, category: "people" }, a3 = { keywords: ["beauty", "manicure", "finger", "fashion", "nail"], char: "💅", fitzpatrick_scale: !0, category: "people" }, o3 = { keywords: ["mouth", "kiss"], char: "👄", fitzpatrick_scale: !1, category: "people" }, l3 = { keywords: ["teeth", "dentist"], char: "🦷", fitzpatrick_scale: !1, category: "people" }, O3 = { keywords: ["mouth", "playful"], char: "👅", fitzpatrick_scale: !1, category: "people" }, c3 = { keywords: ["face", "hear", "sound", "listen"], char: "👂", fitzpatrick_scale: !0, category: "people" }, h3 = { keywords: ["smell", "sniff"], char: "👃", fitzpatrick_scale: !0, category: "people" }, u3 = { keywords: ["face", "look", "see", "watch", "stare"], char: "👁", fitzpatrick_scale: !1, category: "people" }, d3 = { keywords: ["look", "watch", "stalk", "peek", "see"], char: "👀", fitzpatrick_scale: !1, category: "people" }, f3 = { keywords: ["smart", "intelligent"], char: "🧠", fitzpatrick_scale: !1, category: "people" }, p3 = { keywords: ["user", "person", "human"], char: "👤", fitzpatrick_scale: !1, category: "people" }, g3 = { keywords: ["user", "person", "human", "group", "team"], char: "👥", fitzpatrick_scale: !1, category: "people" }, m3 = { keywords: ["user", "person", "human", "sing", "say", "talk"], char: "🗣", fitzpatrick_scale: !1, category: "people" }, _3 = { keywords: ["child", "boy", "girl", "toddler"], char: "👶", fitzpatrick_scale: !0, category: "people" }, $3 = { keywords: ["gender-neutral", "young"], char: "🧒", fitzpatrick_scale: !0, category: "people" }, Q3 = { keywords: ["man", "male", "guy", "teenager"], char: "👦", fitzpatrick_scale: !0, category: "people" }, y3 = { keywords: ["female", "woman", "teenager"], char: "👧", fitzpatrick_scale: !0, category: "people" }, b3 = { keywords: ["gender-neutral", "person"], char: "🧑", fitzpatrick_scale: !0, category: "people" }, S3 = { keywords: ["mustache", "father", "dad", "guy", "classy", "sir", "moustache"], char: "👨", fitzpatrick_scale: !0, category: "people" }, k3 = { keywords: ["female", "girls", "lady"], char: "👩", fitzpatrick_scale: !0, category: "people" }, w3 = { keywords: ["woman", "female", "girl", "blonde", "person"], char: "👱‍♀️", fitzpatrick_scale: !0, category: "people" }, P3 = { keywords: ["man", "male", "boy", "blonde", "guy", "person"], char: "👱", fitzpatrick_scale: !0, category: "people" }, v3 = { keywords: ["person", "bewhiskered"], char: "🧔", fitzpatrick_scale: !0, category: "people" }, x3 = { keywords: ["human", "elder", "senior", "gender-neutral"], char: "🧓", fitzpatrick_scale: !0, category: "people" }, T3 = { keywords: ["human", "male", "men", "old", "elder", "senior"], char: "👴", fitzpatrick_scale: !0, category: "people" }, X3 = { keywords: ["human", "female", "women", "lady", "old", "elder", "senior"], char: "👵", fitzpatrick_scale: !0, category: "people" }, R3 = { keywords: ["male", "boy", "chinese"], char: "👲", fitzpatrick_scale: !0, category: "people" }, z3 = { keywords: ["female", "hijab", "mantilla", "tichel"], char: "🧕", fitzpatrick_scale: !0, category: "people" }, E3 = { keywords: ["female", "indian", "hinduism", "arabs", "woman"], char: "👳‍♀️", fitzpatrick_scale: !0, category: "people" }, C3 = { keywords: ["male", "indian", "hinduism", "arabs"], char: "👳", fitzpatrick_scale: !0, category: "people" }, Y3 = { keywords: ["woman", "police", "law", "legal", "enforcement", "arrest", "911", "female"], char: "👮‍♀️", fitzpatrick_scale: !0, category: "people" }, Z3 = { keywords: ["man", "police", "law", "legal", "enforcement", "arrest", "911"], char: "👮", fitzpatrick_scale: !0, category: "people" }, U3 = { keywords: ["female", "human", "wip", "build", "construction", "worker", "labor", "woman"], char: "👷‍♀️", fitzpatrick_scale: !0, category: "people" }, q3 = { keywords: ["male", "human", "wip", "guy", "build", "construction", "worker", "labor"], char: "👷", fitzpatrick_scale: !0, category: "people" }, A3 = { keywords: ["uk", "gb", "british", "female", "royal", "woman"], char: "💂‍♀️", fitzpatrick_scale: !0, category: "people" }, W3 = { keywords: ["uk", "gb", "british", "male", "guy", "royal"], char: "💂", fitzpatrick_scale: !0, category: "people" }, V3 = { keywords: ["human", "spy", "detective", "female", "woman"], char: "🕵️‍♀️", fitzpatrick_scale: !0, category: "people" }, D3 = { keywords: ["human", "spy", "detective"], char: "🕵", fitzpatrick_scale: !0, category: "people" }, j3 = { keywords: ["doctor", "nurse", "therapist", "healthcare", "woman", "human"], char: "👩‍⚕️", fitzpatrick_scale: !0, category: "people" }, L3 = { keywords: ["doctor", "nurse", "therapist", "healthcare", "man", "human"], char: "👨‍⚕️", fitzpatrick_scale: !0, category: "people" }, I3 = { keywords: ["rancher", "gardener", "woman", "human"], char: "👩‍🌾", fitzpatrick_scale: !0, category: "people" }, M3 = { keywords: ["rancher", "gardener", "man", "human"], char: "👨‍🌾", fitzpatrick_scale: !0, category: "people" }, G3 = { keywords: ["chef", "woman", "human"], char: "👩‍🍳", fitzpatrick_scale: !0, category: "people" }, B3 = { keywords: ["chef", "man", "human"], char: "👨‍🍳", fitzpatrick_scale: !0, category: "people" }, N3 = { keywords: ["graduate", "woman", "human"], char: "👩‍🎓", fitzpatrick_scale: !0, category: "people" }, F3 = { keywords: ["graduate", "man", "human"], char: "👨‍🎓", fitzpatrick_scale: !0, category: "people" }, H3 = { keywords: ["rockstar", "entertainer", "woman", "human"], char: "👩‍🎤", fitzpatrick_scale: !0, category: "people" }, K3 = { keywords: ["rockstar", "entertainer", "man", "human"], char: "👨‍🎤", fitzpatrick_scale: !0, category: "people" }, J3 = { keywords: ["instructor", "professor", "woman", "human"], char: "👩‍🏫", fitzpatrick_scale: !0, category: "people" }, eD = { keywords: ["instructor", "professor", "man", "human"], char: "👨‍🏫", fitzpatrick_scale: !0, category: "people" }, tD = { keywords: ["assembly", "industrial", "woman", "human"], char: "👩‍🏭", fitzpatrick_scale: !0, category: "people" }, rD = { keywords: ["assembly", "industrial", "man", "human"], char: "👨‍🏭", fitzpatrick_scale: !0, category: "people" }, iD = { keywords: ["coder", "developer", "engineer", "programmer", "software", "woman", "human", "laptop", "computer"], char: "👩‍💻", fitzpatrick_scale: !0, category: "people" }, nD = { keywords: ["coder", "developer", "engineer", "programmer", "software", "man", "human", "laptop", "computer"], char: "👨‍💻", fitzpatrick_scale: !0, category: "people" }, sD = { keywords: ["business", "manager", "woman", "human"], char: "👩‍💼", fitzpatrick_scale: !0, category: "people" }, aD = { keywords: ["business", "manager", "man", "human"], char: "👨‍💼", fitzpatrick_scale: !0, category: "people" }, oD = { keywords: ["plumber", "woman", "human", "wrench"], char: "👩‍🔧", fitzpatrick_scale: !0, category: "people" }, lD = { keywords: ["plumber", "man", "human", "wrench"], char: "👨‍🔧", fitzpatrick_scale: !0, category: "people" }, OD = { keywords: ["biologist", "chemist", "engineer", "physicist", "woman", "human"], char: "👩‍🔬", fitzpatrick_scale: !0, category: "people" }, cD = { keywords: ["biologist", "chemist", "engineer", "physicist", "man", "human"], char: "👨‍🔬", fitzpatrick_scale: !0, category: "people" }, hD = { keywords: ["painter", "woman", "human"], char: "👩‍🎨", fitzpatrick_scale: !0, category: "people" }, uD = { keywords: ["painter", "man", "human"], char: "👨‍🎨", fitzpatrick_scale: !0, category: "people" }, dD = { keywords: ["fireman", "woman", "human"], char: "👩‍🚒", fitzpatrick_scale: !0, category: "people" }, fD = { keywords: ["fireman", "man", "human"], char: "👨‍🚒", fitzpatrick_scale: !0, category: "people" }, pD = { keywords: ["aviator", "plane", "woman", "human"], char: "👩‍✈️", fitzpatrick_scale: !0, category: "people" }, gD = { keywords: ["aviator", "plane", "man", "human"], char: "👨‍✈️", fitzpatrick_scale: !0, category: "people" }, mD = { keywords: ["space", "rocket", "woman", "human"], char: "👩‍🚀", fitzpatrick_scale: !0, category: "people" }, _D = { keywords: ["space", "rocket", "man", "human"], char: "👨‍🚀", fitzpatrick_scale: !0, category: "people" }, $D = { keywords: ["justice", "court", "woman", "human"], char: "👩‍⚖️", fitzpatrick_scale: !0, category: "people" }, QD = { keywords: ["justice", "court", "man", "human"], char: "👨‍⚖️", fitzpatrick_scale: !0, category: "people" }, yD = { keywords: ["woman", "female", "good", "heroine", "superpowers"], char: "🦸‍♀️", fitzpatrick_scale: !0, category: "people" }, bD = { keywords: ["man", "male", "good", "hero", "superpowers"], char: "🦸‍♂️", fitzpatrick_scale: !0, category: "people" }, SD = { keywords: ["woman", "female", "evil", "bad", "criminal", "heroine", "superpowers"], char: "🦹‍♀️", fitzpatrick_scale: !0, category: "people" }, kD = { keywords: ["man", "male", "evil", "bad", "criminal", "hero", "superpowers"], char: "🦹‍♂️", fitzpatrick_scale: !0, category: "people" }, wD = { keywords: ["woman", "female", "xmas", "mother christmas"], char: "🤶", fitzpatrick_scale: !0, category: "people" }, PD = { keywords: ["festival", "man", "male", "xmas", "father christmas"], char: "🎅", fitzpatrick_scale: !0, category: "people" }, vD = { keywords: ["woman", "female", "mage", "witch"], char: "🧙‍♀️", fitzpatrick_scale: !0, category: "people" }, xD = { keywords: ["man", "male", "mage", "sorcerer"], char: "🧙‍♂️", fitzpatrick_scale: !0, category: "people" }, TD = { keywords: ["woman", "female"], char: "🧝‍♀️", fitzpatrick_scale: !0, category: "people" }, XD = { keywords: ["man", "male"], char: "🧝‍♂️", fitzpatrick_scale: !0, category: "people" }, RD = { keywords: ["woman", "female"], char: "🧛‍♀️", fitzpatrick_scale: !0, category: "people" }, zD = { keywords: ["man", "male", "dracula"], char: "🧛‍♂️", fitzpatrick_scale: !0, category: "people" }, ED = { keywords: ["woman", "female", "undead", "walking dead"], char: "🧟‍♀️", fitzpatrick_scale: !1, category: "people" }, CD = { keywords: ["man", "male", "dracula", "undead", "walking dead"], char: "🧟‍♂️", fitzpatrick_scale: !1, category: "people" }, YD = { keywords: ["woman", "female"], char: "🧞‍♀️", fitzpatrick_scale: !1, category: "people" }, ZD = { keywords: ["man", "male"], char: "🧞‍♂️", fitzpatrick_scale: !1, category: "people" }, UD = { keywords: ["woman", "female", "merwoman", "ariel"], char: "🧜‍♀️", fitzpatrick_scale: !0, category: "people" }, qD = { keywords: ["man", "male", "triton"], char: "🧜‍♂️", fitzpatrick_scale: !0, category: "people" }, AD = { keywords: ["woman", "female"], char: "🧚‍♀️", fitzpatrick_scale: !0, category: "people" }, WD = { keywords: ["man", "male"], char: "🧚‍♂️", fitzpatrick_scale: !0, category: "people" }, VD = { keywords: ["heaven", "wings", "halo"], char: "👼", fitzpatrick_scale: !0, category: "people" }, DD = { keywords: ["baby"], char: "🤰", fitzpatrick_scale: !0, category: "people" }, jD = { keywords: ["nursing", "baby"], char: "🤱", fitzpatrick_scale: !0, category: "people" }, LD = { keywords: ["girl", "woman", "female", "blond", "crown", "royal", "queen"], char: "👸", fitzpatrick_scale: !0, category: "people" }, ID = { keywords: ["boy", "man", "male", "crown", "royal", "king"], char: "🤴", fitzpatrick_scale: !0, category: "people" }, MD = { keywords: ["couple", "marriage", "wedding", "woman", "bride"], char: "👰", fitzpatrick_scale: !0, category: "people" }, GD = { keywords: ["couple", "marriage", "wedding", "groom"], char: "🤵", fitzpatrick_scale: !0, category: "people" }, BD = { keywords: ["woman", "walking", "exercise", "race", "running", "female"], char: "🏃‍♀️", fitzpatrick_scale: !0, category: "people" }, ND = { keywords: ["man", "walking", "exercise", "race", "running"], char: "🏃", fitzpatrick_scale: !0, category: "people" }, FD = { keywords: ["human", "feet", "steps", "woman", "female"], char: "🚶‍♀️", fitzpatrick_scale: !0, category: "people" }, HD = { keywords: ["human", "feet", "steps"], char: "🚶", fitzpatrick_scale: !0, category: "people" }, KD = { keywords: ["female", "girl", "woman", "fun"], char: "💃", fitzpatrick_scale: !0, category: "people" }, JD = { keywords: ["male", "boy", "fun", "dancer"], char: "🕺", fitzpatrick_scale: !0, category: "people" }, e8 = { keywords: ["female", "bunny", "women", "girls"], char: "👯", fitzpatrick_scale: !1, category: "people" }, t8 = { keywords: ["male", "bunny", "men", "boys"], char: "👯‍♂️", fitzpatrick_scale: !1, category: "people" }, r8 = { keywords: ["pair", "people", "human", "love", "date", "dating", "like", "affection", "valentines", "marriage"], char: "👫", fitzpatrick_scale: !1, category: "people" }, i8 = { keywords: ["pair", "couple", "love", "like", "bromance", "friendship", "people", "human"], char: "👬", fitzpatrick_scale: !1, category: "people" }, n8 = { keywords: ["pair", "friendship", "couple", "love", "like", "female", "people", "human"], char: "👭", fitzpatrick_scale: !1, category: "people" }, s8 = { keywords: ["woman", "female", "girl"], char: "🙇‍♀️", fitzpatrick_scale: !0, category: "people" }, a8 = { keywords: ["man", "male", "boy"], char: "🙇", fitzpatrick_scale: !0, category: "people" }, o8 = { keywords: ["man", "male", "boy", "disbelief"], char: "🤦‍♂️", fitzpatrick_scale: !0, category: "people" }, l8 = { keywords: ["woman", "female", "girl", "disbelief"], char: "🤦‍♀️", fitzpatrick_scale: !0, category: "people" }, O8 = { keywords: ["woman", "female", "girl", "confused", "indifferent", "doubt"], char: "🤷", fitzpatrick_scale: !0, category: "people" }, c8 = { keywords: ["man", "male", "boy", "confused", "indifferent", "doubt"], char: "🤷‍♂️", fitzpatrick_scale: !0, category: "people" }, h8 = { keywords: ["female", "girl", "woman", "human", "information"], char: "💁", fitzpatrick_scale: !0, category: "people" }, u8 = { keywords: ["male", "boy", "man", "human", "information"], char: "💁‍♂️", fitzpatrick_scale: !0, category: "people" }, d8 = { keywords: ["female", "girl", "woman", "nope"], char: "🙅", fitzpatrick_scale: !0, category: "people" }, f8 = { keywords: ["male", "boy", "man", "nope"], char: "🙅‍♂️", fitzpatrick_scale: !0, category: "people" }, p8 = { keywords: ["women", "girl", "female", "pink", "human", "woman"], char: "🙆", fitzpatrick_scale: !0, category: "people" }, g8 = { keywords: ["men", "boy", "male", "blue", "human", "man"], char: "🙆‍♂️", fitzpatrick_scale: !0, category: "people" }, m8 = { keywords: ["female", "girl", "woman"], char: "🙋", fitzpatrick_scale: !0, category: "people" }, _8 = { keywords: ["male", "boy", "man"], char: "🙋‍♂️", fitzpatrick_scale: !0, category: "people" }, $8 = { keywords: ["female", "girl", "woman"], char: "🙎", fitzpatrick_scale: !0, category: "people" }, Q8 = { keywords: ["male", "boy", "man"], char: "🙎‍♂️", fitzpatrick_scale: !0, category: "people" }, y8 = { keywords: ["female", "girl", "woman", "sad", "depressed", "discouraged", "unhappy"], char: "🙍", fitzpatrick_scale: !0, category: "people" }, b8 = { keywords: ["male", "boy", "man", "sad", "depressed", "discouraged", "unhappy"], char: "🙍‍♂️", fitzpatrick_scale: !0, category: "people" }, S8 = { keywords: ["female", "girl", "woman"], char: "💇", fitzpatrick_scale: !0, category: "people" }, k8 = { keywords: ["male", "boy", "man"], char: "💇‍♂️", fitzpatrick_scale: !0, category: "people" }, w8 = { keywords: ["female", "girl", "woman", "head"], char: "💆", fitzpatrick_scale: !0, category: "people" }, P8 = { keywords: ["male", "boy", "man", "head"], char: "💆‍♂️", fitzpatrick_scale: !0, category: "people" }, v8 = { keywords: ["female", "woman", "spa", "steamroom", "sauna"], char: "🧖‍♀️", fitzpatrick_scale: !0, category: "people" }, x8 = { keywords: ["male", "man", "spa", "steamroom", "sauna"], char: "🧖‍♂️", fitzpatrick_scale: !0, category: "people" }, T8 = { keywords: ["pair", "love", "like", "affection", "human", "dating", "valentines", "marriage"], char: "💑", fitzpatrick_scale: !1, category: "people" }, X8 = { keywords: ["pair", "love", "like", "affection", "human", "dating", "valentines", "marriage"], char: "👩‍❤️‍👩", fitzpatrick_scale: !1, category: "people" }, R8 = { keywords: ["pair", "love", "like", "affection", "human", "dating", "valentines", "marriage"], char: "👨‍❤️‍👨", fitzpatrick_scale: !1, category: "people" }, z8 = { keywords: ["pair", "valentines", "love", "like", "dating", "marriage"], char: "💏", fitzpatrick_scale: !1, category: "people" }, E8 = { keywords: ["pair", "valentines", "love", "like", "dating", "marriage"], char: "👩‍❤️‍💋‍👩", fitzpatrick_scale: !1, category: "people" }, C8 = { keywords: ["pair", "valentines", "love", "like", "dating", "marriage"], char: "👨‍❤️‍💋‍👨", fitzpatrick_scale: !1, category: "people" }, Y8 = { keywords: ["home", "parents", "child", "mom", "dad", "father", "mother", "people", "human"], char: "👪", fitzpatrick_scale: !1, category: "people" }, Z8 = { keywords: ["home", "parents", "people", "human", "child"], char: "👨‍👩‍👧", fitzpatrick_scale: !1, category: "people" }, U8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👨‍👩‍👧‍👦", fitzpatrick_scale: !1, category: "people" }, q8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👨‍👩‍👦‍👦", fitzpatrick_scale: !1, category: "people" }, A8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👨‍👩‍👧‍👧", fitzpatrick_scale: !1, category: "people" }, W8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👩‍👩‍👦", fitzpatrick_scale: !1, category: "people" }, V8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👩‍👩‍👧", fitzpatrick_scale: !1, category: "people" }, D8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👩‍👩‍👧‍👦", fitzpatrick_scale: !1, category: "people" }, j8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👩‍👩‍👦‍👦", fitzpatrick_scale: !1, category: "people" }, L8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👩‍👩‍👧‍👧", fitzpatrick_scale: !1, category: "people" }, I8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👨‍👨‍👦", fitzpatrick_scale: !1, category: "people" }, M8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👨‍👨‍👧", fitzpatrick_scale: !1, category: "people" }, G8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👨‍👨‍👧‍👦", fitzpatrick_scale: !1, category: "people" }, B8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👨‍👨‍👦‍👦", fitzpatrick_scale: !1, category: "people" }, N8 = { keywords: ["home", "parents", "people", "human", "children"], char: "👨‍👨‍👧‍👧", fitzpatrick_scale: !1, category: "people" }, F8 = { keywords: ["home", "parent", "people", "human", "child"], char: "👩‍👦", fitzpatrick_scale: !1, category: "people" }, H8 = { keywords: ["home", "parent", "people", "human", "child"], char: "👩‍👧", fitzpatrick_scale: !1, category: "people" }, K8 = { keywords: ["home", "parent", "people", "human", "children"], char: "👩‍👧‍👦", fitzpatrick_scale: !1, category: "people" }, J8 = { keywords: ["home", "parent", "people", "human", "children"], char: "👩‍👦‍👦", fitzpatrick_scale: !1, category: "people" }, e7 = { keywords: ["home", "parent", "people", "human", "children"], char: "👩‍👧‍👧", fitzpatrick_scale: !1, category: "people" }, t7 = { keywords: ["home", "parent", "people", "human", "child"], char: "👨‍👦", fitzpatrick_scale: !1, category: "people" }, r7 = { keywords: ["home", "parent", "people", "human", "child"], char: "👨‍👧", fitzpatrick_scale: !1, category: "people" }, i7 = { keywords: ["home", "parent", "people", "human", "children"], char: "👨‍👧‍👦", fitzpatrick_scale: !1, category: "people" }, n7 = { keywords: ["home", "parent", "people", "human", "children"], char: "👨‍👦‍👦", fitzpatrick_scale: !1, category: "people" }, s7 = { keywords: ["home", "parent", "people", "human", "children"], char: "👨‍👧‍👧", fitzpatrick_scale: !1, category: "people" }, a7 = { keywords: ["ball", "crochet", "knit"], char: "🧶", fitzpatrick_scale: !1, category: "people" }, o7 = { keywords: ["needle", "sewing", "spool", "string"], char: "🧵", fitzpatrick_scale: !1, category: "people" }, l7 = { keywords: ["jacket"], char: "🧥", fitzpatrick_scale: !1, category: "people" }, O7 = { keywords: ["doctor", "experiment", "scientist", "chemist"], char: "🥼", fitzpatrick_scale: !1, category: "people" }, c7 = { keywords: ["fashion", "shopping_bags", "female"], char: "👚", fitzpatrick_scale: !1, category: "people" }, h7 = { keywords: ["fashion", "cloth", "casual", "shirt", "tee"], char: "👕", fitzpatrick_scale: !1, category: "people" }, u7 = { keywords: ["fashion", "shopping"], char: "👖", fitzpatrick_scale: !1, category: "people" }, d7 = { keywords: ["shirt", "suitup", "formal", "fashion", "cloth", "business"], char: "👔", fitzpatrick_scale: !1, category: "people" }, f7 = { keywords: ["clothes", "fashion", "shopping"], char: "👗", fitzpatrick_scale: !1, category: "people" }, p7 = { keywords: ["swimming", "female", "woman", "girl", "fashion", "beach", "summer"], char: "👙", fitzpatrick_scale: !1, category: "people" }, g7 = { keywords: ["dress", "fashion", "women", "female", "japanese"], char: "👘", fitzpatrick_scale: !1, category: "people" }, m7 = { keywords: ["female", "girl", "fashion", "woman"], char: "💄", fitzpatrick_scale: !1, category: "people" }, _7 = { keywords: ["face", "lips", "love", "like", "affection", "valentines"], char: "💋", fitzpatrick_scale: !1, category: "people" }, $7 = { keywords: ["feet", "tracking", "walking", "beach"], char: "👣", fitzpatrick_scale: !1, category: "people" }, Q7 = { keywords: ["ballet", "slip-on", "slipper"], char: "🥿", fitzpatrick_scale: !1, category: "people" }, y7 = { keywords: ["fashion", "shoes", "female", "pumps", "stiletto"], char: "👠", fitzpatrick_scale: !1, category: "people" }, b7 = { keywords: ["shoes", "fashion", "flip flops"], char: "👡", fitzpatrick_scale: !1, category: "people" }, S7 = { keywords: ["shoes", "fashion"], char: "👢", fitzpatrick_scale: !1, category: "people" }, k7 = { keywords: ["fashion", "male"], char: "👞", fitzpatrick_scale: !1, category: "people" }, w7 = { keywords: ["shoes", "sports", "sneakers"], char: "👟", fitzpatrick_scale: !1, category: "people" }, P7 = { keywords: ["backpacking", "camping", "hiking"], char: "🥾", fitzpatrick_scale: !1, category: "people" }, v7 = { keywords: ["stockings", "clothes"], char: "🧦", fitzpatrick_scale: !1, category: "people" }, x7 = { keywords: ["hands", "winter", "clothes"], char: "🧤", fitzpatrick_scale: !1, category: "people" }, T7 = { keywords: ["neck", "winter", "clothes"], char: "🧣", fitzpatrick_scale: !1, category: "people" }, X7 = { keywords: ["fashion", "accessories", "female", "lady", "spring"], char: "👒", fitzpatrick_scale: !1, category: "people" }, R7 = { keywords: ["magic", "gentleman", "classy", "circus"], char: "🎩", fitzpatrick_scale: !1, category: "people" }, z7 = { keywords: ["cap", "baseball"], char: "🧢", fitzpatrick_scale: !1, category: "people" }, E7 = { keywords: ["construction", "build"], char: "⛑", fitzpatrick_scale: !1, category: "people" }, C7 = { keywords: ["school", "college", "degree", "university", "graduation", "cap", "hat", "legal", "learn", "education"], char: "🎓", fitzpatrick_scale: !1, category: "people" }, Y7 = { keywords: ["king", "kod", "leader", "royalty", "lord"], char: "👑", fitzpatrick_scale: !1, category: "people" }, Z7 = { keywords: ["student", "education", "bag", "backpack"], char: "🎒", fitzpatrick_scale: !1, category: "people" }, U7 = { keywords: ["packing", "travel"], char: "🧳", fitzpatrick_scale: !1, category: "people" }, q7 = { keywords: ["bag", "accessories", "shopping"], char: "👝", fitzpatrick_scale: !1, category: "people" }, A7 = { keywords: ["fashion", "accessories", "money", "sales", "shopping"], char: "👛", fitzpatrick_scale: !1, category: "people" }, W7 = { keywords: ["fashion", "accessory", "accessories", "shopping"], char: "👜", fitzpatrick_scale: !1, category: "people" }, V7 = { keywords: ["business", "documents", "work", "law", "legal", "job", "career"], char: "💼", fitzpatrick_scale: !1, category: "people" }, D7 = { keywords: ["fashion", "accessories", "eyesight", "nerdy", "dork", "geek"], char: "👓", fitzpatrick_scale: !1, category: "people" }, j7 = { keywords: ["face", "cool", "accessories"], char: "🕶", fitzpatrick_scale: !1, category: "people" }, L7 = { keywords: ["eyes", "protection", "safety"], char: "🥽", fitzpatrick_scale: !1, category: "people" }, I7 = { keywords: ["wedding", "propose", "marriage", "valentines", "diamond", "fashion", "jewelry", "gem", "engagement"], char: "💍", fitzpatrick_scale: !1, category: "people" }, M7 = { keywords: ["weather", "rain", "drizzle"], char: "🌂", fitzpatrick_scale: !1, category: "people" }, G7 = { keywords: ["animal", "friend", "nature", "woof", "puppy", "pet", "faithful"], char: "🐶", fitzpatrick_scale: !1, category: "animals_and_nature" }, B7 = { keywords: ["animal", "meow", "nature", "pet", "kitten"], char: "🐱", fitzpatrick_scale: !1, category: "animals_and_nature" }, N7 = { keywords: ["animal", "nature", "cheese_wedge", "rodent"], char: "🐭", fitzpatrick_scale: !1, category: "animals_and_nature" }, F7 = { keywords: ["animal", "nature"], char: "🐹", fitzpatrick_scale: !1, category: "animals_and_nature" }, H7 = { keywords: ["animal", "nature", "pet", "spring", "magic", "bunny"], char: "🐰", fitzpatrick_scale: !1, category: "animals_and_nature" }, K7 = { keywords: ["animal", "nature", "face"], char: "🦊", fitzpatrick_scale: !1, category: "animals_and_nature" }, J7 = { keywords: ["animal", "nature", "wild"], char: "🐻", fitzpatrick_scale: !1, category: "animals_and_nature" }, e6 = { keywords: ["animal", "nature", "panda"], char: "🐼", fitzpatrick_scale: !1, category: "animals_and_nature" }, t6 = { keywords: ["animal", "nature"], char: "🐨", fitzpatrick_scale: !1, category: "animals_and_nature" }, r6 = { keywords: ["animal", "cat", "danger", "wild", "nature", "roar"], char: "🐯", fitzpatrick_scale: !1, category: "animals_and_nature" }, i6 = { keywords: ["animal", "nature"], char: "🦁", fitzpatrick_scale: !1, category: "animals_and_nature" }, n6 = { keywords: ["beef", "ox", "animal", "nature", "moo", "milk"], char: "🐮", fitzpatrick_scale: !1, category: "animals_and_nature" }, s6 = { keywords: ["animal", "oink", "nature"], char: "🐷", fitzpatrick_scale: !1, category: "animals_and_nature" }, a6 = { keywords: ["animal", "oink"], char: "🐽", fitzpatrick_scale: !1, category: "animals_and_nature" }, o6 = { keywords: ["animal", "nature", "croak", "toad"], char: "🐸", fitzpatrick_scale: !1, category: "animals_and_nature" }, l6 = { keywords: ["animal", "nature", "ocean", "sea"], char: "🦑", fitzpatrick_scale: !1, category: "animals_and_nature" }, O6 = { keywords: ["animal", "creature", "ocean", "sea", "nature", "beach"], char: "🐙", fitzpatrick_scale: !1, category: "animals_and_nature" }, c6 = { keywords: ["animal", "ocean", "nature", "seafood"], char: "🦐", fitzpatrick_scale: !1, category: "animals_and_nature" }, h6 = { keywords: ["animal", "nature", "circus"], char: "🐵", fitzpatrick_scale: !1, category: "animals_and_nature" }, u6 = { keywords: ["animal", "nature", "circus"], char: "🦍", fitzpatrick_scale: !1, category: "animals_and_nature" }, d6 = { keywords: ["monkey", "animal", "nature", "haha"], char: "🙈", fitzpatrick_scale: !1, category: "animals_and_nature" }, f6 = { keywords: ["animal", "monkey", "nature"], char: "🙉", fitzpatrick_scale: !1, category: "animals_and_nature" }, p6 = { keywords: ["monkey", "animal", "nature", "omg"], char: "🙊", fitzpatrick_scale: !1, category: "animals_and_nature" }, g6 = { keywords: ["animal", "nature", "banana", "circus"], char: "🐒", fitzpatrick_scale: !1, category: "animals_and_nature" }, m6 = { keywords: ["animal", "cluck", "nature", "bird"], char: "🐔", fitzpatrick_scale: !1, category: "animals_and_nature" }, _6 = { keywords: ["animal", "nature"], char: "🐧", fitzpatrick_scale: !1, category: "animals_and_nature" }, $6 = { keywords: ["animal", "nature", "fly", "tweet", "spring"], char: "🐦", fitzpatrick_scale: !1, category: "animals_and_nature" }, Q6 = { keywords: ["animal", "chicken", "bird"], char: "🐤", fitzpatrick_scale: !1, category: "animals_and_nature" }, y6 = { keywords: ["animal", "chicken", "egg", "born", "baby", "bird"], char: "🐣", fitzpatrick_scale: !1, category: "animals_and_nature" }, b6 = { keywords: ["animal", "chicken", "baby", "bird"], char: "🐥", fitzpatrick_scale: !1, category: "animals_and_nature" }, S6 = { keywords: ["animal", "nature", "bird", "mallard"], char: "🦆", fitzpatrick_scale: !1, category: "animals_and_nature" }, k6 = { keywords: ["animal", "nature", "bird"], char: "🦅", fitzpatrick_scale: !1, category: "animals_and_nature" }, w6 = { keywords: ["animal", "nature", "bird", "hoot"], char: "🦉", fitzpatrick_scale: !1, category: "animals_and_nature" }, P6 = { keywords: ["animal", "nature", "blind", "vampire"], char: "🦇", fitzpatrick_scale: !1, category: "animals_and_nature" }, v6 = { keywords: ["animal", "nature", "wild"], char: "🐺", fitzpatrick_scale: !1, category: "animals_and_nature" }, x6 = { keywords: ["animal", "nature"], char: "🐗", fitzpatrick_scale: !1, category: "animals_and_nature" }, T6 = { keywords: ["animal", "brown", "nature"], char: "🐴", fitzpatrick_scale: !1, category: "animals_and_nature" }, X6 = { keywords: ["animal", "nature", "mystical"], char: "🦄", fitzpatrick_scale: !1, category: "animals_and_nature" }, R6 = { keywords: ["animal", "insect", "nature", "bug", "spring", "honey"], char: "🐝", fitzpatrick_scale: !1, category: "animals_and_nature" }, z6 = { keywords: ["animal", "insect", "nature", "worm"], char: "🐛", fitzpatrick_scale: !1, category: "animals_and_nature" }, E6 = { keywords: ["animal", "insect", "nature", "caterpillar"], char: "🦋", fitzpatrick_scale: !1, category: "animals_and_nature" }, C6 = { keywords: ["slow", "animal", "shell"], char: "🐌", fitzpatrick_scale: !1, category: "animals_and_nature" }, Y6 = { keywords: ["animal", "insect", "nature", "ladybug"], char: "🐞", fitzpatrick_scale: !1, category: "animals_and_nature" }, Z6 = { keywords: ["animal", "insect", "nature", "bug"], char: "🐜", fitzpatrick_scale: !1, category: "animals_and_nature" }, U6 = { keywords: ["animal", "cricket", "chirp"], char: "🦗", fitzpatrick_scale: !1, category: "animals_and_nature" }, q6 = { keywords: ["animal", "arachnid"], char: "🕷", fitzpatrick_scale: !1, category: "animals_and_nature" }, A6 = { keywords: ["animal", "arachnid"], char: "🦂", fitzpatrick_scale: !1, category: "animals_and_nature" }, W6 = { keywords: ["animal", "crustacean"], char: "🦀", fitzpatrick_scale: !1, category: "animals_and_nature" }, V6 = { keywords: ["animal", "evil", "nature", "hiss", "python"], char: "🐍", fitzpatrick_scale: !1, category: "animals_and_nature" }, D6 = { keywords: ["animal", "nature", "reptile"], char: "🦎", fitzpatrick_scale: !1, category: "animals_and_nature" }, j6 = { keywords: ["animal", "nature", "dinosaur", "brachiosaurus", "brontosaurus", "diplodocus", "extinct"], char: "🦕", fitzpatrick_scale: !1, category: "animals_and_nature" }, L6 = { keywords: ["animal", "slow", "nature", "tortoise"], char: "🐢", fitzpatrick_scale: !1, category: "animals_and_nature" }, I6 = { keywords: ["animal", "swim", "ocean", "beach", "nemo"], char: "🐠", fitzpatrick_scale: !1, category: "animals_and_nature" }, M6 = { keywords: ["animal", "food", "nature"], char: "🐟", fitzpatrick_scale: !1, category: "animals_and_nature" }, G6 = { keywords: ["animal", "nature", "food", "sea", "ocean"], char: "🐡", fitzpatrick_scale: !1, category: "animals_and_nature" }, B6 = { keywords: ["animal", "nature", "fish", "sea", "ocean", "flipper", "fins", "beach"], char: "🐬", fitzpatrick_scale: !1, category: "animals_and_nature" }, N6 = { keywords: ["animal", "nature", "fish", "sea", "ocean", "jaws", "fins", "beach"], char: "🦈", fitzpatrick_scale: !1, category: "animals_and_nature" }, F6 = { keywords: ["animal", "nature", "sea", "ocean"], char: "🐳", fitzpatrick_scale: !1, category: "animals_and_nature" }, H6 = { keywords: ["animal", "nature", "sea", "ocean"], char: "🐋", fitzpatrick_scale: !1, category: "animals_and_nature" }, K6 = { keywords: ["animal", "nature", "reptile", "lizard", "alligator"], char: "🐊", fitzpatrick_scale: !1, category: "animals_and_nature" }, J6 = { keywords: ["animal", "nature"], char: "🐆", fitzpatrick_scale: !1, category: "animals_and_nature" }, ej = { keywords: ["animal", "nature", "stripes", "safari"], char: "🦓", fitzpatrick_scale: !1, category: "animals_and_nature" }, tj = { keywords: ["animal", "nature", "roar"], char: "🐅", fitzpatrick_scale: !1, category: "animals_and_nature" }, rj = { keywords: ["animal", "nature", "ox", "cow"], char: "🐃", fitzpatrick_scale: !1, category: "animals_and_nature" }, ij = { keywords: ["animal", "cow", "beef"], char: "🐂", fitzpatrick_scale: !1, category: "animals_and_nature" }, nj = { keywords: ["beef", "ox", "animal", "nature", "moo", "milk"], char: "🐄", fitzpatrick_scale: !1, category: "animals_and_nature" }, sj = { keywords: ["animal", "nature", "horns", "venison"], char: "🦌", fitzpatrick_scale: !1, category: "animals_and_nature" }, aj = { keywords: ["animal", "hot", "desert", "hump"], char: "🐪", fitzpatrick_scale: !1, category: "animals_and_nature" }, oj = { keywords: ["animal", "nature", "hot", "desert", "hump"], char: "🐫", fitzpatrick_scale: !1, category: "animals_and_nature" }, lj = { keywords: ["animal", "nature", "spots", "safari"], char: "🦒", fitzpatrick_scale: !1, category: "animals_and_nature" }, Oj = { keywords: ["animal", "nature", "nose", "th", "circus"], char: "🐘", fitzpatrick_scale: !1, category: "animals_and_nature" }, cj = { keywords: ["animal", "nature", "horn"], char: "🦏", fitzpatrick_scale: !1, category: "animals_and_nature" }, hj = { keywords: ["animal", "nature"], char: "🐐", fitzpatrick_scale: !1, category: "animals_and_nature" }, uj = { keywords: ["animal", "sheep", "nature"], char: "🐏", fitzpatrick_scale: !1, category: "animals_and_nature" }, dj = { keywords: ["animal", "nature", "wool", "shipit"], char: "🐑", fitzpatrick_scale: !1, category: "animals_and_nature" }, fj = { keywords: ["animal", "gamble", "luck"], char: "🐎", fitzpatrick_scale: !1, category: "animals_and_nature" }, pj = { keywords: ["animal", "nature"], char: "🐖", fitzpatrick_scale: !1, category: "animals_and_nature" }, gj = { keywords: ["animal", "mouse", "rodent"], char: "🐀", fitzpatrick_scale: !1, category: "animals_and_nature" }, mj = { keywords: ["animal", "nature", "rodent"], char: "🐁", fitzpatrick_scale: !1, category: "animals_and_nature" }, _j = { keywords: ["animal", "nature", "chicken"], char: "🐓", fitzpatrick_scale: !1, category: "animals_and_nature" }, $j = { keywords: ["animal", "bird"], char: "🦃", fitzpatrick_scale: !1, category: "animals_and_nature" }, Qj = { keywords: ["animal", "bird"], char: "🕊", fitzpatrick_scale: !1, category: "animals_and_nature" }, yj = { keywords: ["animal", "nature", "friend", "doge", "pet", "faithful"], char: "🐕", fitzpatrick_scale: !1, category: "animals_and_nature" }, bj = { keywords: ["dog", "animal", "101", "nature", "pet"], char: "🐩", fitzpatrick_scale: !1, category: "animals_and_nature" }, Sj = { keywords: ["animal", "meow", "pet", "cats"], char: "🐈", fitzpatrick_scale: !1, category: "animals_and_nature" }, kj = { keywords: ["animal", "nature", "pet", "magic", "spring"], char: "🐇", fitzpatrick_scale: !1, category: "animals_and_nature" }, wj = { keywords: ["animal", "nature", "rodent", "squirrel"], char: "🐿", fitzpatrick_scale: !1, category: "animals_and_nature" }, Pj = { keywords: ["animal", "nature", "spiny"], char: "🦔", fitzpatrick_scale: !1, category: "animals_and_nature" }, vj = { keywords: ["animal", "nature"], char: "🦝", fitzpatrick_scale: !1, category: "animals_and_nature" }, xj = { keywords: ["animal", "nature", "alpaca"], char: "🦙", fitzpatrick_scale: !1, category: "animals_and_nature" }, Tj = { keywords: ["animal", "nature"], char: "🦛", fitzpatrick_scale: !1, category: "animals_and_nature" }, Xj = { keywords: ["animal", "nature", "australia", "joey", "hop", "marsupial"], char: "🦘", fitzpatrick_scale: !1, category: "animals_and_nature" }, Rj = { keywords: ["animal", "nature", "honey"], char: "🦡", fitzpatrick_scale: !1, category: "animals_and_nature" }, zj = { keywords: ["animal", "nature", "bird"], char: "🦢", fitzpatrick_scale: !1, category: "animals_and_nature" }, Ej = { keywords: ["animal", "nature", "peahen", "bird"], char: "🦚", fitzpatrick_scale: !1, category: "animals_and_nature" }, Cj = { keywords: ["animal", "nature", "bird", "pirate", "talk"], char: "🦜", fitzpatrick_scale: !1, category: "animals_and_nature" }, Yj = { keywords: ["animal", "nature", "bisque", "claws", "seafood"], char: "🦞", fitzpatrick_scale: !1, category: "animals_and_nature" }, Zj = { keywords: ["animal", "nature", "insect", "malaria"], char: "🦟", fitzpatrick_scale: !1, category: "animals_and_nature" }, Uj = { keywords: ["animal", "tracking", "footprints", "dog", "cat", "pet", "feet"], char: "🐾", fitzpatrick_scale: !1, category: "animals_and_nature" }, qj = { keywords: ["animal", "myth", "nature", "chinese", "green"], char: "🐉", fitzpatrick_scale: !1, category: "animals_and_nature" }, Aj = { keywords: ["animal", "myth", "nature", "chinese", "green"], char: "🐲", fitzpatrick_scale: !1, category: "animals_and_nature" }, Wj = { keywords: ["vegetable", "plant", "nature"], char: "🌵", fitzpatrick_scale: !1, category: "animals_and_nature" }, Vj = { keywords: ["festival", "vacation", "december", "xmas", "celebration"], char: "🎄", fitzpatrick_scale: !1, category: "animals_and_nature" }, Dj = { keywords: ["plant", "nature"], char: "🌲", fitzpatrick_scale: !1, category: "animals_and_nature" }, jj = { keywords: ["plant", "nature"], char: "🌳", fitzpatrick_scale: !1, category: "animals_and_nature" }, Lj = { keywords: ["plant", "vegetable", "nature", "summer", "beach", "mojito", "tropical"], char: "🌴", fitzpatrick_scale: !1, category: "animals_and_nature" }, Ij = { keywords: ["plant", "nature", "grass", "lawn", "spring"], char: "🌱", fitzpatrick_scale: !1, category: "animals_and_nature" }, Mj = { keywords: ["vegetable", "plant", "medicine", "weed", "grass", "lawn"], char: "🌿", fitzpatrick_scale: !1, category: "animals_and_nature" }, Gj = { keywords: ["vegetable", "plant", "nature", "irish", "clover"], char: "☘", fitzpatrick_scale: !1, category: "animals_and_nature" }, Bj = { keywords: ["vegetable", "plant", "nature", "lucky", "irish"], char: "🍀", fitzpatrick_scale: !1, category: "animals_and_nature" }, Nj = { keywords: ["plant", "nature", "vegetable", "panda", "pine_decoration"], char: "🎍", fitzpatrick_scale: !1, category: "animals_and_nature" }, Fj = { keywords: ["plant", "nature", "branch", "summer"], char: "🎋", fitzpatrick_scale: !1, category: "animals_and_nature" }, Hj = { keywords: ["nature", "plant", "tree", "vegetable", "grass", "lawn", "spring"], char: "🍃", fitzpatrick_scale: !1, category: "animals_and_nature" }, Kj = { keywords: ["nature", "plant", "vegetable", "leaves"], char: "🍂", fitzpatrick_scale: !1, category: "animals_and_nature" }, Jj = { keywords: ["nature", "plant", "vegetable", "ca", "fall"], char: "🍁", fitzpatrick_scale: !1, category: "animals_and_nature" }, e9 = { keywords: ["nature", "plant"], char: "🌾", fitzpatrick_scale: !1, category: "animals_and_nature" }, t9 = { keywords: ["plant", "vegetable", "flowers", "beach"], char: "🌺", fitzpatrick_scale: !1, category: "animals_and_nature" }, r9 = { keywords: ["nature", "plant", "fall"], char: "🌻", fitzpatrick_scale: !1, category: "animals_and_nature" }, i9 = { keywords: ["flowers", "valentines", "love", "spring"], char: "🌹", fitzpatrick_scale: !1, category: "animals_and_nature" }, n9 = { keywords: ["plant", "nature", "flower"], char: "🥀", fitzpatrick_scale: !1, category: "animals_and_nature" }, s9 = { keywords: ["flowers", "plant", "nature", "summer", "spring"], char: "🌷", fitzpatrick_scale: !1, category: "animals_and_nature" }, a9 = { keywords: ["nature", "flowers", "yellow"], char: "🌼", fitzpatrick_scale: !1, category: "animals_and_nature" }, o9 = { keywords: ["nature", "plant", "spring", "flower"], char: "🌸", fitzpatrick_scale: !1, category: "animals_and_nature" }, l9 = { keywords: ["flowers", "nature", "spring"], char: "💐", fitzpatrick_scale: !1, category: "animals_and_nature" }, O9 = { keywords: ["plant", "vegetable"], char: "🍄", fitzpatrick_scale: !1, category: "animals_and_nature" }, c9 = { keywords: ["food", "squirrel"], char: "🌰", fitzpatrick_scale: !1, category: "animals_and_nature" }, h9 = { keywords: ["halloween", "light", "pumpkin", "creepy", "fall"], char: "🎃", fitzpatrick_scale: !1, category: "animals_and_nature" }, u9 = { keywords: ["nature", "sea", "beach"], char: "🐚", fitzpatrick_scale: !1, category: "animals_and_nature" }, d9 = { keywords: ["animal", "insect", "arachnid", "silk"], char: "🕸", fitzpatrick_scale: !1, category: "animals_and_nature" }, f9 = { keywords: ["globe", "world", "USA", "international"], char: "🌎", fitzpatrick_scale: !1, category: "animals_and_nature" }, p9 = { keywords: ["globe", "world", "international"], char: "🌍", fitzpatrick_scale: !1, category: "animals_and_nature" }, g9 = { keywords: ["globe", "world", "east", "international"], char: "🌏", fitzpatrick_scale: !1, category: "animals_and_nature" }, m9 = { keywords: ["nature", "yellow", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌕", fitzpatrick_scale: !1, category: "animals_and_nature" }, _9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep", "waxing_gibbous_moon"], char: "🌖", fitzpatrick_scale: !1, category: "animals_and_nature" }, $9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌗", fitzpatrick_scale: !1, category: "animals_and_nature" }, Q9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌘", fitzpatrick_scale: !1, category: "animals_and_nature" }, y9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌑", fitzpatrick_scale: !1, category: "animals_and_nature" }, b9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌒", fitzpatrick_scale: !1, category: "animals_and_nature" }, S9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌓", fitzpatrick_scale: !1, category: "animals_and_nature" }, k9 = { keywords: ["nature", "night", "sky", "gray", "twilight", "planet", "space", "evening", "sleep"], char: "🌔", fitzpatrick_scale: !1, category: "animals_and_nature" }, w9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌚", fitzpatrick_scale: !1, category: "animals_and_nature" }, P9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌝", fitzpatrick_scale: !1, category: "animals_and_nature" }, v9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌛", fitzpatrick_scale: !1, category: "animals_and_nature" }, x9 = { keywords: ["nature", "twilight", "planet", "space", "night", "evening", "sleep"], char: "🌜", fitzpatrick_scale: !1, category: "animals_and_nature" }, T9 = { keywords: ["nature", "morning", "sky"], char: "🌞", fitzpatrick_scale: !1, category: "animals_and_nature" }, X9 = { keywords: ["night", "sleep", "sky", "evening", "magic"], char: "🌙", fitzpatrick_scale: !1, category: "animals_and_nature" }, R9 = { keywords: ["night", "yellow"], char: "⭐", fitzpatrick_scale: !1, category: "animals_and_nature" }, z9 = { keywords: ["night", "sparkle", "awesome", "good", "magic"], char: "🌟", fitzpatrick_scale: !1, category: "animals_and_nature" }, E9 = { keywords: ["star", "sparkle", "shoot", "magic"], char: "💫", fitzpatrick_scale: !1, category: "animals_and_nature" }, C9 = { keywords: ["stars", "shine", "shiny", "cool", "awesome", "good", "magic"], char: "✨", fitzpatrick_scale: !1, category: "animals_and_nature" }, Y9 = { keywords: ["space"], char: "☄", fitzpatrick_scale: !1, category: "animals_and_nature" }, Z9 = { keywords: ["weather", "nature", "brightness", "summer", "beach", "spring"], char: "☀️", fitzpatrick_scale: !1, category: "animals_and_nature" }, U9 = { keywords: ["weather"], char: "🌤", fitzpatrick_scale: !1, category: "animals_and_nature" }, q9 = { keywords: ["weather", "nature", "cloudy", "morning", "fall", "spring"], char: "⛅", fitzpatrick_scale: !1, category: "animals_and_nature" }, A9 = { keywords: ["weather"], char: "🌥", fitzpatrick_scale: !1, category: "animals_and_nature" }, W9 = { keywords: ["weather"], char: "🌦", fitzpatrick_scale: !1, category: "animals_and_nature" }, V9 = { keywords: ["weather", "sky"], char: "☁️", fitzpatrick_scale: !1, category: "animals_and_nature" }, D9 = { keywords: ["weather"], char: "🌧", fitzpatrick_scale: !1, category: "animals_and_nature" }, j9 = { keywords: ["weather", "lightning"], char: "⛈", fitzpatrick_scale: !1, category: "animals_and_nature" }, L9 = { keywords: ["weather", "thunder"], char: "🌩", fitzpatrick_scale: !1, category: "animals_and_nature" }, I9 = { keywords: ["thunder", "weather", "lightning bolt", "fast"], char: "⚡", fitzpatrick_scale: !1, category: "animals_and_nature" }, M9 = { keywords: ["hot", "cook", "flame"], char: "🔥", fitzpatrick_scale: !1, category: "animals_and_nature" }, G9 = { keywords: ["bomb", "explode", "explosion", "collision", "blown"], char: "💥", fitzpatrick_scale: !1, category: "animals_and_nature" }, B9 = { keywords: ["winter", "season", "cold", "weather", "christmas", "xmas"], char: "❄️", fitzpatrick_scale: !1, category: "animals_and_nature" }, N9 = { keywords: ["weather"], char: "🌨", fitzpatrick_scale: !1, category: "animals_and_nature" }, F9 = { keywords: ["winter", "season", "cold", "weather", "christmas", "xmas", "frozen", "without_snow"], char: "⛄", fitzpatrick_scale: !1, category: "animals_and_nature" }, H9 = { keywords: ["winter", "season", "cold", "weather", "christmas", "xmas", "frozen"], char: "☃", fitzpatrick_scale: !1, category: "animals_and_nature" }, K9 = { keywords: ["gust", "air"], char: "🌬", fitzpatrick_scale: !1, category: "animals_and_nature" }, J9 = { keywords: ["wind", "air", "fast", "shoo", "fart", "smoke", "puff"], char: "💨", fitzpatrick_scale: !1, category: "animals_and_nature" }, eL = { keywords: ["weather", "cyclone", "twister"], char: "🌪", fitzpatrick_scale: !1, category: "animals_and_nature" }, tL = { keywords: ["weather"], char: "🌫", fitzpatrick_scale: !1, category: "animals_and_nature" }, rL = { keywords: ["weather", "spring"], char: "☂", fitzpatrick_scale: !1, category: "animals_and_nature" }, iL = { keywords: ["rainy", "weather", "spring"], char: "☔", fitzpatrick_scale: !1, category: "animals_and_nature" }, nL = { keywords: ["water", "drip", "faucet", "spring"], char: "💧", fitzpatrick_scale: !1, category: "animals_and_nature" }, sL = { keywords: ["water", "drip", "oops"], char: "💦", fitzpatrick_scale: !1, category: "animals_and_nature" }, aL = { keywords: ["sea", "water", "wave", "nature", "tsunami", "disaster"], char: "🌊", fitzpatrick_scale: !1, category: "animals_and_nature" }, oL = { keywords: ["fruit", "nature"], char: "🍏", fitzpatrick_scale: !1, category: "food_and_drink" }, lL = { keywords: ["fruit", "mac", "school"], char: "🍎", fitzpatrick_scale: !1, category: "food_and_drink" }, OL = { keywords: ["fruit", "nature", "food"], char: "🍐", fitzpatrick_scale: !1, category: "food_and_drink" }, cL = { keywords: ["food", "fruit", "nature", "orange"], char: "🍊", fitzpatrick_scale: !1, category: "food_and_drink" }, hL = { keywords: ["fruit", "nature"], char: "🍋", fitzpatrick_scale: !1, category: "food_and_drink" }, uL = { keywords: ["fruit", "food", "monkey"], char: "🍌", fitzpatrick_scale: !1, category: "food_and_drink" }, dL = { keywords: ["fruit", "food", "picnic", "summer"], char: "🍉", fitzpatrick_scale: !1, category: "food_and_drink" }, fL = { keywords: ["fruit", "food", "wine"], char: "🍇", fitzpatrick_scale: !1, category: "food_and_drink" }, pL = { keywords: ["fruit", "food", "nature"], char: "🍓", fitzpatrick_scale: !1, category: "food_and_drink" }, gL = { keywords: ["fruit", "nature", "food"], char: "🍈", fitzpatrick_scale: !1, category: "food_and_drink" }, mL = { keywords: ["food", "fruit"], char: "🍒", fitzpatrick_scale: !1, category: "food_and_drink" }, _L = { keywords: ["fruit", "nature", "food"], char: "🍑", fitzpatrick_scale: !1, category: "food_and_drink" }, $L = { keywords: ["fruit", "nature", "food"], char: "🍍", fitzpatrick_scale: !1, category: "food_and_drink" }, QL = { keywords: ["fruit", "nature", "food", "palm"], char: "🥥", fitzpatrick_scale: !1, category: "food_and_drink" }, yL = { keywords: ["fruit", "food"], char: "🥝", fitzpatrick_scale: !1, category: "food_and_drink" }, bL = { keywords: ["fruit", "food", "tropical"], char: "🥭", fitzpatrick_scale: !1, category: "food_and_drink" }, SL = { keywords: ["fruit", "food"], char: "🥑", fitzpatrick_scale: !1, category: "food_and_drink" }, kL = { keywords: ["fruit", "food", "vegetable"], char: "🥦", fitzpatrick_scale: !1, category: "food_and_drink" }, wL = { keywords: ["fruit", "vegetable", "nature", "food"], char: "🍅", fitzpatrick_scale: !1, category: "food_and_drink" }, PL = { keywords: ["vegetable", "nature", "food", "aubergine"], char: "🍆", fitzpatrick_scale: !1, category: "food_and_drink" }, vL = { keywords: ["fruit", "food", "pickle"], char: "🥒", fitzpatrick_scale: !1, category: "food_and_drink" }, xL = { keywords: ["vegetable", "food", "orange"], char: "🥕", fitzpatrick_scale: !1, category: "food_and_drink" }, TL = { keywords: ["food", "spicy", "chilli", "chili"], char: "🌶", fitzpatrick_scale: !1, category: "food_and_drink" }, XL = { keywords: ["food", "tuber", "vegatable", "starch"], char: "🥔", fitzpatrick_scale: !1, category: "food_and_drink" }, RL = { keywords: ["food", "vegetable", "plant"], char: "🌽", fitzpatrick_scale: !1, category: "food_and_drink" }, zL = { keywords: ["food", "vegetable", "plant", "bok choy", "cabbage", "kale", "lettuce"], char: "🥬", fitzpatrick_scale: !1, category: "food_and_drink" }, EL = { keywords: ["food", "nature"], char: "🍠", fitzpatrick_scale: !1, category: "food_and_drink" }, CL = { keywords: ["food", "nut"], char: "🥜", fitzpatrick_scale: !1, category: "food_and_drink" }, YL = { keywords: ["bees", "sweet", "kitchen"], char: "🍯", fitzpatrick_scale: !1, category: "food_and_drink" }, ZL = { keywords: ["food", "bread", "french"], char: "🥐", fitzpatrick_scale: !1, category: "food_and_drink" }, UL = { keywords: ["food", "wheat", "breakfast", "toast"], char: "🍞", fitzpatrick_scale: !1, category: "food_and_drink" }, qL = { keywords: ["food", "bread", "french"], char: "🥖", fitzpatrick_scale: !1, category: "food_and_drink" }, AL = { keywords: ["food", "bread", "bakery", "schmear"], char: "🥯", fitzpatrick_scale: !1, category: "food_and_drink" }, WL = { keywords: ["food", "bread", "twisted"], char: "🥨", fitzpatrick_scale: !1, category: "food_and_drink" }, VL = { keywords: ["food", "chadder"], char: "🧀", fitzpatrick_scale: !1, category: "food_and_drink" }, DL = { keywords: ["food", "chicken", "breakfast"], char: "🥚", fitzpatrick_scale: !1, category: "food_and_drink" }, jL = { keywords: ["food", "breakfast", "pork", "pig", "meat"], char: "🥓", fitzpatrick_scale: !1, category: "food_and_drink" }, LL = { keywords: ["food", "cow", "meat", "cut", "chop", "lambchop", "porkchop"], char: "🥩", fitzpatrick_scale: !1, category: "food_and_drink" }, IL = { keywords: ["food", "breakfast", "flapjacks", "hotcakes"], char: "🥞", fitzpatrick_scale: !1, category: "food_and_drink" }, ML = { keywords: ["food", "meat", "drumstick", "bird", "chicken", "turkey"], char: "🍗", fitzpatrick_scale: !1, category: "food_and_drink" }, GL = { keywords: ["good", "food", "drumstick"], char: "🍖", fitzpatrick_scale: !1, category: "food_and_drink" }, BL = { keywords: ["skeleton"], char: "🦴", fitzpatrick_scale: !1, category: "food_and_drink" }, NL = { keywords: ["food", "animal", "appetizer", "summer"], char: "🍤", fitzpatrick_scale: !1, category: "food_and_drink" }, FL = { keywords: ["food", "breakfast", "kitchen", "egg"], char: "🍳", fitzpatrick_scale: !1, category: "food_and_drink" }, HL = { keywords: ["meat", "fast food", "beef", "cheeseburger", "mcdonalds", "burger king"], char: "🍔", fitzpatrick_scale: !1, category: "food_and_drink" }, KL = { keywords: ["chips", "snack", "fast food"], char: "🍟", fitzpatrick_scale: !1, category: "food_and_drink" }, JL = { keywords: ["food", "flatbread", "stuffed", "gyro"], char: "🥙", fitzpatrick_scale: !1, category: "food_and_drink" }, eI = { keywords: ["food", "frankfurter"], char: "🌭", fitzpatrick_scale: !1, category: "food_and_drink" }, tI = { keywords: ["food", "party"], char: "🍕", fitzpatrick_scale: !1, category: "food_and_drink" }, rI = { keywords: ["food", "lunch", "bread"], char: "🥪", fitzpatrick_scale: !1, category: "food_and_drink" }, iI = { keywords: ["food", "soup"], char: "🥫", fitzpatrick_scale: !1, category: "food_and_drink" }, nI = { keywords: ["food", "italian", "noodle"], char: "🍝", fitzpatrick_scale: !1, category: "food_and_drink" }, sI = { keywords: ["food", "mexican"], char: "🌮", fitzpatrick_scale: !1, category: "food_and_drink" }, aI = { keywords: ["food", "mexican"], char: "🌯", fitzpatrick_scale: !1, category: "food_and_drink" }, oI = { keywords: ["food", "healthy", "lettuce"], char: "🥗", fitzpatrick_scale: !1, category: "food_and_drink" }, lI = { keywords: ["food", "cooking", "casserole", "paella"], char: "🥘", fitzpatrick_scale: !1, category: "food_and_drink" }, OI = { keywords: ["food", "japanese", "noodle", "chopsticks"], char: "🍜", fitzpatrick_scale: !1, category: "food_and_drink" }, cI = { keywords: ["food", "meat", "soup"], char: "🍲", fitzpatrick_scale: !1, category: "food_and_drink" }, hI = { keywords: ["food", "japan", "sea", "beach", "narutomaki", "pink", "swirl", "kamaboko", "surimi", "ramen"], char: "🍥", fitzpatrick_scale: !1, category: "food_and_drink" }, uI = { keywords: ["food", "prophecy"], char: "🥠", fitzpatrick_scale: !1, category: "food_and_drink" }, dI = { keywords: ["food", "fish", "japanese", "rice"], char: "🍣", fitzpatrick_scale: !1, category: "food_and_drink" }, fI = { keywords: ["food", "japanese", "box"], char: "🍱", fitzpatrick_scale: !1, category: "food_and_drink" }, pI = { keywords: ["food", "spicy", "hot", "indian"], char: "🍛", fitzpatrick_scale: !1, category: "food_and_drink" }, gI = { keywords: ["food", "japanese"], char: "🍙", fitzpatrick_scale: !1, category: "food_and_drink" }, mI = { keywords: ["food", "china", "asian"], char: "🍚", fitzpatrick_scale: !1, category: "food_and_drink" }, _I = { keywords: ["food", "japanese"], char: "🍘", fitzpatrick_scale: !1, category: "food_and_drink" }, $I = { keywords: ["food", "japanese"], char: "🍢", fitzpatrick_scale: !1, category: "food_and_drink" }, QI = { keywords: ["food", "dessert", "sweet", "japanese", "barbecue", "meat"], char: "🍡", fitzpatrick_scale: !1, category: "food_and_drink" }, yI = { keywords: ["hot", "dessert", "summer"], char: "🍧", fitzpatrick_scale: !1, category: "food_and_drink" }, bI = { keywords: ["food", "hot", "dessert"], char: "🍨", fitzpatrick_scale: !1, category: "food_and_drink" }, SI = { keywords: ["food", "hot", "dessert", "summer"], char: "🍦", fitzpatrick_scale: !1, category: "food_and_drink" }, kI = { keywords: ["food", "dessert", "pastry"], char: "🥧", fitzpatrick_scale: !1, category: "food_and_drink" }, wI = { keywords: ["food", "dessert"], char: "🍰", fitzpatrick_scale: !1, category: "food_and_drink" }, PI = { keywords: ["food", "dessert", "bakery", "sweet"], char: "🧁", fitzpatrick_scale: !1, category: "food_and_drink" }, vI = { keywords: ["food", "autumn"], char: "🥮", fitzpatrick_scale: !1, category: "food_and_drink" }, xI = { keywords: ["food", "dessert", "cake"], char: "🎂", fitzpatrick_scale: !1, category: "food_and_drink" }, TI = { keywords: ["dessert", "food"], char: "🍮", fitzpatrick_scale: !1, category: "food_and_drink" }, XI = { keywords: ["snack", "dessert", "sweet", "lolly"], char: "🍬", fitzpatrick_scale: !1, category: "food_and_drink" }, RI = { keywords: ["food", "snack", "candy", "sweet"], char: "🍭", fitzpatrick_scale: !1, category: "food_and_drink" }, zI = { keywords: ["food", "snack", "dessert", "sweet"], char: "🍫", fitzpatrick_scale: !1, category: "food_and_drink" }, EI = { keywords: ["food", "movie theater", "films", "snack"], char: "🍿", fitzpatrick_scale: !1, category: "food_and_drink" }, CI = { keywords: ["food", "empanada", "pierogi", "potsticker"], char: "🥟", fitzpatrick_scale: !1, category: "food_and_drink" }, YI = { keywords: ["food", "dessert", "snack", "sweet", "donut"], char: "🍩", fitzpatrick_scale: !1, category: "food_and_drink" }, ZI = { keywords: ["food", "snack", "oreo", "chocolate", "sweet", "dessert"], char: "🍪", fitzpatrick_scale: !1, category: "food_and_drink" }, UI = { keywords: ["beverage", "drink", "cow"], char: "🥛", fitzpatrick_scale: !1, category: "food_and_drink" }, qI = { keywords: ["relax", "beverage", "drink", "drunk", "party", "pub", "summer", "alcohol", "booze"], char: "🍺", fitzpatrick_scale: !1, category: "food_and_drink" }, AI = { keywords: ["relax", "beverage", "drink", "drunk", "party", "pub", "summer", "alcohol", "booze"], char: "🍻", fitzpatrick_scale: !1, category: "food_and_drink" }, WI = { keywords: ["beverage", "drink", "party", "alcohol", "celebrate", "cheers", "wine", "champagne", "toast"], char: "🥂", fitzpatrick_scale: !1, category: "food_and_drink" }, VI = { keywords: ["drink", "beverage", "drunk", "alcohol", "booze"], char: "🍷", fitzpatrick_scale: !1, category: "food_and_drink" }, DI = { keywords: ["drink", "beverage", "drunk", "alcohol", "liquor", "booze", "bourbon", "scotch", "whisky", "glass", "shot"], char: "🥃", fitzpatrick_scale: !1, category: "food_and_drink" }, jI = { keywords: ["drink", "drunk", "alcohol", "beverage", "booze", "mojito"], char: "🍸", fitzpatrick_scale: !1, category: "food_and_drink" }, LI = { keywords: ["beverage", "cocktail", "summer", "beach", "alcohol", "booze", "mojito"], char: "🍹", fitzpatrick_scale: !1, category: "food_and_drink" }, II = { keywords: ["drink", "wine", "bottle", "celebration"], char: "🍾", fitzpatrick_scale: !1, category: "food_and_drink" }, MI = { keywords: ["wine", "drink", "drunk", "beverage", "japanese", "alcohol", "booze"], char: "🍶", fitzpatrick_scale: !1, category: "food_and_drink" }, GI = { keywords: ["drink", "bowl", "breakfast", "green", "british"], char: "🍵", fitzpatrick_scale: !1, category: "food_and_drink" }, BI = { keywords: ["drink", "soda"], char: "🥤", fitzpatrick_scale: !1, category: "food_and_drink" }, NI = { keywords: ["beverage", "caffeine", "latte", "espresso"], char: "☕", fitzpatrick_scale: !1, category: "food_and_drink" }, FI = { keywords: ["food", "container", "milk"], char: "🍼", fitzpatrick_scale: !1, category: "food_and_drink" }, HI = { keywords: ["condiment", "shaker"], char: "🧂", fitzpatrick_scale: !1, category: "food_and_drink" }, KI = { keywords: ["cutlery", "kitchen", "tableware"], char: "🥄", fitzpatrick_scale: !1, category: "food_and_drink" }, JI = { keywords: ["cutlery", "kitchen"], char: "🍴", fitzpatrick_scale: !1, category: "food_and_drink" }, eM = { keywords: ["food", "eat", "meal", "lunch", "dinner", "restaurant"], char: "🍽", fitzpatrick_scale: !1, category: "food_and_drink" }, tM = { keywords: ["food", "breakfast", "cereal", "oatmeal", "porridge"], char: "🥣", fitzpatrick_scale: !1, category: "food_and_drink" }, rM = { keywords: ["food", "leftovers"], char: "🥡", fitzpatrick_scale: !1, category: "food_and_drink" }, iM = { keywords: ["food"], char: "🥢", fitzpatrick_scale: !1, category: "food_and_drink" }, nM = { keywords: ["sports", "football"], char: "⚽", fitzpatrick_scale: !1, category: "activity" }, sM = { keywords: ["sports", "balls", "NBA"], char: "🏀", fitzpatrick_scale: !1, category: "activity" }, aM = { keywords: ["sports", "balls", "NFL"], char: "🏈", fitzpatrick_scale: !1, category: "activity" }, oM = { keywords: ["sports", "balls"], char: "⚾", fitzpatrick_scale: !1, category: "activity" }, lM = { keywords: ["sports", "balls"], char: "🥎", fitzpatrick_scale: !1, category: "activity" }, OM = { keywords: ["sports", "balls", "green"], char: "🎾", fitzpatrick_scale: !1, category: "activity" }, cM = { keywords: ["sports", "balls"], char: "🏐", fitzpatrick_scale: !1, category: "activity" }, hM = { keywords: ["sports", "team"], char: "🏉", fitzpatrick_scale: !1, category: "activity" }, uM = { keywords: ["sports", "frisbee", "ultimate"], char: "🥏", fitzpatrick_scale: !1, category: "activity" }, dM = { keywords: ["sports", "business", "flag", "hole", "summer"], char: "⛳", fitzpatrick_scale: !1, category: "activity" }, fM = { keywords: ["sports", "business", "woman", "female"], char: "🏌️‍♀️", fitzpatrick_scale: !1, category: "activity" }, pM = { keywords: ["sports", "business"], char: "🏌", fitzpatrick_scale: !0, category: "activity" }, gM = { keywords: ["sports", "pingpong"], char: "🏓", fitzpatrick_scale: !1, category: "activity" }, mM = { keywords: ["sports"], char: "🏸", fitzpatrick_scale: !1, category: "activity" }, _M = { keywords: ["sports"], char: "🥅", fitzpatrick_scale: !1, category: "activity" }, $M = { keywords: ["sports"], char: "🏒", fitzpatrick_scale: !1, category: "activity" }, QM = { keywords: ["sports"], char: "🏑", fitzpatrick_scale: !1, category: "activity" }, yM = { keywords: ["sports", "ball", "stick"], char: "🥍", fitzpatrick_scale: !1, category: "activity" }, bM = { keywords: ["sports"], char: "🏏", fitzpatrick_scale: !1, category: "activity" }, SM = { keywords: ["sports", "winter", "cold", "snow"], char: "🎿", fitzpatrick_scale: !1, category: "activity" }, kM = { keywords: ["sports", "winter", "snow"], char: "⛷", fitzpatrick_scale: !1, category: "activity" }, wM = { keywords: ["sports", "winter"], char: "🏂", fitzpatrick_scale: !0, category: "activity" }, PM = { keywords: ["sports", "fencing", "sword"], char: "🤺", fitzpatrick_scale: !1, category: "activity" }, vM = { keywords: ["sports", "wrestlers"], char: "🤼‍♀️", fitzpatrick_scale: !1, category: "activity" }, xM = { keywords: ["sports", "wrestlers"], char: "🤼‍♂️", fitzpatrick_scale: !1, category: "activity" }, TM = { keywords: ["gymnastics"], char: "🤸‍♀️", fitzpatrick_scale: !0, category: "activity" }, XM = { keywords: ["gymnastics"], char: "🤸‍♂️", fitzpatrick_scale: !0, category: "activity" }, RM = { keywords: ["sports"], char: "🤾‍♀️", fitzpatrick_scale: !0, category: "activity" }, zM = { keywords: ["sports"], char: "🤾‍♂️", fitzpatrick_scale: !0, category: "activity" }, EM = { keywords: ["sports"], char: "⛸", fitzpatrick_scale: !1, category: "activity" }, CM = { keywords: ["sports"], char: "🥌", fitzpatrick_scale: !1, category: "activity" }, YM = { keywords: ["board"], char: "🛹", fitzpatrick_scale: !1, category: "activity" }, ZM = { keywords: ["sleigh", "luge", "toboggan"], char: "🛷", fitzpatrick_scale: !1, category: "activity" }, UM = { keywords: ["sports"], char: "🏹", fitzpatrick_scale: !1, category: "activity" }, qM = { keywords: ["food", "hobby", "summer"], char: "🎣", fitzpatrick_scale: !1, category: "activity" }, AM = { keywords: ["sports", "fighting"], char: "🥊", fitzpatrick_scale: !1, category: "activity" }, WM = { keywords: ["judo", "karate", "taekwondo"], char: "🥋", fitzpatrick_scale: !1, category: "activity" }, VM = { keywords: ["sports", "hobby", "water", "ship", "woman", "female"], char: "🚣‍♀️", fitzpatrick_scale: !0, category: "activity" }, DM = { keywords: ["sports", "hobby", "water", "ship"], char: "🚣", fitzpatrick_scale: !0, category: "activity" }, jM = { keywords: ["sports", "hobby", "woman", "female", "rock"], char: "🧗‍♀️", fitzpatrick_scale: !0, category: "activity" }, LM = { keywords: ["sports", "hobby", "man", "male", "rock"], char: "🧗‍♂️", fitzpatrick_scale: !0, category: "activity" }, IM = { keywords: ["sports", "exercise", "human", "athlete", "water", "summer", "woman", "female"], char: "🏊‍♀️", fitzpatrick_scale: !0, category: "activity" }, MM = { keywords: ["sports", "exercise", "human", "athlete", "water", "summer"], char: "🏊", fitzpatrick_scale: !0, category: "activity" }, GM = { keywords: ["sports", "pool"], char: "🤽‍♀️", fitzpatrick_scale: !0, category: "activity" }, BM = { keywords: ["sports", "pool"], char: "🤽‍♂️", fitzpatrick_scale: !0, category: "activity" }, NM = { keywords: ["woman", "female", "meditation", "yoga", "serenity", "zen", "mindfulness"], char: "🧘‍♀️", fitzpatrick_scale: !0, category: "activity" }, FM = { keywords: ["man", "male", "meditation", "yoga", "serenity", "zen", "mindfulness"], char: "🧘‍♂️", fitzpatrick_scale: !0, category: "activity" }, HM = { keywords: ["sports", "ocean", "sea", "summer", "beach", "woman", "female"], char: "🏄‍♀️", fitzpatrick_scale: !0, category: "activity" }, KM = { keywords: ["sports", "ocean", "sea", "summer", "beach"], char: "🏄", fitzpatrick_scale: !0, category: "activity" }, JM = { keywords: ["clean", "shower", "bathroom"], char: "🛀", fitzpatrick_scale: !0, category: "activity" }, eG = { keywords: ["sports", "human", "woman", "female"], char: "⛹️‍♀️", fitzpatrick_scale: !0, category: "activity" }, tG = { keywords: ["sports", "human"], char: "⛹", fitzpatrick_scale: !0, category: "activity" }, rG = { keywords: ["sports", "training", "exercise", "woman", "female"], char: "🏋️‍♀️", fitzpatrick_scale: !0, category: "activity" }, iG = { keywords: ["sports", "training", "exercise"], char: "🏋", fitzpatrick_scale: !0, category: "activity" }, nG = { keywords: ["sports", "bike", "exercise", "hipster", "woman", "female"], char: "🚴‍♀️", fitzpatrick_scale: !0, category: "activity" }, sG = { keywords: ["sports", "bike", "exercise", "hipster"], char: "🚴", fitzpatrick_scale: !0, category: "activity" }, aG = { keywords: ["transportation", "sports", "human", "race", "bike", "woman", "female"], char: "🚵‍♀️", fitzpatrick_scale: !0, category: "activity" }, oG = { keywords: ["transportation", "sports", "human", "race", "bike"], char: "🚵", fitzpatrick_scale: !0, category: "activity" }, lG = { keywords: ["animal", "betting", "competition", "gambling", "luck"], char: "🏇", fitzpatrick_scale: !0, category: "activity" }, OG = { keywords: ["suit", "business", "levitate", "hover", "jump"], char: "🕴", fitzpatrick_scale: !0, category: "activity" }, cG = { keywords: ["win", "award", "contest", "place", "ftw", "ceremony"], char: "🏆", fitzpatrick_scale: !1, category: "activity" }, hG = { keywords: ["play", "pageant"], char: "🎽", fitzpatrick_scale: !1, category: "activity" }, uG = { keywords: ["award", "winning"], char: "🏅", fitzpatrick_scale: !1, category: "activity" }, dG = { keywords: ["award", "winning", "army"], char: "🎖", fitzpatrick_scale: !1, category: "activity" }, fG = { keywords: ["sports", "cause", "support", "awareness"], char: "🎗", fitzpatrick_scale: !1, category: "activity" }, pG = { keywords: ["flower", "decoration", "military"], char: "🏵", fitzpatrick_scale: !1, category: "activity" }, gG = { keywords: ["event", "concert", "pass"], char: "🎫", fitzpatrick_scale: !1, category: "activity" }, mG = { keywords: ["sports", "concert", "entrance"], char: "🎟", fitzpatrick_scale: !1, category: "activity" }, _G = { keywords: ["acting", "theater", "drama"], char: "🎭", fitzpatrick_scale: !1, category: "activity" }, $G = { keywords: ["design", "paint", "draw", "colors"], char: "🎨", fitzpatrick_scale: !1, category: "activity" }, QG = { keywords: ["festival", "carnival", "party"], char: "🎪", fitzpatrick_scale: !1, category: "activity" }, yG = { keywords: ["juggle", "balance", "skill", "multitask"], char: "🤹‍♀️", fitzpatrick_scale: !0, category: "activity" }, bG = { keywords: ["juggle", "balance", "skill", "multitask"], char: "🤹‍♂️", fitzpatrick_scale: !0, category: "activity" }, SG = { keywords: ["sound", "music", "PA", "sing", "talkshow"], char: "🎤", fitzpatrick_scale: !1, category: "activity" }, kG = { keywords: ["music", "score", "gadgets"], char: "🎧", fitzpatrick_scale: !1, category: "activity" }, wG = { keywords: ["treble", "clef", "compose"], char: "🎼", fitzpatrick_scale: !1, category: "activity" }, PG = { keywords: ["piano", "instrument", "compose"], char: "🎹", fitzpatrick_scale: !1, category: "activity" }, vG = { keywords: ["music", "instrument", "drumsticks", "snare"], char: "🥁", fitzpatrick_scale: !1, category: "activity" }, xG = { keywords: ["music", "instrument", "jazz", "blues"], char: "🎷", fitzpatrick_scale: !1, category: "activity" }, TG = { keywords: ["music", "brass"], char: "🎺", fitzpatrick_scale: !1, category: "activity" }, XG = { keywords: ["music", "instrument"], char: "🎸", fitzpatrick_scale: !1, category: "activity" }, RG = { keywords: ["music", "instrument", "orchestra", "symphony"], char: "🎻", fitzpatrick_scale: !1, category: "activity" }, zG = { keywords: ["movie", "film", "record"], char: "🎬", fitzpatrick_scale: !1, category: "activity" }, EG = { keywords: ["play", "console", "PS4", "controller"], char: "🎮", fitzpatrick_scale: !1, category: "activity" }, CG = { keywords: ["game", "arcade", "play"], char: "👾", fitzpatrick_scale: !1, category: "activity" }, YG = { keywords: ["game", "play", "bar", "target", "bullseye"], char: "🎯", fitzpatrick_scale: !1, category: "activity" }, ZG = { keywords: ["dice", "random", "tabletop", "play", "luck"], char: "🎲", fitzpatrick_scale: !1, category: "activity" }, UG = { keywords: ["expendable"], char: "♟", fitzpatrick_scale: !1, category: "activity" }, qG = { keywords: ["bet", "gamble", "vegas", "fruit machine", "luck", "casino"], char: "🎰", fitzpatrick_scale: !1, category: "activity" }, AG = { keywords: ["interlocking", "puzzle", "piece"], char: "🧩", fitzpatrick_scale: !1, category: "activity" }, WG = { keywords: ["sports", "fun", "play"], char: "🎳", fitzpatrick_scale: !1, category: "activity" }, VG = { keywords: ["red", "transportation", "vehicle"], char: "🚗", fitzpatrick_scale: !1, category: "travel_and_places" }, DG = { keywords: ["uber", "vehicle", "cars", "transportation"], char: "🚕", fitzpatrick_scale: !1, category: "travel_and_places" }, jG = { keywords: ["transportation", "vehicle"], char: "🚙", fitzpatrick_scale: !1, category: "travel_and_places" }, LG = { keywords: ["car", "vehicle", "transportation"], char: "🚌", fitzpatrick_scale: !1, category: "travel_and_places" }, IG = { keywords: ["bart", "transportation", "vehicle"], char: "🚎", fitzpatrick_scale: !1, category: "travel_and_places" }, MG = { keywords: ["sports", "race", "fast", "formula", "f1"], char: "🏎", fitzpatrick_scale: !1, category: "travel_and_places" }, GG = { keywords: ["vehicle", "cars", "transportation", "law", "legal", "enforcement"], char: "🚓", fitzpatrick_scale: !1, category: "travel_and_places" }, BG = { keywords: ["health", "911", "hospital"], char: "🚑", fitzpatrick_scale: !1, category: "travel_and_places" }, NG = { keywords: ["transportation", "cars", "vehicle"], char: "🚒", fitzpatrick_scale: !1, category: "travel_and_places" }, FG = { keywords: ["vehicle", "car", "transportation"], char: "🚐", fitzpatrick_scale: !1, category: "travel_and_places" }, HG = { keywords: ["cars", "transportation"], char: "🚚", fitzpatrick_scale: !1, category: "travel_and_places" }, KG = { keywords: ["vehicle", "cars", "transportation", "express"], char: "🚛", fitzpatrick_scale: !1, category: "travel_and_places" }, JG = { keywords: ["vehicle", "car", "farming", "agriculture"], char: "🚜", fitzpatrick_scale: !1, category: "travel_and_places" }, eB = { keywords: ["vehicle", "kick", "razor"], char: "🛴", fitzpatrick_scale: !1, category: "travel_and_places" }, tB = { keywords: ["race", "sports", "fast"], char: "🏍", fitzpatrick_scale: !1, category: "travel_and_places" }, rB = { keywords: ["sports", "bicycle", "exercise", "hipster"], char: "🚲", fitzpatrick_scale: !1, category: "travel_and_places" }, iB = { keywords: ["vehicle", "vespa", "sasha"], char: "🛵", fitzpatrick_scale: !1, category: "travel_and_places" }, nB = { keywords: ["police", "ambulance", "911", "emergency", "alert", "error", "pinged", "law", "legal"], char: "🚨", fitzpatrick_scale: !1, category: "travel_and_places" }, sB = { keywords: ["vehicle", "law", "legal", "enforcement", "911"], char: "🚔", fitzpatrick_scale: !1, category: "travel_and_places" }, aB = { keywords: ["vehicle", "transportation"], char: "🚍", fitzpatrick_scale: !1, category: "travel_and_places" }, oB = { keywords: ["car", "vehicle", "transportation"], char: "🚘", fitzpatrick_scale: !1, category: "travel_and_places" }, lB = { keywords: ["vehicle", "cars", "uber"], char: "🚖", fitzpatrick_scale: !1, category: "travel_and_places" }, OB = { keywords: ["transportation", "vehicle", "ski"], char: "🚡", fitzpatrick_scale: !1, category: "travel_and_places" }, cB = { keywords: ["transportation", "vehicle", "ski"], char: "🚠", fitzpatrick_scale: !1, category: "travel_and_places" }, hB = { keywords: ["vehicle", "transportation"], char: "🚟", fitzpatrick_scale: !1, category: "travel_and_places" }, uB = { keywords: ["transportation", "vehicle"], char: "🚃", fitzpatrick_scale: !1, category: "travel_and_places" }, dB = { keywords: ["transportation", "vehicle", "carriage", "public", "travel"], char: "🚋", fitzpatrick_scale: !1, category: "travel_and_places" }, fB = { keywords: ["transportation", "vehicle"], char: "🚝", fitzpatrick_scale: !1, category: "travel_and_places" }, pB = { keywords: ["transportation", "vehicle"], char: "🚄", fitzpatrick_scale: !1, category: "travel_and_places" }, gB = { keywords: ["transportation", "vehicle", "speed", "fast", "public", "travel"], char: "🚅", fitzpatrick_scale: !1, category: "travel_and_places" }, mB = { keywords: ["transportation", "vehicle"], char: "🚈", fitzpatrick_scale: !1, category: "travel_and_places" }, _B = { keywords: ["transportation", "vehicle"], char: "🚞", fitzpatrick_scale: !1, category: "travel_and_places" }, $B = { keywords: ["transportation", "vehicle", "train"], char: "🚂", fitzpatrick_scale: !1, category: "travel_and_places" }, QB = { keywords: ["transportation", "vehicle"], char: "🚆", fitzpatrick_scale: !1, category: "travel_and_places" }, yB = { keywords: ["transportation", "blue-square", "mrt", "underground", "tube"], char: "🚇", fitzpatrick_scale: !1, category: "travel_and_places" }, bB = { keywords: ["transportation", "vehicle"], char: "🚊", fitzpatrick_scale: !1, category: "travel_and_places" }, SB = { keywords: ["transportation", "vehicle", "public"], char: "🚉", fitzpatrick_scale: !1, category: "travel_and_places" }, kB = { keywords: ["transportation", "vehicle", "ufo"], char: "🛸", fitzpatrick_scale: !1, category: "travel_and_places" }, wB = { keywords: ["transportation", "vehicle", "fly"], char: "🚁", fitzpatrick_scale: !1, category: "travel_and_places" }, PB = { keywords: ["flight", "transportation", "fly", "vehicle"], char: "🛩", fitzpatrick_scale: !1, category: "travel_and_places" }, vB = { keywords: ["vehicle", "transportation", "flight", "fly"], char: "✈️", fitzpatrick_scale: !1, category: "travel_and_places" }, xB = { keywords: ["airport", "flight", "landing"], char: "🛫", fitzpatrick_scale: !1, category: "travel_and_places" }, TB = { keywords: ["airport", "flight", "boarding"], char: "🛬", fitzpatrick_scale: !1, category: "travel_and_places" }, XB = { keywords: ["ship", "summer", "transportation", "water", "sailing"], char: "⛵", fitzpatrick_scale: !1, category: "travel_and_places" }, RB = { keywords: ["ship"], char: "🛥", fitzpatrick_scale: !1, category: "travel_and_places" }, zB = { keywords: ["ship", "transportation", "vehicle", "summer"], char: "🚤", fitzpatrick_scale: !1, category: "travel_and_places" }, EB = { keywords: ["boat", "ship", "yacht"], char: "⛴", fitzpatrick_scale: !1, category: "travel_and_places" }, CB = { keywords: ["yacht", "cruise", "ferry"], char: "🛳", fitzpatrick_scale: !1, category: "travel_and_places" }, YB = { keywords: ["launch", "ship", "staffmode", "NASA", "outer space", "outer_space", "fly"], char: "🚀", fitzpatrick_scale: !1, category: "travel_and_places" }, ZB = { keywords: ["communication", "gps", "orbit", "spaceflight", "NASA", "ISS"], char: "🛰", fitzpatrick_scale: !1, category: "travel_and_places" }, UB = { keywords: ["sit", "airplane", "transport", "bus", "flight", "fly"], char: "💺", fitzpatrick_scale: !1, category: "travel_and_places" }, qB = { keywords: ["boat", "paddle", "water", "ship"], char: "🛶", fitzpatrick_scale: !1, category: "travel_and_places" }, AB = { keywords: ["ship", "ferry", "sea", "boat"], char: "⚓", fitzpatrick_scale: !1, category: "travel_and_places" }, WB = { keywords: ["wip", "progress", "caution", "warning"], char: "🚧", fitzpatrick_scale: !1, category: "travel_and_places" }, VB = { keywords: ["gas station", "petroleum"], char: "⛽", fitzpatrick_scale: !1, category: "travel_and_places" }, DB = { keywords: ["transportation", "wait"], char: "🚏", fitzpatrick_scale: !1, category: "travel_and_places" }, jB = { keywords: ["transportation", "driving"], char: "🚦", fitzpatrick_scale: !1, category: "travel_and_places" }, LB = { keywords: ["transportation", "signal"], char: "🚥", fitzpatrick_scale: !1, category: "travel_and_places" }, IB = { keywords: ["contest", "finishline", "race", "gokart"], char: "🏁", fitzpatrick_scale: !1, category: "travel_and_places" }, MB = { keywords: ["transportation", "titanic", "deploy"], char: "🚢", fitzpatrick_scale: !1, category: "travel_and_places" }, GB = { keywords: ["photo", "carnival", "londoneye"], char: "🎡", fitzpatrick_scale: !1, category: "travel_and_places" }, BB = { keywords: ["carnival", "playground", "photo", "fun"], char: "🎢", fitzpatrick_scale: !1, category: "travel_and_places" }, NB = { keywords: ["photo", "carnival"], char: "🎠", fitzpatrick_scale: !1, category: "travel_and_places" }, FB = { keywords: ["wip", "working", "progress"], char: "🏗", fitzpatrick_scale: !1, category: "travel_and_places" }, HB = { keywords: ["photo", "mountain"], char: "🌁", fitzpatrick_scale: !1, category: "travel_and_places" }, KB = { keywords: ["photo", "japanese"], char: "🗼", fitzpatrick_scale: !1, category: "travel_and_places" }, JB = { keywords: ["building", "industry", "pollution", "smoke"], char: "🏭", fitzpatrick_scale: !1, category: "travel_and_places" }, eN = { keywords: ["photo", "summer", "water", "fresh"], char: "⛲", fitzpatrick_scale: !1, category: "travel_and_places" }, tN = { keywords: ["photo", "japan", "asia", "tsukimi"], char: "🎑", fitzpatrick_scale: !1, category: "travel_and_places" }, rN = { keywords: ["photo", "nature", "environment"], char: "⛰", fitzpatrick_scale: !1, category: "travel_and_places" }, iN = { keywords: ["photo", "nature", "environment", "winter", "cold"], char: "🏔", fitzpatrick_scale: !1, category: "travel_and_places" }, nN = { keywords: ["photo", "mountain", "nature", "japanese"], char: "🗻", fitzpatrick_scale: !1, category: "travel_and_places" }, sN = { keywords: ["photo", "nature", "disaster"], char: "🌋", fitzpatrick_scale: !1, category: "travel_and_places" }, aN = { keywords: ["nation", "country", "japanese", "asia"], char: "🗾", fitzpatrick_scale: !1, category: "travel_and_places" }, oN = { keywords: ["photo", "outdoors", "tent"], char: "🏕", fitzpatrick_scale: !1, category: "travel_and_places" }, lN = { keywords: ["photo", "camping", "outdoors"], char: "⛺", fitzpatrick_scale: !1, category: "travel_and_places" }, ON = { keywords: ["photo", "environment", "nature"], char: "🏞", fitzpatrick_scale: !1, category: "travel_and_places" }, cN = { keywords: ["road", "cupertino", "interstate", "highway"], char: "🛣", fitzpatrick_scale: !1, category: "travel_and_places" }, hN = { keywords: ["train", "transportation"], char: "🛤", fitzpatrick_scale: !1, category: "travel_and_places" }, uN = { keywords: ["morning", "view", "vacation", "photo"], char: "🌅", fitzpatrick_scale: !1, category: "travel_and_places" }, dN = { keywords: ["view", "vacation", "photo"], char: "🌄", fitzpatrick_scale: !1, category: "travel_and_places" }, fN = { keywords: ["photo", "warm", "saharah"], char: "🏜", fitzpatrick_scale: !1, category: "travel_and_places" }, pN = { keywords: ["weather", "summer", "sunny", "sand", "mojito"], char: "🏖", fitzpatrick_scale: !1, category: "travel_and_places" }, gN = { keywords: ["photo", "tropical", "mojito"], char: "🏝", fitzpatrick_scale: !1, category: "travel_and_places" }, mN = { keywords: ["photo", "good morning", "dawn"], char: "🌇", fitzpatrick_scale: !1, category: "travel_and_places" }, _N = { keywords: ["photo", "evening", "sky", "buildings"], char: "🌆", fitzpatrick_scale: !1, category: "travel_and_places" }, $N = { keywords: ["photo", "night life", "urban"], char: "🏙", fitzpatrick_scale: !1, category: "travel_and_places" }, QN = { keywords: ["evening", "city", "downtown"], char: "🌃", fitzpatrick_scale: !1, category: "travel_and_places" }, yN = { keywords: ["photo", "sanfrancisco"], char: "🌉", fitzpatrick_scale: !1, category: "travel_and_places" }, bN = { keywords: ["photo", "space", "stars"], char: "🌌", fitzpatrick_scale: !1, category: "travel_and_places" }, SN = { keywords: ["night", "photo"], char: "🌠", fitzpatrick_scale: !1, category: "travel_and_places" }, kN = { keywords: ["stars", "night", "shine"], char: "🎇", fitzpatrick_scale: !1, category: "travel_and_places" }, wN = { keywords: ["photo", "festival", "carnival", "congratulations"], char: "🎆", fitzpatrick_scale: !1, category: "travel_and_places" }, PN = { keywords: ["nature", "happy", "unicorn_face", "photo", "sky", "spring"], char: "🌈", fitzpatrick_scale: !1, category: "travel_and_places" }, vN = { keywords: ["buildings", "photo"], char: "🏘", fitzpatrick_scale: !1, category: "travel_and_places" }, xN = { keywords: ["building", "royalty", "history"], char: "🏰", fitzpatrick_scale: !1, category: "travel_and_places" }, TN = { keywords: ["photo", "building"], char: "🏯", fitzpatrick_scale: !1, category: "travel_and_places" }, XN = { keywords: ["photo", "place", "sports", "concert", "venue"], char: "🏟", fitzpatrick_scale: !1, category: "travel_and_places" }, RN = { keywords: ["american", "newyork"], char: "🗽", fitzpatrick_scale: !1, category: "travel_and_places" }, zN = { keywords: ["building", "home"], char: "🏠", fitzpatrick_scale: !1, category: "travel_and_places" }, EN = { keywords: ["home", "plant", "nature"], char: "🏡", fitzpatrick_scale: !1, category: "travel_and_places" }, CN = { keywords: ["abandon", "evict", "broken", "building"], char: "🏚", fitzpatrick_scale: !1, category: "travel_and_places" }, YN = { keywords: ["building", "bureau", "work"], char: "🏢", fitzpatrick_scale: !1, category: "travel_and_places" }, ZN = { keywords: ["building", "shopping", "mall"], char: "🏬", fitzpatrick_scale: !1, category: "travel_and_places" }, UN = { keywords: ["building", "envelope", "communication"], char: "🏣", fitzpatrick_scale: !1, category: "travel_and_places" }, qN = { keywords: ["building", "email"], char: "🏤", fitzpatrick_scale: !1, category: "travel_and_places" }, AN = { keywords: ["building", "health", "surgery", "doctor"], char: "🏥", fitzpatrick_scale: !1, category: "travel_and_places" }, WN = { keywords: ["building", "money", "sales", "cash", "business", "enterprise"], char: "🏦", fitzpatrick_scale: !1, category: "travel_and_places" }, VN = { keywords: ["building", "accomodation", "checkin"], char: "🏨", fitzpatrick_scale: !1, category: "travel_and_places" }, DN = { keywords: ["building", "shopping", "groceries"], char: "🏪", fitzpatrick_scale: !1, category: "travel_and_places" }, jN = { keywords: ["building", "student", "education", "learn", "teach"], char: "🏫", fitzpatrick_scale: !1, category: "travel_and_places" }, LN = { keywords: ["like", "affection", "dating"], char: "🏩", fitzpatrick_scale: !1, category: "travel_and_places" }, IN = { keywords: ["love", "like", "affection", "couple", "marriage", "bride", "groom"], char: "💒", fitzpatrick_scale: !1, category: "travel_and_places" }, MN = { keywords: ["art", "culture", "history"], char: "🏛", fitzpatrick_scale: !1, category: "travel_and_places" }, GN = { keywords: ["building", "religion", "christ"], char: "⛪", fitzpatrick_scale: !1, category: "travel_and_places" }, BN = { keywords: ["islam", "worship", "minaret"], char: "🕌", fitzpatrick_scale: !1, category: "travel_and_places" }, NN = { keywords: ["judaism", "worship", "temple", "jewish"], char: "🕍", fitzpatrick_scale: !1, category: "travel_and_places" }, FN = { keywords: ["mecca", "mosque", "islam"], char: "🕋", fitzpatrick_scale: !1, category: "travel_and_places" }, HN = { keywords: ["temple", "japan", "kyoto"], char: "⛩", fitzpatrick_scale: !1, category: "travel_and_places" }, KN = { keywords: ["time", "accessories"], char: "⌚", fitzpatrick_scale: !1, category: "objects" }, JN = { keywords: ["technology", "apple", "gadgets", "dial"], char: "📱", fitzpatrick_scale: !1, category: "objects" }, eF = { keywords: ["iphone", "incoming"], char: "📲", fitzpatrick_scale: !1, category: "objects" }, tF = { keywords: ["technology", "laptop", "screen", "display", "monitor"], char: "💻", fitzpatrick_scale: !1, category: "objects" }, rF = { keywords: ["technology", "computer", "type", "input", "text"], char: "⌨", fitzpatrick_scale: !1, category: "objects" }, iF = { keywords: ["technology", "computing", "screen"], char: "🖥", fitzpatrick_scale: !1, category: "objects" }, nF = { keywords: ["paper", "ink"], char: "🖨", fitzpatrick_scale: !1, category: "objects" }, sF = { keywords: ["click"], char: "🖱", fitzpatrick_scale: !1, category: "objects" }, aF = { keywords: ["technology", "trackpad"], char: "🖲", fitzpatrick_scale: !1, category: "objects" }, oF = { keywords: ["game", "play"], char: "🕹", fitzpatrick_scale: !1, category: "objects" }, lF = { keywords: ["tool"], char: "🗜", fitzpatrick_scale: !1, category: "objects" }, OF = { keywords: ["technology", "record", "data", "disk", "90s"], char: "💽", fitzpatrick_scale: !1, category: "objects" }, cF = { keywords: ["oldschool", "technology", "save", "90s", "80s"], char: "💾", fitzpatrick_scale: !1, category: "objects" }, hF = { keywords: ["technology", "dvd", "disk", "disc", "90s"], char: "💿", fitzpatrick_scale: !1, category: "objects" }, uF = { keywords: ["cd", "disk", "disc"], char: "📀", fitzpatrick_scale: !1, category: "objects" }, dF = { keywords: ["record", "video", "oldschool", "90s", "80s"], char: "📼", fitzpatrick_scale: !1, category: "objects" }, fF = { keywords: ["gadgets", "photography"], char: "📷", fitzpatrick_scale: !1, category: "objects" }, pF = { keywords: ["photography", "gadgets"], char: "📸", fitzpatrick_scale: !1, category: "objects" }, gF = { keywords: ["film", "record"], char: "📹", fitzpatrick_scale: !1, category: "objects" }, mF = { keywords: ["film", "record"], char: "🎥", fitzpatrick_scale: !1, category: "objects" }, _F = { keywords: ["video", "tape", "record", "movie"], char: "📽", fitzpatrick_scale: !1, category: "objects" }, $F = { keywords: ["movie"], char: "🎞", fitzpatrick_scale: !1, category: "objects" }, QF = { keywords: ["technology", "communication", "dial"], char: "📞", fitzpatrick_scale: !1, category: "objects" }, yF = { keywords: ["technology", "communication", "dial", "telephone"], char: "☎️", fitzpatrick_scale: !1, category: "objects" }, bF = { keywords: ["bbcall", "oldschool", "90s"], char: "📟", fitzpatrick_scale: !1, category: "objects" }, SF = { keywords: ["communication", "technology"], char: "📠", fitzpatrick_scale: !1, category: "objects" }, kF = { keywords: ["technology", "program", "oldschool", "show", "television"], char: "📺", fitzpatrick_scale: !1, category: "objects" }, wF = { keywords: ["communication", "music", "podcast", "program"], char: "📻", fitzpatrick_scale: !1, category: "objects" }, PF = { keywords: ["sing", "recording", "artist", "talkshow"], char: "🎙", fitzpatrick_scale: !1, category: "objects" }, vF = { keywords: ["scale"], char: "🎚", fitzpatrick_scale: !1, category: "objects" }, xF = { keywords: ["dial"], char: "🎛", fitzpatrick_scale: !1, category: "objects" }, TF = { keywords: ["magnetic", "navigation", "orienteering"], char: "🧭", fitzpatrick_scale: !1, category: "objects" }, XF = { keywords: ["time", "deadline"], char: "⏱", fitzpatrick_scale: !1, category: "objects" }, RF = { keywords: ["alarm"], char: "⏲", fitzpatrick_scale: !1, category: "objects" }, zF = { keywords: ["time", "wake"], char: "⏰", fitzpatrick_scale: !1, category: "objects" }, EF = { keywords: ["time"], char: "🕰", fitzpatrick_scale: !1, category: "objects" }, CF = { keywords: ["oldschool", "time", "countdown"], char: "⏳", fitzpatrick_scale: !1, category: "objects" }, YF = { keywords: ["time", "clock", "oldschool", "limit", "exam", "quiz", "test"], char: "⌛", fitzpatrick_scale: !1, category: "objects" }, ZF = { keywords: ["communication", "future", "radio", "space"], char: "📡", fitzpatrick_scale: !1, category: "objects" }, UF = { keywords: ["power", "energy", "sustain"], char: "🔋", fitzpatrick_scale: !1, category: "objects" }, qF = { keywords: ["charger", "power"], char: "🔌", fitzpatrick_scale: !1, category: "objects" }, AF = { keywords: ["light", "electricity", "idea"], char: "💡", fitzpatrick_scale: !1, category: "objects" }, WF = { keywords: ["dark", "camping", "sight", "night"], char: "🔦", fitzpatrick_scale: !1, category: "objects" }, VF = { keywords: ["fire", "wax"], char: "🕯", fitzpatrick_scale: !1, category: "objects" }, DF = { keywords: ["quench"], char: "🧯", fitzpatrick_scale: !1, category: "objects" }, jF = { keywords: ["bin", "trash", "rubbish", "garbage", "toss"], char: "🗑", fitzpatrick_scale: !1, category: "objects" }, LF = { keywords: ["barrell"], char: "🛢", fitzpatrick_scale: !1, category: "objects" }, IF = { keywords: ["dollar", "bills", "payment", "sale"], char: "💸", fitzpatrick_scale: !1, category: "objects" }, MF = { keywords: ["money", "sales", "bill", "currency"], char: "💵", fitzpatrick_scale: !1, category: "objects" }, GF = { keywords: ["money", "sales", "japanese", "dollar", "currency"], char: "💴", fitzpatrick_scale: !1, category: "objects" }, BF = { keywords: ["money", "sales", "dollar", "currency"], char: "💶", fitzpatrick_scale: !1, category: "objects" }, NF = { keywords: ["british", "sterling", "money", "sales", "bills", "uk", "england", "currency"], char: "💷", fitzpatrick_scale: !1, category: "objects" }, FF = { keywords: ["dollar", "payment", "coins", "sale"], char: "💰", fitzpatrick_scale: !1, category: "objects" }, HF = { keywords: ["money", "sales", "dollar", "bill", "payment", "shopping"], char: "💳", fitzpatrick_scale: !1, category: "objects" }, KF = { keywords: ["blue", "ruby", "diamond", "jewelry"], char: "💎", fitzpatrick_scale: !1, category: "objects" }, JF = { keywords: ["law", "fairness", "weight"], char: "⚖", fitzpatrick_scale: !1, category: "objects" }, eH = { keywords: ["tools", "diy", "fix", "maintainer", "mechanic"], char: "🧰", fitzpatrick_scale: !1, category: "objects" }, tH = { keywords: ["tools", "diy", "ikea", "fix", "maintainer"], char: "🔧", fitzpatrick_scale: !1, category: "objects" }, rH = { keywords: ["tools", "build", "create"], char: "🔨", fitzpatrick_scale: !1, category: "objects" }, iH = { keywords: ["tools", "build", "create"], char: "⚒", fitzpatrick_scale: !1, category: "objects" }, nH = { keywords: ["tools", "build", "create"], char: "🛠", fitzpatrick_scale: !1, category: "objects" }, sH = { keywords: ["tools", "dig"], char: "⛏", fitzpatrick_scale: !1, category: "objects" }, aH = { keywords: ["handy", "tools", "fix"], char: "🔩", fitzpatrick_scale: !1, category: "objects" }, oH = { keywords: ["cog"], char: "⚙", fitzpatrick_scale: !1, category: "objects" }, lH = { keywords: ["bricks"], char: "🧱", fitzpatrick_scale: !1, category: "objects" }, OH = { keywords: ["lock", "arrest"], char: "⛓", fitzpatrick_scale: !1, category: "objects" }, cH = { keywords: ["attraction", "magnetic"], char: "🧲", fitzpatrick_scale: !1, category: "objects" }, hH = { keywords: ["violence", "weapon", "pistol", "revolver"], char: "🔫", fitzpatrick_scale: !1, category: "objects" }, uH = { keywords: ["boom", "explode", "explosion", "terrorism"], char: "💣", fitzpatrick_scale: !1, category: "objects" }, dH = { keywords: ["dynamite", "boom", "explode", "explosion", "explosive"], char: "🧨", fitzpatrick_scale: !1, category: "objects" }, fH = { keywords: ["knife", "blade", "cutlery", "kitchen", "weapon"], char: "🔪", fitzpatrick_scale: !1, category: "objects" }, pH = { keywords: ["weapon"], char: "🗡", fitzpatrick_scale: !1, category: "objects" }, gH = { keywords: ["weapon"], char: "⚔", fitzpatrick_scale: !1, category: "objects" }, mH = { keywords: ["protection", "security"], char: "🛡", fitzpatrick_scale: !1, category: "objects" }, _H = { keywords: ["kills", "tobacco", "cigarette", "joint", "smoke"], char: "🚬", fitzpatrick_scale: !1, category: "objects" }, $H = { keywords: ["poison", "danger", "deadly", "scary", "death", "pirate", "evil"], char: "☠", fitzpatrick_scale: !1, category: "objects" }, QH = { keywords: ["vampire", "dead", "die", "death", "rip", "graveyard", "cemetery", "casket", "funeral", "box"], char: "⚰", fitzpatrick_scale: !1, category: "objects" }, yH = { keywords: ["dead", "die", "death", "rip", "ashes"], char: "⚱", fitzpatrick_scale: !1, category: "objects" }, bH = { keywords: ["vase", "jar"], char: "🏺", fitzpatrick_scale: !1, category: "objects" }, SH = { keywords: ["disco", "party", "magic", "circus", "fortune_teller"], char: "🔮", fitzpatrick_scale: !1, category: "objects" }, kH = { keywords: ["dhikr", "religious"], char: "📿", fitzpatrick_scale: !1, category: "objects" }, wH = { keywords: ["bead", "charm"], char: "🧿", fitzpatrick_scale: !1, category: "objects" }, PH = { keywords: ["hair", "salon", "style"], char: "💈", fitzpatrick_scale: !1, category: "objects" }, vH = { keywords: ["distilling", "science", "experiment", "chemistry"], char: "⚗", fitzpatrick_scale: !1, category: "objects" }, xH = { keywords: ["stars", "space", "zoom", "science", "astronomy"], char: "🔭", fitzpatrick_scale: !1, category: "objects" }, TH = { keywords: ["laboratory", "experiment", "zoomin", "science", "study"], char: "🔬", fitzpatrick_scale: !1, category: "objects" }, XH = { keywords: ["embarrassing"], char: "🕳", fitzpatrick_scale: !1, category: "objects" }, RH = { keywords: ["health", "medicine", "doctor", "pharmacy", "drug"], char: "💊", fitzpatrick_scale: !1, category: "objects" }, zH = { keywords: ["health", "hospital", "drugs", "blood", "medicine", "needle", "doctor", "nurse"], char: "💉", fitzpatrick_scale: !1, category: "objects" }, EH = { keywords: ["biologist", "genetics", "life"], char: "🧬", fitzpatrick_scale: !1, category: "objects" }, CH = { keywords: ["amoeba", "bacteria", "germs"], char: "🦠", fitzpatrick_scale: !1, category: "objects" }, YH = { keywords: ["bacteria", "biology", "culture", "lab"], char: "🧫", fitzpatrick_scale: !1, category: "objects" }, ZH = { keywords: ["chemistry", "experiment", "lab", "science"], char: "🧪", fitzpatrick_scale: !1, category: "objects" }, UH = { keywords: ["weather", "temperature", "hot", "cold"], char: "🌡", fitzpatrick_scale: !1, category: "objects" }, qH = { keywords: ["cleaning", "sweeping", "witch"], char: "🧹", fitzpatrick_scale: !1, category: "objects" }, AH = { keywords: ["laundry"], char: "🧺", fitzpatrick_scale: !1, category: "objects" }, WH = { keywords: ["roll"], char: "🧻", fitzpatrick_scale: !1, category: "objects" }, VH = { keywords: ["sale", "tag"], char: "🏷", fitzpatrick_scale: !1, category: "objects" }, DH = { keywords: ["favorite", "label", "save"], char: "🔖", fitzpatrick_scale: !1, category: "objects" }, jH = { keywords: ["restroom", "wc", "washroom", "bathroom", "potty"], char: "🚽", fitzpatrick_scale: !1, category: "objects" }, LH = { keywords: ["clean", "water", "bathroom"], char: "🚿", fitzpatrick_scale: !1, category: "objects" }, IH = { keywords: ["clean", "shower", "bathroom"], char: "🛁", fitzpatrick_scale: !1, category: "objects" }, MH = { keywords: ["bar", "bathing", "cleaning", "lather"], char: "🧼", fitzpatrick_scale: !1, category: "objects" }, GH = { keywords: ["absorbing", "cleaning", "porous"], char: "🧽", fitzpatrick_scale: !1, category: "objects" }, BH = { keywords: ["moisturizer", "sunscreen"], char: "🧴", fitzpatrick_scale: !1, category: "objects" }, NH = { keywords: ["lock", "door", "password"], char: "🔑", fitzpatrick_scale: !1, category: "objects" }, FH = { keywords: ["lock", "door", "password"], char: "🗝", fitzpatrick_scale: !1, category: "objects" }, HH = { keywords: ["read", "chill"], char: "🛋", fitzpatrick_scale: !1, category: "objects" }, KH = { keywords: ["bed", "rest"], char: "🛌", fitzpatrick_scale: !0, category: "objects" }, JH = { keywords: ["sleep", "rest"], char: "🛏", fitzpatrick_scale: !1, category: "objects" }, eK = { keywords: ["house", "entry", "exit"], char: "🚪", fitzpatrick_scale: !1, category: "objects" }, tK = { keywords: ["service"], char: "🛎", fitzpatrick_scale: !1, category: "objects" }, rK = { keywords: ["plush", "stuffed"], char: "🧸", fitzpatrick_scale: !1, category: "objects" }, iK = { keywords: ["photography"], char: "🖼", fitzpatrick_scale: !1, category: "objects" }, nK = { keywords: ["location", "direction"], char: "🗺", fitzpatrick_scale: !1, category: "objects" }, sK = { keywords: ["weather", "summer"], char: "⛱", fitzpatrick_scale: !1, category: "objects" }, aK = { keywords: ["rock", "easter island", "moai"], char: "🗿", fitzpatrick_scale: !1, category: "objects" }, oK = { keywords: ["mall", "buy", "purchase"], char: "🛍", fitzpatrick_scale: !1, category: "objects" }, lK = { keywords: ["trolley"], char: "🛒", fitzpatrick_scale: !1, category: "objects" }, OK = { keywords: ["party", "celebration", "birthday", "circus"], char: "🎈", fitzpatrick_scale: !1, category: "objects" }, cK = { keywords: ["fish", "japanese", "koinobori", "carp", "banner"], char: "🎏", fitzpatrick_scale: !1, category: "objects" }, hK = { keywords: ["decoration", "pink", "girl", "bowtie"], char: "🎀", fitzpatrick_scale: !1, category: "objects" }, uK = { keywords: ["present", "birthday", "christmas", "xmas"], char: "🎁", fitzpatrick_scale: !1, category: "objects" }, dK = { keywords: ["festival", "party", "birthday", "circus"], char: "🎊", fitzpatrick_scale: !1, category: "objects" }, fK = { keywords: ["party", "congratulations", "birthday", "magic", "circus", "celebration"], char: "🎉", fitzpatrick_scale: !1, category: "objects" }, pK = { keywords: ["japanese", "toy", "kimono"], char: "🎎", fitzpatrick_scale: !1, category: "objects" }, gK = { keywords: ["nature", "ding", "spring", "bell"], char: "🎐", fitzpatrick_scale: !1, category: "objects" }, mK = { keywords: ["japanese", "nation", "country", "border"], char: "🎌", fitzpatrick_scale: !1, category: "objects" }, _K = { keywords: ["light", "paper", "halloween", "spooky"], char: "🏮", fitzpatrick_scale: !1, category: "objects" }, $K = { keywords: ["gift"], char: "🧧", fitzpatrick_scale: !1, category: "objects" }, QK = { keywords: ["letter", "postal", "inbox", "communication"], char: "✉️", fitzpatrick_scale: !1, category: "objects" }, yK = { keywords: ["email", "communication"], char: "📩", fitzpatrick_scale: !1, category: "objects" }, bK = { keywords: ["email", "inbox"], char: "📨", fitzpatrick_scale: !1, category: "objects" }, SK = { keywords: ["email", "like", "affection", "envelope", "valentines"], char: "💌", fitzpatrick_scale: !1, category: "objects" }, kK = { keywords: ["email", "letter", "envelope"], char: "📮", fitzpatrick_scale: !1, category: "objects" }, wK = { keywords: ["email", "communication", "inbox"], char: "📪", fitzpatrick_scale: !1, category: "objects" }, PK = { keywords: ["email", "inbox", "communication"], char: "📫", fitzpatrick_scale: !1, category: "objects" }, vK = { keywords: ["email", "inbox", "communication"], char: "📬", fitzpatrick_scale: !1, category: "objects" }, xK = { keywords: ["email", "inbox"], char: "📭", fitzpatrick_scale: !1, category: "objects" }, TK = { keywords: ["instrument", "music"], char: "📯", fitzpatrick_scale: !1, category: "objects" }, XK = { keywords: ["email", "documents"], char: "📥", fitzpatrick_scale: !1, category: "objects" }, RK = { keywords: ["inbox", "email"], char: "📤", fitzpatrick_scale: !1, category: "objects" }, zK = { keywords: ["documents", "ancient", "history", "paper"], char: "📜", fitzpatrick_scale: !1, category: "objects" }, EK = { keywords: ["documents", "office", "paper"], char: "📃", fitzpatrick_scale: !1, category: "objects" }, CK = { keywords: ["favorite", "save", "order", "tidy"], char: "📑", fitzpatrick_scale: !1, category: "objects" }, YK = { keywords: ["accounting", "expenses"], char: "🧾", fitzpatrick_scale: !1, category: "objects" }, ZK = { keywords: ["graph", "presentation", "stats"], char: "📊", fitzpatrick_scale: !1, category: "objects" }, UK = { keywords: ["graph", "presentation", "stats", "recovery", "business", "economics", "money", "sales", "good", "success"], char: "📈", fitzpatrick_scale: !1, category: "objects" }, qK = { keywords: ["graph", "presentation", "stats", "recession", "business", "economics", "money", "sales", "bad", "failure"], char: "📉", fitzpatrick_scale: !1, category: "objects" }, AK = { keywords: ["documents", "office", "paper", "information"], char: "📄", fitzpatrick_scale: !1, category: "objects" }, WK = { keywords: ["calendar", "schedule"], char: "📅", fitzpatrick_scale: !1, category: "objects" }, VK = { keywords: ["schedule", "date", "planning"], char: "📆", fitzpatrick_scale: !1, category: "objects" }, DK = { keywords: ["date", "schedule", "planning"], char: "🗓", fitzpatrick_scale: !1, category: "objects" }, jK = { keywords: ["business", "stationery"], char: "📇", fitzpatrick_scale: !1, category: "objects" }, LK = { keywords: ["business", "stationery"], char: "🗃", fitzpatrick_scale: !1, category: "objects" }, IK = { keywords: ["election", "vote"], char: "🗳", fitzpatrick_scale: !1, category: "objects" }, MK = { keywords: ["filing", "organizing"], char: "🗄", fitzpatrick_scale: !1, category: "objects" }, GK = { keywords: ["stationery", "documents"], char: "📋", fitzpatrick_scale: !1, category: "objects" }, BK = { keywords: ["memo", "stationery"], char: "🗒", fitzpatrick_scale: !1, category: "objects" }, NK = { keywords: ["documents", "business", "office"], char: "📁", fitzpatrick_scale: !1, category: "objects" }, FK = { keywords: ["documents", "load"], char: "📂", fitzpatrick_scale: !1, category: "objects" }, HK = { keywords: ["organizing", "business", "stationery"], char: "🗂", fitzpatrick_scale: !1, category: "objects" }, KK = { keywords: ["press", "headline"], char: "🗞", fitzpatrick_scale: !1, category: "objects" }, JK = { keywords: ["press", "headline"], char: "📰", fitzpatrick_scale: !1, category: "objects" }, eJ = { keywords: ["stationery", "record", "notes", "paper", "study"], char: "📓", fitzpatrick_scale: !1, category: "objects" }, tJ = { keywords: ["read", "library", "knowledge", "textbook", "learn"], char: "📕", fitzpatrick_scale: !1, category: "objects" }, rJ = { keywords: ["read", "library", "knowledge", "study"], char: "📗", fitzpatrick_scale: !1, category: "objects" }, iJ = { keywords: ["read", "library", "knowledge", "learn", "study"], char: "📘", fitzpatrick_scale: !1, category: "objects" }, nJ = { keywords: ["read", "library", "knowledge", "textbook", "study"], char: "📙", fitzpatrick_scale: !1, category: "objects" }, sJ = { keywords: ["classroom", "notes", "record", "paper", "study"], char: "📔", fitzpatrick_scale: !1, category: "objects" }, aJ = { keywords: ["notes", "paper"], char: "📒", fitzpatrick_scale: !1, category: "objects" }, oJ = { keywords: ["literature", "library", "study"], char: "📚", fitzpatrick_scale: !1, category: "objects" }, lJ = { keywords: ["book", "read", "library", "knowledge", "literature", "learn", "study"], char: "📖", fitzpatrick_scale: !1, category: "objects" }, OJ = { keywords: ["diaper"], char: "🧷", fitzpatrick_scale: !1, category: "objects" }, cJ = { keywords: ["rings", "url"], char: "🔗", fitzpatrick_scale: !1, category: "objects" }, hJ = { keywords: ["documents", "stationery"], char: "📎", fitzpatrick_scale: !1, category: "objects" }, uJ = { keywords: ["documents", "stationery"], char: "🖇", fitzpatrick_scale: !1, category: "objects" }, dJ = { keywords: ["stationery", "cut"], char: "✂️", fitzpatrick_scale: !1, category: "objects" }, fJ = { keywords: ["stationery", "math", "architect", "sketch"], char: "📐", fitzpatrick_scale: !1, category: "objects" }, pJ = { keywords: ["stationery", "calculate", "length", "math", "school", "drawing", "architect", "sketch"], char: "📏", fitzpatrick_scale: !1, category: "objects" }, gJ = { keywords: ["calculation"], char: "🧮", fitzpatrick_scale: !1, category: "objects" }, mJ = { keywords: ["stationery", "mark", "here"], char: "📌", fitzpatrick_scale: !1, category: "objects" }, _J = { keywords: ["stationery", "location", "map", "here"], char: "📍", fitzpatrick_scale: !1, category: "objects" }, $J = { keywords: ["mark", "milestone", "place"], char: "🚩", fitzpatrick_scale: !1, category: "objects" }, QJ = { keywords: ["losing", "loser", "lost", "surrender", "give up", "fail"], char: "🏳", fitzpatrick_scale: !1, category: "objects" }, yJ = { keywords: ["pirate"], char: "🏴", fitzpatrick_scale: !1, category: "objects" }, bJ = { keywords: ["flag", "rainbow", "pride", "gay", "lgbt", "glbt", "queer", "homosexual", "lesbian", "bisexual", "transgender"], char: "🏳️‍🌈", fitzpatrick_scale: !1, category: "objects" }, SJ = { keywords: ["security", "privacy"], char: "🔐", fitzpatrick_scale: !1, category: "objects" }, kJ = { keywords: ["security", "password", "padlock"], char: "🔒", fitzpatrick_scale: !1, category: "objects" }, wJ = { keywords: ["privacy", "security"], char: "🔓", fitzpatrick_scale: !1, category: "objects" }, PJ = { keywords: ["security", "secret"], char: "🔏", fitzpatrick_scale: !1, category: "objects" }, vJ = { keywords: ["stationery", "writing", "write"], char: "🖊", fitzpatrick_scale: !1, category: "objects" }, xJ = { keywords: ["stationery", "writing", "write"], char: "🖋", fitzpatrick_scale: !1, category: "objects" }, TJ = { keywords: ["pen", "stationery", "writing", "write"], char: "✒️", fitzpatrick_scale: !1, category: "objects" }, XJ = { keywords: ["write", "documents", "stationery", "pencil", "paper", "writing", "legal", "exam", "quiz", "test", "study", "compose"], char: "📝", fitzpatrick_scale: !1, category: "objects" }, RJ = { keywords: ["stationery", "write", "paper", "writing", "school", "study"], char: "✏️", fitzpatrick_scale: !1, category: "objects" }, zJ = { keywords: ["drawing", "creativity"], char: "🖍", fitzpatrick_scale: !1, category: "objects" }, EJ = { keywords: ["drawing", "creativity", "art"], char: "🖌", fitzpatrick_scale: !1, category: "objects" }, CJ = { keywords: ["search", "zoom", "find", "detective"], char: "🔍", fitzpatrick_scale: !1, category: "objects" }, YJ = { keywords: ["search", "zoom", "find", "detective"], char: "🔎", fitzpatrick_scale: !1, category: "objects" }, ZJ = { keywords: ["love", "like", "valentines"], char: "❤️", fitzpatrick_scale: !1, category: "symbols" }, UJ = { keywords: ["love", "like", "affection", "valentines"], char: "🧡", fitzpatrick_scale: !1, category: "symbols" }, qJ = { keywords: ["love", "like", "affection", "valentines"], char: "💛", fitzpatrick_scale: !1, category: "symbols" }, AJ = { keywords: ["love", "like", "affection", "valentines"], char: "💚", fitzpatrick_scale: !1, category: "symbols" }, WJ = { keywords: ["love", "like", "affection", "valentines"], char: "💙", fitzpatrick_scale: !1, category: "symbols" }, VJ = { keywords: ["love", "like", "affection", "valentines"], char: "💜", fitzpatrick_scale: !1, category: "symbols" }, DJ = { keywords: ["evil"], char: "🖤", fitzpatrick_scale: !1, category: "symbols" }, jJ = { keywords: ["sad", "sorry", "break", "heart", "heartbreak"], char: "💔", fitzpatrick_scale: !1, category: "symbols" }, LJ = { keywords: ["decoration", "love"], char: "❣", fitzpatrick_scale: !1, category: "symbols" }, IJ = { keywords: ["love", "like", "affection", "valentines", "heart"], char: "💕", fitzpatrick_scale: !1, category: "symbols" }, MJ = { keywords: ["love", "like", "affection", "valentines"], char: "💞", fitzpatrick_scale: !1, category: "symbols" }, GJ = { keywords: ["love", "like", "affection", "valentines", "pink", "heart"], char: "💓", fitzpatrick_scale: !1, category: "symbols" }, BJ = { keywords: ["like", "love", "affection", "valentines", "pink"], char: "💗", fitzpatrick_scale: !1, category: "symbols" }, NJ = { keywords: ["love", "like", "affection", "valentines"], char: "💖", fitzpatrick_scale: !1, category: "symbols" }, FJ = { keywords: ["love", "like", "heart", "affection", "valentines"], char: "💘", fitzpatrick_scale: !1, category: "symbols" }, HJ = { keywords: ["love", "valentines"], char: "💝", fitzpatrick_scale: !1, category: "symbols" }, KJ = { keywords: ["purple-square", "love", "like"], char: "💟", fitzpatrick_scale: !1, category: "symbols" }, JJ = { keywords: ["hippie"], char: "☮", fitzpatrick_scale: !1, category: "symbols" }, eee = { keywords: ["christianity"], char: "✝", fitzpatrick_scale: !1, category: "symbols" }, tee = { keywords: ["islam"], char: "☪", fitzpatrick_scale: !1, category: "symbols" }, ree = { keywords: ["hinduism", "buddhism", "sikhism", "jainism"], char: "🕉", fitzpatrick_scale: !1, category: "symbols" }, iee = { keywords: ["hinduism", "buddhism", "sikhism", "jainism"], char: "☸", fitzpatrick_scale: !1, category: "symbols" }, nee = { keywords: ["judaism"], char: "✡", fitzpatrick_scale: !1, category: "symbols" }, see = { keywords: ["purple-square", "religion", "jewish", "hexagram"], char: "🔯", fitzpatrick_scale: !1, category: "symbols" }, aee = { keywords: ["hanukkah", "candles", "jewish"], char: "🕎", fitzpatrick_scale: !1, category: "symbols" }, oee = { keywords: ["balance"], char: "☯", fitzpatrick_scale: !1, category: "symbols" }, lee = { keywords: ["suppedaneum", "religion"], char: "☦", fitzpatrick_scale: !1, category: "symbols" }, Oee = { keywords: ["religion", "church", "temple", "prayer"], char: "🛐", fitzpatrick_scale: !1, category: "symbols" }, cee = { keywords: ["sign", "purple-square", "constellation", "astrology"], char: "⛎", fitzpatrick_scale: !1, category: "symbols" }, hee = { keywords: ["sign", "purple-square", "zodiac", "astrology"], char: "♈", fitzpatrick_scale: !1, category: "symbols" }, uee = { keywords: ["purple-square", "sign", "zodiac", "astrology"], char: "♉", fitzpatrick_scale: !1, category: "symbols" }, dee = { keywords: ["sign", "zodiac", "purple-square", "astrology"], char: "♊", fitzpatrick_scale: !1, category: "symbols" }, fee = { keywords: ["sign", "zodiac", "purple-square", "astrology"], char: "♋", fitzpatrick_scale: !1, category: "symbols" }, pee = { keywords: ["sign", "purple-square", "zodiac", "astrology"], char: "♌", fitzpatrick_scale: !1, category: "symbols" }, gee = { keywords: ["sign", "zodiac", "purple-square", "astrology"], char: "♍", fitzpatrick_scale: !1, category: "symbols" }, mee = { keywords: ["sign", "purple-square", "zodiac", "astrology"], char: "♎", fitzpatrick_scale: !1, category: "symbols" }, _ee = { keywords: ["sign", "zodiac", "purple-square", "astrology", "scorpio"], char: "♏", fitzpatrick_scale: !1, category: "symbols" }, $ee = { keywords: ["sign", "zodiac", "purple-square", "astrology"], char: "♐", fitzpatrick_scale: !1, category: "symbols" }, Qee = { keywords: ["sign", "zodiac", "purple-square", "astrology"], char: "♑", fitzpatrick_scale: !1, category: "symbols" }, yee = { keywords: ["sign", "purple-square", "zodiac", "astrology"], char: "♒", fitzpatrick_scale: !1, category: "symbols" }, bee = { keywords: ["purple-square", "sign", "zodiac", "astrology"], char: "♓", fitzpatrick_scale: !1, category: "symbols" }, See = { keywords: ["purple-square", "words"], char: "🆔", fitzpatrick_scale: !1, category: "symbols" }, kee = { keywords: ["science", "physics", "chemistry"], char: "⚛", fitzpatrick_scale: !1, category: "symbols" }, wee = { keywords: ["kanji", "japanese", "chinese", "empty", "sky", "blue-square"], char: "🈳", fitzpatrick_scale: !1, category: "symbols" }, Pee = { keywords: ["cut", "divide", "chinese", "kanji", "pink-square"], char: "🈹", fitzpatrick_scale: !1, category: "symbols" }, vee = { keywords: ["nuclear", "danger"], char: "☢", fitzpatrick_scale: !1, category: "symbols" }, xee = { keywords: ["danger"], char: "☣", fitzpatrick_scale: !1, category: "symbols" }, Tee = { keywords: ["mute", "orange-square", "silence", "quiet"], char: "📴", fitzpatrick_scale: !1, category: "symbols" }, Xee = { keywords: ["orange-square", "phone"], char: "📳", fitzpatrick_scale: !1, category: "symbols" }, Ree = { keywords: ["orange-square", "chinese", "have", "kanji"], char: "🈶", fitzpatrick_scale: !1, category: "symbols" }, zee = { keywords: ["nothing", "chinese", "kanji", "japanese", "orange-square"], char: "🈚", fitzpatrick_scale: !1, category: "symbols" }, Eee = { keywords: ["chinese", "japanese", "kanji", "orange-square"], char: "🈸", fitzpatrick_scale: !1, category: "symbols" }, Cee = { keywords: ["japanese", "opening hours", "orange-square"], char: "🈺", fitzpatrick_scale: !1, category: "symbols" }, Yee = { keywords: ["chinese", "month", "moon", "japanese", "orange-square", "kanji"], char: "🈷️", fitzpatrick_scale: !1, category: "symbols" }, Zee = { keywords: ["orange-square", "shape", "polygon"], char: "✴️", fitzpatrick_scale: !1, category: "symbols" }, Uee = { keywords: ["words", "orange-square"], char: "🆚", fitzpatrick_scale: !1, category: "symbols" }, qee = { keywords: ["ok", "good", "chinese", "kanji", "agree", "yes", "orange-circle"], char: "🉑", fitzpatrick_scale: !1, category: "symbols" }, Aee = { keywords: ["japanese", "spring"], char: "💮", fitzpatrick_scale: !1, category: "symbols" }, Wee = { keywords: ["chinese", "kanji", "obtain", "get", "circle"], char: "🉐", fitzpatrick_scale: !1, category: "symbols" }, Vee = { keywords: ["privacy", "chinese", "sshh", "kanji", "red-circle"], char: "㊙️", fitzpatrick_scale: !1, category: "symbols" }, Dee = { keywords: ["chinese", "kanji", "japanese", "red-circle"], char: "㊗️", fitzpatrick_scale: !1, category: "symbols" }, jee = { keywords: ["japanese", "chinese", "join", "kanji", "red-square"], char: "🈴", fitzpatrick_scale: !1, category: "symbols" }, Lee = { keywords: ["full", "chinese", "japanese", "red-square", "kanji"], char: "🈵", fitzpatrick_scale: !1, category: "symbols" }, Iee = { keywords: ["kanji", "japanese", "chinese", "forbidden", "limit", "restricted", "red-square"], char: "🈲", fitzpatrick_scale: !1, category: "symbols" }, Mee = { keywords: ["red-square", "alphabet", "letter"], char: "🅰️", fitzpatrick_scale: !1, category: "symbols" }, Gee = { keywords: ["red-square", "alphabet", "letter"], char: "🅱️", fitzpatrick_scale: !1, category: "symbols" }, Bee = { keywords: ["red-square", "alphabet"], char: "🆎", fitzpatrick_scale: !1, category: "symbols" }, Nee = { keywords: ["alphabet", "words", "red-square"], char: "🆑", fitzpatrick_scale: !1, category: "symbols" }, Fee = { keywords: ["alphabet", "red-square", "letter"], char: "🅾️", fitzpatrick_scale: !1, category: "symbols" }, Hee = { keywords: ["help", "red-square", "words", "emergency", "911"], char: "🆘", fitzpatrick_scale: !1, category: "symbols" }, Kee = { keywords: ["limit", "security", "privacy", "bad", "denied", "stop", "circle"], char: "⛔", fitzpatrick_scale: !1, category: "symbols" }, Jee = { keywords: ["fire", "forbid"], char: "📛", fitzpatrick_scale: !1, category: "symbols" }, ete = { keywords: ["forbid", "stop", "limit", "denied", "disallow", "circle"], char: "🚫", fitzpatrick_scale: !1, category: "symbols" }, tte = { keywords: ["no", "delete", "remove", "cancel", "red"], char: "❌", fitzpatrick_scale: !1, category: "symbols" }, rte = { keywords: ["circle", "round"], char: "⭕", fitzpatrick_scale: !1, category: "symbols" }, ite = { keywords: ["stop"], char: "🛑", fitzpatrick_scale: !1, category: "symbols" }, nte = { keywords: ["angry", "mad"], char: "💢", fitzpatrick_scale: !1, category: "symbols" }, ste = { keywords: ["bath", "warm", "relax"], char: "♨️", fitzpatrick_scale: !1, category: "symbols" }, ate = { keywords: ["rules", "crossing", "walking", "circle"], char: "🚷", fitzpatrick_scale: !1, category: "symbols" }, ote = { keywords: ["trash", "bin", "garbage", "circle"], char: "🚯", fitzpatrick_scale: !1, category: "symbols" }, lte = { keywords: ["cyclist", "prohibited", "circle"], char: "🚳", fitzpatrick_scale: !1, category: "symbols" }, Ote = { keywords: ["18", "drink", "pub", "night", "minor", "circle"], char: "🔞", fitzpatrick_scale: !1, category: "symbols" }, cte = { keywords: ["iphone", "mute", "circle"], char: "📵", fitzpatrick_scale: !1, category: "symbols" }, hte = { keywords: ["heavy_exclamation_mark", "danger", "surprise", "punctuation", "wow", "warning"], char: "❗", fitzpatrick_scale: !1, category: "symbols" }, ute = { keywords: ["surprise", "punctuation", "gray", "wow", "warning"], char: "❕", fitzpatrick_scale: !1, category: "symbols" }, dte = { keywords: ["doubt", "confused"], char: "❓", fitzpatrick_scale: !1, category: "symbols" }, fte = { keywords: ["doubts", "gray", "huh", "confused"], char: "❔", fitzpatrick_scale: !1, category: "symbols" }, pte = { keywords: ["exclamation", "surprise"], char: "‼️", fitzpatrick_scale: !1, category: "symbols" }, gte = { keywords: ["wat", "punctuation", "surprise"], char: "⁉️", fitzpatrick_scale: !1, category: "symbols" }, mte = { keywords: ["sun", "afternoon", "warm", "summer"], char: "🔅", fitzpatrick_scale: !1, category: "symbols" }, _te = { keywords: ["sun", "light"], char: "🔆", fitzpatrick_scale: !1, category: "symbols" }, $te = { keywords: ["weapon", "spear"], char: "🔱", fitzpatrick_scale: !1, category: "symbols" }, Qte = { keywords: ["decorative", "scout"], char: "⚜", fitzpatrick_scale: !1, category: "symbols" }, yte = { keywords: ["graph", "presentation", "stats", "business", "economics", "bad"], char: "〽️", fitzpatrick_scale: !1, category: "symbols" }, bte = { keywords: ["exclamation", "wip", "alert", "error", "problem", "issue"], char: "⚠️", fitzpatrick_scale: !1, category: "symbols" }, Ste = { keywords: ["school", "warning", "danger", "sign", "driving", "yellow-diamond"], char: "🚸", fitzpatrick_scale: !1, category: "symbols" }, kte = { keywords: ["badge", "shield"], char: "🔰", fitzpatrick_scale: !1, category: "symbols" }, wte = { keywords: ["arrow", "environment", "garbage", "trash"], char: "♻️", fitzpatrick_scale: !1, category: "symbols" }, Pte = { keywords: ["chinese", "point", "green-square", "kanji"], char: "🈯", fitzpatrick_scale: !1, category: "symbols" }, vte = { keywords: ["green-square", "graph", "presentation", "stats"], char: "💹", fitzpatrick_scale: !1, category: "symbols" }, xte = { keywords: ["stars", "green-square", "awesome", "good", "fireworks"], char: "❇️", fitzpatrick_scale: !1, category: "symbols" }, Tte = { keywords: ["star", "sparkle", "green-square"], char: "✳️", fitzpatrick_scale: !1, category: "symbols" }, Xte = { keywords: ["x", "green-square", "no", "deny"], char: "❎", fitzpatrick_scale: !1, category: "symbols" }, Rte = { keywords: ["green-square", "ok", "agree", "vote", "election", "answer", "tick"], char: "✅", fitzpatrick_scale: !1, category: "symbols" }, zte = { keywords: ["jewel", "blue", "gem", "crystal", "fancy"], char: "💠", fitzpatrick_scale: !1, category: "symbols" }, Ete = { keywords: ["weather", "swirl", "blue", "cloud", "vortex", "spiral", "whirlpool", "spin", "tornado", "hurricane", "typhoon"], char: "🌀", fitzpatrick_scale: !1, category: "symbols" }, Cte = { keywords: ["tape", "cassette"], char: "➿", fitzpatrick_scale: !1, category: "symbols" }, Yte = { keywords: ["earth", "international", "world", "internet", "interweb", "i18n"], char: "🌐", fitzpatrick_scale: !1, category: "symbols" }, Zte = { keywords: ["alphabet", "blue-circle", "letter"], char: "Ⓜ️", fitzpatrick_scale: !1, category: "symbols" }, Ute = { keywords: ["money", "sales", "cash", "blue-square", "payment", "bank"], char: "🏧", fitzpatrick_scale: !1, category: "symbols" }, qte = { keywords: ["japanese", "blue-square", "katakana"], char: "🈂️", fitzpatrick_scale: !1, category: "symbols" }, Ate = { keywords: ["custom", "blue-square"], char: "🛂", fitzpatrick_scale: !1, category: "symbols" }, Wte = { keywords: ["passport", "border", "blue-square"], char: "🛃", fitzpatrick_scale: !1, category: "symbols" }, Vte = { keywords: ["blue-square", "airport", "transport"], char: "🛄", fitzpatrick_scale: !1, category: "symbols" }, Dte = { keywords: ["blue-square", "travel"], char: "🛅", fitzpatrick_scale: !1, category: "symbols" }, jte = { keywords: ["blue-square", "disabled", "a11y", "accessibility"], char: "♿", fitzpatrick_scale: !1, category: "symbols" }, Lte = { keywords: ["cigarette", "blue-square", "smell", "smoke"], char: "🚭", fitzpatrick_scale: !1, category: "symbols" }, Ite = { keywords: ["toilet", "restroom", "blue-square"], char: "🚾", fitzpatrick_scale: !1, category: "symbols" }, Mte = { keywords: ["cars", "blue-square", "alphabet", "letter"], char: "🅿️", fitzpatrick_scale: !1, category: "symbols" }, Gte = { keywords: ["blue-square", "liquid", "restroom", "cleaning", "faucet"], char: "🚰", fitzpatrick_scale: !1, category: "symbols" }, Bte = { keywords: ["toilet", "restroom", "wc", "blue-square", "gender", "male"], char: "🚹", fitzpatrick_scale: !1, category: "symbols" }, Nte = { keywords: ["purple-square", "woman", "female", "toilet", "loo", "restroom", "gender"], char: "🚺", fitzpatrick_scale: !1, category: "symbols" }, Fte = { keywords: ["orange-square", "child"], char: "🚼", fitzpatrick_scale: !1, category: "symbols" }, Hte = { keywords: ["blue-square", "toilet", "refresh", "wc", "gender"], char: "🚻", fitzpatrick_scale: !1, category: "symbols" }, Kte = { keywords: ["blue-square", "sign", "human", "info"], char: "🚮", fitzpatrick_scale: !1, category: "symbols" }, Jte = { keywords: ["blue-square", "record", "film", "movie", "curtain", "stage", "theater"], char: "🎦", fitzpatrick_scale: !1, category: "symbols" }, ere = { keywords: ["blue-square", "reception", "phone", "internet", "connection", "wifi", "bluetooth", "bars"], char: "📶", fitzpatrick_scale: !1, category: "symbols" }, tre = { keywords: ["blue-square", "here", "katakana", "japanese", "destination"], char: "🈁", fitzpatrick_scale: !1, category: "symbols" }, rre = { keywords: ["blue-square", "words", "shape", "icon"], char: "🆖", fitzpatrick_scale: !1, category: "symbols" }, ire = { keywords: ["good", "agree", "yes", "blue-square"], char: "🆗", fitzpatrick_scale: !1, category: "symbols" }, nre = { keywords: ["blue-square", "above", "high"], char: "🆙", fitzpatrick_scale: !1, category: "symbols" }, sre = { keywords: ["words", "blue-square"], char: "🆒", fitzpatrick_scale: !1, category: "symbols" }, are = { keywords: ["blue-square", "words"], char: "🆓", fitzpatrick_scale: !1, category: "symbols" }, ore = { keywords: ["0", "numbers", "blue-square", "null"], char: "0️⃣", fitzpatrick_scale: !1, category: "symbols" }, lre = { keywords: ["blue-square", "numbers", "1"], char: "1️⃣", fitzpatrick_scale: !1, category: "symbols" }, Ore = { keywords: ["numbers", "2", "prime", "blue-square"], char: "2️⃣", fitzpatrick_scale: !1, category: "symbols" }, cre = { keywords: ["3", "numbers", "prime", "blue-square"], char: "3️⃣", fitzpatrick_scale: !1, category: "symbols" }, hre = { keywords: ["4", "numbers", "blue-square"], char: "4️⃣", fitzpatrick_scale: !1, category: "symbols" }, ure = { keywords: ["5", "numbers", "blue-square", "prime"], char: "5️⃣", fitzpatrick_scale: !1, category: "symbols" }, dre = { keywords: ["6", "numbers", "blue-square"], char: "6️⃣", fitzpatrick_scale: !1, category: "symbols" }, fre = { keywords: ["7", "numbers", "blue-square", "prime"], char: "7️⃣", fitzpatrick_scale: !1, category: "symbols" }, pre = { keywords: ["8", "blue-square", "numbers"], char: "8️⃣", fitzpatrick_scale: !1, category: "symbols" }, gre = { keywords: ["blue-square", "numbers", "9"], char: "9️⃣", fitzpatrick_scale: !1, category: "symbols" }, mre = { keywords: ["numbers", "10", "blue-square"], char: "🔟", fitzpatrick_scale: !1, category: "symbols" }, _re = { keywords: ["star", "keycap"], char: "*⃣", fitzpatrick_scale: !1, category: "symbols" }, $re = { keywords: ["blue-square"], char: "⏏️", fitzpatrick_scale: !1, category: "symbols" }, Qre = { keywords: ["blue-square", "right", "direction", "play"], char: "▶️", fitzpatrick_scale: !1, category: "symbols" }, yre = { keywords: ["pause", "blue-square"], char: "⏸", fitzpatrick_scale: !1, category: "symbols" }, bre = { keywords: ["forward", "next", "blue-square"], char: "⏭", fitzpatrick_scale: !1, category: "symbols" }, Sre = { keywords: ["blue-square"], char: "⏹", fitzpatrick_scale: !1, category: "symbols" }, kre = { keywords: ["blue-square"], char: "⏺", fitzpatrick_scale: !1, category: "symbols" }, wre = { keywords: ["blue-square", "play", "pause"], char: "⏯", fitzpatrick_scale: !1, category: "symbols" }, Pre = { keywords: ["backward"], char: "⏮", fitzpatrick_scale: !1, category: "symbols" }, vre = { keywords: ["blue-square", "play", "speed", "continue"], char: "⏩", fitzpatrick_scale: !1, category: "symbols" }, xre = { keywords: ["play", "blue-square"], char: "⏪", fitzpatrick_scale: !1, category: "symbols" }, Tre = { keywords: ["blue-square", "shuffle", "music", "random"], char: "🔀", fitzpatrick_scale: !1, category: "symbols" }, Xre = { keywords: ["loop", "record"], char: "🔁", fitzpatrick_scale: !1, category: "symbols" }, Rre = { keywords: ["blue-square", "loop"], char: "🔂", fitzpatrick_scale: !1, category: "symbols" }, zre = { keywords: ["blue-square", "left", "direction"], char: "◀️", fitzpatrick_scale: !1, category: "symbols" }, Ere = { keywords: ["blue-square", "triangle", "direction", "point", "forward", "top"], char: "🔼", fitzpatrick_scale: !1, category: "symbols" }, Cre = { keywords: ["blue-square", "direction", "bottom"], char: "🔽", fitzpatrick_scale: !1, category: "symbols" }, Yre = { keywords: ["blue-square", "direction", "top"], char: "⏫", fitzpatrick_scale: !1, category: "symbols" }, Zre = { keywords: ["blue-square", "direction", "bottom"], char: "⏬", fitzpatrick_scale: !1, category: "symbols" }, Ure = { keywords: ["blue-square", "next"], char: "➡️", fitzpatrick_scale: !1, category: "symbols" }, qre = { keywords: ["blue-square", "previous", "back"], char: "⬅️", fitzpatrick_scale: !1, category: "symbols" }, Are = { keywords: ["blue-square", "continue", "top", "direction"], char: "⬆️", fitzpatrick_scale: !1, category: "symbols" }, Wre = { keywords: ["blue-square", "direction", "bottom"], char: "⬇️", fitzpatrick_scale: !1, category: "symbols" }, Vre = { keywords: ["blue-square", "point", "direction", "diagonal", "northeast"], char: "↗️", fitzpatrick_scale: !1, category: "symbols" }, Dre = { keywords: ["blue-square", "direction", "diagonal", "southeast"], char: "↘️", fitzpatrick_scale: !1, category: "symbols" }, jre = { keywords: ["blue-square", "direction", "diagonal", "southwest"], char: "↙️", fitzpatrick_scale: !1, category: "symbols" }, Lre = { keywords: ["blue-square", "point", "direction", "diagonal", "northwest"], char: "↖️", fitzpatrick_scale: !1, category: "symbols" }, Ire = { keywords: ["blue-square", "direction", "way", "vertical"], char: "↕️", fitzpatrick_scale: !1, category: "symbols" }, Mre = { keywords: ["shape", "direction", "horizontal", "sideways"], char: "↔️", fitzpatrick_scale: !1, category: "symbols" }, Gre = { keywords: ["blue-square", "sync", "cycle"], char: "🔄", fitzpatrick_scale: !1, category: "symbols" }, Bre = { keywords: ["blue-square", "return", "rotate", "direction"], char: "↪️", fitzpatrick_scale: !1, category: "symbols" }, Nre = { keywords: ["back", "return", "blue-square", "undo", "enter"], char: "↩️", fitzpatrick_scale: !1, category: "symbols" }, Fre = { keywords: ["blue-square", "direction", "top"], char: "⤴️", fitzpatrick_scale: !1, category: "symbols" }, Hre = { keywords: ["blue-square", "direction", "bottom"], char: "⤵️", fitzpatrick_scale: !1, category: "symbols" }, Kre = { keywords: ["symbol", "blue-square", "twitter"], char: "#️⃣", fitzpatrick_scale: !1, category: "symbols" }, Jre = { keywords: ["blue-square", "alphabet", "letter"], char: "ℹ️", fitzpatrick_scale: !1, category: "symbols" }, eie = { keywords: ["blue-square", "alphabet"], char: "🔤", fitzpatrick_scale: !1, category: "symbols" }, tie = { keywords: ["blue-square", "alphabet"], char: "🔡", fitzpatrick_scale: !1, category: "symbols" }, rie = { keywords: ["alphabet", "words", "blue-square"], char: "🔠", fitzpatrick_scale: !1, category: "symbols" }, iie = { keywords: ["blue-square", "music", "note", "ampersand", "percent", "glyphs", "characters"], char: "🔣", fitzpatrick_scale: !1, category: "symbols" }, nie = { keywords: ["score", "tone", "sound"], char: "🎵", fitzpatrick_scale: !1, category: "symbols" }, sie = { keywords: ["music", "score"], char: "🎶", fitzpatrick_scale: !1, category: "symbols" }, aie = { keywords: ["draw", "line", "moustache", "mustache", "squiggle", "scribble"], char: "〰️", fitzpatrick_scale: !1, category: "symbols" }, oie = { keywords: ["scribble", "draw", "shape", "squiggle"], char: "➰", fitzpatrick_scale: !1, category: "symbols" }, lie = { keywords: ["ok", "nike", "answer", "yes", "tick"], char: "✔️", fitzpatrick_scale: !1, category: "symbols" }, Oie = { keywords: ["sync", "cycle", "round", "repeat"], char: "🔃", fitzpatrick_scale: !1, category: "symbols" }, cie = { keywords: ["math", "calculation", "addition", "more", "increase"], char: "➕", fitzpatrick_scale: !1, category: "symbols" }, hie = { keywords: ["math", "calculation", "subtract", "less"], char: "➖", fitzpatrick_scale: !1, category: "symbols" }, uie = { keywords: ["divide", "math", "calculation"], char: "➗", fitzpatrick_scale: !1, category: "symbols" }, die = { keywords: ["math", "calculation"], char: "✖️", fitzpatrick_scale: !1, category: "symbols" }, fie = { keywords: ["forever"], char: "♾", fitzpatrick_scale: !1, category: "symbols" }, pie = { keywords: ["money", "sales", "payment", "currency", "buck"], char: "💲", fitzpatrick_scale: !1, category: "symbols" }, gie = { keywords: ["money", "sales", "dollar", "travel"], char: "💱", fitzpatrick_scale: !1, category: "symbols" }, mie = { keywords: ["ip", "license", "circle", "law", "legal"], char: "©️", fitzpatrick_scale: !1, category: "symbols" }, _ie = { keywords: ["alphabet", "circle"], char: "®️", fitzpatrick_scale: !1, category: "symbols" }, $ie = { keywords: ["trademark", "brand", "law", "legal"], char: "™️", fitzpatrick_scale: !1, category: "symbols" }, Qie = { keywords: ["words", "arrow"], char: "🔚", fitzpatrick_scale: !1, category: "symbols" }, yie = { keywords: ["arrow", "words", "return"], char: "🔙", fitzpatrick_scale: !1, category: "symbols" }, bie = { keywords: ["arrow", "words"], char: "🔛", fitzpatrick_scale: !1, category: "symbols" }, Sie = { keywords: ["words", "blue-square"], char: "🔝", fitzpatrick_scale: !1, category: "symbols" }, kie = { keywords: ["arrow", "words"], char: "🔜", fitzpatrick_scale: !1, category: "symbols" }, wie = { keywords: ["ok", "agree", "confirm", "black-square", "vote", "election", "yes", "tick"], char: "☑️", fitzpatrick_scale: !1, category: "symbols" }, Pie = { keywords: ["input", "old", "music", "circle"], char: "🔘", fitzpatrick_scale: !1, category: "symbols" }, vie = { keywords: ["shape", "round"], char: "⚪", fitzpatrick_scale: !1, category: "symbols" }, xie = { keywords: ["shape", "button", "round"], char: "⚫", fitzpatrick_scale: !1, category: "symbols" }, Tie = { keywords: ["shape", "error", "danger"], char: "🔴", fitzpatrick_scale: !1, category: "symbols" }, Xie = { keywords: ["shape", "icon", "button"], char: "🔵", fitzpatrick_scale: !1, category: "symbols" }, Rie = { keywords: ["shape", "jewel", "gem"], char: "🔸", fitzpatrick_scale: !1, category: "symbols" }, zie = { keywords: ["shape", "jewel", "gem"], char: "🔹", fitzpatrick_scale: !1, category: "symbols" }, Eie = { keywords: ["shape", "jewel", "gem"], char: "🔶", fitzpatrick_scale: !1, category: "symbols" }, Cie = { keywords: ["shape", "jewel", "gem"], char: "🔷", fitzpatrick_scale: !1, category: "symbols" }, Yie = { keywords: ["shape", "direction", "up", "top"], char: "🔺", fitzpatrick_scale: !1, category: "symbols" }, Zie = { keywords: ["shape", "icon"], char: "▪️", fitzpatrick_scale: !1, category: "symbols" }, Uie = { keywords: ["shape", "icon"], char: "▫️", fitzpatrick_scale: !1, category: "symbols" }, qie = { keywords: ["shape", "icon", "button"], char: "⬛", fitzpatrick_scale: !1, category: "symbols" }, Aie = { keywords: ["shape", "icon", "stone", "button"], char: "⬜", fitzpatrick_scale: !1, category: "symbols" }, Wie = { keywords: ["shape", "direction", "bottom"], char: "🔻", fitzpatrick_scale: !1, category: "symbols" }, Vie = { keywords: ["shape", "button", "icon"], char: "◼️", fitzpatrick_scale: !1, category: "symbols" }, Die = { keywords: ["shape", "stone", "icon"], char: "◻️", fitzpatrick_scale: !1, category: "symbols" }, jie = { keywords: ["icon", "shape", "button"], char: "◾", fitzpatrick_scale: !1, category: "symbols" }, Lie = { keywords: ["shape", "stone", "icon", "button"], char: "◽", fitzpatrick_scale: !1, category: "symbols" }, Iie = { keywords: ["shape", "input", "frame"], char: "🔲", fitzpatrick_scale: !1, category: "symbols" }, Mie = { keywords: ["shape", "input"], char: "🔳", fitzpatrick_scale: !1, category: "symbols" }, Gie = { keywords: ["sound", "volume", "silence", "broadcast"], char: "🔈", fitzpatrick_scale: !1, category: "symbols" }, Bie = { keywords: ["volume", "speaker", "broadcast"], char: "🔉", fitzpatrick_scale: !1, category: "symbols" }, Nie = { keywords: ["volume", "noise", "noisy", "speaker", "broadcast"], char: "🔊", fitzpatrick_scale: !1, category: "symbols" }, Fie = { keywords: ["sound", "volume", "silence", "quiet"], char: "🔇", fitzpatrick_scale: !1, category: "symbols" }, Hie = { keywords: ["sound", "speaker", "volume"], char: "📣", fitzpatrick_scale: !1, category: "symbols" }, Kie = { keywords: ["volume", "sound"], char: "📢", fitzpatrick_scale: !1, category: "symbols" }, Jie = { keywords: ["sound", "notification", "christmas", "xmas", "chime"], char: "🔔", fitzpatrick_scale: !1, category: "symbols" }, ene = { keywords: ["sound", "volume", "mute", "quiet", "silent"], char: "🔕", fitzpatrick_scale: !1, category: "symbols" }, tne = { keywords: ["poker", "cards", "game", "play", "magic"], char: "🃏", fitzpatrick_scale: !1, category: "symbols" }, rne = { keywords: ["game", "play", "chinese", "kanji"], char: "🀄", fitzpatrick_scale: !1, category: "symbols" }, ine = { keywords: ["poker", "cards", "suits", "magic"], char: "♠️", fitzpatrick_scale: !1, category: "symbols" }, nne = { keywords: ["poker", "cards", "magic", "suits"], char: "♣️", fitzpatrick_scale: !1, category: "symbols" }, sne = { keywords: ["poker", "cards", "magic", "suits"], char: "♥️", fitzpatrick_scale: !1, category: "symbols" }, ane = { keywords: ["poker", "cards", "magic", "suits"], char: "♦️", fitzpatrick_scale: !1, category: "symbols" }, one = { keywords: ["game", "sunset", "red"], char: "🎴", fitzpatrick_scale: !1, category: "symbols" }, lne = { keywords: ["bubble", "cloud", "speech", "thinking", "dream"], char: "💭", fitzpatrick_scale: !1, category: "symbols" }, One = { keywords: ["caption", "speech", "thinking", "mad"], char: "🗯", fitzpatrick_scale: !1, category: "symbols" }, cne = { keywords: ["bubble", "words", "message", "talk", "chatting"], char: "💬", fitzpatrick_scale: !1, category: "symbols" }, hne = { keywords: ["words", "message", "talk", "chatting"], char: "🗨", fitzpatrick_scale: !1, category: "symbols" }, une = { keywords: ["time", "late", "early", "schedule"], char: "🕐", fitzpatrick_scale: !1, category: "symbols" }, dne = { keywords: ["time", "late", "early", "schedule"], char: "🕑", fitzpatrick_scale: !1, category: "symbols" }, fne = { keywords: ["time", "late", "early", "schedule"], char: "🕒", fitzpatrick_scale: !1, category: "symbols" }, pne = { keywords: ["time", "late", "early", "schedule"], char: "🕓", fitzpatrick_scale: !1, category: "symbols" }, gne = { keywords: ["time", "late", "early", "schedule"], char: "🕔", fitzpatrick_scale: !1, category: "symbols" }, mne = { keywords: ["time", "late", "early", "schedule", "dawn", "dusk"], char: "🕕", fitzpatrick_scale: !1, category: "symbols" }, _ne = { keywords: ["time", "late", "early", "schedule"], char: "🕖", fitzpatrick_scale: !1, category: "symbols" }, $ne = { keywords: ["time", "late", "early", "schedule"], char: "🕗", fitzpatrick_scale: !1, category: "symbols" }, Qne = { keywords: ["time", "late", "early", "schedule"], char: "🕘", fitzpatrick_scale: !1, category: "symbols" }, yne = { keywords: ["time", "late", "early", "schedule"], char: "🕙", fitzpatrick_scale: !1, category: "symbols" }, bne = { keywords: ["time", "late", "early", "schedule"], char: "🕚", fitzpatrick_scale: !1, category: "symbols" }, Sne = { keywords: ["time", "noon", "midnight", "midday", "late", "early", "schedule"], char: "🕛", fitzpatrick_scale: !1, category: "symbols" }, kne = { keywords: ["time", "late", "early", "schedule"], char: "🕜", fitzpatrick_scale: !1, category: "symbols" }, wne = { keywords: ["time", "late", "early", "schedule"], char: "🕝", fitzpatrick_scale: !1, category: "symbols" }, Pne = { keywords: ["time", "late", "early", "schedule"], char: "🕞", fitzpatrick_scale: !1, category: "symbols" }, vne = { keywords: ["time", "late", "early", "schedule"], char: "🕟", fitzpatrick_scale: !1, category: "symbols" }, xne = { keywords: ["time", "late", "early", "schedule"], char: "🕠", fitzpatrick_scale: !1, category: "symbols" }, Tne = { keywords: ["time", "late", "early", "schedule"], char: "🕡", fitzpatrick_scale: !1, category: "symbols" }, Xne = { keywords: ["time", "late", "early", "schedule"], char: "🕢", fitzpatrick_scale: !1, category: "symbols" }, Rne = { keywords: ["time", "late", "early", "schedule"], char: "🕣", fitzpatrick_scale: !1, category: "symbols" }, zne = { keywords: ["time", "late", "early", "schedule"], char: "🕤", fitzpatrick_scale: !1, category: "symbols" }, Ene = { keywords: ["time", "late", "early", "schedule"], char: "🕥", fitzpatrick_scale: !1, category: "symbols" }, Cne = { keywords: ["time", "late", "early", "schedule"], char: "🕦", fitzpatrick_scale: !1, category: "symbols" }, Yne = { keywords: ["time", "late", "early", "schedule"], char: "🕧", fitzpatrick_scale: !1, category: "symbols" }, Zne = { keywords: ["af", "flag", "nation", "country", "banner"], char: "🇦🇫", fitzpatrick_scale: !1, category: "flags" }, Une = { keywords: ["Åland", "islands", "flag", "nation", "country", "banner"], char: "🇦🇽", fitzpatrick_scale: !1, category: "flags" }, qne = { keywords: ["al", "flag", "nation", "country", "banner"], char: "🇦🇱", fitzpatrick_scale: !1, category: "flags" }, Ane = { keywords: ["dz", "flag", "nation", "country", "banner"], char: "🇩🇿", fitzpatrick_scale: !1, category: "flags" }, Wne = { keywords: ["american", "ws", "flag", "nation", "country", "banner"], char: "🇦🇸", fitzpatrick_scale: !1, category: "flags" }, Vne = { keywords: ["ad", "flag", "nation", "country", "banner"], char: "🇦🇩", fitzpatrick_scale: !1, category: "flags" }, Dne = { keywords: ["ao", "flag", "nation", "country", "banner"], char: "🇦🇴", fitzpatrick_scale: !1, category: "flags" }, jne = { keywords: ["ai", "flag", "nation", "country", "banner"], char: "🇦🇮", fitzpatrick_scale: !1, category: "flags" }, Lne = { keywords: ["aq", "flag", "nation", "country", "banner"], char: "🇦🇶", fitzpatrick_scale: !1, category: "flags" }, Ine = { keywords: ["antigua", "barbuda", "flag", "nation", "country", "banner"], char: "🇦🇬", fitzpatrick_scale: !1, category: "flags" }, Mne = { keywords: ["ar", "flag", "nation", "country", "banner"], char: "🇦🇷", fitzpatrick_scale: !1, category: "flags" }, Gne = { keywords: ["am", "flag", "nation", "country", "banner"], char: "🇦🇲", fitzpatrick_scale: !1, category: "flags" }, Bne = { keywords: ["aw", "flag", "nation", "country", "banner"], char: "🇦🇼", fitzpatrick_scale: !1, category: "flags" }, Nne = { keywords: ["au", "flag", "nation", "country", "banner"], char: "🇦🇺", fitzpatrick_scale: !1, category: "flags" }, Fne = { keywords: ["at", "flag", "nation", "country", "banner"], char: "🇦🇹", fitzpatrick_scale: !1, category: "flags" }, Hne = { keywords: ["az", "flag", "nation", "country", "banner"], char: "🇦🇿", fitzpatrick_scale: !1, category: "flags" }, Kne = { keywords: ["bs", "flag", "nation", "country", "banner"], char: "🇧🇸", fitzpatrick_scale: !1, category: "flags" }, Jne = { keywords: ["bh", "flag", "nation", "country", "banner"], char: "🇧🇭", fitzpatrick_scale: !1, category: "flags" }, ese = { keywords: ["bd", "flag", "nation", "country", "banner"], char: "🇧🇩", fitzpatrick_scale: !1, category: "flags" }, tse = { keywords: ["bb", "flag", "nation", "country", "banner"], char: "🇧🇧", fitzpatrick_scale: !1, category: "flags" }, rse = { keywords: ["by", "flag", "nation", "country", "banner"], char: "🇧🇾", fitzpatrick_scale: !1, category: "flags" }, ise = { keywords: ["be", "flag", "nation", "country", "banner"], char: "🇧🇪", fitzpatrick_scale: !1, category: "flags" }, nse = { keywords: ["bz", "flag", "nation", "country", "banner"], char: "🇧🇿", fitzpatrick_scale: !1, category: "flags" }, sse = { keywords: ["bj", "flag", "nation", "country", "banner"], char: "🇧🇯", fitzpatrick_scale: !1, category: "flags" }, ase = { keywords: ["bm", "flag", "nation", "country", "banner"], char: "🇧🇲", fitzpatrick_scale: !1, category: "flags" }, ose = { keywords: ["bt", "flag", "nation", "country", "banner"], char: "🇧🇹", fitzpatrick_scale: !1, category: "flags" }, lse = { keywords: ["bo", "flag", "nation", "country", "banner"], char: "🇧🇴", fitzpatrick_scale: !1, category: "flags" }, Ose = { keywords: ["bonaire", "flag", "nation", "country", "banner"], char: "🇧🇶", fitzpatrick_scale: !1, category: "flags" }, cse = { keywords: ["bosnia", "herzegovina", "flag", "nation", "country", "banner"], char: "🇧🇦", fitzpatrick_scale: !1, category: "flags" }, hse = { keywords: ["bw", "flag", "nation", "country", "banner"], char: "🇧🇼", fitzpatrick_scale: !1, category: "flags" }, use = { keywords: ["br", "flag", "nation", "country", "banner"], char: "🇧🇷", fitzpatrick_scale: !1, category: "flags" }, dse = { keywords: ["british", "indian", "ocean", "territory", "flag", "nation", "country", "banner"], char: "🇮🇴", fitzpatrick_scale: !1, category: "flags" }, fse = { keywords: ["british", "virgin", "islands", "bvi", "flag", "nation", "country", "banner"], char: "🇻🇬", fitzpatrick_scale: !1, category: "flags" }, pse = { keywords: ["bn", "darussalam", "flag", "nation", "country", "banner"], char: "🇧🇳", fitzpatrick_scale: !1, category: "flags" }, gse = { keywords: ["bg", "flag", "nation", "country", "banner"], char: "🇧🇬", fitzpatrick_scale: !1, category: "flags" }, mse = { keywords: ["burkina", "faso", "flag", "nation", "country", "banner"], char: "🇧🇫", fitzpatrick_scale: !1, category: "flags" }, _se = { keywords: ["bi", "flag", "nation", "country", "banner"], char: "🇧🇮", fitzpatrick_scale: !1, category: "flags" }, $se = { keywords: ["cabo", "verde", "flag", "nation", "country", "banner"], char: "🇨🇻", fitzpatrick_scale: !1, category: "flags" }, Qse = { keywords: ["kh", "flag", "nation", "country", "banner"], char: "🇰🇭", fitzpatrick_scale: !1, category: "flags" }, yse = { keywords: ["cm", "flag", "nation", "country", "banner"], char: "🇨🇲", fitzpatrick_scale: !1, category: "flags" }, bse = { keywords: ["ca", "flag", "nation", "country", "banner"], char: "🇨🇦", fitzpatrick_scale: !1, category: "flags" }, Sse = { keywords: ["canary", "islands", "flag", "nation", "country", "banner"], char: "🇮🇨", fitzpatrick_scale: !1, category: "flags" }, kse = { keywords: ["cayman", "islands", "flag", "nation", "country", "banner"], char: "🇰🇾", fitzpatrick_scale: !1, category: "flags" }, wse = { keywords: ["central", "african", "republic", "flag", "nation", "country", "banner"], char: "🇨🇫", fitzpatrick_scale: !1, category: "flags" }, Pse = { keywords: ["td", "flag", "nation", "country", "banner"], char: "🇹🇩", fitzpatrick_scale: !1, category: "flags" }, vse = { keywords: ["flag", "nation", "country", "banner"], char: "🇨🇱", fitzpatrick_scale: !1, category: "flags" }, xse = { keywords: ["china", "chinese", "prc", "flag", "country", "nation", "banner"], char: "🇨🇳", fitzpatrick_scale: !1, category: "flags" }, Tse = { keywords: ["christmas", "island", "flag", "nation", "country", "banner"], char: "🇨🇽", fitzpatrick_scale: !1, category: "flags" }, Xse = { keywords: ["cocos", "keeling", "islands", "flag", "nation", "country", "banner"], char: "🇨🇨", fitzpatrick_scale: !1, category: "flags" }, Rse = { keywords: ["co", "flag", "nation", "country", "banner"], char: "🇨🇴", fitzpatrick_scale: !1, category: "flags" }, zse = { keywords: ["km", "flag", "nation", "country", "banner"], char: "🇰🇲", fitzpatrick_scale: !1, category: "flags" }, Ese = { keywords: ["congo", "flag", "nation", "country", "banner"], char: "🇨🇬", fitzpatrick_scale: !1, category: "flags" }, Cse = { keywords: ["congo", "democratic", "republic", "flag", "nation", "country", "banner"], char: "🇨🇩", fitzpatrick_scale: !1, category: "flags" }, Yse = { keywords: ["cook", "islands", "flag", "nation", "country", "banner"], char: "🇨🇰", fitzpatrick_scale: !1, category: "flags" }, Zse = { keywords: ["costa", "rica", "flag", "nation", "country", "banner"], char: "🇨🇷", fitzpatrick_scale: !1, category: "flags" }, Use = { keywords: ["hr", "flag", "nation", "country", "banner"], char: "🇭🇷", fitzpatrick_scale: !1, category: "flags" }, qse = { keywords: ["cu", "flag", "nation", "country", "banner"], char: "🇨🇺", fitzpatrick_scale: !1, category: "flags" }, Ase = { keywords: ["curaçao", "flag", "nation", "country", "banner"], char: "🇨🇼", fitzpatrick_scale: !1, category: "flags" }, Wse = { keywords: ["cy", "flag", "nation", "country", "banner"], char: "🇨🇾", fitzpatrick_scale: !1, category: "flags" }, Vse = { keywords: ["cz", "flag", "nation", "country", "banner"], char: "🇨🇿", fitzpatrick_scale: !1, category: "flags" }, Dse = { keywords: ["dk", "flag", "nation", "country", "banner"], char: "🇩🇰", fitzpatrick_scale: !1, category: "flags" }, jse = { keywords: ["dj", "flag", "nation", "country", "banner"], char: "🇩🇯", fitzpatrick_scale: !1, category: "flags" }, Lse = { keywords: ["dm", "flag", "nation", "country", "banner"], char: "🇩🇲", fitzpatrick_scale: !1, category: "flags" }, Ise = { keywords: ["dominican", "republic", "flag", "nation", "country", "banner"], char: "🇩🇴", fitzpatrick_scale: !1, category: "flags" }, Mse = { keywords: ["ec", "flag", "nation", "country", "banner"], char: "🇪🇨", fitzpatrick_scale: !1, category: "flags" }, Gse = { keywords: ["eg", "flag", "nation", "country", "banner"], char: "🇪🇬", fitzpatrick_scale: !1, category: "flags" }, Bse = { keywords: ["el", "salvador", "flag", "nation", "country", "banner"], char: "🇸🇻", fitzpatrick_scale: !1, category: "flags" }, Nse = { keywords: ["equatorial", "gn", "flag", "nation", "country", "banner"], char: "🇬🇶", fitzpatrick_scale: !1, category: "flags" }, Fse = { keywords: ["er", "flag", "nation", "country", "banner"], char: "🇪🇷", fitzpatrick_scale: !1, category: "flags" }, Hse = { keywords: ["ee", "flag", "nation", "country", "banner"], char: "🇪🇪", fitzpatrick_scale: !1, category: "flags" }, Kse = { keywords: ["et", "flag", "nation", "country", "banner"], char: "🇪🇹", fitzpatrick_scale: !1, category: "flags" }, Jse = { keywords: ["european", "union", "flag", "banner"], char: "🇪🇺", fitzpatrick_scale: !1, category: "flags" }, eae = { keywords: ["falkland", "islands", "malvinas", "flag", "nation", "country", "banner"], char: "🇫🇰", fitzpatrick_scale: !1, category: "flags" }, tae = { keywords: ["faroe", "islands", "flag", "nation", "country", "banner"], char: "🇫🇴", fitzpatrick_scale: !1, category: "flags" }, rae = { keywords: ["fj", "flag", "nation", "country", "banner"], char: "🇫🇯", fitzpatrick_scale: !1, category: "flags" }, iae = { keywords: ["fi", "flag", "nation", "country", "banner"], char: "🇫🇮", fitzpatrick_scale: !1, category: "flags" }, nae = { keywords: ["banner", "flag", "nation", "france", "french", "country"], char: "🇫🇷", fitzpatrick_scale: !1, category: "flags" }, sae = { keywords: ["french", "guiana", "flag", "nation", "country", "banner"], char: "🇬🇫", fitzpatrick_scale: !1, category: "flags" }, aae = { keywords: ["french", "polynesia", "flag", "nation", "country", "banner"], char: "🇵🇫", fitzpatrick_scale: !1, category: "flags" }, oae = { keywords: ["french", "southern", "territories", "flag", "nation", "country", "banner"], char: "🇹🇫", fitzpatrick_scale: !1, category: "flags" }, lae = { keywords: ["ga", "flag", "nation", "country", "banner"], char: "🇬🇦", fitzpatrick_scale: !1, category: "flags" }, Oae = { keywords: ["gm", "flag", "nation", "country", "banner"], char: "🇬🇲", fitzpatrick_scale: !1, category: "flags" }, cae = { keywords: ["ge", "flag", "nation", "country", "banner"], char: "🇬🇪", fitzpatrick_scale: !1, category: "flags" }, hae = { keywords: ["german", "nation", "flag", "country", "banner"], char: "🇩🇪", fitzpatrick_scale: !1, category: "flags" }, uae = { keywords: ["gh", "flag", "nation", "country", "banner"], char: "🇬🇭", fitzpatrick_scale: !1, category: "flags" }, dae = { keywords: ["gi", "flag", "nation", "country", "banner"], char: "🇬🇮", fitzpatrick_scale: !1, category: "flags" }, fae = { keywords: ["gr", "flag", "nation", "country", "banner"], char: "🇬🇷", fitzpatrick_scale: !1, category: "flags" }, pae = { keywords: ["gl", "flag", "nation", "country", "banner"], char: "🇬🇱", fitzpatrick_scale: !1, category: "flags" }, gae = { keywords: ["gd", "flag", "nation", "country", "banner"], char: "🇬🇩", fitzpatrick_scale: !1, category: "flags" }, mae = { keywords: ["gp", "flag", "nation", "country", "banner"], char: "🇬🇵", fitzpatrick_scale: !1, category: "flags" }, _ae = { keywords: ["gu", "flag", "nation", "country", "banner"], char: "🇬🇺", fitzpatrick_scale: !1, category: "flags" }, $ae = { keywords: ["gt", "flag", "nation", "country", "banner"], char: "🇬🇹", fitzpatrick_scale: !1, category: "flags" }, Qae = { keywords: ["gg", "flag", "nation", "country", "banner"], char: "🇬🇬", fitzpatrick_scale: !1, category: "flags" }, yae = { keywords: ["gn", "flag", "nation", "country", "banner"], char: "🇬🇳", fitzpatrick_scale: !1, category: "flags" }, bae = { keywords: ["gw", "bissau", "flag", "nation", "country", "banner"], char: "🇬🇼", fitzpatrick_scale: !1, category: "flags" }, Sae = { keywords: ["gy", "flag", "nation", "country", "banner"], char: "🇬🇾", fitzpatrick_scale: !1, category: "flags" }, kae = { keywords: ["ht", "flag", "nation", "country", "banner"], char: "🇭🇹", fitzpatrick_scale: !1, category: "flags" }, wae = { keywords: ["hn", "flag", "nation", "country", "banner"], char: "🇭🇳", fitzpatrick_scale: !1, category: "flags" }, Pae = { keywords: ["hong", "kong", "flag", "nation", "country", "banner"], char: "🇭🇰", fitzpatrick_scale: !1, category: "flags" }, vae = { keywords: ["hu", "flag", "nation", "country", "banner"], char: "🇭🇺", fitzpatrick_scale: !1, category: "flags" }, xae = { keywords: ["is", "flag", "nation", "country", "banner"], char: "🇮🇸", fitzpatrick_scale: !1, category: "flags" }, Tae = { keywords: ["in", "flag", "nation", "country", "banner"], char: "🇮🇳", fitzpatrick_scale: !1, category: "flags" }, Xae = { keywords: ["flag", "nation", "country", "banner"], char: "🇮🇩", fitzpatrick_scale: !1, category: "flags" }, Rae = { keywords: ["iran,", "islamic", "republic", "flag", "nation", "country", "banner"], char: "🇮🇷", fitzpatrick_scale: !1, category: "flags" }, zae = { keywords: ["iq", "flag", "nation", "country", "banner"], char: "🇮🇶", fitzpatrick_scale: !1, category: "flags" }, Eae = { keywords: ["ie", "flag", "nation", "country", "banner"], char: "🇮🇪", fitzpatrick_scale: !1, category: "flags" }, Cae = { keywords: ["isle", "man", "flag", "nation", "country", "banner"], char: "🇮🇲", fitzpatrick_scale: !1, category: "flags" }, Yae = { keywords: ["il", "flag", "nation", "country", "banner"], char: "🇮🇱", fitzpatrick_scale: !1, category: "flags" }, Zae = { keywords: ["italy", "flag", "nation", "country", "banner"], char: "🇮🇹", fitzpatrick_scale: !1, category: "flags" }, Uae = { keywords: ["ivory", "coast", "flag", "nation", "country", "banner"], char: "🇨🇮", fitzpatrick_scale: !1, category: "flags" }, qae = { keywords: ["jm", "flag", "nation", "country", "banner"], char: "🇯🇲", fitzpatrick_scale: !1, category: "flags" }, Aae = { keywords: ["japanese", "nation", "flag", "country", "banner"], char: "🇯🇵", fitzpatrick_scale: !1, category: "flags" }, Wae = { keywords: ["je", "flag", "nation", "country", "banner"], char: "🇯🇪", fitzpatrick_scale: !1, category: "flags" }, Vae = { keywords: ["jo", "flag", "nation", "country", "banner"], char: "🇯🇴", fitzpatrick_scale: !1, category: "flags" }, Dae = { keywords: ["kz", "flag", "nation", "country", "banner"], char: "🇰🇿", fitzpatrick_scale: !1, category: "flags" }, jae = { keywords: ["ke", "flag", "nation", "country", "banner"], char: "🇰🇪", fitzpatrick_scale: !1, category: "flags" }, Lae = { keywords: ["ki", "flag", "nation", "country", "banner"], char: "🇰🇮", fitzpatrick_scale: !1, category: "flags" }, Iae = { keywords: ["xk", "flag", "nation", "country", "banner"], char: "🇽🇰", fitzpatrick_scale: !1, category: "flags" }, Mae = { keywords: ["kw", "flag", "nation", "country", "banner"], char: "🇰🇼", fitzpatrick_scale: !1, category: "flags" }, Gae = { keywords: ["kg", "flag", "nation", "country", "banner"], char: "🇰🇬", fitzpatrick_scale: !1, category: "flags" }, Bae = { keywords: ["lao", "democratic", "republic", "flag", "nation", "country", "banner"], char: "🇱🇦", fitzpatrick_scale: !1, category: "flags" }, Nae = { keywords: ["lv", "flag", "nation", "country", "banner"], char: "🇱🇻", fitzpatrick_scale: !1, category: "flags" }, Fae = { keywords: ["lb", "flag", "nation", "country", "banner"], char: "🇱🇧", fitzpatrick_scale: !1, category: "flags" }, Hae = { keywords: ["ls", "flag", "nation", "country", "banner"], char: "🇱🇸", fitzpatrick_scale: !1, category: "flags" }, Kae = { keywords: ["lr", "flag", "nation", "country", "banner"], char: "🇱🇷", fitzpatrick_scale: !1, category: "flags" }, Jae = { keywords: ["ly", "flag", "nation", "country", "banner"], char: "🇱🇾", fitzpatrick_scale: !1, category: "flags" }, eoe = { keywords: ["li", "flag", "nation", "country", "banner"], char: "🇱🇮", fitzpatrick_scale: !1, category: "flags" }, toe = { keywords: ["lt", "flag", "nation", "country", "banner"], char: "🇱🇹", fitzpatrick_scale: !1, category: "flags" }, roe = { keywords: ["lu", "flag", "nation", "country", "banner"], char: "🇱🇺", fitzpatrick_scale: !1, category: "flags" }, ioe = { keywords: ["macao", "flag", "nation", "country", "banner"], char: "🇲🇴", fitzpatrick_scale: !1, category: "flags" }, noe = { keywords: ["macedonia,", "flag", "nation", "country", "banner"], char: "🇲🇰", fitzpatrick_scale: !1, category: "flags" }, soe = { keywords: ["mg", "flag", "nation", "country", "banner"], char: "🇲🇬", fitzpatrick_scale: !1, category: "flags" }, aoe = { keywords: ["mw", "flag", "nation", "country", "banner"], char: "🇲🇼", fitzpatrick_scale: !1, category: "flags" }, ooe = { keywords: ["my", "flag", "nation", "country", "banner"], char: "🇲🇾", fitzpatrick_scale: !1, category: "flags" }, loe = { keywords: ["mv", "flag", "nation", "country", "banner"], char: "🇲🇻", fitzpatrick_scale: !1, category: "flags" }, Ooe = { keywords: ["ml", "flag", "nation", "country", "banner"], char: "🇲🇱", fitzpatrick_scale: !1, category: "flags" }, coe = { keywords: ["mt", "flag", "nation", "country", "banner"], char: "🇲🇹", fitzpatrick_scale: !1, category: "flags" }, hoe = { keywords: ["marshall", "islands", "flag", "nation", "country", "banner"], char: "🇲🇭", fitzpatrick_scale: !1, category: "flags" }, uoe = { keywords: ["mq", "flag", "nation", "country", "banner"], char: "🇲🇶", fitzpatrick_scale: !1, category: "flags" }, doe = { keywords: ["mr", "flag", "nation", "country", "banner"], char: "🇲🇷", fitzpatrick_scale: !1, category: "flags" }, foe = { keywords: ["mu", "flag", "nation", "country", "banner"], char: "🇲🇺", fitzpatrick_scale: !1, category: "flags" }, poe = { keywords: ["yt", "flag", "nation", "country", "banner"], char: "🇾🇹", fitzpatrick_scale: !1, category: "flags" }, goe = { keywords: ["mx", "flag", "nation", "country", "banner"], char: "🇲🇽", fitzpatrick_scale: !1, category: "flags" }, moe = { keywords: ["micronesia,", "federated", "states", "flag", "nation", "country", "banner"], char: "🇫🇲", fitzpatrick_scale: !1, category: "flags" }, _oe = { keywords: ["moldova,", "republic", "flag", "nation", "country", "banner"], char: "🇲🇩", fitzpatrick_scale: !1, category: "flags" }, $oe = { keywords: ["mc", "flag", "nation", "country", "banner"], char: "🇲🇨", fitzpatrick_scale: !1, category: "flags" }, Qoe = { keywords: ["mn", "flag", "nation", "country", "banner"], char: "🇲🇳", fitzpatrick_scale: !1, category: "flags" }, yoe = { keywords: ["me", "flag", "nation", "country", "banner"], char: "🇲🇪", fitzpatrick_scale: !1, category: "flags" }, boe = { keywords: ["ms", "flag", "nation", "country", "banner"], char: "🇲🇸", fitzpatrick_scale: !1, category: "flags" }, Soe = { keywords: ["ma", "flag", "nation", "country", "banner"], char: "🇲🇦", fitzpatrick_scale: !1, category: "flags" }, koe = { keywords: ["mz", "flag", "nation", "country", "banner"], char: "🇲🇿", fitzpatrick_scale: !1, category: "flags" }, woe = { keywords: ["mm", "flag", "nation", "country", "banner"], char: "🇲🇲", fitzpatrick_scale: !1, category: "flags" }, Poe = { keywords: ["na", "flag", "nation", "country", "banner"], char: "🇳🇦", fitzpatrick_scale: !1, category: "flags" }, voe = { keywords: ["nr", "flag", "nation", "country", "banner"], char: "🇳🇷", fitzpatrick_scale: !1, category: "flags" }, xoe = { keywords: ["np", "flag", "nation", "country", "banner"], char: "🇳🇵", fitzpatrick_scale: !1, category: "flags" }, Toe = { keywords: ["nl", "flag", "nation", "country", "banner"], char: "🇳🇱", fitzpatrick_scale: !1, category: "flags" }, Xoe = { keywords: ["new", "caledonia", "flag", "nation", "country", "banner"], char: "🇳🇨", fitzpatrick_scale: !1, category: "flags" }, Roe = { keywords: ["new", "zealand", "flag", "nation", "country", "banner"], char: "🇳🇿", fitzpatrick_scale: !1, category: "flags" }, zoe = { keywords: ["ni", "flag", "nation", "country", "banner"], char: "🇳🇮", fitzpatrick_scale: !1, category: "flags" }, Eoe = { keywords: ["ne", "flag", "nation", "country", "banner"], char: "🇳🇪", fitzpatrick_scale: !1, category: "flags" }, Coe = { keywords: ["flag", "nation", "country", "banner"], char: "🇳🇬", fitzpatrick_scale: !1, category: "flags" }, Yoe = { keywords: ["nu", "flag", "nation", "country", "banner"], char: "🇳🇺", fitzpatrick_scale: !1, category: "flags" }, Zoe = { keywords: ["norfolk", "island", "flag", "nation", "country", "banner"], char: "🇳🇫", fitzpatrick_scale: !1, category: "flags" }, Uoe = { keywords: ["northern", "mariana", "islands", "flag", "nation", "country", "banner"], char: "🇲🇵", fitzpatrick_scale: !1, category: "flags" }, qoe = { keywords: ["north", "korea", "nation", "flag", "country", "banner"], char: "🇰🇵", fitzpatrick_scale: !1, category: "flags" }, Aoe = { keywords: ["no", "flag", "nation", "country", "banner"], char: "🇳🇴", fitzpatrick_scale: !1, category: "flags" }, Woe = { keywords: ["om_symbol", "flag", "nation", "country", "banner"], char: "🇴🇲", fitzpatrick_scale: !1, category: "flags" }, Voe = { keywords: ["pk", "flag", "nation", "country", "banner"], char: "🇵🇰", fitzpatrick_scale: !1, category: "flags" }, Doe = { keywords: ["pw", "flag", "nation", "country", "banner"], char: "🇵🇼", fitzpatrick_scale: !1, category: "flags" }, joe = { keywords: ["palestine", "palestinian", "territories", "flag", "nation", "country", "banner"], char: "🇵🇸", fitzpatrick_scale: !1, category: "flags" }, Loe = { keywords: ["pa", "flag", "nation", "country", "banner"], char: "🇵🇦", fitzpatrick_scale: !1, category: "flags" }, Ioe = { keywords: ["papua", "new", "guinea", "flag", "nation", "country", "banner"], char: "🇵🇬", fitzpatrick_scale: !1, category: "flags" }, Moe = { keywords: ["py", "flag", "nation", "country", "banner"], char: "🇵🇾", fitzpatrick_scale: !1, category: "flags" }, Goe = { keywords: ["pe", "flag", "nation", "country", "banner"], char: "🇵🇪", fitzpatrick_scale: !1, category: "flags" }, Boe = { keywords: ["ph", "flag", "nation", "country", "banner"], char: "🇵🇭", fitzpatrick_scale: !1, category: "flags" }, Noe = { keywords: ["pitcairn", "flag", "nation", "country", "banner"], char: "🇵🇳", fitzpatrick_scale: !1, category: "flags" }, Foe = { keywords: ["pl", "flag", "nation", "country", "banner"], char: "🇵🇱", fitzpatrick_scale: !1, category: "flags" }, Hoe = { keywords: ["pt", "flag", "nation", "country", "banner"], char: "🇵🇹", fitzpatrick_scale: !1, category: "flags" }, Koe = { keywords: ["puerto", "rico", "flag", "nation", "country", "banner"], char: "🇵🇷", fitzpatrick_scale: !1, category: "flags" }, Joe = { keywords: ["qa", "flag", "nation", "country", "banner"], char: "🇶🇦", fitzpatrick_scale: !1, category: "flags" }, ele = { keywords: ["réunion", "flag", "nation", "country", "banner"], char: "🇷🇪", fitzpatrick_scale: !1, category: "flags" }, tle = { keywords: ["ro", "flag", "nation", "country", "banner"], char: "🇷🇴", fitzpatrick_scale: !1, category: "flags" }, rle = { keywords: ["russian", "federation", "flag", "nation", "country", "banner"], char: "🇷🇺", fitzpatrick_scale: !1, category: "flags" }, ile = { keywords: ["rw", "flag", "nation", "country", "banner"], char: "🇷🇼", fitzpatrick_scale: !1, category: "flags" }, nle = { keywords: ["saint", "barthélemy", "flag", "nation", "country", "banner"], char: "🇧🇱", fitzpatrick_scale: !1, category: "flags" }, sle = { keywords: ["saint", "helena", "ascension", "tristan", "cunha", "flag", "nation", "country", "banner"], char: "🇸🇭", fitzpatrick_scale: !1, category: "flags" }, ale = { keywords: ["saint", "kitts", "nevis", "flag", "nation", "country", "banner"], char: "🇰🇳", fitzpatrick_scale: !1, category: "flags" }, ole = { keywords: ["saint", "lucia", "flag", "nation", "country", "banner"], char: "🇱🇨", fitzpatrick_scale: !1, category: "flags" }, lle = { keywords: ["saint", "pierre", "miquelon", "flag", "nation", "country", "banner"], char: "🇵🇲", fitzpatrick_scale: !1, category: "flags" }, Ole = { keywords: ["saint", "vincent", "grenadines", "flag", "nation", "country", "banner"], char: "🇻🇨", fitzpatrick_scale: !1, category: "flags" }, cle = { keywords: ["ws", "flag", "nation", "country", "banner"], char: "🇼🇸", fitzpatrick_scale: !1, category: "flags" }, hle = { keywords: ["san", "marino", "flag", "nation", "country", "banner"], char: "🇸🇲", fitzpatrick_scale: !1, category: "flags" }, ule = { keywords: ["sao", "tome", "principe", "flag", "nation", "country", "banner"], char: "🇸🇹", fitzpatrick_scale: !1, category: "flags" }, dle = { keywords: ["flag", "nation", "country", "banner"], char: "🇸🇦", fitzpatrick_scale: !1, category: "flags" }, fle = { keywords: ["sn", "flag", "nation", "country", "banner"], char: "🇸🇳", fitzpatrick_scale: !1, category: "flags" }, ple = { keywords: ["rs", "flag", "nation", "country", "banner"], char: "🇷🇸", fitzpatrick_scale: !1, category: "flags" }, gle = { keywords: ["sc", "flag", "nation", "country", "banner"], char: "🇸🇨", fitzpatrick_scale: !1, category: "flags" }, mle = { keywords: ["sierra", "leone", "flag", "nation", "country", "banner"], char: "🇸🇱", fitzpatrick_scale: !1, category: "flags" }, _le = { keywords: ["sg", "flag", "nation", "country", "banner"], char: "🇸🇬", fitzpatrick_scale: !1, category: "flags" }, $le = { keywords: ["sint", "maarten", "dutch", "flag", "nation", "country", "banner"], char: "🇸🇽", fitzpatrick_scale: !1, category: "flags" }, Qle = { keywords: ["sk", "flag", "nation", "country", "banner"], char: "🇸🇰", fitzpatrick_scale: !1, category: "flags" }, yle = { keywords: ["si", "flag", "nation", "country", "banner"], char: "🇸🇮", fitzpatrick_scale: !1, category: "flags" }, ble = { keywords: ["solomon", "islands", "flag", "nation", "country", "banner"], char: "🇸🇧", fitzpatrick_scale: !1, category: "flags" }, Sle = { keywords: ["so", "flag", "nation", "country", "banner"], char: "🇸🇴", fitzpatrick_scale: !1, category: "flags" }, kle = { keywords: ["south", "africa", "flag", "nation", "country", "banner"], char: "🇿🇦", fitzpatrick_scale: !1, category: "flags" }, wle = { keywords: ["south", "georgia", "sandwich", "islands", "flag", "nation", "country", "banner"], char: "🇬🇸", fitzpatrick_scale: !1, category: "flags" }, Ple = { keywords: ["south", "korea", "nation", "flag", "country", "banner"], char: "🇰🇷", fitzpatrick_scale: !1, category: "flags" }, vle = { keywords: ["south", "sd", "flag", "nation", "country", "banner"], char: "🇸🇸", fitzpatrick_scale: !1, category: "flags" }, xle = { keywords: ["spain", "flag", "nation", "country", "banner"], char: "🇪🇸", fitzpatrick_scale: !1, category: "flags" }, Tle = { keywords: ["sri", "lanka", "flag", "nation", "country", "banner"], char: "🇱🇰", fitzpatrick_scale: !1, category: "flags" }, Xle = { keywords: ["sd", "flag", "nation", "country", "banner"], char: "🇸🇩", fitzpatrick_scale: !1, category: "flags" }, Rle = { keywords: ["sr", "flag", "nation", "country", "banner"], char: "🇸🇷", fitzpatrick_scale: !1, category: "flags" }, zle = { keywords: ["sz", "flag", "nation", "country", "banner"], char: "🇸🇿", fitzpatrick_scale: !1, category: "flags" }, Ele = { keywords: ["se", "flag", "nation", "country", "banner"], char: "🇸🇪", fitzpatrick_scale: !1, category: "flags" }, Cle = { keywords: ["ch", "flag", "nation", "country", "banner"], char: "🇨🇭", fitzpatrick_scale: !1, category: "flags" }, Yle = { keywords: ["syrian", "arab", "republic", "flag", "nation", "country", "banner"], char: "🇸🇾", fitzpatrick_scale: !1, category: "flags" }, Zle = { keywords: ["tw", "flag", "nation", "country", "banner"], char: "🇹🇼", fitzpatrick_scale: !1, category: "flags" }, Ule = { keywords: ["tj", "flag", "nation", "country", "banner"], char: "🇹🇯", fitzpatrick_scale: !1, category: "flags" }, qle = { keywords: ["tanzania,", "united", "republic", "flag", "nation", "country", "banner"], char: "🇹🇿", fitzpatrick_scale: !1, category: "flags" }, Ale = { keywords: ["th", "flag", "nation", "country", "banner"], char: "🇹🇭", fitzpatrick_scale: !1, category: "flags" }, Wle = { keywords: ["timor", "leste", "flag", "nation", "country", "banner"], char: "🇹🇱", fitzpatrick_scale: !1, category: "flags" }, Vle = { keywords: ["tg", "flag", "nation", "country", "banner"], char: "🇹🇬", fitzpatrick_scale: !1, category: "flags" }, Dle = { keywords: ["tk", "flag", "nation", "country", "banner"], char: "🇹🇰", fitzpatrick_scale: !1, category: "flags" }, jle = { keywords: ["to", "flag", "nation", "country", "banner"], char: "🇹🇴", fitzpatrick_scale: !1, category: "flags" }, Lle = { keywords: ["trinidad", "tobago", "flag", "nation", "country", "banner"], char: "🇹🇹", fitzpatrick_scale: !1, category: "flags" }, Ile = { keywords: ["tn", "flag", "nation", "country", "banner"], char: "🇹🇳", fitzpatrick_scale: !1, category: "flags" }, Mle = { keywords: ["turkey", "flag", "nation", "country", "banner"], char: "🇹🇷", fitzpatrick_scale: !1, category: "flags" }, Gle = { keywords: ["flag", "nation", "country", "banner"], char: "🇹🇲", fitzpatrick_scale: !1, category: "flags" }, Ble = { keywords: ["turks", "caicos", "islands", "flag", "nation", "country", "banner"], char: "🇹🇨", fitzpatrick_scale: !1, category: "flags" }, Nle = { keywords: ["flag", "nation", "country", "banner"], char: "🇹🇻", fitzpatrick_scale: !1, category: "flags" }, Fle = { keywords: ["ug", "flag", "nation", "country", "banner"], char: "🇺🇬", fitzpatrick_scale: !1, category: "flags" }, Hle = { keywords: ["ua", "flag", "nation", "country", "banner"], char: "🇺🇦", fitzpatrick_scale: !1, category: "flags" }, Kle = { keywords: ["united", "arab", "emirates", "flag", "nation", "country", "banner"], char: "🇦🇪", fitzpatrick_scale: !1, category: "flags" }, Jle = { keywords: ["united", "kingdom", "great", "britain", "northern", "ireland", "flag", "nation", "country", "banner", "british", "UK", "english", "england", "union jack"], char: "🇬🇧", fitzpatrick_scale: !1, category: "flags" }, eOe = { keywords: ["flag", "english"], char: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", fitzpatrick_scale: !1, category: "flags" }, tOe = { keywords: ["flag", "scottish"], char: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", fitzpatrick_scale: !1, category: "flags" }, rOe = { keywords: ["flag", "welsh"], char: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", fitzpatrick_scale: !1, category: "flags" }, iOe = { keywords: ["united", "states", "america", "flag", "nation", "country", "banner"], char: "🇺🇸", fitzpatrick_scale: !1, category: "flags" }, nOe = { keywords: ["virgin", "islands", "us", "flag", "nation", "country", "banner"], char: "🇻🇮", fitzpatrick_scale: !1, category: "flags" }, sOe = { keywords: ["uy", "flag", "nation", "country", "banner"], char: "🇺🇾", fitzpatrick_scale: !1, category: "flags" }, aOe = { keywords: ["uz", "flag", "nation", "country", "banner"], char: "🇺🇿", fitzpatrick_scale: !1, category: "flags" }, oOe = { keywords: ["vu", "flag", "nation", "country", "banner"], char: "🇻🇺", fitzpatrick_scale: !1, category: "flags" }, lOe = { keywords: ["vatican", "city", "flag", "nation", "country", "banner"], char: "🇻🇦", fitzpatrick_scale: !1, category: "flags" }, OOe = { keywords: ["ve", "bolivarian", "republic", "flag", "nation", "country", "banner"], char: "🇻🇪", fitzpatrick_scale: !1, category: "flags" }, cOe = { keywords: ["viet", "nam", "flag", "nation", "country", "banner"], char: "🇻🇳", fitzpatrick_scale: !1, category: "flags" }, hOe = { keywords: ["wallis", "futuna", "flag", "nation", "country", "banner"], char: "🇼🇫", fitzpatrick_scale: !1, category: "flags" }, uOe = { keywords: ["western", "sahara", "flag", "nation", "country", "banner"], char: "🇪🇭", fitzpatrick_scale: !1, category: "flags" }, dOe = { keywords: ["ye", "flag", "nation", "country", "banner"], char: "🇾🇪", fitzpatrick_scale: !1, category: "flags" }, fOe = { keywords: ["zm", "flag", "nation", "country", "banner"], char: "🇿🇲", fitzpatrick_scale: !1, category: "flags" }, pOe = { keywords: ["zw", "flag", "nation", "country", "banner"], char: "🇿🇼", fitzpatrick_scale: !1, category: "flags" }, gOe = { keywords: ["un", "flag", "banner"], char: "🇺🇳", fitzpatrick_scale: !1, category: "flags" }, mOe = { keywords: ["skull", "crossbones", "flag", "banner"], char: "🏴‍☠️", fitzpatrick_scale: !1, category: "flags" }, _Oe = {
@@ -33743,7 +33743,7 @@ function QOe() {
   }), Sc;
 }
 var yOe = QOe();
-const bOe = /* @__PURE__ */ ya(yOe);
+const bOe = /* @__PURE__ */ ba(yOe);
 var kc, Sm;
 function SOe() {
   return Sm || (Sm = 1, kc = () => {
@@ -33752,7 +33752,7 @@ function SOe() {
   }), kc;
 }
 var kOe = SOe();
-const wOe = /* @__PURE__ */ ya(kOe);
+const wOe = /* @__PURE__ */ ba(kOe);
 wOe();
 var POe = "️", vOe = new RegExp(POe, "g");
 function xOe(t) {
@@ -33768,7 +33768,7 @@ new Map(
   TS.map(([t, e]) => [xOe(e), t])
 );
 var ROe = (t) => (PA.assert.string(t), XOe.get(TOe(t)));
-const po = [
+const go = [
   {
     description: "angry face",
     emoji: "😠",
@@ -34248,7 +34248,7 @@ const po = [
     };
   }
   function a(h) {
-    const c = po.find((y) => y.emoticons.includes(h)), u = po.find((y) => y.emoticons.includes(h.slice(0, -1))), d = po.find((y) => y.emoticons.includes(h.slice(1))), $ = po.find((y) => y.emoticons.includes(h.slice(1, -1))), Q = c || u || d || $;
+    const c = go.find((y) => y.emoticons.includes(h)), u = go.find((y) => y.emoticons.includes(h.slice(0, -1))), d = go.find((y) => y.emoticons.includes(h.slice(1))), $ = go.find((y) => y.emoticons.includes(h.slice(1, -1))), Q = c || u || d || $;
     if (!Q)
       return !1;
     const f = !(c || d) && ($ || u) ? h.slice(-1) : "", p = !(c || u) && ($ || d) ? h.slice(0, 1) : "", g = r ? " " : "", _ = p + Q.emoji + g + f;
@@ -34331,7 +34331,7 @@ function UOe() {
   })(wc)), wc.exports;
 }
 var qOe = UOe();
-const AOe = /* @__PURE__ */ ya(qOe), go = Object.assign(on(Error), {
+const AOe = /* @__PURE__ */ ba(qOe), mo = Object.assign(on(Error), {
   eval: on(EvalError),
   range: on(RangeError),
   reference: on(ReferenceError),
@@ -34346,7 +34346,7 @@ function on(t) {
     return new t(n);
   }
 }
-const mo = {}.hasOwnProperty, wm = {
+const _o = {}.hasOwnProperty, wm = {
   yaml: "-",
   toml: "+"
 };
@@ -34361,18 +34361,18 @@ function Pd(t) {
 function WOe(t) {
   let e = t;
   if (typeof e == "string") {
-    if (!mo.call(wm, e))
-      throw go("Missing matter definition for `%s`", e);
+    if (!_o.call(wm, e))
+      throw mo("Missing matter definition for `%s`", e);
     e = {
       type: e,
       marker: wm[e]
     };
   } else if (typeof e != "object")
-    throw go("Expected matter to be an object, not `%j`", e);
-  if (!mo.call(e, "type"))
-    throw go("Missing `type` in matter `%j`", e);
-  if (!mo.call(e, "fence") && !mo.call(e, "marker"))
-    throw go("Missing `marker` or `fence` in matter `%j`", e);
+    throw mo("Expected matter to be an object, not `%j`", e);
+  if (!_o.call(e, "type"))
+    throw mo("Missing `type` in matter `%j`", e);
+  if (!_o.call(e, "fence") && !_o.call(e, "marker"))
+    throw mo("Missing `marker` or `fence` in matter `%j`", e);
   return e;
 }
 function VOe(t) {
@@ -34891,14 +34891,14 @@ const Sce = {
   tableRow: _ce,
   text: yce,
   thematicBreak: bce,
-  toml: _o,
-  yaml: _o,
-  definition: _o,
-  footnoteDefinition: _o
+  toml: $o,
+  yaml: $o,
+  definition: $o,
+  footnoteDefinition: $o
 };
-function _o() {
+function $o() {
 }
-const YS = -1, nO = 0, Ks = 1, Pl = 2, vd = 3, xd = 4, Td = 5, Xd = 6, ZS = 7, US = 8, Rm = typeof self == "object" ? self : globalThis, kce = (t, e) => {
+const YS = -1, nO = 0, Js = 1, Pl = 2, vd = 3, xd = 4, Td = 5, Xd = 6, ZS = 7, US = 8, Rm = typeof self == "object" ? self : globalThis, kce = (t, e) => {
   const r = (n, s) => (t.set(s, n), n), i = (n) => {
     if (t.has(n))
       return t.get(n);
@@ -34907,7 +34907,7 @@ const YS = -1, nO = 0, Ks = 1, Pl = 2, vd = 3, xd = 4, Td = 5, Xd = 6, ZS = 7, U
       case nO:
       case YS:
         return r(a, n);
-      case Ks: {
+      case Js: {
         const o = r([], n);
         for (const l of a)
           o.push(i(l));
@@ -34962,7 +34962,7 @@ const YS = -1, nO = 0, Ks = 1, Pl = 2, vd = 3, xd = 4, Td = 5, Xd = 6, ZS = 7, U
   const r = wce.call(t).slice(8, -1);
   switch (r) {
     case "Array":
-      return [Ks, Yn];
+      return [Js, Yn];
     case "Object":
       return [Pl, Yn];
     case "Date":
@@ -34974,10 +34974,10 @@ const YS = -1, nO = 0, Ks = 1, Pl = 2, vd = 3, xd = 4, Td = 5, Xd = 6, ZS = 7, U
     case "Set":
       return [Xd, Yn];
     case "DataView":
-      return [Ks, r];
+      return [Js, r];
   }
-  return r.includes("Array") ? [Ks, r] : r.includes("Error") ? [ZS, r] : [Pl, r];
-}, $o = ([t, e]) => t === nO && (e === "function" || e === "symbol"), vce = (t, e, r, i) => {
+  return r.includes("Array") ? [Js, r] : r.includes("Error") ? [ZS, r] : [Pl, r];
+}, Qo = ([t, e]) => t === nO && (e === "function" || e === "symbol"), vce = (t, e, r, i) => {
   const n = (a, o) => {
     const l = i.push(a) - 1;
     return r.set(o, l), l;
@@ -35003,7 +35003,7 @@ const YS = -1, nO = 0, Ks = 1, Pl = 2, vd = 3, xd = 4, Td = 5, Xd = 6, ZS = 7, U
         }
         return n([o, h], a);
       }
-      case Ks: {
+      case Js: {
         if (l) {
           let u = a;
           return l === "DataView" ? u = new Uint8Array(a.buffer) : l === "ArrayBuffer" && (u = new Uint8Array(a)), n([l, [...u]], a);
@@ -35027,7 +35027,7 @@ const YS = -1, nO = 0, Ks = 1, Pl = 2, vd = 3, xd = 4, Td = 5, Xd = 6, ZS = 7, U
           return s(a.toJSON());
         const h = [], c = n([o, h], a);
         for (const u of Pce(a))
-          (t || !$o(Es(a[u]))) && h.push([s(u), s(a[u])]);
+          (t || !Qo(Es(a[u]))) && h.push([s(u), s(a[u])]);
         return c;
       }
       case vd:
@@ -35039,13 +35039,13 @@ const YS = -1, nO = 0, Ks = 1, Pl = 2, vd = 3, xd = 4, Td = 5, Xd = 6, ZS = 7, U
       case Td: {
         const h = [], c = n([o, h], a);
         for (const [u, d] of a)
-          (t || !($o(Es(u)) || $o(Es(d)))) && h.push([s(u), s(d)]);
+          (t || !(Qo(Es(u)) || Qo(Es(d)))) && h.push([s(u), s(d)]);
         return c;
       }
       case Xd: {
         const h = [], c = n([o, h], a);
         for (const u of a)
-          (t || !$o(Es(u))) && h.push(s(u));
+          (t || !Qo(Es(u))) && h.push(s(u));
         return c;
       }
     }
@@ -35273,7 +35273,7 @@ const Zm = (
    * @returns {UnistNode | undefined}
    */
   (function(t, e, r) {
-    const i = Ua(r);
+    const i = qa(r);
     if (!t || !t.type || !t.children)
       throw new Error("Expected parent node");
     if (typeof e == "number") {
@@ -39302,22 +39302,22 @@ function phe(t) {
     ]
   };
 }
-var Wn = "[0-9](_*[0-9])*", Qo = `\\.(${Wn})`, yo = "[0-9a-fA-F](_*[0-9a-fA-F])*", Vm = {
+var Wn = "[0-9](_*[0-9])*", yo = `\\.(${Wn})`, bo = "[0-9a-fA-F](_*[0-9a-fA-F])*", Vm = {
   className: "number",
   variants: [
     // DecimalFloatingPointLiteral
     // including ExponentPart
-    { begin: `(\\b(${Wn})((${Qo})|\\.)?|(${Qo}))[eE][+-]?(${Wn})[fFdD]?\\b` },
+    { begin: `(\\b(${Wn})((${yo})|\\.)?|(${yo}))[eE][+-]?(${Wn})[fFdD]?\\b` },
     // excluding ExponentPart
-    { begin: `\\b(${Wn})((${Qo})[fFdD]?\\b|\\.([fFdD]\\b)?)` },
-    { begin: `(${Qo})[fFdD]?\\b` },
+    { begin: `\\b(${Wn})((${yo})[fFdD]?\\b|\\.([fFdD]\\b)?)` },
+    { begin: `(${yo})[fFdD]?\\b` },
     { begin: `\\b(${Wn})[fFdD]\\b` },
     // HexadecimalFloatingPointLiteral
-    { begin: `\\b0[xX]((${yo})\\.?|(${yo})?\\.(${yo}))[pP][+-]?(${Wn})[fFdD]?\\b` },
+    { begin: `\\b0[xX]((${bo})\\.?|(${bo})?\\.(${bo}))[pP][+-]?(${Wn})[fFdD]?\\b` },
     // DecimalIntegerLiteral
     { begin: "\\b(0|[1-9](_*[0-9])*)[lL]?\\b" },
     // HexIntegerLiteral
-    { begin: `\\b0[xX](${yo})[lL]?\\b` },
+    { begin: `\\b0[xX](${bo})[lL]?\\b` },
     // OctalIntegerLiteral
     { begin: "\\b0(_*[0-7])*[lL]?\\b" },
     // BinaryIntegerLiteral
@@ -40229,22 +40229,22 @@ function bhe(t) {
     illegal: "\\S"
   };
 }
-var Vn = "[0-9](_*[0-9])*", bo = `\\.(${Vn})`, So = "[0-9a-fA-F](_*[0-9a-fA-F])*", She = {
+var Vn = "[0-9](_*[0-9])*", So = `\\.(${Vn})`, ko = "[0-9a-fA-F](_*[0-9a-fA-F])*", She = {
   className: "number",
   variants: [
     // DecimalFloatingPointLiteral
     // including ExponentPart
-    { begin: `(\\b(${Vn})((${bo})|\\.)?|(${bo}))[eE][+-]?(${Vn})[fFdD]?\\b` },
+    { begin: `(\\b(${Vn})((${So})|\\.)?|(${So}))[eE][+-]?(${Vn})[fFdD]?\\b` },
     // excluding ExponentPart
-    { begin: `\\b(${Vn})((${bo})[fFdD]?\\b|\\.([fFdD]\\b)?)` },
-    { begin: `(${bo})[fFdD]?\\b` },
+    { begin: `\\b(${Vn})((${So})[fFdD]?\\b|\\.([fFdD]\\b)?)` },
+    { begin: `(${So})[fFdD]?\\b` },
     { begin: `\\b(${Vn})[fFdD]\\b` },
     // HexadecimalFloatingPointLiteral
-    { begin: `\\b0[xX]((${So})\\.?|(${So})?\\.(${So}))[pP][+-]?(${Vn})[fFdD]?\\b` },
+    { begin: `\\b0[xX]((${ko})\\.?|(${ko})?\\.(${ko}))[pP][+-]?(${Vn})[fFdD]?\\b` },
     // DecimalIntegerLiteral
     { begin: "\\b(0|[1-9](_*[0-9])*)[lL]?\\b" },
     // HexIntegerLiteral
-    { begin: `\\b0[xX](${So})[lL]?\\b` },
+    { begin: `\\b0[xX](${ko})[lL]?\\b` },
     // OctalIntegerLiteral
     { begin: "\\b0(_*[0-7])*[lL]?\\b" },
     // BinaryIntegerLiteral
@@ -46240,7 +46240,7 @@ const zd = (t) => rt(
   HS,
   /\d/,
   /[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]/
-), ti = rt(HS, xl, "*"), ko = rt(/[A-Z]/, xl, "*"), lue = [
+), ti = rt(HS, xl, "*"), wo = rt(/[A-Z]/, xl, "*"), lue = [
   "attached",
   "autoclosure",
   rt(/convention\(/, sr("swift", "block", "c"), /\)/),
@@ -46491,7 +46491,7 @@ function cue(t) {
       {
         // Type identifier
         className: "type",
-        match: ko,
+        match: wo,
         relevance: 0
       },
       {
@@ -46506,7 +46506,7 @@ function cue(t) {
       },
       {
         // Protocol composition
-        match: rt(/\s+&\s+/, Cs(ko)),
+        match: rt(/\s+&\s+/, Cs(wo)),
         relevance: 0
       }
     ]
@@ -46633,7 +46633,7 @@ function cue(t) {
     begin: [
       /precedencegroup/,
       /\s+/,
-      ko
+      wo
     ],
     className: {
       1: "keyword",
@@ -46690,7 +46690,7 @@ function cue(t) {
         contains: [
           {
             scope: "title.class.inherited",
-            match: ko
+            match: wo
           },
           ...h
         ],
@@ -48874,7 +48874,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
           const tt = Fr.case_insensitive ? Qe[0].toLowerCase() : Qe[0], Nt = Ar(Xe, tt);
           if (Nt) {
             const [yi, vk] = Nt;
-            if (Dt.addText(Ze), Ze = "", Xt[tt] = (Xt[tt] || 0) + 1, Xt[tt] <= $s && (Va += vk), yi.startsWith("_"))
+            if (Dt.addText(Ze), Ze = "", Xt[tt] = (Xt[tt] || 0) + 1, Xt[tt] <= $s && (Da += vk), yi.startsWith("_"))
               Ze += Qe[0];
             else {
               const xk = Fr.classNameAliases[yi] || yi;
@@ -48886,7 +48886,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
         }
         Ze += ot.substring(he), Dt.addText(Ze);
       }
-      function Aa() {
+      function Wa() {
         if (ot === "") return;
         let he = null;
         if (typeof Xe.subLanguage == "string") {
@@ -48898,10 +48898,10 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
           he._top;
         } else
           he = A(ot, Xe.subLanguage.length ? Xe.subLanguage : null);
-        Xe.relevance > 0 && (Va += he.relevance), Dt.__addSublanguage(he._emitter, he.language);
+        Xe.relevance > 0 && (Da += he.relevance), Dt.__addSublanguage(he._emitter, he.language);
       }
       function Qr() {
-        Xe.subLanguage != null ? Aa() : Ai(), ot = "";
+        Xe.subLanguage != null ? Wa() : Ai(), ot = "";
       }
       function Nr(he, Qe) {
         he !== "" && (Dt.startScope(Qe), Dt.addText(he), Dt.endScope());
@@ -48954,7 +48954,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
         const Nt = Xe;
         Xe.endScope && Xe.endScope._wrap ? (Qr(), Nr(Qe, Xe.endScope._wrap)) : Xe.endScope && Xe.endScope._multi ? (Qr(), Ud(Xe.endScope, he)) : Nt.skip ? ot += Qe : (Nt.returnEnd || Nt.excludeEnd || (ot += Qe), Qr(), Nt.excludeEnd && (ot = Qe));
         do
-          Xe.scope && Dt.closeNode(), !Xe.skip && !Xe.subLanguage && (Va += Xe.relevance), Xe = Xe.parent;
+          Xe.scope && Dt.closeNode(), !Xe.skip && !Xe.subLanguage && (Da += Xe.relevance), Xe = Xe.parent;
         while (Xe !== tt.parent);
         return tt.starts && qd(tt.starts, he), Nt.returnEnd ? 0 : Qe.length;
       }
@@ -48964,19 +48964,19 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
           Qe.scope && he.unshift(Qe.scope);
         he.forEach((Qe) => Dt.openNode(Qe));
       }
-      let Wa = {};
+      let Va = {};
       function Wd(he, Qe) {
         const Ze = Qe && Qe[0];
         if (ot += he, Ze == null)
           return Qr(), 0;
-        if (Wa.type === "begin" && Qe.type === "end" && Wa.index === Qe.index && Ze === "") {
+        if (Va.type === "begin" && Qe.type === "end" && Va.index === Qe.index && Ze === "") {
           if (ot += Se.slice(Qe.index, Qe.index + 1), !ht) {
             const tt = new Error(`0 width match regex (${ne})`);
-            throw tt.languageName = ne, tt.badRule = Wa.rule, tt;
+            throw tt.languageName = ne, tt.badRule = Va.rule, tt;
           }
           return 1;
         }
-        if (Wa = Qe, Qe.type === "begin")
+        if (Va = Qe, Qe.type === "begin")
           return Sk(Qe);
         if (Qe.type === "illegal" && !je) {
           const tt = new Error('Illegal lexeme "' + Ze + '" for mode "' + (Xe.scope || "<unnamed>") + '"');
@@ -49000,7 +49000,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
       let oO = "", Xe = at || Pk;
       const Vd = {}, Dt = new de.__emitter(de);
       wk();
-      let ot = "", Va = 0, rn = 0, lO = 0, OO = !1;
+      let ot = "", Da = 0, rn = 0, lO = 0, OO = !1;
       try {
         if (Fr.__emitTokens)
           Fr.__emitTokens(Se, Dt);
@@ -49017,7 +49017,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
         return Dt.finalize(), oO = Dt.toHTML(), {
           language: ne,
           value: oO,
-          relevance: Va,
+          relevance: Da,
           illegal: !1,
           _emitter: Dt,
           _top: Xe
@@ -49076,8 +49076,8 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
             return -1;
         }
         return 0;
-      }), [Ar, Ai] = Xt, Aa = Ar;
-      return Aa.secondBest = Ai, Aa;
+      }), [Ar, Ai] = Xt, Wa = Ar;
+      return Wa.secondBest = Ai, Wa;
     }
     function ee(ne, Se, je) {
       const at = Se && le[Se] || je;
@@ -49228,7 +49228,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Xt = ne, at = Se), je
   return $i.newInstance = () => Xn({}), xc = $i, $i.HighlightJS = $i, $i.default = $i, xc;
 }
 var $ue = /* @__PURE__ */ _ue();
-const Que = /* @__PURE__ */ ya($ue), Gm = {}, yue = "hljs-";
+const Que = /* @__PURE__ */ ba($ue), Gm = {}, yue = "hljs-";
 function bue(t) {
   const e = Que.newInstance();
   return t && s(t), {
@@ -49560,7 +49560,7 @@ const Zue = [
   "track",
   "wbr"
 ];
-class qa {
+class Aa {
   /**
    * @param {SchemaType['property']} property
    *   Property.
@@ -49575,14 +49575,14 @@ class qa {
     this.normal = r, this.property = e, i && (this.space = i);
   }
 }
-qa.prototype.normal = {};
-qa.prototype.property = {};
-qa.prototype.space = void 0;
+Aa.prototype.normal = {};
+Aa.prototype.property = {};
+Aa.prototype.space = void 0;
 function ak(t, e) {
   const r = {}, i = {};
   for (const n of t)
     Object.assign(r, n.property), Object.assign(i, n.normal);
-  return new qa(r, i, e);
+  return new Aa(r, i, e);
 }
 function Ou(t) {
   return t.toLowerCase();
@@ -49668,7 +49668,7 @@ function ms(t) {
     );
     t.mustUseProperty && t.mustUseProperty.includes(i) && (s.mustUseProperty = !0), e[i] = s, r[Ou(i)] = i, r[Ou(s.attribute)] = i;
   }
-  return new qa(e, r, t.space);
+  return new Aa(e, r, t.space);
 }
 const ok = ms({
   properties: {
@@ -51121,9 +51121,9 @@ const ide = [
   "para",
   "times"
 ], fk = {}.hasOwnProperty, uu = {};
-let wo;
-for (wo in Xc)
-  fk.call(Xc, wo) && (uu[Xc[wo]] = wo);
+let Po;
+for (Po in Xc)
+  fk.call(Xc, Po) && (uu[Xc[Po]] = Po);
 const sde = /[^\dA-Za-z]/;
 function ade(t, e, r, i) {
   const n = String.fromCharCode(t);
@@ -51318,7 +51318,7 @@ function Yde(t, e, r) {
   const i = pk(r, e), n = Et(t, -1);
   return r && i && i.type === "element" && (i.tagName === "thead" || i.tagName === "tbody") && Yd(i, r.children.indexOf(i), r) ? !1 : !!(n && n.type === "element" && n.tagName === "tr");
 }
-const Po = {
+const vo = {
   // See: <https://html.spec.whatwg.org/#attribute-name-state>.
   name: [
     [`	
@@ -51384,7 +51384,7 @@ function qde(t, e, r) {
     i.attribute,
     Object.assign({}, t.settings.characterReferences, {
       // Always encode without parse errors in non-HTML.
-      subset: Po.name[n][s]
+      subset: vo.name[n][s]
     })
   );
   return r === !0 || (r = Array.isArray(r) ? (i.commaSeparated ? dde : fde)(r, {
@@ -51393,13 +51393,13 @@ function qde(t, e, r) {
     r,
     Object.assign({}, t.settings.characterReferences, {
       attribute: !0,
-      subset: Po.unquoted[n][s]
+      subset: vo.unquoted[n][s]
     })
   )), o !== r && (t.settings.quoteSmart && kl(r, a) > kl(r, t.alternative) && (a = t.alternative), o = a + Kn(
     r,
     Object.assign({}, t.settings.characterReferences, {
       // Always encode without parse errors in non-HTML.
-      subset: (a === "'" ? Po.single : Po.double)[n][s],
+      subset: (a === "'" ? vo.single : vo.double)[n][s],
       attribute: !0
     })
   ) + a), l + (o && "=" + o));
@@ -51522,20 +51522,20 @@ const efe = {
   }
 };
 function tfe({ tabs: t, activeTabId: e, onSelect: r, onClose: i }) {
-  return t.length === 0 ? null : /* @__PURE__ */ q.jsx("div", { style: vo.bar, children: t.map((n) => {
+  return t.length === 0 ? null : /* @__PURE__ */ q.jsx("div", { style: xo.bar, children: t.map((n) => {
     const s = n.id === e;
     return /* @__PURE__ */ q.jsxs(
       "div",
       {
         onClick: () => r(n.id),
         style: {
-          ...vo.tab,
+          ...xo.tab,
           backgroundColor: s ? "var(--bg-base)" : "var(--bg-crust)",
           borderBottomColor: s ? "var(--accent-blue)" : "transparent"
         },
         children: [
           /* @__PURE__ */ q.jsxs("span", { style: {
-            ...vo.tabName,
+            ...xo.tabName,
             color: s ? "var(--text-primary)" : "var(--text-muted)"
           }, children: [
             n.isDirty ? "• " : "",
@@ -51547,7 +51547,7 @@ function tfe({ tabs: t, activeTabId: e, onSelect: r, onClose: i }) {
               onClick: (a) => {
                 a.stopPropagation(), i(n.id);
               },
-              style: vo.closeBtn,
+              style: xo.closeBtn,
               children: "✕"
             }
           )
@@ -51557,7 +51557,7 @@ function tfe({ tabs: t, activeTabId: e, onSelect: r, onClose: i }) {
     );
   }) });
 }
-const vo = {
+const xo = {
   bar: {
     display: "flex",
     overflowX: "auto",
@@ -58651,7 +58651,6 @@ const Sfe = {
   flex: 1,
   position: "relative"
 }, Xfe = [
-  { label: "⌨", value: "keyboard" },
   { label: "Esc", value: Fk },
   { label: "Tab", value: Hk },
   { label: "C-c", value: "" },
@@ -58666,12 +58665,11 @@ const Sfe = {
   { label: "-", value: "-" },
   { label: "_", value: "_" },
   // Arrow keys handled separately as dpad
-  { label: "↑", value: ba },
-  { label: "↓", value: Sa },
-  { label: "←", value: ka },
-  { label: "→", value: wa }
+  { label: "↑", value: Sa },
+  { label: "↓", value: ka },
+  { label: "←", value: wa },
+  { label: "→", value: Pa }
 ], Rfe = [
-  { label: "⌨", value: "keyboard" },
   { label: "Save", value: "save" },
   { label: "Undo", value: "undo" },
   { label: "Redo", value: "redo" },
@@ -58685,17 +58683,18 @@ const Sfe = {
   { label: '"', value: '"' },
   { label: "'", value: "'" },
   // Arrow keys handled separately as dpad
-  { label: "↑", value: ba },
-  { label: "↓", value: Sa },
-  { label: "←", value: ka },
-  { label: "→", value: wa }
-], zfe = /* @__PURE__ */ new Set([ba, Sa, ka, wa]), Efe = 8;
+  { label: "↑", value: Sa },
+  { label: "↓", value: ka },
+  { label: "←", value: wa },
+  { label: "→", value: Pa }
+], zfe = /* @__PURE__ */ new Set([Sa, ka, wa, Pa]), Efe = 8;
 function Cfe({ keyDef: t, onPress: e }) {
   const r = or(null);
   return /* @__PURE__ */ q.jsx(
     "button",
     {
       tabIndex: -1,
+      onTouchStart: (i) => i.preventDefault(),
       onMouseDown: (i) => i.preventDefault(),
       onPointerDown: (i) => {
         i.preventDefault(), r.current = { x: i.clientX, y: i.clientY };
@@ -58708,21 +58707,22 @@ function Cfe({ keyDef: t, onPress: e }) {
       onPointerCancel: () => {
         r.current = null;
       },
-      style: Afe,
+      style: Wfe,
       children: t.label
     }
   );
 }
-function xo({ keyDef: t, onPress: e }) {
+function Zs({ keyDef: t, onPress: e }) {
   return /* @__PURE__ */ q.jsx(
     "button",
     {
       tabIndex: -1,
+      onTouchStart: (r) => r.preventDefault(),
       onMouseDown: (r) => r.preventDefault(),
       onPointerDown: (r) => {
         r.preventDefault(), e(t.value);
       },
-      style: Wfe,
+      style: Vfe,
       children: t.label
     }
   );
@@ -58730,19 +58730,22 @@ function xo({ keyDef: t, onPress: e }) {
 function Yfe({ context: t, onKeyPress: e }) {
   const r = t === "terminal" ? Xfe : t === "code-editor" ? Rfe : [];
   if (r.length === 0) return null;
-  const i = r.filter((l) => !zfe.has(l.value)), n = r.find((l) => l.value === ba), s = r.find((l) => l.value === Sa), a = r.find((l) => l.value === ka), o = r.find((l) => l.value === wa);
+  const i = r.filter((l) => !zfe.has(l.value)), n = r.find((l) => l.value === Sa), s = r.find((l) => l.value === ka), a = r.find((l) => l.value === wa), o = r.find((l) => l.value === Pa);
   return /* @__PURE__ */ q.jsxs("div", { style: Zfe, children: [
     /* @__PURE__ */ q.jsx("div", { style: Ufe, children: i.map((l) => /* @__PURE__ */ q.jsx(Cfe, { keyDef: l, onPress: e }, l.label)) }),
     /* @__PURE__ */ q.jsxs("div", { style: qfe, children: [
-      /* @__PURE__ */ q.jsx("div", {}),
-      /* @__PURE__ */ q.jsx(xo, { keyDef: n, onPress: e }),
-      /* @__PURE__ */ q.jsx("div", {}),
-      /* @__PURE__ */ q.jsx(xo, { keyDef: a, onPress: e }),
-      /* @__PURE__ */ q.jsx("div", {}),
-      /* @__PURE__ */ q.jsx(xo, { keyDef: o, onPress: e }),
-      /* @__PURE__ */ q.jsx("div", {}),
-      /* @__PURE__ */ q.jsx(xo, { keyDef: s, onPress: e }),
-      /* @__PURE__ */ q.jsx("div", {})
+      /* @__PURE__ */ q.jsx(Zs, { keyDef: { label: "⌨", value: "keyboard" }, onPress: e }),
+      /* @__PURE__ */ q.jsxs("div", { style: Afe, children: [
+        /* @__PURE__ */ q.jsx("div", {}),
+        /* @__PURE__ */ q.jsx(Zs, { keyDef: n, onPress: e }),
+        /* @__PURE__ */ q.jsx("div", {}),
+        /* @__PURE__ */ q.jsx(Zs, { keyDef: a, onPress: e }),
+        /* @__PURE__ */ q.jsx("div", {}),
+        /* @__PURE__ */ q.jsx(Zs, { keyDef: o, onPress: e }),
+        /* @__PURE__ */ q.jsx("div", {}),
+        /* @__PURE__ */ q.jsx(Zs, { keyDef: s, onPress: e }),
+        /* @__PURE__ */ q.jsx("div", {})
+      ] })
     ] })
   ] });
 }
@@ -58762,15 +58765,19 @@ const Zfe = {
   maxHeight: 84,
   alignContent: "flex-start"
 }, qfe = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 3,
+  padding: 4,
+  flexShrink: 0,
+  borderLeft: "1px solid var(--bg-surface0)"
+}, Afe = {
   display: "grid",
   gridTemplateColumns: "repeat(3, 30px)",
   gridTemplateRows: "repeat(3, 26px)",
-  gap: 2,
-  padding: 4,
-  flexShrink: 0,
-  alignSelf: "center",
-  borderLeft: "1px solid var(--bg-surface0)"
-}, Afe = {
+  gap: 2
+}, Wfe = {
   flexShrink: 0,
   minWidth: 40,
   height: 34,
@@ -58786,7 +58793,7 @@ const Zfe = {
   alignItems: "center",
   justifyContent: "center",
   ...__
-}, Wfe = {
+}, Vfe = {
   width: "100%",
   height: "100%",
   border: "1px solid var(--bg-surface1)",
@@ -58803,7 +58810,7 @@ const Zfe = {
   padding: 0,
   ...__
 };
-class Vfe {
+class Dfe {
   constructor() {
     Ve(this, "tabs", []);
     Ve(this, "activeTabId", null);
@@ -58870,7 +58877,7 @@ class Vfe {
   }
 }
 const O_ = __APP_VERSION__, c_ = __BUILD_NUMBER__;
-function Dfe() {
+function jfe() {
   const [t, e] = qe(0);
   return er(() => {
     const r = window.visualViewport;
@@ -58882,7 +58889,7 @@ function Dfe() {
     return r.addEventListener("resize", i), () => r.removeEventListener("resize", i);
   }, []), t;
 }
-function jfe({ ftm: t, sftpId: e }) {
+function Lfe({ ftm: t, sftpId: e }) {
   const [r, i] = qe([]), [n, s] = qe(null), [a, o] = qe(!1);
   er(() => {
     const O = () => {
@@ -58939,8 +58946,8 @@ function jfe({ ftm: t, sftpId: e }) {
     ) : n != null && n.isLoading ? /* @__PURE__ */ q.jsx("div", { style: Zt.placeholder, children: /* @__PURE__ */ q.jsx("span", { style: { color: "var(--text-muted)" }, children: "Loading..." }) }) : /* @__PURE__ */ q.jsx("div", { style: Zt.placeholder, children: /* @__PURE__ */ q.jsx("span", { style: { color: "var(--text-muted)" }, children: "Select a file" }) })
   ] });
 }
-function npe() {
-  const t = Dfe(), [e, r] = qe("workspace-list"), [i, n] = qe("terminal"), [s, a] = qe(() => localStorage.getItem("intode_debug") === "true");
+function spe() {
+  const t = jfe(), [e, r] = qe("workspace-list"), [i, n] = qe("terminal"), [s, a] = qe(() => localStorage.getItem("intode_debug") === "true");
   er(() => {
     const Z = (j) => j.preventDefault();
     return document.addEventListener("contextmenu", Z), () => document.removeEventListener("contextmenu", Z);
@@ -58949,7 +58956,7 @@ function npe() {
     a(Z), localStorage.setItem("intode_debug", String(Z));
   }, []), [l, O] = qe([]), [h, c] = qe(null), [u, d] = qe(null), [$, Q] = qe(null), [f, p] = qe("list"), [g, _] = qe(0), y = or(/* @__PURE__ */ new Map()), b = l.find((Z) => Z.wsId === h) ?? null, m = new Set(l.map((Z) => Z.wsId)), k = dr((Z) => {
     let j = y.current.get(Z);
-    return j || (j = new Vfe(), y.current.set(Z, j)), j;
+    return j || (j = new Dfe(), y.current.set(Z, j)), j;
   }, []), S = dr(
     (Z) => {
       if (l.find((B) => B.wsId === Z.id)) {
@@ -59124,7 +59131,7 @@ function npe() {
                     display: j && i === "editor" ? "flex" : "none",
                     flexDirection: "column"
                   },
-                  children: /* @__PURE__ */ q.jsx(jfe, { ftm: B, sftpId: Z.sftpId })
+                  children: /* @__PURE__ */ q.jsx(Lfe, { ftm: B, sftpId: Z.sftpId })
                 }
               ),
               /* @__PURE__ */ q.jsx("div", { style: { ...Zt.tabContent, display: j && i === "terminal" ? "flex" : "none" }, children: /* @__PURE__ */ q.jsx(
@@ -59173,7 +59180,7 @@ function npe() {
               } else if (i === "editor") {
                 const j = ZY();
                 if (!j) return;
-                Z === "save" ? j.save() : Z === "undo" ? j.undo() : Z === "redo" ? j.redo() : Z === "tab" ? j.insertText("	") : Z === ba ? j.cursorUp() : Z === Sa ? j.cursorDown() : Z === ka ? j.cursorLeft() : Z === wa ? j.cursorRight() : j.insertText(Z);
+                Z === "save" ? j.save() : Z === "undo" ? j.undo() : Z === "redo" ? j.redo() : Z === "tab" ? j.insertText("	") : Z === Sa ? j.cursorUp() : Z === ka ? j.cursorDown() : Z === wa ? j.cursorLeft() : Z === Pa ? j.cursorRight() : j.insertText(Z);
               }
             }
           }
@@ -59257,22 +59264,22 @@ const Zt = {
     fontSize: 16
   }
 }, Zd = [], Qk = [];
-function spe(t) {
+function ape(t) {
   Zd.push(t);
 }
-function ape() {
+function ope() {
   return Zd;
 }
-function ope(t) {
+function lpe(t) {
   return Zd.find((e) => e.canHandle(t)) ?? null;
 }
-function lpe(t) {
+function Ope(t) {
   Qk.push(t);
 }
-function Ope() {
+function cpe() {
   return Qk;
 }
-const cpe = {
+const hpe = {
   // Background / Foreground — Cyberpunk Obsidian
   "--bg-base": "#030303",
   "--bg-mantle": "#0a0c0a",
@@ -59298,37 +59305,37 @@ const cpe = {
   "--term-cursor": "#00ff66",
   "--term-selection": "rgba(0, 255, 102, 0.2)"
 };
-function hpe(t) {
+function upe(t) {
   const e = document.documentElement;
   for (const [r, i] of Object.entries(t))
     e.style.setProperty(r, i);
 }
 export {
-  npe as A,
+  spe as A,
   Wb as B,
   fs as C,
-  cpe as D,
+  hpe as D,
   be as E,
-  Vfe as F,
+  Dfe as F,
   ZY as G,
-  Ope as H,
+  cpe as H,
   Id as I,
-  ape as J,
-  ope as K,
+  ope as J,
+  lpe as K,
   Ut as L,
   Jde as M,
   Xl as N,
   Ak as O,
   Vb as P,
   mn as Q,
-  lpe as R,
+  Ope as R,
   _t as S,
   qk as T,
-  spe as U,
-  Mfe as V,
+  ape as U,
+  Gfe as V,
   Kde as W,
-  Bfe as X,
-  Gfe as Y,
+  Nfe as X,
+  Bfe as Y,
   Vk as Z,
   K as a,
   It as b,
@@ -59337,7 +59344,7 @@ export {
   Mt as e,
   hr as f,
   Ge as g,
-  fa as h,
+  pa as h,
   tr as i,
   as as j,
   yy as k,
@@ -59353,7 +59360,7 @@ export {
   zw as u,
   ffe as v,
   $fe as w,
-  hpe as x,
+  upe as x,
   fu as y,
   p_ as z
 };
