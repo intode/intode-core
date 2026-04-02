@@ -46,12 +46,56 @@ function useKeyboardHeight() {
   return height;
 }
 
+// --- Per-workspace Editor panel (self-contained state) ---
+
+function WorkspaceEditor({ ftm }: { ftm: FileTabManager }) {
+  const [tabs, setTabs] = useState<FileTab[]>([]);
+  const [active, setActive] = useState<FileTab | null>(null);
+
+  useEffect(() => {
+    const sync = () => {
+      setTabs([...ftm.getTabs()]);
+      setActive(ftm.getActiveTab());
+    };
+    ftm.setOnChange(sync);
+    sync();
+    return () => ftm.setOnChange(() => {});
+  }, [ftm]);
+
+  return (
+    <>
+      <EditorTabs
+        tabs={tabs}
+        activeTabId={active?.id ?? null}
+        onSelect={(id) => ftm.setActiveTab(id)}
+        onClose={(id) => ftm.closeTab(id)}
+      />
+      {active?.content != null ? (
+        active.type === 'markdown' ? (
+          <MarkdownPreview content={active.content} visible={true} />
+        ) : (
+          <CodeViewer content={active.content} fileName={active.fileName} visible={true} />
+        )
+      ) : active?.isLoading ? (
+        <div style={styles.placeholder}>
+          <span style={{ color: 'var(--text-muted)' }}>Loading...</span>
+        </div>
+      ) : (
+        <div style={styles.placeholder}>
+          <span style={{ color: 'var(--text-muted)' }}>Select a file</span>
+        </div>
+      )}
+    </>
+  );
+}
+
+// --- Main App ---
+
 export function App() {
   const keyboardHeight = useKeyboardHeight();
   const [screen, setScreen] = useState<Screen>('workspace-list');
   const [activeTab, setActiveTab] = useState<TabId>('terminal');
 
-  // Multi-workspace: keep all connections alive
   const [connections, setConnections] = useState<ConnectedWorkspace[]>([]);
   const [activeWsId, setActiveWsId] = useState<string | null>(null);
   const [connectingWorkspace, setConnectingWorkspace] = useState<Workspace | null>(null);
@@ -60,12 +104,9 @@ export function App() {
   const [addReturnTo, setAddReturnTo] = useState<'list' | 'view'>('list');
   const [listKey, setListKey] = useState(0);
 
-  // Per-workspace FileTabManagers
+  // Per-workspace FileTabManagers (stable across renders)
   const ftmRef = useRef(new Map<string, FileTabManager>());
-  const [fileTabs, setFileTabs] = useState<FileTab[]>([]);
-  const [activeFileTab, setActiveFileTab] = useState<FileTab | null>(null);
 
-  // Derived
   const activeConn = connections.find((c) => c.wsId === activeWsId) ?? null;
   const connectedIds = new Set(connections.map((c) => c.wsId));
 
@@ -77,23 +118,6 @@ export function App() {
     }
     return mgr;
   }, []);
-
-  // Sync file tab state when active workspace changes
-  useEffect(() => {
-    if (!activeWsId) {
-      setFileTabs([]);
-      setActiveFileTab(null);
-      return;
-    }
-    const mgr = getFileTabMgr(activeWsId);
-    const sync = () => {
-      setFileTabs([...mgr.getTabs()]);
-      setActiveFileTab(mgr.getActiveTab());
-    };
-    mgr.setOnChange(sync);
-    sync();
-    return () => mgr.setOnChange(() => {});
-  }, [activeWsId, getFileTabMgr]);
 
   // --- Handlers ---
 
@@ -183,17 +207,6 @@ export function App() {
     [editingWorkspace, addReturnTo],
   );
 
-  const handleFileSelect = useCallback(
-    async (path: string) => {
-      if (!activeConn?.sftpId || !activeWsId) return;
-      const type = detectFileType(path.split('/').pop() ?? '');
-      if (type === 'binary') return;
-      await getFileTabMgr(activeWsId).openFile(activeConn.sftpId, path);
-      setActiveTab('editor');
-    },
-    [activeConn, activeWsId, getFileTabMgr],
-  );
-
   // --- Screens ---
 
   if (screen === 'settings') {
@@ -263,11 +276,10 @@ export function App() {
     );
   }
 
-  // --- Workspace view ---
+  // --- Workspace view: ALL workspaces stay mounted ---
   return (
     <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight }}>
       <div style={styles.container}>
-        {/* Status bar */}
         <div style={styles.statusBar}>
           {activeConn && (
             <WorkspaceDropdown
@@ -288,65 +300,60 @@ export function App() {
         </div>
 
         <div style={styles.content}>
-          {/* Files — active workspace only */}
-          <div style={{ ...styles.tabContent, display: activeTab === 'files' ? 'flex' : 'none' }}>
-            {activeConn?.sftpId ? (
-              <FileTree sftpId={activeConn.sftpId} rootPath={activeConn.workspace.defaultPath} onFileSelect={handleFileSelect} />
-            ) : activeConn?.sftpError ? (
-              <div style={styles.placeholder}>
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ color: 'var(--accent-red)', marginBottom: 8 }}>SFTP connection failed</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{activeConn.sftpError}</p>
+          {connections.map((conn) => {
+            const isActive = conn.wsId === activeWsId;
+            const ftm = getFileTabMgr(conn.wsId);
+            return (
+              <React.Fragment key={conn.wsId}>
+                {/* Files — per workspace, always mounted */}
+                <div style={{ ...styles.tabContent, display: isActive && activeTab === 'files' ? 'flex' : 'none' }}>
+                  {conn.sftpId ? (
+                    <FileTree
+                      sftpId={conn.sftpId}
+                      rootPath={conn.workspace.defaultPath}
+                      onFileSelect={async (path) => {
+                        const type = detectFileType(path.split('/').pop() ?? '');
+                        if (type === 'binary') return;
+                        await ftm.openFile(conn.sftpId!, path);
+                        setActiveTab('editor');
+                      }}
+                    />
+                  ) : conn.sftpError ? (
+                    <div style={styles.placeholder}>
+                      <div style={{ textAlign: 'center' }}>
+                        <p style={{ color: 'var(--accent-red)', marginBottom: 8 }}>SFTP connection failed</p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{conn.sftpError}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={styles.placeholder}>
+                      <span style={{ color: 'var(--text-muted)' }}>Connecting SFTP...</span>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ) : (
-              <div style={styles.placeholder}>
-                <span style={{ color: 'var(--text-muted)' }}>Connecting SFTP...</span>
-              </div>
-            )}
-          </div>
 
-          {/* Editor — active workspace only */}
-          <div style={{ ...styles.tabContent, display: activeTab === 'editor' ? 'flex' : 'none', flexDirection: 'column' }}>
-            <EditorTabs
-              tabs={fileTabs}
-              activeTabId={activeFileTab?.id ?? null}
-              onSelect={(id) => activeWsId && getFileTabMgr(activeWsId).setActiveTab(id)}
-              onClose={(id) => activeWsId && getFileTabMgr(activeWsId).closeTab(id)}
-            />
-            {activeFileTab?.content != null ? (
-              activeFileTab.type === 'markdown' ? (
-                <MarkdownPreview content={activeFileTab.content} visible={true} />
-              ) : (
-                <CodeViewer content={activeFileTab.content} fileName={activeFileTab.fileName} visible={true} />
-              )
-            ) : activeFileTab?.isLoading ? (
-              <div style={styles.placeholder}>
-                <span style={{ color: 'var(--text-muted)' }}>Loading...</span>
-              </div>
-            ) : (
-              <div style={styles.placeholder}>
-                <span style={{ color: 'var(--text-muted)' }}>Select a file</span>
-              </div>
-            )}
-          </div>
+                {/* Editor — per workspace, always mounted */}
+                <div
+                  style={{
+                    ...styles.tabContent,
+                    display: isActive && activeTab === 'editor' ? 'flex' : 'none',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <WorkspaceEditor ftm={ftm} />
+                </div>
 
-          {/* Terminals — ALL workspaces stay mounted (sessions preserved) */}
-          {connections.map((conn) => (
-            <div
-              key={`term-${conn.wsId}`}
-              style={{
-                ...styles.tabContent,
-                display: conn.wsId === activeWsId && activeTab === 'terminal' ? 'flex' : 'none',
-              }}
-            >
-              <TerminalTabs
-                sessionId={conn.sessionId}
-                defaultPath={conn.workspace.defaultPath}
-                visible={conn.wsId === activeWsId && activeTab === 'terminal'}
-              />
-            </div>
-          ))}
+                {/* Terminal — per workspace, always mounted */}
+                <div style={{ ...styles.tabContent, display: isActive && activeTab === 'terminal' ? 'flex' : 'none' }}>
+                  <TerminalTabs
+                    sessionId={conn.sessionId}
+                    defaultPath={conn.workspace.defaultPath}
+                    visible={isActive && activeTab === 'terminal'}
+                  />
+                </div>
+              </React.Fragment>
+            );
+          })}
         </div>
 
         {activeTab === 'terminal' && <ExtraKeyBar context="terminal" onKeyPress={() => {}} />}

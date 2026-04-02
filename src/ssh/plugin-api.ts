@@ -43,6 +43,7 @@ export interface SshPlugin {
     cols: number;
     rows: number;
     term?: string;
+    initialPath?: string;
   }): Promise<{ channelId: string }>;
   writeToShell(options: { channelId: string; data: string }): Promise<void>;
   resizeShell(options: { channelId: string; cols: number; rows: number }): Promise<void>;

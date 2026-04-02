@@ -44,6 +44,7 @@ export class TerminalManager {
     sshSessionId: string,
     cols: number,
     rows: number,
+    initialPath?: string,
   ): Promise<void> {
     // Register listener BEFORE openShell to avoid race condition
     // (Kotlin read thread starts immediately on channel.connect)
@@ -54,6 +55,7 @@ export class TerminalManager {
       sessionId: sshSessionId,
       cols,
       rows,
+      initialPath,
     });
 
     session.channelId = channelId;
