@@ -1,7 +1,7 @@
 var Tk = Object.defineProperty;
 var Xk = (t, e, r) => e in t ? Tk(t, e, { enumerable: !0, configurable: !0, writable: !0, value: r }) : t[e] = r;
 var Ve = (t, e, r) => Xk(t, typeof e != "symbol" ? e + "" : e, r);
-import du, { useState as qe, useEffect as er, useRef as or, useCallback as dr, forwardRef as Rk, useImperativeHandle as zk } from "react";
+import du, { useState as qe, useEffect as er, useRef as lr, useCallback as or, forwardRef as Rk, useImperativeHandle as zk } from "react";
 function ba(t) {
   return t && t.__esModule && Object.prototype.hasOwnProperty.call(t, "default") ? t.default : t;
 }
@@ -131,14 +131,14 @@ function Ck() {
         }
       return null;
     }
-    var W = Object.assign, Z = 0, j, B, I, T, P, Y, U;
+    var W = Object.assign, Y = 0, D, B, I, T, P, Z, U;
     function E() {
     }
     E.__reactDisabledLog = !0;
     function J() {
       {
-        if (Z === 0) {
-          j = console.log, B = console.info, I = console.warn, T = console.error, P = console.group, Y = console.groupCollapsed, U = console.groupEnd;
+        if (Y === 0) {
+          D = console.log, B = console.info, I = console.warn, T = console.error, P = console.group, Z = console.groupCollapsed, U = console.groupEnd;
           var A = {
             configurable: !0,
             enumerable: !0,
@@ -155,12 +155,12 @@ function Ck() {
             groupEnd: A
           });
         }
-        Z++;
+        Y++;
       }
     }
     function ce() {
       {
-        if (Z--, Z === 0) {
+        if (Y--, Y === 0) {
           var A = {
             configurable: !0,
             enumerable: !0,
@@ -168,7 +168,7 @@ function Ck() {
           };
           Object.defineProperties(console, {
             log: W({}, A, {
-              value: j
+              value: D
             }),
             info: W({}, A, {
               value: B
@@ -183,28 +183,28 @@ function Ck() {
               value: P
             }),
             groupCollapsed: W({}, A, {
-              value: Y
+              value: Z
             }),
             groupEnd: W({}, A, {
               value: U
             })
           });
         }
-        Z < 0 && g("disabledDepth fell below zero. This is a bug in React. Please file an issue.");
+        Y < 0 && g("disabledDepth fell below zero. This is a bug in React. Please file an issue.");
       }
     }
-    var ae = p.ReactCurrentDispatcher, D;
+    var ae = p.ReactCurrentDispatcher, j;
     function C(A, ee, ue) {
       {
-        if (D === void 0)
+        if (j === void 0)
           try {
             throw Error();
           } catch (Ne) {
             var Pe = Ne.stack.trim().match(/\n( *(at )?)/);
-            D = Pe && Pe[1] || "";
+            j = Pe && Pe[1] || "";
           }
         return `
-` + D + A;
+` + j + A;
       }
     }
     var F = !1, M;
@@ -1051,8 +1051,8 @@ const iw = (t) => {
         const X = p().then((R) => {
           const W = g(R, S);
           if (W) {
-            const Z = W(...z);
-            return v = Z == null ? void 0 : Z.remove, Z;
+            const Y = W(...z);
+            return v = Y == null ? void 0 : Y.remove, Y;
           } else
             throw new uO(`"${c}.${S}()" is not implemented on ${$}`, Jn.Unimplemented);
         });
@@ -1772,7 +1772,7 @@ function Kd(t) {
   Xo = t;
 }
 function fO({ enabled: t }) {
-  const [e, r] = qe(!1), [i, n] = qe(Hd()), s = or(null);
+  const [e, r] = qe(!1), [i, n] = qe(Hd()), s = lr(null);
   return er(() => (Kd(() => {
     n([...Hd()]);
   }), () => Kd(null)), []), er(() => {
@@ -1893,7 +1893,7 @@ function zw({ sftpId: t, rootPath: e, onFileSelect: r }) {
       n(Jd(l).map(ef)), a(!1);
     }).catch(() => a(!1)));
   }, [t, e]);
-  const o = dr(async (l) => {
+  const o = or(async (l) => {
     n((h) => Ro(h, l, (c) => c.isExpanded ? { ...c, isExpanded: !1 } : c.children !== void 0 ? { ...c, isExpanded: !0 } : { ...c, isLoading: !0, isExpanded: !0 }));
     const O = Q_(i, l);
     if (O && O.children === void 0)
@@ -2457,9 +2457,9 @@ function Vw(t) {
   return t < 65536 ? 1 : 2;
 }
 const Wc = /\r\n?|\n/;
-var lr = /* @__PURE__ */ (function(t) {
+var Or = /* @__PURE__ */ (function(t) {
   return t[t.Simple = 0] = "Simple", t[t.TrackDel = 1] = "TrackDel", t[t.TrackBefore = 2] = "TrackBefore", t[t.TrackAfter = 3] = "TrackAfter", t;
-})(lr || (lr = {}));
+})(Or || (Or = {}));
 class ui {
   // Sections are encoded as pairs of integers. The first is the
   // length in the current document, and the second is -1 for
@@ -2552,7 +2552,7 @@ class ui {
   mapDesc(e, r = !1) {
     return e.empty ? this : Dc(this, e, r);
   }
-  mapPos(e, r = -1, i = lr.Simple) {
+  mapPos(e, r = -1, i = Or.Simple) {
     let n = 0, s = 0;
     for (let a = 0; a < this.sections.length; ) {
       let o = this.sections[a++], l = this.sections[a++], O = n + o;
@@ -2561,7 +2561,7 @@ class ui {
           return s + (e - n);
         s += o;
       } else {
-        if (i != lr.Simple && O >= e && (i == lr.TrackDel && n < e && O > e || i == lr.TrackBefore && n < e || i == lr.TrackAfter && O > e))
+        if (i != Or.Simple && O >= e && (i == Or.TrackDel && n < e && O > e || i == Or.TrackBefore && n < e || i == Or.TrackAfter && O > e))
           return null;
         if (O > e || O == e && r < 0 && !o)
           return e == n || r < 0 ? s : s + l;
@@ -4097,7 +4097,7 @@ class Bi {
 }
 Bi.prototype.startSide = Bi.prototype.endSide = 0;
 Bi.prototype.point = !1;
-Bi.prototype.mapMode = lr.TrackDel;
+Bi.prototype.mapMode = Or.TrackDel;
 function _u(t, e) {
   return t == e || t.constructor == e.constructor && t.eq(e);
 }
@@ -5090,11 +5090,11 @@ class Ra extends dt {
     return super.range(e, r);
   }
 }
-Ra.prototype.mapMode = lr.TrackBefore;
+Ra.prototype.mapMode = Or.TrackBefore;
 Ra.prototype.point = !0;
 class _n extends dt {
   constructor(e, r, i, n, s, a) {
-    super(r, i, s, e), this.block = n, this.isReplace = a, this.mapMode = n ? r <= 0 ? lr.TrackBefore : lr.TrackAfter : lr.TrackDel;
+    super(r, i, s, e), this.block = n, this.isReplace = a, this.mapMode = n ? r <= 0 ? Or.TrackBefore : Or.TrackAfter : Or.TrackDel;
   }
   // Only relevant when this.block == true
   get type() {
@@ -8357,7 +8357,7 @@ var Ot = /* @__PURE__ */ (function(t) {
   return t[t.ByPos = 0] = "ByPos", t[t.ByHeight = 1] = "ByHeight", t[t.ByPosNoHeight = 2] = "ByPosNoHeight", t;
 })(Ot || (Ot = {}));
 const Yo = 1e-3;
-class cr {
+class hr {
   constructor(e, r, i = 2) {
     this.length = e, this.height = r, this.flags = i;
   }
@@ -8374,7 +8374,7 @@ class cr {
   // from the new nodes and returns that (HeightMapBranch and
   // HeightMapGap override this to actually use from/to)
   replace(e, r, i) {
-    return cr.of(i);
+    return hr.of(i);
   }
   // Again, these are base cases, and are overridden for branch and gap nodes.
   decomposeLeft(e, r) {
@@ -8424,15 +8424,15 @@ class cr {
         o && (s += o.size);
       }
     let a = 0;
-    return e[r - 1] == null ? (a = 1, r--) : e[r] == null && (a = 1, i++), new wP(cr.of(e.slice(0, r)), a, cr.of(e.slice(i)));
+    return e[r - 1] == null ? (a = 1, r--) : e[r] == null && (a = 1, i++), new wP(hr.of(e.slice(0, r)), a, hr.of(e.slice(i)));
   }
 }
 function ol(t, e) {
   return t == e ? t : (t.constructor != e.constructor && (is = !0), e);
 }
-cr.prototype.size = 1;
+hr.prototype.size = 1;
 const kP = /* @__PURE__ */ dt.replace({});
-class T$ extends cr {
+class T$ extends hr {
   constructor(e, r, i) {
     super(e, r), this.deco = i, this.spaceAbove = 0;
   }
@@ -8469,7 +8469,7 @@ class kr extends T$ {
   }
   replace(e, r, i) {
     let n = i[0];
-    return i.length == 1 && (n instanceof kr || n instanceof jt && n.flags & 4) && Math.abs(this.length - n.length) < 10 ? (n instanceof jt ? n = new kr(n.length, this.height, this.spaceAbove) : n.height = this.height, this.outdated || (n.outdated = !1), n) : cr.of(i);
+    return i.length == 1 && (n instanceof kr || n instanceof jt && n.flags & 4) && Math.abs(this.length - n.length) < 10 ? (n instanceof jt ? n = new kr(n.length, this.height, this.spaceAbove) : n.height = this.height, this.outdated || (n.outdated = !1), n) : hr.of(i);
   }
   updateHeight(e, r = 0, i = !1, n) {
     return n && n.from <= r && n.more ? this.setMeasuredHeight(n) : (i || this.outdated) && (this.spaceAbove = 0, this.setHeight(Math.max(this.widgetHeight, e.heightForLine(this.length - this.collapsed)) + this.breaks * e.lineHeight)), this.outdated = !1, this;
@@ -8478,7 +8478,7 @@ class kr extends T$ {
     return `line(${this.length}${this.collapsed ? -this.collapsed : ""}${this.widgetHeight ? ":" + this.widgetHeight : ""})`;
   }
 }
-class jt extends cr {
+class jt extends hr {
   constructor(e) {
     super(e, 0);
   }
@@ -8534,7 +8534,7 @@ class jt extends cr {
       let s = i[0];
       s instanceof jt ? i[0] = new jt(e + s.length) : i.unshift(new jt(e - 1), null);
     }
-    return cr.of(i);
+    return hr.of(i);
   }
   decomposeLeft(e, r) {
     r.push(new jt(e - 1), null);
@@ -8555,7 +8555,7 @@ class jt extends cr {
         d.outdated = !1, a.push(d), o += h + 1;
       }
       o <= s && a.push(null, new jt(s - o).updateHeight(e, o));
-      let O = cr.of(a);
+      let O = hr.of(a);
       return (l < 0 || Math.abs(O.height - this.height) >= Yo || Math.abs(l - this.heightMetrics(e, r).perLine) >= Yo) && (is = !0), ol(this, O);
     } else (i || this.outdated) && (this.setHeight(e.heightForGap(r, r + this.length)), this.outdated = !1);
     return this;
@@ -8564,7 +8564,7 @@ class jt extends cr {
     return `gap(${this.length})`;
   }
 }
-class wP extends cr {
+class wP extends hr {
   constructor(e, r, i) {
     super(e.length + r + i.length, e.height + i.height, r | (e.outdated || i.outdated ? 2 : 0)), this.left = e, this.right = i, this.size = e.size + i.size;
   }
@@ -8606,7 +8606,7 @@ class wP extends cr {
       let o = s.length;
       this.decomposeRight(r, s), Ef(s, o);
     }
-    return cr.of(s);
+    return hr.of(s);
   }
   decomposeLeft(e, r) {
     let i = this.left.length;
@@ -8621,7 +8621,7 @@ class wP extends cr {
     e < i && this.left.decomposeRight(e, r), this.break && e < n && r.push(null), r.push(this.right);
   }
   balanced(e, r) {
-    return e.size > 2 * r.size || r.size > 2 * e.size ? cr.of(this.break ? [e, null, r] : [e, r]) : (this.left = ol(this.left, e), this.right = ol(this.right, r), this.setHeight(e.height + r.height), this.outdated = e.outdated || r.outdated, this.size = e.size + r.size, this.length = e.length + this.break + r.length, this);
+    return e.size > 2 * r.size || r.size > 2 * e.size ? hr.of(this.break ? [e, null, r] : [e, r]) : (this.left = ol(this.left, e), this.right = ol(this.right, r), this.setHeight(e.height + r.height), this.outdated = e.outdated || r.outdated, this.size = e.size + r.size, this.length = e.length + this.break + r.length, this);
   }
   updateHeight(e, r = 0, i = !1, n) {
     let { left: s, right: a } = this, o = r + s.length + this.break, l = null;
@@ -8791,7 +8791,7 @@ class Cf {
   constructor(e, r) {
     this.view = e, this.state = r, this.pixelViewport = { left: 0, right: window.innerWidth, top: 0, bottom: 0 }, this.inView = !0, this.paddingTop = 0, this.paddingBottom = 0, this.contentDOMWidth = 0, this.contentDOMHeight = 0, this.editorHeight = 0, this.editorWidth = 0, this.scaleX = 1, this.scaleY = 1, this.scrollOffset = 0, this.scrolledToBottom = !1, this.scrollAnchorPos = 0, this.scrollAnchorHeight = -1, this.scaler = Yf, this.scrollTarget = null, this.printing = !1, this.mustMeasureContent = !0, this.defaultTextDirection = St.LTR, this.visibleRanges = [], this.mustEnforceCursorAssoc = !1;
     let i = r.facet(wu).some((n) => typeof n != "function" && n.class == "cm-lineWrapping");
-    this.heightOracle = new bP(i), this.stateDeco = Zf(r), this.heightMap = cr.empty().applyChanges(this.stateDeco, He.empty, this.heightOracle.setDoc(r.doc), [new Rr(0, 0, 0, r.doc.length)]);
+    this.heightOracle = new bP(i), this.stateDeco = Zf(r), this.heightMap = hr.empty().applyChanges(this.stateDeco, He.empty, this.heightOracle.setDoc(r.doc), [new Rr(0, 0, 0, r.doc.length)]);
     for (let n = 0; n < 2 && (this.viewport = this.getViewport(0, null), !!this.updateForViewport()); n++)
       ;
     this.updateViewportLines(), this.lineGaps = this.ensureLineGaps([]), this.lineGapDeco = dt.set(this.lineGaps.map((n) => n.draw(this, !1))), this.scrollParent = e.scrollDOM, this.computeVisibleRanges();
@@ -8858,7 +8858,7 @@ class Cf {
       f > 0 && p > 0 ? h = Math.max(f, p) : f < 0 && p < 0 && (h = Math.min(f, p)), zf();
       for (let m of this.viewports) {
         let k = m.from == this.viewport.from ? b : e.docView.measureVisibleLineHeights(m);
-        this.heightMap = (a ? cr.empty().applyChanges(this.stateDeco, He.empty, this.heightOracle, [new Rr(0, 0, 0, e.state.doc.length)]) : this.heightMap).updateHeight(n, 0, a, new SP(m.from, k));
+        this.heightMap = (a ? hr.empty().applyChanges(this.stateDeco, He.empty, this.heightOracle, [new Rr(0, 0, 0, e.state.doc.length)]) : this.heightMap).updateHeight(n, 0, a, new SP(m.from, k));
       }
       is && (O |= 2);
     }
@@ -10753,7 +10753,7 @@ class yn extends Bi {
 }
 yn.prototype.elementClass = "";
 yn.prototype.toDOM = void 0;
-yn.prototype.mapMode = lr.TrackBefore;
+yn.prototype.mapMode = Or.TrackBefore;
 yn.prototype.startSide = yn.prototype.endSide = -1;
 yn.prototype.point = !0;
 const PO = /* @__PURE__ */ me.define(), HP = /* @__PURE__ */ me.define(), Zo = /* @__PURE__ */ me.define(), Df = /* @__PURE__ */ me.define({
@@ -12127,11 +12127,11 @@ function hv(t) {
   var e;
   let { buffer: r, nodeSet: i, maxBufferLength: n = C$, reused: s = [], minRepeatType: a = i.types.length } = t, o = Array.isArray(r) ? new Xu(r, r.length) : r, l = i.types, O = 0, h = 0;
   function c(b, m, k, S, v, x) {
-    let { id: z, start: X, end: R, size: W } = o, Z = h, j = O;
+    let { id: z, start: X, end: R, size: W } = o, Y = h, D = O;
     if (W < 0)
       if (o.next(), W == -1) {
-        let Y = s[z];
-        k.push(Y), S.push(X - b);
+        let Z = s[z];
+        k.push(Z), S.push(X - b);
         return;
       } else if (W == -3) {
         O = z;
@@ -12143,29 +12143,29 @@ function hv(t) {
         throw new RangeError(`Unrecognized record size: ${W}`);
     let B = l[z], I, T, P = X - b;
     if (R - X <= n && (T = f(o.pos - m, v))) {
-      let Y = new Uint16Array(T.size - T.skip), U = o.pos - T.size, E = Y.length;
+      let Z = new Uint16Array(T.size - T.skip), U = o.pos - T.size, E = Z.length;
       for (; o.pos > U; )
-        E = p(T.start, Y, E);
-      I = new Ki(Y, R - T.start, i), P = T.start - b;
+        E = p(T.start, Z, E);
+      I = new Ki(Z, R - T.start, i), P = T.start - b;
     } else {
-      let Y = o.pos - W;
+      let Z = o.pos - W;
       o.next();
       let U = [], E = [], J = z >= a ? z : -1, ce = 0, ae = R;
-      for (; o.pos > Y; )
-        J >= 0 && o.id == J && o.size >= 0 ? (o.end <= ae - n && ($(U, E, X, ce, o.end, ae, J, Z, j), ce = U.length, ae = o.end), o.next()) : x > 2500 ? u(X, Y, U, E) : c(X, Y, U, E, J, x + 1);
-      if (J >= 0 && ce > 0 && ce < U.length && $(U, E, X, ce, X, ae, J, Z, j), U.reverse(), E.reverse(), J > -1 && ce > 0) {
-        let D = d(B, j);
-        I = zu(B, U, E, 0, U.length, 0, R - X, D, D);
+      for (; o.pos > Z; )
+        J >= 0 && o.id == J && o.size >= 0 ? (o.end <= ae - n && ($(U, E, X, ce, o.end, ae, J, Y, D), ce = U.length, ae = o.end), o.next()) : x > 2500 ? u(X, Z, U, E) : c(X, Z, U, E, J, x + 1);
+      if (J >= 0 && ce > 0 && ce < U.length && $(U, E, X, ce, X, ae, J, Y, D), U.reverse(), E.reverse(), J > -1 && ce > 0) {
+        let j = d(B, D);
+        I = zu(B, U, E, 0, U.length, 0, R - X, j, j);
       } else
-        I = Q(B, U, E, R - X, Z - R, j);
+        I = Q(B, U, E, R - X, Y - R, D);
     }
     k.push(I), S.push(P);
   }
   function u(b, m, k, S) {
     let v = [], x = 0, z = -1;
     for (; o.pos > m; ) {
-      let { id: X, start: R, end: W, size: Z } = o;
-      if (Z > 4)
+      let { id: X, start: R, end: W, size: Y } = o;
+      if (Y > 4)
         o.next();
       else {
         if (z > -1 && R < z)
@@ -12175,8 +12175,8 @@ function hv(t) {
     }
     if (x) {
       let X = new Uint16Array(x * 4), R = v[v.length - 2];
-      for (let W = v.length - 3, Z = 0; W >= 0; W -= 3)
-        X[Z++] = v[W], X[Z++] = v[W + 1] - R, X[Z++] = v[W + 2] - R, X[Z++] = Z;
+      for (let W = v.length - 3, Y = 0; W >= 0; W -= 3)
+        X[Y++] = v[W], X[Y++] = v[W + 1] - R, X[Y++] = v[W + 2] - R, X[Y++] = Y;
       k.push(new Ki(X, v[2] - R, i)), S.push(R - b);
     }
   }
@@ -12192,10 +12192,10 @@ function hv(t) {
     };
   }
   function $(b, m, k, S, v, x, z, X, R) {
-    let W = [], Z = [];
+    let W = [], Y = [];
     for (; b.length > S; )
-      W.push(b.pop()), Z.push(m.pop() + k - v);
-    b.push(Q(i.types[z], W, Z, x - v, X - x, R)), m.push(v - k);
+      W.push(b.pop()), Y.push(m.pop() + k - v);
+    b.push(Q(i.types[z], W, Y, x - v, X - x, R)), m.push(v - k);
   }
   function Q(b, m, k, S, v, x, z) {
     if (x) {
@@ -12216,20 +12216,20 @@ function hv(t) {
         X.size = S, X.start = v, X.skip = x, x += 4, S += 4, k.next();
         continue;
       }
-      let Z = k.pos - W;
-      if (W < 0 || Z < R || k.start < z)
+      let Y = k.pos - W;
+      if (W < 0 || Y < R || k.start < z)
         break;
-      let j = k.id >= a ? 4 : 0, B = k.start;
-      for (k.next(); k.pos > Z; ) {
+      let D = k.id >= a ? 4 : 0, B = k.start;
+      for (k.next(); k.pos > Y; ) {
         if (k.size < 0)
           if (k.size == -3 || k.size == -4)
-            j += 4;
+            D += 4;
           else
             break e;
-        else k.id >= a && (j += 4);
+        else k.id >= a && (D += 4);
         k.next();
       }
-      v = B, S += W, x += j;
+      v = B, S += W, x += D;
     }
     return (m < 0 || S == b) && (X.size = S, X.start = v, X.skip = x), X.size > 4 ? X : void 0;
   }
@@ -14042,7 +14042,7 @@ function vt({ except: t, units: e = 1 } = {}) {
     return r.baseIndent + (i ? 0 : e * r.unit);
   };
 }
-const Zv = /* @__PURE__ */ me.define(), hr = /* @__PURE__ */ new xe();
+const Zv = /* @__PURE__ */ me.define(), ur = /* @__PURE__ */ new xe();
 function fi(t) {
   let e = t.firstChild, r = t.lastChild;
   return e && e.to < r.from ? { from: e.to, to: r.type.isError ? t.to : r.from } : null;
@@ -17112,7 +17112,7 @@ class Gu {
     this.field = e, this.from = r, this.to = i;
   }
   map(e) {
-    let r = e.mapPos(this.from, -1, lr.TrackDel), i = e.mapPos(this.to, 1, lr.TrackDel);
+    let r = e.mapPos(this.from, -1, Or.TrackDel), i = e.mapPos(this.to, 1, Or.TrackDel);
     return r == null || i == null ? null : new Gu(this.field, r, i);
   }
 }
@@ -17531,7 +17531,7 @@ const Cr = /* @__PURE__ */ It.define({
           return t.column(t.node.from) + t.unit;
         }
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "Block ClassBody SwitchBody EnumBody ObjectExpression ArrayExpression ObjectType": fi,
         BlockComment(t) {
           return { from: t.from + 2, to: t.to - 2 };
@@ -18242,7 +18242,7 @@ const Vo = /* @__PURE__ */ It.define({
           return (e = r && DO(t, r)) !== null && e !== void 0 ? e : t.continue();
         }
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "ArrayExpression DictionaryExpression SetExpression TupleExpression": fi,
         Body: (t, e) => ({ from: t.from + 1, to: t.to - (t.to == e.doc.length ? 0 : 1) }),
         "String FormatString": (t, e) => ({ from: e.doc.lineAt(t.from).to, to: t.to })
@@ -18360,7 +18360,7 @@ const CX = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
         BlockComment: () => null,
         Statement: /* @__PURE__ */ vt({ except: /^{/ })
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "Block SwitchBlock ClassBody ElementValueArrayInitializer ModuleBody EnumBody ConstructorBody InterfaceBody ArrayInitializer": fi,
         BlockComment(t) {
           return { from: t.from + 2, to: t.to - 2 };
@@ -18495,7 +18495,7 @@ const qX = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
         CompoundStatement: /* @__PURE__ */ di({ closing: "}" }),
         Statement: /* @__PURE__ */ vt({ except: /^{/ })
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "DeclarationList CompoundStatement EnumeratorList FieldDeclarationList InitializerList": fi,
         BlockComment(t) {
           return { from: t.from + 2, to: t.to - 2 };
@@ -18650,7 +18650,7 @@ const $R = new Ge((t, e) => {
         AttributeItem: (t) => t.continue(),
         "Statement MatchArm": /* @__PURE__ */ vt()
       }),
-      /* @__PURE__ */ hr.add((t) => {
+      /* @__PURE__ */ ur.add((t) => {
         if (/(Block|edTokens|List)$/.test(t.name))
           return fi;
         if (t.name == "BlockComment")
@@ -18925,7 +18925,7 @@ const Bp = /^[\w$\xa1-\uffff][\w$\d\xa1-\uffff]*$/, iy = [
         BlockComment: () => null,
         Statement: /* @__PURE__ */ vt({ except: /^{/ })
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "Block SwitchBlock SelectBlock LiteralValue InterfaceType StructType SpecList": fi,
         BlockComment(t) {
           return { from: t.from + 2, to: t.to - 2 };
@@ -20172,7 +20172,7 @@ const yy = (t) => (e) => {
       /* @__PURE__ */ tr.add({
         Declaration: /* @__PURE__ */ vt()
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "Block KeyframeList": fi
       })
     ]
@@ -20791,7 +20791,7 @@ const k5 = /* @__PURE__ */ Cr.parser.configure({ top: "SingleExpression" }), Xy 
           return e && !((r = e.lastChild) && (r.name == "CloseTag" || r.name == "SelfClosingTag")) ? t.lineIndent(e.from) + t.unit : null;
         }
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         Element(t) {
           let e = t.firstChild, r = t.lastChild;
           return !e || e.name != "OpenTag" ? null : { from: e.to, to: r.name == "CloseTag" ? r.from : t.to };
@@ -20915,7 +20915,7 @@ const Cy = /* @__PURE__ */ It.define({
         Object: /* @__PURE__ */ vt({ except: /^\s*\}/ }),
         Array: /* @__PURE__ */ vt({ except: /^\s*\]/ })
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "Object Array": fi
       })
     ]
@@ -21242,7 +21242,7 @@ const tE = new Ge((t, e) => {
         FlowMapping: /* @__PURE__ */ di({ closing: "}" }),
         FlowSequence: /* @__PURE__ */ di({ closing: "]" })
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "FlowMapping FlowSequence": fi,
         "Item Pair BlockLiteral": (t, e) => ({ from: e.doc.lineAt(t.from).to, to: t.to })
       })
@@ -21670,7 +21670,7 @@ let jE = /* @__PURE__ */ zE.configure({
     /* @__PURE__ */ tr.add({
       Statement: /* @__PURE__ */ vt()
     }),
-    /* @__PURE__ */ hr.add({
+    /* @__PURE__ */ ur.add({
       Statement(t, e) {
         return { from: Math.min(t.from + 100, e.doc.lineAt(t.from).to), to: t.to };
       },
@@ -23430,7 +23430,7 @@ const kC = {
   }]
 }, bb = /* @__PURE__ */ Vl({ commentTokens: { block: { open: "<!--", close: "-->" } } }), Sb = /* @__PURE__ */ new xe(), kb = /* @__PURE__ */ uC.configure({
   props: [
-    /* @__PURE__ */ hr.add((t) => !t.is("Block") || t.is("Document") || Bh(t) != null || vC(t) ? void 0 : (e, r) => ({ from: r.doc.lineAt(e.from).to, to: e.to })),
+    /* @__PURE__ */ ur.add((t) => !t.is("Block") || t.is("Document") || Bh(t) != null || vC(t) ? void 0 : (e, r) => ({ from: r.doc.lineAt(e.from).to, to: e.to })),
     /* @__PURE__ */ Sb.add(Bh),
     /* @__PURE__ */ tr.add({
       Document: () => null
@@ -23473,7 +23473,7 @@ function gd(t) {
 }
 const wb = /* @__PURE__ */ gd(kb), XC = /* @__PURE__ */ kb.configure([SC, wC, kC, PC, {
   props: [
-    /* @__PURE__ */ hr.add({
+    /* @__PURE__ */ ur.add({
       Table: (t, e) => ({ from: e.doc.lineAt(t.from).to, to: t.to })
     })
   ]
@@ -24011,7 +24011,7 @@ const iY = new Ge((t, e) => {
         "String BlockComment": () => null,
         Statement: /* @__PURE__ */ vt({ except: /^({|end(for|foreach|switch|while)\b)/ })
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         "Block EnumBody DeclarationList SwitchBody ArrayExpression ValueList": fi,
         ColonBlock(t) {
           return { from: t.from + 1, to: t.to };
@@ -24290,7 +24290,7 @@ const bl = /* @__PURE__ */ It.define({
           return t.column(t.node.from) + t.unit;
         }
       }),
-      /* @__PURE__ */ hr.add({
+      /* @__PURE__ */ ur.add({
         Element(t) {
           let e = t.firstChild, r = t.lastChild;
           return !e || e.name != "OpenTag" ? null : { from: e.to, to: r.name == "CloseTag" ? r.from : t.to };
@@ -24428,7 +24428,7 @@ const XY = [
     name: "Jinja",
     extensions: ["j2", "jinja", "jinja2"],
     load() {
-      return import("./index-CLYPpT-c.js").then((t) => t.jinja());
+      return import("./index-BnfYHVbd.js").then((t) => t.jinja());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24450,14 +24450,14 @@ const XY = [
     name: "LESS",
     extensions: ["less"],
     load() {
-      return import("./index-9tDVC6T1.js").then((t) => t.less());
+      return import("./index-CjJensLQ.js").then((t) => t.less());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Liquid",
     extensions: ["liquid"],
     load() {
-      return import("./index-CfP2TRsD.js").then((t) => t.liquid());
+      return import("./index-Dz62-Imk.js").then((t) => t.liquid());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24524,14 +24524,14 @@ const XY = [
     name: "Sass",
     extensions: ["sass"],
     load() {
-      return import("./index-BXkk8t7v.js").then((t) => t.sass({ indented: !0 }));
+      return import("./index-Dhndkhea.js").then((t) => t.sass({ indented: !0 }));
     }
   }),
   /* @__PURE__ */ L.of({
     name: "SCSS",
     extensions: ["scss"],
     load() {
-      return import("./index-BXkk8t7v.js").then((t) => t.sass());
+      return import("./index-Dhndkhea.js").then((t) => t.sass());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -24566,7 +24566,7 @@ const XY = [
     name: "WebAssembly",
     extensions: ["wat", "wast"],
     load() {
-      return import("./index-7pOI-NiS.js").then((t) => t.wast());
+      return import("./index-7zZzAtXt.js").then((t) => t.wast());
     }
   }),
   /* @__PURE__ */ L.of({
@@ -25371,13 +25371,13 @@ const XY = [
     name: "Vue",
     extensions: ["vue"],
     load() {
-      return import("./index-CRSEMxUg.js").then((t) => t.vue());
+      return import("./index-DlWD1Ty7.js").then((t) => t.vue());
     }
   }),
   /* @__PURE__ */ L.of({
     name: "Angular Template",
     load() {
-      return import("./index-DH_MVlcy.js").then((t) => t.angular());
+      return import("./index-_0AcyMGK.js").then((t) => t.angular());
     }
   })
 ], RY = ["md", "mdx", "markdown"], zY = [
@@ -25544,7 +25544,7 @@ const UY = be.theme({
   }
 }, { dark: !0 }), qY = Rk(
   function({ content: e, fileName: r, visible: i, onContentChange: n, onSave: s }, a) {
-    const o = or(null), l = or(null), O = or(null), h = or(n), c = or(s);
+    const o = lr(null), l = lr(null), O = lr(null), h = lr(n), c = lr(s);
     h.current = n, c.current = s;
     const u = {
       undo() {
@@ -27031,7 +27031,7 @@ function Lb(t, e) {
 function Dr(t) {
   return t.replace(/[\t\n\r ]+/g, " ").replace(/^ | $/g, "").toLowerCase().toUpperCase();
 }
-const Or = en(/[A-Za-z]/), Kt = en(/[\dA-Za-z]/), hZ = en(/[#-'*+\--9=?A-Z^-~]/);
+const cr = en(/[A-Za-z]/), Kt = en(/[\dA-Za-z]/), hZ = en(/[#-'*+\--9=?A-Z^-~]/);
 function Sl(t) {
   return (
     // Special whitespace codes (which have negative values), C0 and Control
@@ -27341,7 +27341,7 @@ function bZ(t, e, r) {
     return t.enter("autolink"), t.enter("autolinkMarker"), t.consume(d), t.exit("autolinkMarker"), t.enter("autolinkProtocol"), s;
   }
   function s(d) {
-    return Or(d) ? (t.consume(d), a) : d === 64 ? r(d) : O(d);
+    return cr(d) ? (t.consume(d), a) : d === 64 ? r(d) : O(d);
   }
   function a(d) {
     return d === 43 || d === 45 || d === 46 || Kt(d) ? (i = 1, o(d)) : O(d);
@@ -27519,20 +27519,20 @@ function TZ(t, e, r) {
   function b(m, k, S) {
     let v = 0;
     return x;
-    function x(Z) {
-      return m.enter("lineEnding"), m.consume(Z), m.exit("lineEnding"), z;
+    function x(Y) {
+      return m.enter("lineEnding"), m.consume(Y), m.exit("lineEnding"), z;
     }
-    function z(Z) {
-      return m.enter("codeFencedFence"), Ye(Z) ? Me(m, X, "linePrefix", i.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4)(Z) : X(Z);
+    function z(Y) {
+      return m.enter("codeFencedFence"), Ye(Y) ? Me(m, X, "linePrefix", i.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4)(Y) : X(Y);
     }
-    function X(Z) {
-      return Z === o ? (m.enter("codeFencedFenceSequence"), R(Z)) : S(Z);
+    function X(Y) {
+      return Y === o ? (m.enter("codeFencedFenceSequence"), R(Y)) : S(Y);
     }
-    function R(Z) {
-      return Z === o ? (v++, m.consume(Z), R) : v >= a ? (m.exit("codeFencedFenceSequence"), Ye(Z) ? Me(m, W, "whitespace")(Z) : W(Z)) : S(Z);
+    function R(Y) {
+      return Y === o ? (v++, m.consume(Y), R) : v >= a ? (m.exit("codeFencedFenceSequence"), Ye(Y) ? Me(m, W, "whitespace")(Y) : W(Y)) : S(Y);
     }
-    function W(Z) {
-      return Z === null || ye(Z) ? (m.exit("codeFencedFence"), k(Z)) : S(Z);
+    function W(Y) {
+      return Y === null || ye(Y) ? (m.exit("codeFencedFence"), k(Y)) : S(Y);
     }
   }
 }
@@ -28184,10 +28184,10 @@ function sU(t, e, r) {
     return t.enter("htmlFlow"), t.enter("htmlFlowData"), t.consume(E), c;
   }
   function c(E) {
-    return E === 33 ? (t.consume(E), u) : E === 47 ? (t.consume(E), s = !0, Q) : E === 63 ? (t.consume(E), n = 3, i.interrupt ? e : P) : Or(E) ? (t.consume(E), a = String.fromCharCode(E), f) : r(E);
+    return E === 33 ? (t.consume(E), u) : E === 47 ? (t.consume(E), s = !0, Q) : E === 63 ? (t.consume(E), n = 3, i.interrupt ? e : P) : cr(E) ? (t.consume(E), a = String.fromCharCode(E), f) : r(E);
   }
   function u(E) {
-    return E === 45 ? (t.consume(E), n = 2, d) : E === 91 ? (t.consume(E), n = 5, o = 0, $) : Or(E) ? (t.consume(E), n = 4, i.interrupt ? e : P) : r(E);
+    return E === 45 ? (t.consume(E), n = 2, d) : E === 91 ? (t.consume(E), n = 5, o = 0, $) : cr(E) ? (t.consume(E), n = 4, i.interrupt ? e : P) : r(E);
   }
   function d(E) {
     return E === 45 ? (t.consume(E), i.interrupt ? e : P) : r(E);
@@ -28197,7 +28197,7 @@ function sU(t, e, r) {
     return E === J.charCodeAt(o++) ? (t.consume(E), o === J.length ? i.interrupt ? e : X : $) : r(E);
   }
   function Q(E) {
-    return Or(E) ? (t.consume(E), a = String.fromCharCode(E), f) : r(E);
+    return cr(E) ? (t.consume(E), a = String.fromCharCode(E), f) : r(E);
   }
   function f(E) {
     if (E === null || E === 47 || E === 62 || st(E)) {
@@ -28213,7 +28213,7 @@ function sU(t, e, r) {
     return Ye(E) ? (t.consume(E), g) : x(E);
   }
   function _(E) {
-    return E === 47 ? (t.consume(E), x) : E === 58 || E === 95 || Or(E) ? (t.consume(E), y) : Ye(E) ? (t.consume(E), _) : x(E);
+    return E === 47 ? (t.consume(E), x) : E === 58 || E === 95 || cr(E) ? (t.consume(E), y) : Ye(E) ? (t.consume(E), _) : x(E);
   }
   function y(E) {
     return E === 45 || E === 46 || E === 58 || E === 95 || Kt(E) ? (t.consume(E), y) : b(E);
@@ -28240,18 +28240,18 @@ function sU(t, e, r) {
     return E === null || ye(E) ? X(E) : Ye(E) ? (t.consume(E), z) : r(E);
   }
   function X(E) {
-    return E === 45 && n === 2 ? (t.consume(E), j) : E === 60 && n === 1 ? (t.consume(E), B) : E === 62 && n === 4 ? (t.consume(E), Y) : E === 63 && n === 3 ? (t.consume(E), P) : E === 93 && n === 5 ? (t.consume(E), T) : ye(E) && (n === 6 || n === 7) ? (t.exit("htmlFlowData"), t.check(rU, U, R)(E)) : E === null || ye(E) ? (t.exit("htmlFlowData"), R(E)) : (t.consume(E), X);
+    return E === 45 && n === 2 ? (t.consume(E), D) : E === 60 && n === 1 ? (t.consume(E), B) : E === 62 && n === 4 ? (t.consume(E), Z) : E === 63 && n === 3 ? (t.consume(E), P) : E === 93 && n === 5 ? (t.consume(E), T) : ye(E) && (n === 6 || n === 7) ? (t.exit("htmlFlowData"), t.check(rU, U, R)(E)) : E === null || ye(E) ? (t.exit("htmlFlowData"), R(E)) : (t.consume(E), X);
   }
   function R(E) {
     return t.check(iU, W, U)(E);
   }
   function W(E) {
-    return t.enter("lineEnding"), t.consume(E), t.exit("lineEnding"), Z;
+    return t.enter("lineEnding"), t.consume(E), t.exit("lineEnding"), Y;
   }
-  function Z(E) {
+  function Y(E) {
     return E === null || ye(E) ? R(E) : (t.enter("htmlFlowData"), X(E));
   }
-  function j(E) {
+  function D(E) {
     return E === 45 ? (t.consume(E), P) : X(E);
   }
   function B(E) {
@@ -28260,18 +28260,18 @@ function sU(t, e, r) {
   function I(E) {
     if (E === 62) {
       const J = a.toLowerCase();
-      return cm.includes(J) ? (t.consume(E), Y) : X(E);
+      return cm.includes(J) ? (t.consume(E), Z) : X(E);
     }
-    return Or(E) && a.length < 8 ? (t.consume(E), a += String.fromCharCode(E), I) : X(E);
+    return cr(E) && a.length < 8 ? (t.consume(E), a += String.fromCharCode(E), I) : X(E);
   }
   function T(E) {
     return E === 93 ? (t.consume(E), P) : X(E);
   }
   function P(E) {
-    return E === 62 ? (t.consume(E), Y) : E === 45 && n === 2 ? (t.consume(E), P) : X(E);
+    return E === 62 ? (t.consume(E), Z) : E === 45 && n === 2 ? (t.consume(E), P) : X(E);
   }
-  function Y(E) {
-    return E === null || ye(E) ? (t.exit("htmlFlowData"), U(E)) : (t.consume(E), Y);
+  function Z(E) {
+    return E === null || ye(E) ? (t.exit("htmlFlowData"), U(E)) : (t.consume(E), Z);
   }
   function U(E) {
     return t.exit("htmlFlow"), e(E);
@@ -28305,10 +28305,10 @@ function OU(t, e, r) {
     return t.enter("htmlText"), t.enter("htmlTextData"), t.consume(P), l;
   }
   function l(P) {
-    return P === 33 ? (t.consume(P), O) : P === 47 ? (t.consume(P), b) : P === 63 ? (t.consume(P), _) : Or(P) ? (t.consume(P), S) : r(P);
+    return P === 33 ? (t.consume(P), O) : P === 47 ? (t.consume(P), b) : P === 63 ? (t.consume(P), _) : cr(P) ? (t.consume(P), S) : r(P);
   }
   function O(P) {
-    return P === 45 ? (t.consume(P), h) : P === 91 ? (t.consume(P), s = 0, $) : Or(P) ? (t.consume(P), g) : r(P);
+    return P === 45 ? (t.consume(P), h) : P === 91 ? (t.consume(P), s = 0, $) : cr(P) ? (t.consume(P), g) : r(P);
   }
   function h(P) {
     return P === 45 ? (t.consume(P), d) : r(P);
@@ -28320,11 +28320,11 @@ function OU(t, e, r) {
     return P === 45 ? (t.consume(P), d) : c(P);
   }
   function d(P) {
-    return P === 62 ? j(P) : P === 45 ? u(P) : c(P);
+    return P === 62 ? D(P) : P === 45 ? u(P) : c(P);
   }
   function $(P) {
-    const Y = "CDATA[";
-    return P === Y.charCodeAt(s++) ? (t.consume(P), s === Y.length ? Q : $) : r(P);
+    const Z = "CDATA[";
+    return P === Z.charCodeAt(s++) ? (t.consume(P), s === Z.length ? Q : $) : r(P);
   }
   function Q(P) {
     return P === null ? r(P) : P === 93 ? (t.consume(P), f) : ye(P) ? (a = Q, B(P)) : (t.consume(P), Q);
@@ -28333,31 +28333,31 @@ function OU(t, e, r) {
     return P === 93 ? (t.consume(P), p) : Q(P);
   }
   function p(P) {
-    return P === 62 ? j(P) : P === 93 ? (t.consume(P), p) : Q(P);
+    return P === 62 ? D(P) : P === 93 ? (t.consume(P), p) : Q(P);
   }
   function g(P) {
-    return P === null || P === 62 ? j(P) : ye(P) ? (a = g, B(P)) : (t.consume(P), g);
+    return P === null || P === 62 ? D(P) : ye(P) ? (a = g, B(P)) : (t.consume(P), g);
   }
   function _(P) {
     return P === null ? r(P) : P === 63 ? (t.consume(P), y) : ye(P) ? (a = _, B(P)) : (t.consume(P), _);
   }
   function y(P) {
-    return P === 62 ? j(P) : _(P);
+    return P === 62 ? D(P) : _(P);
   }
   function b(P) {
-    return Or(P) ? (t.consume(P), m) : r(P);
+    return cr(P) ? (t.consume(P), m) : r(P);
   }
   function m(P) {
     return P === 45 || Kt(P) ? (t.consume(P), m) : k(P);
   }
   function k(P) {
-    return ye(P) ? (a = k, B(P)) : Ye(P) ? (t.consume(P), k) : j(P);
+    return ye(P) ? (a = k, B(P)) : Ye(P) ? (t.consume(P), k) : D(P);
   }
   function S(P) {
     return P === 45 || Kt(P) ? (t.consume(P), S) : P === 47 || P === 62 || st(P) ? v(P) : r(P);
   }
   function v(P) {
-    return P === 47 ? (t.consume(P), j) : P === 58 || P === 95 || Or(P) ? (t.consume(P), x) : ye(P) ? (a = v, B(P)) : Ye(P) ? (t.consume(P), v) : j(P);
+    return P === 47 ? (t.consume(P), D) : P === 58 || P === 95 || cr(P) ? (t.consume(P), x) : ye(P) ? (a = v, B(P)) : Ye(P) ? (t.consume(P), v) : D(P);
   }
   function x(P) {
     return P === 45 || P === 46 || P === 58 || P === 95 || Kt(P) ? (t.consume(P), x) : z(P);
@@ -28369,15 +28369,15 @@ function OU(t, e, r) {
     return P === null || P === 60 || P === 61 || P === 62 || P === 96 ? r(P) : P === 34 || P === 39 ? (t.consume(P), n = P, R) : ye(P) ? (a = X, B(P)) : Ye(P) ? (t.consume(P), X) : (t.consume(P), W);
   }
   function R(P) {
-    return P === n ? (t.consume(P), n = void 0, Z) : P === null ? r(P) : ye(P) ? (a = R, B(P)) : (t.consume(P), R);
+    return P === n ? (t.consume(P), n = void 0, Y) : P === null ? r(P) : ye(P) ? (a = R, B(P)) : (t.consume(P), R);
   }
   function W(P) {
     return P === null || P === 34 || P === 39 || P === 60 || P === 61 || P === 96 ? r(P) : P === 47 || P === 62 || st(P) ? v(P) : (t.consume(P), W);
   }
-  function Z(P) {
+  function Y(P) {
     return P === 47 || P === 62 || st(P) ? v(P) : r(P);
   }
-  function j(P) {
+  function D(P) {
     return P === 62 ? (t.consume(P), t.exit("htmlTextData"), t.exit("htmlText"), e) : r(P);
   }
   function B(P) {
@@ -28594,7 +28594,7 @@ function kU(t, e, r) {
     return O === n ? (t.consume(O), i++, l) : (t.exit("thematicBreakSequence"), Ye(O) ? Me(t, o, "whitespace")(O) : o(O));
   }
 }
-const ur = {
+const dr = {
   continuation: {
     tokenize: xU
   },
@@ -28655,7 +28655,7 @@ function xU(t, e, r) {
     return i.containerState.furtherBlankLines || !Ye(o) ? (i.containerState.furtherBlankLines = void 0, i.containerState.initialBlankLine = void 0, a(o)) : (i.containerState.furtherBlankLines = void 0, i.containerState.initialBlankLine = void 0, t.attempt(PU, e, a)(o));
   }
   function a(o) {
-    return i.containerState._closeFlow = !0, i.interrupt = void 0, Me(t, t.attempt(ur, e, r), "linePrefix", i.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4)(o);
+    return i.containerState._closeFlow = !0, i.interrupt = void 0, Me(t, t.attempt(dr, e, r), "linePrefix", i.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4)(o);
   }
 }
 function TU(t, e, r) {
@@ -28847,19 +28847,19 @@ function AU(t, e) {
   return t;
 }
 const WU = {
-  42: ur,
-  43: ur,
-  45: ur,
-  48: ur,
-  49: ur,
-  50: ur,
-  51: ur,
-  52: ur,
-  53: ur,
-  54: ur,
-  55: ur,
-  56: ur,
-  57: ur,
+  42: dr,
+  43: dr,
+  45: dr,
+  48: dr,
+  49: dr,
+  50: dr,
+  51: dr,
+  52: dr,
+  53: dr,
+  54: dr,
+  55: dr,
+  56: dr,
+  57: dr,
   62: Ib
 }, VU = {
   91: IZ
@@ -28958,14 +28958,14 @@ function FU(t, e, r) {
       _index: X,
       line: R,
       column: W,
-      offset: Z
+      offset: Y
     } = i;
     return {
       _bufferIndex: z,
       _index: X,
       line: R,
       column: W,
-      offset: Z
+      offset: Y
     };
   }
   function Q(z) {
@@ -29007,7 +29007,7 @@ function FU(t, e, r) {
   }
   function k(z, X) {
     return R;
-    function R(W, Z, j) {
+    function R(W, Y, D) {
       let B, I, T, P;
       return Array.isArray(W) ? (
         /* c8 ignore next 1 */
@@ -29018,10 +29018,10 @@ function FU(t, e, r) {
           /** @type {Construct} */
           W
         ])
-      ) : Y(W);
-      function Y(ae) {
-        return D;
-        function D(C) {
+      ) : Z(W);
+      function Z(ae) {
+        return j;
+        function j(C) {
           const F = C !== null && ae[C], M = C !== null && ae.null, oe = [
             // To do: add more extension tests.
             /* c8 ignore next 2 */
@@ -29032,11 +29032,11 @@ function FU(t, e, r) {
         }
       }
       function U(ae) {
-        return B = ae, I = 0, ae.length === 0 ? j : E(ae[I]);
+        return B = ae, I = 0, ae.length === 0 ? D : E(ae[I]);
       }
       function E(ae) {
-        return D;
-        function D(C) {
+        return j;
+        function j(C) {
           return P = v(), T = ae, ae.partial || (O.currentConstruct = ae), ae.name && O.parser.constructs.disable.null.includes(ae.name) ? ce() : ae.tokenize.call(
             // If we do have fields, create an object w/ `context` as its
             // prototype.
@@ -29049,10 +29049,10 @@ function FU(t, e, r) {
         }
       }
       function J(ae) {
-        return z(T, P), Z;
+        return z(T, P), Y;
       }
       function ce(ae) {
-        return P.restore(), ++I < B.length ? E(B[I]) : j;
+        return P.restore(), ++I < B.length ? E(B[I]) : D;
       }
     }
   }
@@ -29060,13 +29060,13 @@ function FU(t, e, r) {
     z.resolveAll && !s.includes(z) && s.push(z), z.resolve && vr(O.events, X, O.events.length - X, z.resolve(O.events.slice(X), O)), z.resolveTo && (O.events = z.resolveTo(O.events, O));
   }
   function v() {
-    const z = $(), X = O.previous, R = O.currentConstruct, W = O.events.length, Z = Array.from(o);
+    const z = $(), X = O.previous, R = O.currentConstruct, W = O.events.length, Y = Array.from(o);
     return {
       from: W,
-      restore: j
+      restore: D
     };
-    function j() {
-      i = z, O.previous = X, O.currentConstruct = R, O.events.length = W, o = Z, x();
+    function D() {
+      i = z, O.previous = X, O.currentConstruct = R, O.events.length = W, o = Y, x();
     }
   }
   function x() {
@@ -29265,14 +29265,14 @@ function aq(t) {
       characterReferenceMarkerHexadecimal: ce,
       characterReferenceMarkerNumeric: ce,
       characterReferenceValue: ae,
-      characterReference: D,
+      characterReference: j,
       codeFenced: l(f),
       codeFencedFence: Q,
       codeFencedFenceInfo: d,
       codeFencedFenceMeta: $,
       codeFlowValue: x,
       codeIndented: l(p),
-      codeText: l(Z),
+      codeText: l(Y),
       codeTextData: x,
       data: x,
       definition: l(),
@@ -29290,14 +29290,14 @@ function aq(t) {
       label: T,
       labelText: I,
       lineEnding: z,
-      link: l(j),
+      link: l(D),
       listItem: l(),
       listOrdered: l(),
       listUnordered: l(),
       paragraph: l(),
       referenceString: J,
       resourceDestinationString: P,
-      resourceTitleString: Y,
+      resourceTitleString: Z,
       resource: U,
       setextHeading: l(S),
       setextHeadingLineSequence: k,
@@ -29536,11 +29536,11 @@ function aq(t) {
     const G = this.resume(), te = this.stack[this.stack.length - 1];
     te.value = G;
   }
-  function Z() {
+  function Y() {
     const G = this.resume(), te = this.stack[this.stack.length - 1];
     te.value = G;
   }
-  function j() {
+  function D() {
     const G = this.stack[this.stack.length - 1];
     if (this.data.inReference) {
       const te = this.data.referenceType || "shortcut";
@@ -29574,7 +29574,7 @@ function aq(t) {
     const G = this.resume(), te = this.stack[this.stack.length - 1];
     te.url = G;
   }
-  function Y() {
+  function Z() {
     const G = this.resume(), te = this.stack[this.stack.length - 1];
     te.title = G;
   }
@@ -29598,7 +29598,7 @@ function aq(t) {
     const ze = this.stack[this.stack.length - 1];
     ze.value += Te;
   }
-  function D(G) {
+  function j(G) {
     const te = this.stack.pop();
     te.position.end = Di(G.end);
   }
@@ -31210,7 +31210,7 @@ function B4(t, e, r) {
     return t.consume(c), n = !0, l;
   }
   function h(c) {
-    return s && n && Or(i.previous) ? (t.exit("literalAutolinkEmail"), t.exit("literalAutolink"), e(c)) : r(c);
+    return s && n && cr(i.previous) ? (t.exit("literalAutolinkEmail"), t.exit("literalAutolink"), e(c)) : r(c);
   }
 }
 function N4(t, e, r) {
@@ -31231,7 +31231,7 @@ function F4(t, e, r) {
     return (c === 72 || c === 104) && vS.call(i, i.previous) && !wd(i.events) ? (t.enter("literalAutolink"), t.enter("literalAutolinkHttp"), n += String.fromCodePoint(c), t.consume(c), o) : r(c);
   }
   function o(c) {
-    if (Or(c) && n.length < 5)
+    if (cr(c) && n.length < 5)
       return n += String.fromCodePoint(c), t.consume(c), o;
     if (c === 58) {
       const u = n.toLowerCase();
@@ -31296,10 +31296,10 @@ function eA(t, e, r) {
     return o === null || o === 40 || o === 91 || st(o) || wn(o) ? e(o) : i(o);
   }
   function s(o) {
-    return Or(o) ? a(o) : r(o);
+    return cr(o) ? a(o) : r(o);
   }
   function a(o) {
-    return o === 59 ? (t.consume(o), i) : Or(o) ? (t.consume(o), a) : r(o);
+    return o === 59 ? (t.consume(o), i) : cr(o) ? (t.consume(o), a) : r(o);
   }
 }
 function tA(t, e, r) {
@@ -31315,7 +31315,7 @@ function PS(t) {
   return t === null || t === 40 || t === 42 || t === 95 || t === 91 || t === 93 || t === 126 || st(t);
 }
 function vS(t) {
-  return !Or(t);
+  return !cr(t);
 }
 function xS(t) {
   return !(t === 47 || nu(t));
@@ -39700,19 +39700,19 @@ function yhe(t) {
      * @param {CallbackResponse} response
      */
     isTrulyOpeningTag: (I, T) => {
-      const P = I[0].length + I.index, Y = I.input[P];
+      const P = I[0].length + I.index, Z = I.input[P];
       if (
         // HTML should not include another raw `<` inside a tag
         // nested type?
         // `<Array<Array<number>>`, etc.
-        Y === "<" || // the , gives away that this is not HTML
+        Z === "<" || // the , gives away that this is not HTML
         // `<T, A extends keyof T, V>`
-        Y === ","
+        Z === ","
       ) {
         T.ignoreMatch();
         return;
       }
-      Y === ">" && (r(I, { after: P }) || T.ignoreMatch());
+      Z === ">" && (r(I, { after: P }) || T.ignoreMatch());
       let U;
       const E = I.input.substring(P);
       if (U = E.match(/^\s*=/)) {
@@ -40002,7 +40002,7 @@ function yhe(t) {
     keywords: "prototype",
     className: "property",
     relevance: 0
-  }, Z = {
+  }, Y = {
     match: [
       /get|set/,
       /\s+/,
@@ -40020,7 +40020,7 @@ function yhe(t) {
       },
       m
     ]
-  }, j = "(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|" + t.UNDERSCORE_IDENT_RE + ")\\s*=>", B = {
+  }, D = "(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|" + t.UNDERSCORE_IDENT_RE + ")\\s*=>", B = {
     match: [
       /const|var|let/,
       /\s+/,
@@ -40029,7 +40029,7 @@ function yhe(t) {
       /=\s*/,
       /(async\s*)?/,
       // async is optional
-      e.lookahead(j)
+      e.lookahead(D)
     ],
     keywords: "async",
     className: {
@@ -40084,7 +40084,7 @@ function yhe(t) {
             // we have to count the parens to make sure we actually have the
             // correct bounding ( ) before the =>.  There could be any number of
             // sub-expressions inside also surrounded by parens.
-            begin: j,
+            begin: D,
             returnBegin: !0,
             end: "\\s*=>",
             contains: [
@@ -40186,7 +40186,7 @@ function yhe(t) {
       R,
       z,
       k,
-      Z,
+      Y,
       {
         match: /\$[(.]/
         // relevance booster for a pattern common to JS libs: `$(something)` and `$.something`
@@ -42530,11 +42530,11 @@ function qhe(t) {
     begin: /<<<[ \t]*(?:(\w+)|"(\w+)")\n/,
     end: /[ \t]*(\w+)\b/,
     contains: t.QUOTE_STRING_MODE.contains.concat(l),
-    "on:begin": (W, Z) => {
-      Z.data._beginMatch = W[1] || W[2];
+    "on:begin": (W, Y) => {
+      Y.data._beginMatch = W[1] || W[2];
     },
-    "on:end": (W, Z) => {
-      Z.data._beginMatch !== W[1] && Z.ignoreMatch();
+    "on:end": (W, Y) => {
+      Y.data._beginMatch !== W[1] && Y.ignoreMatch();
     }
   }, u = t.END_SAME_AS_BEGIN({
     begin: /<<<[ \t]*'(\w+)'\n/,
@@ -42763,13 +42763,13 @@ function qhe(t) {
   ], y = {
     keyword: p,
     literal: ((W) => {
-      const Z = [];
-      return W.forEach((j) => {
-        Z.push(j), j.toLowerCase() === j ? Z.push(j.toUpperCase()) : Z.push(j.toLowerCase());
-      }), Z;
+      const Y = [];
+      return W.forEach((D) => {
+        Y.push(D), D.toLowerCase() === D ? Y.push(D.toUpperCase()) : Y.push(D.toLowerCase());
+      }), Y;
     })(f),
     built_in: g
-  }, b = (W) => W.map((Z) => Z.replace(/\|\d+$/, "")), m = { variants: [
+  }, b = (W) => W.map((Y) => Y.replace(/\|\d+$/, "")), m = { variants: [
     {
       match: [
         /new/,
@@ -46444,16 +46444,16 @@ function cue(t) {
       X("#"),
       z
     ]
-  }, W = { match: rt(/`/, ti, /`/) }, Z = {
+  }, W = { match: rt(/`/, ti, /`/) }, Y = {
     className: "variable",
     match: /\$\d+/
-  }, j = {
+  }, D = {
     className: "variable",
     match: `\\$${xl}+`
   }, B = [
     W,
-    Z,
-    j
+    Y,
+    D
   ], I = {
     match: /(@|#(un)?)available/,
     scope: "keyword",
@@ -46475,7 +46475,7 @@ function cue(t) {
   }, P = {
     scope: "meta",
     match: rt(/@/, ti)
-  }, Y = [
+  }, Z = [
     I,
     T,
     P
@@ -46517,7 +46517,7 @@ function cue(t) {
     contains: [
       ...i,
       ...h,
-      ...Y,
+      ...Z,
       $,
       U
     ]
@@ -46543,7 +46543,7 @@ function cue(t) {
       _,
       v,
       ...B,
-      ...Y,
+      ...Z,
       U
     ]
   }, ae = {
@@ -46554,7 +46554,7 @@ function cue(t) {
       ...i,
       U
     ]
-  }, D = {
+  }, j = {
     begin: sr(
       Cs(rt(ti, /\s*:/)),
       Cs(rt(ti, /\s+/, ti, /\s*:/))
@@ -46576,13 +46576,13 @@ function cue(t) {
     end: /\)/,
     keywords: O,
     contains: [
-      D,
+      j,
       ...i,
       ...h,
       ...f,
       _,
       v,
-      ...Y,
+      ...Z,
       U,
       ce
     ],
@@ -46746,7 +46746,7 @@ function cue(t) {
       _,
       v,
       ...B,
-      ...Y,
+      ...Z,
       U,
       ce
     ]
@@ -46913,19 +46913,19 @@ function hue(t) {
      * @param {CallbackResponse} response
      */
     isTrulyOpeningTag: (I, T) => {
-      const P = I[0].length + I.index, Y = I.input[P];
+      const P = I[0].length + I.index, Z = I.input[P];
       if (
         // HTML should not include another raw `<` inside a tag
         // nested type?
         // `<Array<Array<number>>`, etc.
-        Y === "<" || // the , gives away that this is not HTML
+        Z === "<" || // the , gives away that this is not HTML
         // `<T, A extends keyof T, V>`
-        Y === ","
+        Z === ","
       ) {
         T.ignoreMatch();
         return;
       }
-      Y === ">" && (r(I, { after: P }) || T.ignoreMatch());
+      Z === ">" && (r(I, { after: P }) || T.ignoreMatch());
       let U;
       const E = I.input.substring(P);
       if (U = E.match(/^\s*=/)) {
@@ -47215,7 +47215,7 @@ function hue(t) {
     keywords: "prototype",
     className: "property",
     relevance: 0
-  }, Z = {
+  }, Y = {
     match: [
       /get|set/,
       /\s+/,
@@ -47233,7 +47233,7 @@ function hue(t) {
       },
       m
     ]
-  }, j = "(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|" + t.UNDERSCORE_IDENT_RE + ")\\s*=>", B = {
+  }, D = "(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|" + t.UNDERSCORE_IDENT_RE + ")\\s*=>", B = {
     match: [
       /const|var|let/,
       /\s+/,
@@ -47242,7 +47242,7 @@ function hue(t) {
       /=\s*/,
       /(async\s*)?/,
       // async is optional
-      e.lookahead(j)
+      e.lookahead(D)
     ],
     keywords: "async",
     className: {
@@ -47297,7 +47297,7 @@ function hue(t) {
             // we have to count the parens to make sure we actually have the
             // correct bounding ( ) before the =>.  There could be any number of
             // sub-expressions inside also surrounded by parens.
-            begin: j,
+            begin: D,
             returnBegin: !0,
             end: "\\s*=>",
             contains: [
@@ -47399,7 +47399,7 @@ function hue(t) {
       R,
       z,
       k,
-      Z,
+      Y,
       {
         match: /\$[(.]/
         // relevance booster for a pattern common to JS libs: `$(something)` and `$.something`
@@ -48426,13 +48426,13 @@ function _ue() {
   }, W = {
     begin: "\\\\[\\s\\S]",
     relevance: 0
-  }, Z = {
+  }, Y = {
     scope: "string",
     begin: "'",
     end: "'",
     illegal: "\\n",
     contains: [W]
-  }, j = {
+  }, D = {
     scope: "string",
     begin: '"',
     end: '"',
@@ -48506,7 +48506,7 @@ function _ue() {
         // look for 3 words in a row
       }
     ), ve;
-  }, T = I("//", "$"), P = I("/\\*", "\\*/"), Y = I("#", "$"), U = {
+  }, T = I("//", "$"), P = I("/\\*", "\\*/"), Z = I("#", "$"), U = {
     scope: "number",
     begin: v,
     relevance: 0
@@ -48535,7 +48535,7 @@ function _ue() {
     scope: "title",
     begin: k,
     relevance: 0
-  }, D = {
+  }, j = {
     scope: "title",
     begin: S,
     relevance: 0
@@ -48546,7 +48546,7 @@ function _ue() {
   };
   var M = /* @__PURE__ */ Object.freeze({
     __proto__: null,
-    APOS_STRING_MODE: Z,
+    APOS_STRING_MODE: Y,
     BACKSLASH_ESCAPE: W,
     BINARY_NUMBER_MODE: J,
     BINARY_NUMBER_RE: z,
@@ -48570,20 +48570,20 @@ function _ue() {
         }
       );
     },
-    HASH_COMMENT_MODE: Y,
+    HASH_COMMENT_MODE: Z,
     IDENT_RE: k,
     MATCH_NOTHING_RE: m,
     METHOD_GUARD: C,
     NUMBER_MODE: U,
     NUMBER_RE: v,
     PHRASAL_WORDS_MODE: B,
-    QUOTE_STRING_MODE: j,
+    QUOTE_STRING_MODE: D,
     REGEXP_MODE: ce,
     RE_STARTERS_RE: X,
     SHEBANG: R,
     TITLE_MODE: ae,
     UNDERSCORE_IDENT_RE: S,
-    UNDERSCORE_TITLE_MODE: D
+    UNDERSCORE_TITLE_MODE: j
   });
   function oe(V, N) {
     V.input[V.index - 1] === "." && N.ignoreMatch();
@@ -51684,8 +51684,8 @@ function rfe() {
               if (isNaN(R)) return console.warn("row is invalid. Race condition?"), null;
               const W = this._rowColumns.get(X);
               if (!W) return console.warn("columns is null. Race condition?"), null;
-              let Z = z < W.length ? W[z] : W.slice(-1)[0] + 1;
-              return Z >= this._terminal.cols && (++R, Z = 0), { row: R, column: Z };
+              let Y = z < W.length ? W[z] : W.slice(-1)[0] + 1;
+              return Y >= this._terminal.cols && (++R, Y = 0), { row: R, column: Y };
             }, k = m(_), S = m(y);
             if (k && S) {
               if (k.row > S.row || k.row === S.row && k.column >= S.column) throw new Error("invalid range");
@@ -51963,12 +51963,12 @@ function rfe() {
                   } catch {
                     R = !0;
                   }
-                  R || g.push({ text: z, range: X, activate: (W, Z) => _ ? _.activate(W, Z, X) : $(0, Z), hover: (W, Z) => {
-                    var j;
-                    return (j = _ == null ? void 0 : _.hover) == null ? void 0 : j.call(_, W, Z, X);
-                  }, leave: (W, Z) => {
-                    var j;
-                    return (j = _ == null ? void 0 : _.leave) == null ? void 0 : j.call(_, W, Z, X);
+                  R || g.push({ text: z, range: X, activate: (W, Y) => _ ? _.activate(W, Y, X) : $(0, Y), hover: (W, Y) => {
+                    var D;
+                    return (D = _ == null ? void 0 : _.hover) == null ? void 0 : D.call(_, W, Y, X);
+                  }, leave: (W, Y) => {
+                    var D;
+                    return (D = _ == null ? void 0 : _.leave) == null ? void 0 : D.call(_, W, Y, X);
                   } });
                 }
                 S = !1, y.hasExtendedAttrs() && y.extended.urlId ? (k = x, m = y.extended.urlId) : (k = -1, m = -1);
@@ -52018,7 +52018,7 @@ WARNING: This link could potentially be dangerous`)) {
         };
       }, 3236: (a, o, l) => {
         Object.defineProperty(o, "__esModule", { value: !0 }), o.Terminal = void 0;
-        const O = l(3614), h = l(3656), c = l(3551), u = l(9042), d = l(3730), $ = l(1680), Q = l(3107), f = l(5744), p = l(2950), g = l(1296), _ = l(428), y = l(4269), b = l(5114), m = l(8934), k = l(3230), S = l(9312), v = l(4725), x = l(6731), z = l(8055), X = l(8969), R = l(8460), W = l(844), Z = l(6114), j = l(8437), B = l(2584), I = l(7399), T = l(5941), P = l(9074), Y = l(2585), U = l(5435), E = l(4567), J = l(779);
+        const O = l(3614), h = l(3656), c = l(3551), u = l(9042), d = l(3730), $ = l(1680), Q = l(3107), f = l(5744), p = l(2950), g = l(1296), _ = l(428), y = l(4269), b = l(5114), m = l(8934), k = l(3230), S = l(9312), v = l(4725), x = l(6731), z = l(8055), X = l(8969), R = l(8460), W = l(844), Y = l(6114), D = l(8437), B = l(2584), I = l(7399), T = l(5941), P = l(9074), Z = l(2585), U = l(5435), E = l(4567), J = l(779);
         class ce extends X.CoreTerminal {
           get onFocus() {
             return this._onFocus.event;
@@ -52035,14 +52035,14 @@ WARNING: This link could potentially be dangerous`)) {
           get onWillOpen() {
             return this._onWillOpen.event;
           }
-          constructor(D = {}) {
-            super(D), this.browser = Z, this._keyDownHandled = !1, this._keyDownSeen = !1, this._keyPressHandled = !1, this._unprocessedDeadKey = !1, this._accessibilityManager = this.register(new W.MutableDisposable()), this._onCursorMove = this.register(new R.EventEmitter()), this.onCursorMove = this._onCursorMove.event, this._onKey = this.register(new R.EventEmitter()), this.onKey = this._onKey.event, this._onRender = this.register(new R.EventEmitter()), this.onRender = this._onRender.event, this._onSelectionChange = this.register(new R.EventEmitter()), this.onSelectionChange = this._onSelectionChange.event, this._onTitleChange = this.register(new R.EventEmitter()), this.onTitleChange = this._onTitleChange.event, this._onBell = this.register(new R.EventEmitter()), this.onBell = this._onBell.event, this._onFocus = this.register(new R.EventEmitter()), this._onBlur = this.register(new R.EventEmitter()), this._onA11yCharEmitter = this.register(new R.EventEmitter()), this._onA11yTabEmitter = this.register(new R.EventEmitter()), this._onWillOpen = this.register(new R.EventEmitter()), this._setup(), this._decorationService = this._instantiationService.createInstance(P.DecorationService), this._instantiationService.setService(Y.IDecorationService, this._decorationService), this._linkProviderService = this._instantiationService.createInstance(J.LinkProviderService), this._instantiationService.setService(v.ILinkProviderService, this._linkProviderService), this._linkProviderService.registerLinkProvider(this._instantiationService.createInstance(d.OscLinkProvider)), this.register(this._inputHandler.onRequestBell((() => this._onBell.fire()))), this.register(this._inputHandler.onRequestRefreshRows(((C, F) => this.refresh(C, F)))), this.register(this._inputHandler.onRequestSendFocus((() => this._reportFocus()))), this.register(this._inputHandler.onRequestReset((() => this.reset()))), this.register(this._inputHandler.onRequestWindowsOptionsReport(((C) => this._reportWindowsOptions(C)))), this.register(this._inputHandler.onColor(((C) => this._handleColorEvent(C)))), this.register((0, R.forwardEvent)(this._inputHandler.onCursorMove, this._onCursorMove)), this.register((0, R.forwardEvent)(this._inputHandler.onTitleChange, this._onTitleChange)), this.register((0, R.forwardEvent)(this._inputHandler.onA11yChar, this._onA11yCharEmitter)), this.register((0, R.forwardEvent)(this._inputHandler.onA11yTab, this._onA11yTabEmitter)), this.register(this._bufferService.onResize(((C) => this._afterResize(C.cols, C.rows)))), this.register((0, W.toDisposable)((() => {
+          constructor(j = {}) {
+            super(j), this.browser = Y, this._keyDownHandled = !1, this._keyDownSeen = !1, this._keyPressHandled = !1, this._unprocessedDeadKey = !1, this._accessibilityManager = this.register(new W.MutableDisposable()), this._onCursorMove = this.register(new R.EventEmitter()), this.onCursorMove = this._onCursorMove.event, this._onKey = this.register(new R.EventEmitter()), this.onKey = this._onKey.event, this._onRender = this.register(new R.EventEmitter()), this.onRender = this._onRender.event, this._onSelectionChange = this.register(new R.EventEmitter()), this.onSelectionChange = this._onSelectionChange.event, this._onTitleChange = this.register(new R.EventEmitter()), this.onTitleChange = this._onTitleChange.event, this._onBell = this.register(new R.EventEmitter()), this.onBell = this._onBell.event, this._onFocus = this.register(new R.EventEmitter()), this._onBlur = this.register(new R.EventEmitter()), this._onA11yCharEmitter = this.register(new R.EventEmitter()), this._onA11yTabEmitter = this.register(new R.EventEmitter()), this._onWillOpen = this.register(new R.EventEmitter()), this._setup(), this._decorationService = this._instantiationService.createInstance(P.DecorationService), this._instantiationService.setService(Z.IDecorationService, this._decorationService), this._linkProviderService = this._instantiationService.createInstance(J.LinkProviderService), this._instantiationService.setService(v.ILinkProviderService, this._linkProviderService), this._linkProviderService.registerLinkProvider(this._instantiationService.createInstance(d.OscLinkProvider)), this.register(this._inputHandler.onRequestBell((() => this._onBell.fire()))), this.register(this._inputHandler.onRequestRefreshRows(((C, F) => this.refresh(C, F)))), this.register(this._inputHandler.onRequestSendFocus((() => this._reportFocus()))), this.register(this._inputHandler.onRequestReset((() => this.reset()))), this.register(this._inputHandler.onRequestWindowsOptionsReport(((C) => this._reportWindowsOptions(C)))), this.register(this._inputHandler.onColor(((C) => this._handleColorEvent(C)))), this.register((0, R.forwardEvent)(this._inputHandler.onCursorMove, this._onCursorMove)), this.register((0, R.forwardEvent)(this._inputHandler.onTitleChange, this._onTitleChange)), this.register((0, R.forwardEvent)(this._inputHandler.onA11yChar, this._onA11yCharEmitter)), this.register((0, R.forwardEvent)(this._inputHandler.onA11yTab, this._onA11yTabEmitter)), this.register(this._bufferService.onResize(((C) => this._afterResize(C.cols, C.rows)))), this.register((0, W.toDisposable)((() => {
               var C, F;
               this._customKeyEventHandler = void 0, (F = (C = this.element) == null ? void 0 : C.parentNode) == null || F.removeChild(this.element);
             })));
           }
-          _handleColorEvent(D) {
-            if (this._themeService) for (const C of D) {
+          _handleColorEvent(j) {
+            if (this._themeService) for (const C of j) {
               let F, M = "";
               switch (C.index) {
                 case 256:
@@ -52083,22 +52083,22 @@ WARNING: This link could potentially be dangerous`)) {
           focus() {
             this.textarea && this.textarea.focus({ preventScroll: !0 });
           }
-          _handleScreenReaderModeOptionChange(D) {
-            D ? !this._accessibilityManager.value && this._renderService && (this._accessibilityManager.value = this._instantiationService.createInstance(E.AccessibilityManager, this)) : this._accessibilityManager.clear();
+          _handleScreenReaderModeOptionChange(j) {
+            j ? !this._accessibilityManager.value && this._renderService && (this._accessibilityManager.value = this._instantiationService.createInstance(E.AccessibilityManager, this)) : this._accessibilityManager.clear();
           }
-          _handleTextAreaFocus(D) {
+          _handleTextAreaFocus(j) {
             this.coreService.decPrivateModes.sendFocus && this.coreService.triggerDataEvent(B.C0.ESC + "[I"), this.element.classList.add("focus"), this._showCursor(), this._onFocus.fire();
           }
           blur() {
-            var D;
-            return (D = this.textarea) == null ? void 0 : D.blur();
+            var j;
+            return (j = this.textarea) == null ? void 0 : j.blur();
           }
           _handleTextAreaBlur() {
             this.textarea.value = "", this.refresh(this.buffer.y, this.buffer.y), this.coreService.decPrivateModes.sendFocus && this.coreService.triggerDataEvent(B.C0.ESC + "[O"), this.element.classList.remove("focus"), this._onBlur.fire();
           }
           _syncTextArea() {
             if (!this.textarea || !this.buffer.isCursorInViewport || this._compositionHelper.isComposing || !this._renderService) return;
-            const D = this.buffer.ybase + this.buffer.y, C = this.buffer.lines.get(D);
+            const j = this.buffer.ybase + this.buffer.y, C = this.buffer.lines.get(j);
             if (!C) return;
             const F = Math.min(this.buffer.x, this.cols - 1), M = this._renderService.dimensions.css.cell.height, oe = C.getWidth(F), se = this._renderService.dimensions.css.cell.width * oe, Re = this.buffer.y * this._renderService.dimensions.css.cell.height, Je = F * this._renderService.dimensions.css.cell.width;
             this.textarea.style.left = Je + "px", this.textarea.style.top = Re + "px", this.textarea.style.width = se + "px", this.textarea.style.height = M + "px", this.textarea.style.lineHeight = M + "px", this.textarea.style.zIndex = "-5";
@@ -52107,25 +52107,25 @@ WARNING: This link could potentially be dangerous`)) {
             this._bindKeys(), this.register((0, h.addDisposableDomListener)(this.element, "copy", ((C) => {
               this.hasSelection() && (0, O.copyHandler)(C, this._selectionService);
             })));
-            const D = (C) => (0, O.handlePasteEvent)(C, this.textarea, this.coreService, this.optionsService);
-            this.register((0, h.addDisposableDomListener)(this.textarea, "paste", D)), this.register((0, h.addDisposableDomListener)(this.element, "paste", D)), Z.isFirefox ? this.register((0, h.addDisposableDomListener)(this.element, "mousedown", ((C) => {
+            const j = (C) => (0, O.handlePasteEvent)(C, this.textarea, this.coreService, this.optionsService);
+            this.register((0, h.addDisposableDomListener)(this.textarea, "paste", j)), this.register((0, h.addDisposableDomListener)(this.element, "paste", j)), Y.isFirefox ? this.register((0, h.addDisposableDomListener)(this.element, "mousedown", ((C) => {
               C.button === 2 && (0, O.rightClickHandler)(C, this.textarea, this.screenElement, this._selectionService, this.options.rightClickSelectsWord);
             }))) : this.register((0, h.addDisposableDomListener)(this.element, "contextmenu", ((C) => {
               (0, O.rightClickHandler)(C, this.textarea, this.screenElement, this._selectionService, this.options.rightClickSelectsWord);
-            }))), Z.isLinux && this.register((0, h.addDisposableDomListener)(this.element, "auxclick", ((C) => {
+            }))), Y.isLinux && this.register((0, h.addDisposableDomListener)(this.element, "auxclick", ((C) => {
               C.button === 1 && (0, O.moveTextAreaUnderMouseCursor)(C, this.textarea, this.screenElement);
             })));
           }
           _bindKeys() {
-            this.register((0, h.addDisposableDomListener)(this.textarea, "keyup", ((D) => this._keyUp(D)), !0)), this.register((0, h.addDisposableDomListener)(this.textarea, "keydown", ((D) => this._keyDown(D)), !0)), this.register((0, h.addDisposableDomListener)(this.textarea, "keypress", ((D) => this._keyPress(D)), !0)), this.register((0, h.addDisposableDomListener)(this.textarea, "compositionstart", (() => this._compositionHelper.compositionstart()))), this.register((0, h.addDisposableDomListener)(this.textarea, "compositionupdate", ((D) => this._compositionHelper.compositionupdate(D)))), this.register((0, h.addDisposableDomListener)(this.textarea, "compositionend", (() => this._compositionHelper.compositionend()))), this.register((0, h.addDisposableDomListener)(this.textarea, "input", ((D) => this._inputEvent(D)), !0)), this.register(this.onRender((() => this._compositionHelper.updateCompositionElements())));
+            this.register((0, h.addDisposableDomListener)(this.textarea, "keyup", ((j) => this._keyUp(j)), !0)), this.register((0, h.addDisposableDomListener)(this.textarea, "keydown", ((j) => this._keyDown(j)), !0)), this.register((0, h.addDisposableDomListener)(this.textarea, "keypress", ((j) => this._keyPress(j)), !0)), this.register((0, h.addDisposableDomListener)(this.textarea, "compositionstart", (() => this._compositionHelper.compositionstart()))), this.register((0, h.addDisposableDomListener)(this.textarea, "compositionupdate", ((j) => this._compositionHelper.compositionupdate(j)))), this.register((0, h.addDisposableDomListener)(this.textarea, "compositionend", (() => this._compositionHelper.compositionend()))), this.register((0, h.addDisposableDomListener)(this.textarea, "input", ((j) => this._inputEvent(j)), !0)), this.register(this.onRender((() => this._compositionHelper.updateCompositionElements())));
           }
-          open(D) {
+          open(j) {
             var F;
-            if (!D) throw new Error("Terminal requires a parent element.");
-            if (D.isConnected || this._logService.debug("Terminal.open was called on an element that was not attached to the DOM"), ((F = this.element) == null ? void 0 : F.ownerDocument.defaultView) && this._coreBrowserService) return void (this.element.ownerDocument.defaultView !== this._coreBrowserService.window && (this._coreBrowserService.window = this.element.ownerDocument.defaultView));
-            this._document = D.ownerDocument, this.options.documentOverride && this.options.documentOverride instanceof Document && (this._document = this.optionsService.rawOptions.documentOverride), this.element = this._document.createElement("div"), this.element.dir = "ltr", this.element.classList.add("terminal"), this.element.classList.add("xterm"), D.appendChild(this.element);
+            if (!j) throw new Error("Terminal requires a parent element.");
+            if (j.isConnected || this._logService.debug("Terminal.open was called on an element that was not attached to the DOM"), ((F = this.element) == null ? void 0 : F.ownerDocument.defaultView) && this._coreBrowserService) return void (this.element.ownerDocument.defaultView !== this._coreBrowserService.window && (this._coreBrowserService.window = this.element.ownerDocument.defaultView));
+            this._document = j.ownerDocument, this.options.documentOverride && this.options.documentOverride instanceof Document && (this._document = this.optionsService.rawOptions.documentOverride), this.element = this._document.createElement("div"), this.element.dir = "ltr", this.element.classList.add("terminal"), this.element.classList.add("xterm"), j.appendChild(this.element);
             const C = this._document.createDocumentFragment();
-            this._viewportElement = this._document.createElement("div"), this._viewportElement.classList.add("xterm-viewport"), C.appendChild(this._viewportElement), this._viewportScrollArea = this._document.createElement("div"), this._viewportScrollArea.classList.add("xterm-scroll-area"), this._viewportElement.appendChild(this._viewportScrollArea), this.screenElement = this._document.createElement("div"), this.screenElement.classList.add("xterm-screen"), this.register((0, h.addDisposableDomListener)(this.screenElement, "mousemove", ((M) => this.updateCursorStyle(M)))), this._helperContainer = this._document.createElement("div"), this._helperContainer.classList.add("xterm-helpers"), this.screenElement.appendChild(this._helperContainer), C.appendChild(this.screenElement), this.textarea = this._document.createElement("textarea"), this.textarea.classList.add("xterm-helper-textarea"), this.textarea.setAttribute("aria-label", u.promptLabel), Z.isChromeOS || this.textarea.setAttribute("aria-multiline", "false"), this.textarea.setAttribute("autocorrect", "off"), this.textarea.setAttribute("autocapitalize", "off"), this.textarea.setAttribute("spellcheck", "false"), this.textarea.tabIndex = 0, this._coreBrowserService = this.register(this._instantiationService.createInstance(b.CoreBrowserService, this.textarea, D.ownerDocument.defaultView ?? window, this._document ?? typeof window < "u" ? window.document : null)), this._instantiationService.setService(v.ICoreBrowserService, this._coreBrowserService), this.register((0, h.addDisposableDomListener)(this.textarea, "focus", ((M) => this._handleTextAreaFocus(M)))), this.register((0, h.addDisposableDomListener)(this.textarea, "blur", (() => this._handleTextAreaBlur()))), this._helperContainer.appendChild(this.textarea), this._charSizeService = this._instantiationService.createInstance(_.CharSizeService, this._document, this._helperContainer), this._instantiationService.setService(v.ICharSizeService, this._charSizeService), this._themeService = this._instantiationService.createInstance(x.ThemeService), this._instantiationService.setService(v.IThemeService, this._themeService), this._characterJoinerService = this._instantiationService.createInstance(y.CharacterJoinerService), this._instantiationService.setService(v.ICharacterJoinerService, this._characterJoinerService), this._renderService = this.register(this._instantiationService.createInstance(k.RenderService, this.rows, this.screenElement)), this._instantiationService.setService(v.IRenderService, this._renderService), this.register(this._renderService.onRenderedViewportChange(((M) => this._onRender.fire(M)))), this.onResize(((M) => this._renderService.resize(M.cols, M.rows))), this._compositionView = this._document.createElement("div"), this._compositionView.classList.add("composition-view"), this._compositionHelper = this._instantiationService.createInstance(p.CompositionHelper, this.textarea, this._compositionView), this._helperContainer.appendChild(this._compositionView), this._mouseService = this._instantiationService.createInstance(m.MouseService), this._instantiationService.setService(v.IMouseService, this._mouseService), this.linkifier = this.register(this._instantiationService.createInstance(c.Linkifier, this.screenElement)), this.element.appendChild(C);
+            this._viewportElement = this._document.createElement("div"), this._viewportElement.classList.add("xterm-viewport"), C.appendChild(this._viewportElement), this._viewportScrollArea = this._document.createElement("div"), this._viewportScrollArea.classList.add("xterm-scroll-area"), this._viewportElement.appendChild(this._viewportScrollArea), this.screenElement = this._document.createElement("div"), this.screenElement.classList.add("xterm-screen"), this.register((0, h.addDisposableDomListener)(this.screenElement, "mousemove", ((M) => this.updateCursorStyle(M)))), this._helperContainer = this._document.createElement("div"), this._helperContainer.classList.add("xterm-helpers"), this.screenElement.appendChild(this._helperContainer), C.appendChild(this.screenElement), this.textarea = this._document.createElement("textarea"), this.textarea.classList.add("xterm-helper-textarea"), this.textarea.setAttribute("aria-label", u.promptLabel), Y.isChromeOS || this.textarea.setAttribute("aria-multiline", "false"), this.textarea.setAttribute("autocorrect", "off"), this.textarea.setAttribute("autocapitalize", "off"), this.textarea.setAttribute("spellcheck", "false"), this.textarea.tabIndex = 0, this._coreBrowserService = this.register(this._instantiationService.createInstance(b.CoreBrowserService, this.textarea, j.ownerDocument.defaultView ?? window, this._document ?? typeof window < "u" ? window.document : null)), this._instantiationService.setService(v.ICoreBrowserService, this._coreBrowserService), this.register((0, h.addDisposableDomListener)(this.textarea, "focus", ((M) => this._handleTextAreaFocus(M)))), this.register((0, h.addDisposableDomListener)(this.textarea, "blur", (() => this._handleTextAreaBlur()))), this._helperContainer.appendChild(this.textarea), this._charSizeService = this._instantiationService.createInstance(_.CharSizeService, this._document, this._helperContainer), this._instantiationService.setService(v.ICharSizeService, this._charSizeService), this._themeService = this._instantiationService.createInstance(x.ThemeService), this._instantiationService.setService(v.IThemeService, this._themeService), this._characterJoinerService = this._instantiationService.createInstance(y.CharacterJoinerService), this._instantiationService.setService(v.ICharacterJoinerService, this._characterJoinerService), this._renderService = this.register(this._instantiationService.createInstance(k.RenderService, this.rows, this.screenElement)), this._instantiationService.setService(v.IRenderService, this._renderService), this.register(this._renderService.onRenderedViewportChange(((M) => this._onRender.fire(M)))), this.onResize(((M) => this._renderService.resize(M.cols, M.rows))), this._compositionView = this._document.createElement("div"), this._compositionView.classList.add("composition-view"), this._compositionHelper = this._instantiationService.createInstance(p.CompositionHelper, this.textarea, this._compositionView), this._helperContainer.appendChild(this._compositionView), this._mouseService = this._instantiationService.createInstance(m.MouseService), this._instantiationService.setService(v.IMouseService, this._mouseService), this.linkifier = this.register(this._instantiationService.createInstance(c.Linkifier, this.screenElement)), this.element.appendChild(C);
             try {
               this._onWillOpen.fire(this.element);
             } catch {
@@ -52144,9 +52144,9 @@ WARNING: This link could potentially be dangerous`)) {
             return this._instantiationService.createInstance(g.DomRenderer, this, this._document, this.element, this.screenElement, this._viewportElement, this._helperContainer, this.linkifier);
           }
           bindMouse() {
-            const D = this, C = this.element;
+            const j = this, C = this.element;
             function F(se) {
-              const Re = D._mouseService.getMouseReportCoords(se, D.screenElement);
+              const Re = j._mouseService.getMouseReportCoords(se, j.screenElement);
               if (!Re) return !1;
               let Je, Le;
               switch (se.overrideType || se.type) {
@@ -52160,13 +52160,13 @@ WARNING: This link could potentially be dangerous`)) {
                   Le = 1, Je = se.button < 3 ? se.button : 3;
                   break;
                 case "wheel":
-                  if (D._customWheelEventHandler && D._customWheelEventHandler(se) === !1 || D.viewport.getLinesScrolled(se) === 0) return !1;
+                  if (j._customWheelEventHandler && j._customWheelEventHandler(se) === !1 || j.viewport.getLinesScrolled(se) === 0) return !1;
                   Le = se.deltaY < 0 ? 0 : 1, Je = 4;
                   break;
                 default:
                   return !1;
               }
-              return !(Le === void 0 || Je === void 0 || Je > 4) && D.coreMouseService.triggerMouseEvent({ col: Re.col, row: Re.row, x: Re.x, y: Re.y, button: Je, action: Le, ctrl: se.ctrlKey, alt: se.altKey, shift: se.shiftKey });
+              return !(Le === void 0 || Je === void 0 || Je > 4) && j.coreMouseService.triggerMouseEvent({ col: Re.col, row: Re.row, x: Re.x, y: Re.y, button: Je, action: Le, ctrl: se.ctrlKey, alt: se.altKey, shift: se.shiftKey });
             }
             const M = { mouseup: null, wheel: null, mousedrag: null, mousemove: null }, oe = { mouseup: (se) => (F(se), se.buttons || (this._document.removeEventListener("mouseup", M.mouseup), M.mousedrag && this._document.removeEventListener("mousemove", M.mousedrag)), this.cancel(se)), wheel: (se) => (F(se), this.cancel(se, !0)), mousedrag: (se) => {
               se.buttons && F(se);
@@ -52196,56 +52196,56 @@ WARNING: This link could potentially be dangerous`)) {
               if (!this.coreMouseService.areMouseEventsActive) return this.viewport.handleTouchMove(se) ? void 0 : this.cancel(se);
             }), { passive: !1 }));
           }
-          refresh(D, C) {
+          refresh(j, C) {
             var F;
-            (F = this._renderService) == null || F.refreshRows(D, C);
+            (F = this._renderService) == null || F.refreshRows(j, C);
           }
-          updateCursorStyle(D) {
+          updateCursorStyle(j) {
             var C;
-            (C = this._selectionService) != null && C.shouldColumnSelect(D) ? this.element.classList.add("column-select") : this.element.classList.remove("column-select");
+            (C = this._selectionService) != null && C.shouldColumnSelect(j) ? this.element.classList.add("column-select") : this.element.classList.remove("column-select");
           }
           _showCursor() {
             this.coreService.isCursorInitialized || (this.coreService.isCursorInitialized = !0, this.refresh(this.buffer.y, this.buffer.y));
           }
-          scrollLines(D, C, F = 0) {
+          scrollLines(j, C, F = 0) {
             var M;
-            F === 1 ? (super.scrollLines(D, C, F), this.refresh(0, this.rows - 1)) : (M = this.viewport) == null || M.scrollLines(D);
+            F === 1 ? (super.scrollLines(j, C, F), this.refresh(0, this.rows - 1)) : (M = this.viewport) == null || M.scrollLines(j);
           }
-          paste(D) {
-            (0, O.paste)(D, this.textarea, this.coreService, this.optionsService);
+          paste(j) {
+            (0, O.paste)(j, this.textarea, this.coreService, this.optionsService);
           }
-          attachCustomKeyEventHandler(D) {
-            this._customKeyEventHandler = D;
+          attachCustomKeyEventHandler(j) {
+            this._customKeyEventHandler = j;
           }
-          attachCustomWheelEventHandler(D) {
-            this._customWheelEventHandler = D;
+          attachCustomWheelEventHandler(j) {
+            this._customWheelEventHandler = j;
           }
-          registerLinkProvider(D) {
-            return this._linkProviderService.registerLinkProvider(D);
+          registerLinkProvider(j) {
+            return this._linkProviderService.registerLinkProvider(j);
           }
-          registerCharacterJoiner(D) {
+          registerCharacterJoiner(j) {
             if (!this._characterJoinerService) throw new Error("Terminal must be opened first");
-            const C = this._characterJoinerService.register(D);
+            const C = this._characterJoinerService.register(j);
             return this.refresh(0, this.rows - 1), C;
           }
-          deregisterCharacterJoiner(D) {
+          deregisterCharacterJoiner(j) {
             if (!this._characterJoinerService) throw new Error("Terminal must be opened first");
-            this._characterJoinerService.deregister(D) && this.refresh(0, this.rows - 1);
+            this._characterJoinerService.deregister(j) && this.refresh(0, this.rows - 1);
           }
           get markers() {
             return this.buffer.markers;
           }
-          registerMarker(D) {
-            return this.buffer.addMarker(this.buffer.ybase + this.buffer.y + D);
+          registerMarker(j) {
+            return this.buffer.addMarker(this.buffer.ybase + this.buffer.y + j);
           }
-          registerDecoration(D) {
-            return this._decorationService.registerDecoration(D);
+          registerDecoration(j) {
+            return this._decorationService.registerDecoration(j);
           }
           hasSelection() {
             return !!this._selectionService && this._selectionService.hasSelection;
           }
-          select(D, C, F) {
-            this._selectionService.setSelection(D, C, F);
+          select(j, C, F) {
+            this._selectionService.setSelection(j, C, F);
           }
           getSelection() {
             return this._selectionService ? this._selectionService.selectionText : "";
@@ -52254,89 +52254,89 @@ WARNING: This link could potentially be dangerous`)) {
             if (this._selectionService && this._selectionService.hasSelection) return { start: { x: this._selectionService.selectionStart[0], y: this._selectionService.selectionStart[1] }, end: { x: this._selectionService.selectionEnd[0], y: this._selectionService.selectionEnd[1] } };
           }
           clearSelection() {
-            var D;
-            (D = this._selectionService) == null || D.clearSelection();
+            var j;
+            (j = this._selectionService) == null || j.clearSelection();
           }
           selectAll() {
-            var D;
-            (D = this._selectionService) == null || D.selectAll();
+            var j;
+            (j = this._selectionService) == null || j.selectAll();
           }
-          selectLines(D, C) {
+          selectLines(j, C) {
             var F;
-            (F = this._selectionService) == null || F.selectLines(D, C);
+            (F = this._selectionService) == null || F.selectLines(j, C);
           }
-          _keyDown(D) {
-            if (this._keyDownHandled = !1, this._keyDownSeen = !0, this._customKeyEventHandler && this._customKeyEventHandler(D) === !1) return !1;
-            const C = this.browser.isMac && this.options.macOptionIsMeta && D.altKey;
-            if (!C && !this._compositionHelper.keydown(D)) return this.options.scrollOnUserInput && this.buffer.ybase !== this.buffer.ydisp && this.scrollToBottom(), !1;
-            C || D.key !== "Dead" && D.key !== "AltGraph" || (this._unprocessedDeadKey = !0);
-            const F = (0, I.evaluateKeyboardEvent)(D, this.coreService.decPrivateModes.applicationCursorKeys, this.browser.isMac, this.options.macOptionIsMeta);
-            if (this.updateCursorStyle(D), F.type === 3 || F.type === 2) {
+          _keyDown(j) {
+            if (this._keyDownHandled = !1, this._keyDownSeen = !0, this._customKeyEventHandler && this._customKeyEventHandler(j) === !1) return !1;
+            const C = this.browser.isMac && this.options.macOptionIsMeta && j.altKey;
+            if (!C && !this._compositionHelper.keydown(j)) return this.options.scrollOnUserInput && this.buffer.ybase !== this.buffer.ydisp && this.scrollToBottom(), !1;
+            C || j.key !== "Dead" && j.key !== "AltGraph" || (this._unprocessedDeadKey = !0);
+            const F = (0, I.evaluateKeyboardEvent)(j, this.coreService.decPrivateModes.applicationCursorKeys, this.browser.isMac, this.options.macOptionIsMeta);
+            if (this.updateCursorStyle(j), F.type === 3 || F.type === 2) {
               const M = this.rows - 1;
-              return this.scrollLines(F.type === 2 ? -M : M), this.cancel(D, !0);
+              return this.scrollLines(F.type === 2 ? -M : M), this.cancel(j, !0);
             }
-            return F.type === 1 && this.selectAll(), !!this._isThirdLevelShift(this.browser, D) || (F.cancel && this.cancel(D, !0), !F.key || !!(D.key && !D.ctrlKey && !D.altKey && !D.metaKey && D.key.length === 1 && D.key.charCodeAt(0) >= 65 && D.key.charCodeAt(0) <= 90) || (this._unprocessedDeadKey ? (this._unprocessedDeadKey = !1, !0) : (F.key !== B.C0.ETX && F.key !== B.C0.CR || (this.textarea.value = ""), this._onKey.fire({ key: F.key, domEvent: D }), this._showCursor(), this.coreService.triggerDataEvent(F.key, !0), !this.optionsService.rawOptions.screenReaderMode || D.altKey || D.ctrlKey ? this.cancel(D, !0) : void (this._keyDownHandled = !0))));
+            return F.type === 1 && this.selectAll(), !!this._isThirdLevelShift(this.browser, j) || (F.cancel && this.cancel(j, !0), !F.key || !!(j.key && !j.ctrlKey && !j.altKey && !j.metaKey && j.key.length === 1 && j.key.charCodeAt(0) >= 65 && j.key.charCodeAt(0) <= 90) || (this._unprocessedDeadKey ? (this._unprocessedDeadKey = !1, !0) : (F.key !== B.C0.ETX && F.key !== B.C0.CR || (this.textarea.value = ""), this._onKey.fire({ key: F.key, domEvent: j }), this._showCursor(), this.coreService.triggerDataEvent(F.key, !0), !this.optionsService.rawOptions.screenReaderMode || j.altKey || j.ctrlKey ? this.cancel(j, !0) : void (this._keyDownHandled = !0))));
           }
-          _isThirdLevelShift(D, C) {
-            const F = D.isMac && !this.options.macOptionIsMeta && C.altKey && !C.ctrlKey && !C.metaKey || D.isWindows && C.altKey && C.ctrlKey && !C.metaKey || D.isWindows && C.getModifierState("AltGraph");
+          _isThirdLevelShift(j, C) {
+            const F = j.isMac && !this.options.macOptionIsMeta && C.altKey && !C.ctrlKey && !C.metaKey || j.isWindows && C.altKey && C.ctrlKey && !C.metaKey || j.isWindows && C.getModifierState("AltGraph");
             return C.type === "keypress" ? F : F && (!C.keyCode || C.keyCode > 47);
           }
-          _keyUp(D) {
-            this._keyDownSeen = !1, this._customKeyEventHandler && this._customKeyEventHandler(D) === !1 || ((function(C) {
+          _keyUp(j) {
+            this._keyDownSeen = !1, this._customKeyEventHandler && this._customKeyEventHandler(j) === !1 || ((function(C) {
               return C.keyCode === 16 || C.keyCode === 17 || C.keyCode === 18;
-            })(D) || this.focus(), this.updateCursorStyle(D), this._keyPressHandled = !1);
+            })(j) || this.focus(), this.updateCursorStyle(j), this._keyPressHandled = !1);
           }
-          _keyPress(D) {
+          _keyPress(j) {
             let C;
-            if (this._keyPressHandled = !1, this._keyDownHandled || this._customKeyEventHandler && this._customKeyEventHandler(D) === !1) return !1;
-            if (this.cancel(D), D.charCode) C = D.charCode;
-            else if (D.which === null || D.which === void 0) C = D.keyCode;
+            if (this._keyPressHandled = !1, this._keyDownHandled || this._customKeyEventHandler && this._customKeyEventHandler(j) === !1) return !1;
+            if (this.cancel(j), j.charCode) C = j.charCode;
+            else if (j.which === null || j.which === void 0) C = j.keyCode;
             else {
-              if (D.which === 0 || D.charCode === 0) return !1;
-              C = D.which;
+              if (j.which === 0 || j.charCode === 0) return !1;
+              C = j.which;
             }
-            return !(!C || (D.altKey || D.ctrlKey || D.metaKey) && !this._isThirdLevelShift(this.browser, D) || (C = String.fromCharCode(C), this._onKey.fire({ key: C, domEvent: D }), this._showCursor(), this.coreService.triggerDataEvent(C, !0), this._keyPressHandled = !0, this._unprocessedDeadKey = !1, 0));
+            return !(!C || (j.altKey || j.ctrlKey || j.metaKey) && !this._isThirdLevelShift(this.browser, j) || (C = String.fromCharCode(C), this._onKey.fire({ key: C, domEvent: j }), this._showCursor(), this.coreService.triggerDataEvent(C, !0), this._keyPressHandled = !0, this._unprocessedDeadKey = !1, 0));
           }
-          _inputEvent(D) {
-            if (D.data && D.inputType === "insertText" && (!D.composed || !this._keyDownSeen) && !this.optionsService.rawOptions.screenReaderMode) {
+          _inputEvent(j) {
+            if (j.data && j.inputType === "insertText" && (!j.composed || !this._keyDownSeen) && !this.optionsService.rawOptions.screenReaderMode) {
               if (this._keyPressHandled) return !1;
               this._unprocessedDeadKey = !1;
-              const C = D.data;
-              return this.coreService.triggerDataEvent(C, !0), this.cancel(D), !0;
+              const C = j.data;
+              return this.coreService.triggerDataEvent(C, !0), this.cancel(j), !0;
             }
             return !1;
           }
-          resize(D, C) {
-            D !== this.cols || C !== this.rows ? super.resize(D, C) : this._charSizeService && !this._charSizeService.hasValidSize && this._charSizeService.measure();
+          resize(j, C) {
+            j !== this.cols || C !== this.rows ? super.resize(j, C) : this._charSizeService && !this._charSizeService.hasValidSize && this._charSizeService.measure();
           }
-          _afterResize(D, C) {
+          _afterResize(j, C) {
             var F, M;
             (F = this._charSizeService) == null || F.measure(), (M = this.viewport) == null || M.syncScrollArea(!0);
           }
           clear() {
-            var D;
+            var j;
             if (this.buffer.ybase !== 0 || this.buffer.y !== 0) {
               this.buffer.clearAllMarkers(), this.buffer.lines.set(0, this.buffer.lines.get(this.buffer.ybase + this.buffer.y)), this.buffer.lines.length = 1, this.buffer.ydisp = 0, this.buffer.ybase = 0, this.buffer.y = 0;
-              for (let C = 1; C < this.rows; C++) this.buffer.lines.push(this.buffer.getBlankLine(j.DEFAULT_ATTR_DATA));
-              this._onScroll.fire({ position: this.buffer.ydisp, source: 0 }), (D = this.viewport) == null || D.reset(), this.refresh(0, this.rows - 1);
+              for (let C = 1; C < this.rows; C++) this.buffer.lines.push(this.buffer.getBlankLine(D.DEFAULT_ATTR_DATA));
+              this._onScroll.fire({ position: this.buffer.ydisp, source: 0 }), (j = this.viewport) == null || j.reset(), this.refresh(0, this.rows - 1);
             }
           }
           reset() {
             var C, F;
             this.options.rows = this.rows, this.options.cols = this.cols;
-            const D = this._customKeyEventHandler;
-            this._setup(), super.reset(), (C = this._selectionService) == null || C.reset(), this._decorationService.reset(), (F = this.viewport) == null || F.reset(), this._customKeyEventHandler = D, this.refresh(0, this.rows - 1);
+            const j = this._customKeyEventHandler;
+            this._setup(), super.reset(), (C = this._selectionService) == null || C.reset(), this._decorationService.reset(), (F = this.viewport) == null || F.reset(), this._customKeyEventHandler = j, this.refresh(0, this.rows - 1);
           }
           clearTextureAtlas() {
-            var D;
-            (D = this._renderService) == null || D.clearTextureAtlas();
+            var j;
+            (j = this._renderService) == null || j.clearTextureAtlas();
           }
           _reportFocus() {
-            var D;
-            (D = this.element) != null && D.classList.contains("focus") ? this.coreService.triggerDataEvent(B.C0.ESC + "[I") : this.coreService.triggerDataEvent(B.C0.ESC + "[O");
+            var j;
+            (j = this.element) != null && j.classList.contains("focus") ? this.coreService.triggerDataEvent(B.C0.ESC + "[I") : this.coreService.triggerDataEvent(B.C0.ESC + "[O");
           }
-          _reportWindowsOptions(D) {
-            if (this._renderService) switch (D) {
+          _reportWindowsOptions(j) {
+            if (this._renderService) switch (j) {
               case U.WindowsOptionsReportType.GET_WIN_SIZE_PIXELS:
                 const C = this._renderService.dimensions.css.canvas.width.toFixed(0), F = this._renderService.dimensions.css.canvas.height.toFixed(0);
                 this.coreService.triggerDataEvent(`${B.C0.ESC}[4;${F};${C}t`);
@@ -52346,8 +52346,8 @@ WARNING: This link could potentially be dangerous`)) {
                 this.coreService.triggerDataEvent(`${B.C0.ESC}[6;${oe};${M}t`);
             }
           }
-          cancel(D, C) {
-            if (this.options.cancelEvents || C) return D.preventDefault(), D.stopPropagation(), !1;
+          cancel(j, C) {
+            if (this.options.cancelEvents || C) return j.preventDefault(), j.stopPropagation(), !1;
           }
         }
         o.Terminal = ce;
@@ -52751,8 +52751,8 @@ WARNING: This link could potentially be dangerous`)) {
             let x = 0;
             const z = k - c(k, v), X = S - c(S, v);
             for (let R = 0; R < Math.abs(z - X); R++) {
-              const W = u(k, S) === "A" ? -1 : 1, Z = v.buffer.lines.get(z + W * R);
-              Z != null && Z.isWrapped && x++;
+              const W = u(k, S) === "A" ? -1 : 1, Y = v.buffer.lines.get(z + W * R);
+              Y != null && Y.isWrapped && x++;
             }
             return x;
           })(f, p, g);
@@ -52788,11 +52788,11 @@ WARNING: This link could potentially be dangerous`)) {
           })(y, b, 0, p, g, _) + h(b, p, g, _) + (function(S, v, x, z, X, R) {
             let W;
             W = h(v, z, X, R).length > 0 ? z - c(z, X) : v;
-            const Z = z, j = (function(B, I, T, P, Y, U) {
+            const Y = z, D = (function(B, I, T, P, Z, U) {
               let E;
-              return E = h(T, P, Y, U).length > 0 ? P - c(P, Y) : I, B < T && E <= P || B >= T && E < P ? "C" : "D";
+              return E = h(T, P, Z, U).length > 0 ? P - c(P, Z) : I, B < T && E <= P || B >= T && E < P ? "C" : "D";
             })(S, v, x, z, X, R);
-            return Q(d(S, W, x, Z, j === "C", X).length, $(j, R));
+            return Q(d(S, W, x, Y, D === "C", X).length, $(D, R));
           })(y, b, f, p, g, _);
           let m;
           if (b === p) return m = y > f ? "D" : "C", Q(Math.abs(y - f), $(m, _));
@@ -52803,28 +52803,28 @@ WARNING: This link could potentially be dangerous`)) {
           })(b > p ? f : y, g) + (k - 1) * g.cols + 1 + ((b > p ? y : f) - 1), $(m, _));
         };
       }, 1296: function(a, o, l) {
-        var O = this && this.__decorate || function(R, W, Z, j) {
-          var B, I = arguments.length, T = I < 3 ? W : j === null ? j = Object.getOwnPropertyDescriptor(W, Z) : j;
-          if (typeof Reflect == "object" && typeof Reflect.decorate == "function") T = Reflect.decorate(R, W, Z, j);
-          else for (var P = R.length - 1; P >= 0; P--) (B = R[P]) && (T = (I < 3 ? B(T) : I > 3 ? B(W, Z, T) : B(W, Z)) || T);
-          return I > 3 && T && Object.defineProperty(W, Z, T), T;
+        var O = this && this.__decorate || function(R, W, Y, D) {
+          var B, I = arguments.length, T = I < 3 ? W : D === null ? D = Object.getOwnPropertyDescriptor(W, Y) : D;
+          if (typeof Reflect == "object" && typeof Reflect.decorate == "function") T = Reflect.decorate(R, W, Y, D);
+          else for (var P = R.length - 1; P >= 0; P--) (B = R[P]) && (T = (I < 3 ? B(T) : I > 3 ? B(W, Y, T) : B(W, Y)) || T);
+          return I > 3 && T && Object.defineProperty(W, Y, T), T;
         }, h = this && this.__param || function(R, W) {
-          return function(Z, j) {
-            W(Z, j, R);
+          return function(Y, D) {
+            W(Y, D, R);
           };
         };
         Object.defineProperty(o, "__esModule", { value: !0 }), o.DomRenderer = void 0;
         const c = l(3787), u = l(2550), d = l(2223), $ = l(6171), Q = l(6052), f = l(4725), p = l(8055), g = l(8460), _ = l(844), y = l(2585), b = "xterm-dom-renderer-owner-", m = "xterm-rows", k = "xterm-fg-", S = "xterm-bg-", v = "xterm-focus", x = "xterm-selection";
         let z = 1, X = o.DomRenderer = class extends _.Disposable {
-          constructor(R, W, Z, j, B, I, T, P, Y, U, E, J, ce) {
-            super(), this._terminal = R, this._document = W, this._element = Z, this._screenElement = j, this._viewportElement = B, this._helperContainer = I, this._linkifier2 = T, this._charSizeService = Y, this._optionsService = U, this._bufferService = E, this._coreBrowserService = J, this._themeService = ce, this._terminalClass = z++, this._rowElements = [], this._selectionRenderModel = (0, Q.createSelectionRenderModel)(), this.onRequestRedraw = this.register(new g.EventEmitter()).event, this._rowContainer = this._document.createElement("div"), this._rowContainer.classList.add(m), this._rowContainer.style.lineHeight = "normal", this._rowContainer.setAttribute("aria-hidden", "true"), this._refreshRowElements(this._bufferService.cols, this._bufferService.rows), this._selectionContainer = this._document.createElement("div"), this._selectionContainer.classList.add(x), this._selectionContainer.setAttribute("aria-hidden", "true"), this.dimensions = (0, $.createRenderDimensions)(), this._updateDimensions(), this.register(this._optionsService.onOptionChange((() => this._handleOptionsChanged()))), this.register(this._themeService.onChangeColors(((ae) => this._injectCss(ae)))), this._injectCss(this._themeService.colors), this._rowFactory = P.createInstance(c.DomRendererRowFactory, document), this._element.classList.add(b + this._terminalClass), this._screenElement.appendChild(this._rowContainer), this._screenElement.appendChild(this._selectionContainer), this.register(this._linkifier2.onShowLinkUnderline(((ae) => this._handleLinkHover(ae)))), this.register(this._linkifier2.onHideLinkUnderline(((ae) => this._handleLinkLeave(ae)))), this.register((0, _.toDisposable)((() => {
+          constructor(R, W, Y, D, B, I, T, P, Z, U, E, J, ce) {
+            super(), this._terminal = R, this._document = W, this._element = Y, this._screenElement = D, this._viewportElement = B, this._helperContainer = I, this._linkifier2 = T, this._charSizeService = Z, this._optionsService = U, this._bufferService = E, this._coreBrowserService = J, this._themeService = ce, this._terminalClass = z++, this._rowElements = [], this._selectionRenderModel = (0, Q.createSelectionRenderModel)(), this.onRequestRedraw = this.register(new g.EventEmitter()).event, this._rowContainer = this._document.createElement("div"), this._rowContainer.classList.add(m), this._rowContainer.style.lineHeight = "normal", this._rowContainer.setAttribute("aria-hidden", "true"), this._refreshRowElements(this._bufferService.cols, this._bufferService.rows), this._selectionContainer = this._document.createElement("div"), this._selectionContainer.classList.add(x), this._selectionContainer.setAttribute("aria-hidden", "true"), this.dimensions = (0, $.createRenderDimensions)(), this._updateDimensions(), this.register(this._optionsService.onOptionChange((() => this._handleOptionsChanged()))), this.register(this._themeService.onChangeColors(((ae) => this._injectCss(ae)))), this._injectCss(this._themeService.colors), this._rowFactory = P.createInstance(c.DomRendererRowFactory, document), this._element.classList.add(b + this._terminalClass), this._screenElement.appendChild(this._rowContainer), this._screenElement.appendChild(this._selectionContainer), this.register(this._linkifier2.onShowLinkUnderline(((ae) => this._handleLinkHover(ae)))), this.register(this._linkifier2.onHideLinkUnderline(((ae) => this._handleLinkLeave(ae)))), this.register((0, _.toDisposable)((() => {
               this._element.classList.remove(b + this._terminalClass), this._rowContainer.remove(), this._selectionContainer.remove(), this._widthCache.dispose(), this._themeStyleElement.remove(), this._dimensionsStyleElement.remove();
             }))), this._widthCache = new u.WidthCache(this._document, this._helperContainer), this._widthCache.setFont(this._optionsService.rawOptions.fontFamily, this._optionsService.rawOptions.fontSize, this._optionsService.rawOptions.fontWeight, this._optionsService.rawOptions.fontWeightBold), this._setDefaultSpacing();
           }
           _updateDimensions() {
             const R = this._coreBrowserService.dpr;
             this.dimensions.device.char.width = this._charSizeService.width * R, this.dimensions.device.char.height = Math.ceil(this._charSizeService.height * R), this.dimensions.device.cell.width = this.dimensions.device.char.width + Math.round(this._optionsService.rawOptions.letterSpacing), this.dimensions.device.cell.height = Math.floor(this.dimensions.device.char.height * this._optionsService.rawOptions.lineHeight), this.dimensions.device.char.left = 0, this.dimensions.device.char.top = 0, this.dimensions.device.canvas.width = this.dimensions.device.cell.width * this._bufferService.cols, this.dimensions.device.canvas.height = this.dimensions.device.cell.height * this._bufferService.rows, this.dimensions.css.canvas.width = Math.round(this.dimensions.device.canvas.width / R), this.dimensions.css.canvas.height = Math.round(this.dimensions.device.canvas.height / R), this.dimensions.css.cell.width = this.dimensions.css.canvas.width / this._bufferService.cols, this.dimensions.css.cell.height = this.dimensions.css.canvas.height / this._bufferService.rows;
-            for (const Z of this._rowElements) Z.style.width = `${this.dimensions.css.canvas.width}px`, Z.style.height = `${this.dimensions.css.cell.height}px`, Z.style.lineHeight = `${this.dimensions.css.cell.height}px`, Z.style.overflow = "hidden";
+            for (const Y of this._rowElements) Y.style.width = `${this.dimensions.css.canvas.width}px`, Y.style.height = `${this.dimensions.css.cell.height}px`, Y.style.lineHeight = `${this.dimensions.css.cell.height}px`, Y.style.overflow = "hidden";
             this._dimensionsStyleElement || (this._dimensionsStyleElement = this._document.createElement("style"), this._screenElement.appendChild(this._dimensionsStyleElement));
             const W = `${this._terminalSelector} .${m} span { display: inline-block; height: 100%; vertical-align: top;}`;
             this._dimensionsStyleElement.textContent = W, this._selectionContainer.style.height = this._viewportElement.style.height, this._screenElement.style.width = `${this.dimensions.css.canvas.width}px`, this._screenElement.style.height = `${this.dimensions.css.canvas.height}px`;
@@ -52833,8 +52833,8 @@ WARNING: This link could potentially be dangerous`)) {
             this._themeStyleElement || (this._themeStyleElement = this._document.createElement("style"), this._screenElement.appendChild(this._themeStyleElement));
             let W = `${this._terminalSelector} .${m} { color: ${R.foreground.css}; font-family: ${this._optionsService.rawOptions.fontFamily}; font-size: ${this._optionsService.rawOptions.fontSize}px; font-kerning: none; white-space: pre}`;
             W += `${this._terminalSelector} .${m} .xterm-dim { color: ${p.color.multiplyOpacity(R.foreground, 0.5).css};}`, W += `${this._terminalSelector} span:not(.xterm-bold) { font-weight: ${this._optionsService.rawOptions.fontWeight};}${this._terminalSelector} span.xterm-bold { font-weight: ${this._optionsService.rawOptions.fontWeightBold};}${this._terminalSelector} span.xterm-italic { font-style: italic;}`;
-            const Z = `blink_underline_${this._terminalClass}`, j = `blink_bar_${this._terminalClass}`, B = `blink_block_${this._terminalClass}`;
-            W += `@keyframes ${Z} { 50% {  border-bottom-style: hidden; }}`, W += `@keyframes ${j} { 50% {  box-shadow: none; }}`, W += `@keyframes ${B} { 0% {  background-color: ${R.cursor.css};  color: ${R.cursorAccent.css}; } 50% {  background-color: inherit;  color: ${R.cursor.css}; }}`, W += `${this._terminalSelector} .${m}.${v} .xterm-cursor.xterm-cursor-blink.xterm-cursor-underline { animation: ${Z} 1s step-end infinite;}${this._terminalSelector} .${m}.${v} .xterm-cursor.xterm-cursor-blink.xterm-cursor-bar { animation: ${j} 1s step-end infinite;}${this._terminalSelector} .${m}.${v} .xterm-cursor.xterm-cursor-blink.xterm-cursor-block { animation: ${B} 1s step-end infinite;}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-block { background-color: ${R.cursor.css}; color: ${R.cursorAccent.css};}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-block:not(.xterm-cursor-blink) { background-color: ${R.cursor.css} !important; color: ${R.cursorAccent.css} !important;}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-outline { outline: 1px solid ${R.cursor.css}; outline-offset: -1px;}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-bar { box-shadow: ${this._optionsService.rawOptions.cursorWidth}px 0 0 ${R.cursor.css} inset;}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-underline { border-bottom: 1px ${R.cursor.css}; border-bottom-style: solid; height: calc(100% - 1px);}`, W += `${this._terminalSelector} .${x} { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none;}${this._terminalSelector}.focus .${x} div { position: absolute; background-color: ${R.selectionBackgroundOpaque.css};}${this._terminalSelector} .${x} div { position: absolute; background-color: ${R.selectionInactiveBackgroundOpaque.css};}`;
+            const Y = `blink_underline_${this._terminalClass}`, D = `blink_bar_${this._terminalClass}`, B = `blink_block_${this._terminalClass}`;
+            W += `@keyframes ${Y} { 50% {  border-bottom-style: hidden; }}`, W += `@keyframes ${D} { 50% {  box-shadow: none; }}`, W += `@keyframes ${B} { 0% {  background-color: ${R.cursor.css};  color: ${R.cursorAccent.css}; } 50% {  background-color: inherit;  color: ${R.cursor.css}; }}`, W += `${this._terminalSelector} .${m}.${v} .xterm-cursor.xterm-cursor-blink.xterm-cursor-underline { animation: ${Y} 1s step-end infinite;}${this._terminalSelector} .${m}.${v} .xterm-cursor.xterm-cursor-blink.xterm-cursor-bar { animation: ${D} 1s step-end infinite;}${this._terminalSelector} .${m}.${v} .xterm-cursor.xterm-cursor-blink.xterm-cursor-block { animation: ${B} 1s step-end infinite;}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-block { background-color: ${R.cursor.css}; color: ${R.cursorAccent.css};}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-block:not(.xterm-cursor-blink) { background-color: ${R.cursor.css} !important; color: ${R.cursorAccent.css} !important;}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-outline { outline: 1px solid ${R.cursor.css}; outline-offset: -1px;}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-bar { box-shadow: ${this._optionsService.rawOptions.cursorWidth}px 0 0 ${R.cursor.css} inset;}${this._terminalSelector} .${m} .xterm-cursor.xterm-cursor-underline { border-bottom: 1px ${R.cursor.css}; border-bottom-style: solid; height: calc(100% - 1px);}`, W += `${this._terminalSelector} .${x} { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none;}${this._terminalSelector}.focus .${x} div { position: absolute; background-color: ${R.selectionBackgroundOpaque.css};}${this._terminalSelector} .${x} div { position: absolute; background-color: ${R.selectionInactiveBackgroundOpaque.css};}`;
             for (const [I, T] of R.ansi.entries()) W += `${this._terminalSelector} .${k}${I} { color: ${T.css}; }${this._terminalSelector} .${k}${I}.xterm-dim { color: ${p.color.multiplyOpacity(T, 0.5).css}; }${this._terminalSelector} .${S}${I} { background-color: ${T.css}; }`;
             W += `${this._terminalSelector} .${k}${d.INVERTED_DEFAULT_COLOR} { color: ${p.color.opaque(R.background).css}; }${this._terminalSelector} .${k}${d.INVERTED_DEFAULT_COLOR}.xterm-dim { color: ${p.color.multiplyOpacity(p.color.opaque(R.background), 0.5).css}; }${this._terminalSelector} .${S}${d.INVERTED_DEFAULT_COLOR} { background-color: ${R.foreground.css}; }`, this._themeStyleElement.textContent = W;
           }
@@ -52846,9 +52846,9 @@ WARNING: This link could potentially be dangerous`)) {
             this._updateDimensions(), this._widthCache.clear(), this._setDefaultSpacing();
           }
           _refreshRowElements(R, W) {
-            for (let Z = this._rowElements.length; Z <= W; Z++) {
-              const j = this._document.createElement("div");
-              this._rowContainer.appendChild(j), this._rowElements.push(j);
+            for (let Y = this._rowElements.length; Y <= W; Y++) {
+              const D = this._document.createElement("div");
+              this._rowContainer.appendChild(D), this._rowElements.push(D);
             }
             for (; this._rowElements.length > W; ) this._rowContainer.removeChild(this._rowElements.pop());
           }
@@ -52864,18 +52864,18 @@ WARNING: This link could potentially be dangerous`)) {
           handleFocus() {
             this._rowContainer.classList.add(v), this.renderRows(this._bufferService.buffer.y, this._bufferService.buffer.y);
           }
-          handleSelectionChanged(R, W, Z) {
-            if (this._selectionContainer.replaceChildren(), this._rowFactory.handleSelectionChanged(R, W, Z), this.renderRows(0, this._bufferService.rows - 1), !R || !W) return;
-            this._selectionRenderModel.update(this._terminal, R, W, Z);
-            const j = this._selectionRenderModel.viewportStartRow, B = this._selectionRenderModel.viewportEndRow, I = this._selectionRenderModel.viewportCappedStartRow, T = this._selectionRenderModel.viewportCappedEndRow;
+          handleSelectionChanged(R, W, Y) {
+            if (this._selectionContainer.replaceChildren(), this._rowFactory.handleSelectionChanged(R, W, Y), this.renderRows(0, this._bufferService.rows - 1), !R || !W) return;
+            this._selectionRenderModel.update(this._terminal, R, W, Y);
+            const D = this._selectionRenderModel.viewportStartRow, B = this._selectionRenderModel.viewportEndRow, I = this._selectionRenderModel.viewportCappedStartRow, T = this._selectionRenderModel.viewportCappedEndRow;
             if (I >= this._bufferService.rows || T < 0) return;
             const P = this._document.createDocumentFragment();
-            if (Z) {
-              const Y = R[0] > W[0];
-              P.appendChild(this._createSelectionElement(I, Y ? W[0] : R[0], Y ? R[0] : W[0], T - I + 1));
+            if (Y) {
+              const Z = R[0] > W[0];
+              P.appendChild(this._createSelectionElement(I, Z ? W[0] : R[0], Z ? R[0] : W[0], T - I + 1));
             } else {
-              const Y = j === I ? R[0] : 0, U = I === B ? W[0] : this._bufferService.cols;
-              P.appendChild(this._createSelectionElement(I, Y, U));
+              const Z = D === I ? R[0] : 0, U = I === B ? W[0] : this._bufferService.cols;
+              P.appendChild(this._createSelectionElement(I, Z, U));
               const E = T - I - 1;
               if (P.appendChild(this._createSelectionElement(I + 1, 0, this._bufferService.cols, E)), I !== T) {
                 const J = B === T ? W[0] : this._bufferService.cols;
@@ -52884,10 +52884,10 @@ WARNING: This link could potentially be dangerous`)) {
             }
             this._selectionContainer.appendChild(P);
           }
-          _createSelectionElement(R, W, Z, j = 1) {
+          _createSelectionElement(R, W, Y, D = 1) {
             const B = this._document.createElement("div"), I = W * this.dimensions.css.cell.width;
-            let T = this.dimensions.css.cell.width * (Z - W);
-            return I + T > this.dimensions.css.canvas.width && (T = this.dimensions.css.canvas.width - I), B.style.height = j * this.dimensions.css.cell.height + "px", B.style.top = R * this.dimensions.css.cell.height + "px", B.style.left = `${I}px`, B.style.width = `${T}px`, B;
+            let T = this.dimensions.css.cell.width * (Y - W);
+            return I + T > this.dimensions.css.canvas.width && (T = this.dimensions.css.canvas.width - I), B.style.height = D * this.dimensions.css.cell.height + "px", B.style.top = R * this.dimensions.css.cell.height + "px", B.style.left = `${I}px`, B.style.width = `${T}px`, B;
           }
           handleCursorMove() {
           }
@@ -52898,11 +52898,11 @@ WARNING: This link could potentially be dangerous`)) {
             for (const R of this._rowElements) R.replaceChildren();
           }
           renderRows(R, W) {
-            const Z = this._bufferService.buffer, j = Z.ybase + Z.y, B = Math.min(Z.x, this._bufferService.cols - 1), I = this._optionsService.rawOptions.cursorBlink, T = this._optionsService.rawOptions.cursorStyle, P = this._optionsService.rawOptions.cursorInactiveStyle;
-            for (let Y = R; Y <= W; Y++) {
-              const U = Y + Z.ydisp, E = this._rowElements[Y], J = Z.lines.get(U);
+            const Y = this._bufferService.buffer, D = Y.ybase + Y.y, B = Math.min(Y.x, this._bufferService.cols - 1), I = this._optionsService.rawOptions.cursorBlink, T = this._optionsService.rawOptions.cursorStyle, P = this._optionsService.rawOptions.cursorInactiveStyle;
+            for (let Z = R; Z <= W; Z++) {
+              const U = Z + Y.ydisp, E = this._rowElements[Z], J = Y.lines.get(U);
               if (!E || !J) break;
-              E.replaceChildren(...this._rowFactory.createRow(J, U, U === j, T, P, B, I, this.dimensions.css.cell.width, this._widthCache, -1, -1));
+              E.replaceChildren(...this._rowFactory.createRow(J, U, U === D, T, P, B, I, this.dimensions.css.cell.width, this._widthCache, -1, -1));
             }
           }
           get _terminalSelector() {
@@ -52914,15 +52914,15 @@ WARNING: This link could potentially be dangerous`)) {
           _handleLinkLeave(R) {
             this._setCellUnderline(R.x1, R.x2, R.y1, R.y2, R.cols, !1);
           }
-          _setCellUnderline(R, W, Z, j, B, I) {
-            Z < 0 && (R = 0), j < 0 && (W = 0);
+          _setCellUnderline(R, W, Y, D, B, I) {
+            Y < 0 && (R = 0), D < 0 && (W = 0);
             const T = this._bufferService.rows - 1;
-            Z = Math.max(Math.min(Z, T), 0), j = Math.max(Math.min(j, T), 0), B = Math.min(B, this._bufferService.cols);
-            const P = this._bufferService.buffer, Y = P.ybase + P.y, U = Math.min(P.x, B - 1), E = this._optionsService.rawOptions.cursorBlink, J = this._optionsService.rawOptions.cursorStyle, ce = this._optionsService.rawOptions.cursorInactiveStyle;
-            for (let ae = Z; ae <= j; ++ae) {
-              const D = ae + P.ydisp, C = this._rowElements[ae], F = P.lines.get(D);
+            Y = Math.max(Math.min(Y, T), 0), D = Math.max(Math.min(D, T), 0), B = Math.min(B, this._bufferService.cols);
+            const P = this._bufferService.buffer, Z = P.ybase + P.y, U = Math.min(P.x, B - 1), E = this._optionsService.rawOptions.cursorBlink, J = this._optionsService.rawOptions.cursorStyle, ce = this._optionsService.rawOptions.cursorInactiveStyle;
+            for (let ae = Y; ae <= D; ++ae) {
+              const j = ae + P.ydisp, C = this._rowElements[ae], F = P.lines.get(j);
               if (!C || !F) break;
-              C.replaceChildren(...this._rowFactory.createRow(F, D, D === Y, J, ce, U, E, this.dimensions.css.cell.width, this._widthCache, I ? ae === Z ? R : 0 : -1, I ? (ae === j ? W : B) - 1 : -1));
+              C.replaceChildren(...this._rowFactory.createRow(F, j, j === Z, J, ce, U, E, this.dimensions.css.cell.width, this._widthCache, I ? ae === Y ? R : 0 : -1, I ? (ae === D ? W : B) - 1 : -1));
             }
           }
         };
@@ -52947,13 +52947,13 @@ WARNING: This link could potentially be dangerous`)) {
           handleSelectionChanged(m, k, S) {
             this._selectionStart = m, this._selectionEnd = k, this._columnSelectMode = S;
           }
-          createRow(m, k, S, v, x, z, X, R, W, Z, j) {
+          createRow(m, k, S, v, x, z, X, R, W, Y, D) {
             const B = [], I = this._characterJoinerService.getJoinedCharacters(k), T = this._themeService.colors;
-            let P, Y = m.getNoBgTrimmedLength();
-            S && Y < z + 1 && (Y = z + 1);
-            let U = 0, E = "", J = 0, ce = 0, ae = 0, D = !1, C = 0, F = !1, M = 0;
-            const oe = [], se = Z !== -1 && j !== -1;
-            for (let Re = 0; Re < Y; Re++) {
+            let P, Z = m.getNoBgTrimmedLength();
+            S && Z < z + 1 && (Z = z + 1);
+            let U = 0, E = "", J = 0, ce = 0, ae = 0, j = !1, C = 0, F = !1, M = 0;
+            const oe = [], se = Y !== -1 && D !== -1;
+            for (let Re = 0; Re < Z; Re++) {
               m.loadCell(Re, this._workCell);
               let Je = this._workCell.getWidth();
               if (Je === 0) continue;
@@ -52963,20 +52963,20 @@ WARNING: This link could potentially be dangerous`)) {
                 const De = I.shift();
                 _e = new p.JoinedCellData(this._workCell, m.translateToString(!0, De[0], De[1]), De[1] - De[0]), ke = De[1] - 1, Je = _e.getWidth();
               }
-              const Ct = this._isCellInSelection(Re, k), ir = S && Re === z, qr = se && Re >= Z && Re <= j;
+              const Ct = this._isCellInSelection(Re, k), ir = S && Re === z, qr = se && Re >= Y && Re <= D;
               let gi = !1;
               this._decorationService.forEachDecorationAtCell(Re, k, void 0, ((De) => {
                 gi = !0;
               }));
               let xr = _e.getChars() || u.WHITESPACE_CELL_CHAR;
               if (xr === " " && (_e.isUnderline() || _e.isOverline()) && (xr = " "), M = Je * R - W.get(xr, _e.isBold(), _e.isItalic()), P) {
-                if (U && (Ct && F || !Ct && !F && _e.bg === J) && (Ct && F && T.selectionForeground || _e.fg === ce) && _e.extended.ext === ae && qr === D && M === C && !ir && !Le && !gi) {
+                if (U && (Ct && F || !Ct && !F && _e.bg === J) && (Ct && F && T.selectionForeground || _e.fg === ce) && _e.extended.ext === ae && qr === j && M === C && !ir && !Le && !gi) {
                   _e.isInvisible() ? E += u.WHITESPACE_CELL_CHAR : E += xr, U++;
                   continue;
                 }
                 U && (P.textContent = E), P = this._document.createElement("span"), U = 0, E = "";
               } else P = this._document.createElement("span");
-              if (J = _e.bg, ce = _e.fg, ae = _e.extended.ext, D = qr, C = M, F = Ct, Le && z >= Re && z <= ke && (z = Re), !this._coreService.isCursorHidden && ir && this._coreService.isCursorInitialized) {
+              if (J = _e.bg, ce = _e.fg, ae = _e.extended.ext, j = qr, C = M, F = Ct, Le && z >= Re && z <= ke && (z = Re), !this._coreService.isCursorHidden && ir && this._coreService.isCursorInitialized) {
                 if (oe.push("xterm-cursor"), this._coreBrowserService.isFocused) X && oe.push("xterm-cursor-blink"), oe.push(v === "bar" ? "xterm-cursor-bar" : v === "underline" ? "xterm-cursor-underline" : "xterm-cursor-block");
                 else if (x) switch (x) {
                   case "outline":
@@ -53556,7 +53556,7 @@ WARNING: This link could potentially be dangerous`)) {
         var O = this && this.__decorate || function(S, v, x, z) {
           var X, R = arguments.length, W = R < 3 ? v : z === null ? z = Object.getOwnPropertyDescriptor(v, x) : z;
           if (typeof Reflect == "object" && typeof Reflect.decorate == "function") W = Reflect.decorate(S, v, x, z);
-          else for (var Z = S.length - 1; Z >= 0; Z--) (X = S[Z]) && (W = (R < 3 ? X(W) : R > 3 ? X(v, x, W) : X(v, x)) || W);
+          else for (var Y = S.length - 1; Y >= 0; Y--) (X = S[Y]) && (W = (R < 3 ? X(W) : R > 3 ? X(v, x, W) : X(v, x)) || W);
           return R > 3 && W && Object.defineProperty(v, x, W), W;
         }, h = this && this.__param || function(S, v) {
           return function(x, z) {
@@ -53566,8 +53566,8 @@ WARNING: This link could potentially be dangerous`)) {
         Object.defineProperty(o, "__esModule", { value: !0 }), o.SelectionService = void 0;
         const c = l(9806), u = l(9504), d = l(456), $ = l(4725), Q = l(8460), f = l(844), p = l(6114), g = l(4841), _ = l(511), y = l(2585), b = " ", m = new RegExp(b, "g");
         let k = o.SelectionService = class extends f.Disposable {
-          constructor(S, v, x, z, X, R, W, Z, j) {
-            super(), this._element = S, this._screenElement = v, this._linkifier = x, this._bufferService = z, this._coreService = X, this._mouseService = R, this._optionsService = W, this._renderService = Z, this._coreBrowserService = j, this._dragScrollAmount = 0, this._enabled = !0, this._workCell = new _.CellData(), this._mouseDownTimeStamp = 0, this._oldHasSelection = !1, this._oldSelectionStart = void 0, this._oldSelectionEnd = void 0, this._onLinuxMouseSelection = this.register(new Q.EventEmitter()), this.onLinuxMouseSelection = this._onLinuxMouseSelection.event, this._onRedrawRequest = this.register(new Q.EventEmitter()), this.onRequestRedraw = this._onRedrawRequest.event, this._onSelectionChange = this.register(new Q.EventEmitter()), this.onSelectionChange = this._onSelectionChange.event, this._onRequestScrollLines = this.register(new Q.EventEmitter()), this.onRequestScrollLines = this._onRequestScrollLines.event, this._mouseMoveListener = (B) => this._handleMouseMove(B), this._mouseUpListener = (B) => this._handleMouseUp(B), this._coreService.onUserInput((() => {
+          constructor(S, v, x, z, X, R, W, Y, D) {
+            super(), this._element = S, this._screenElement = v, this._linkifier = x, this._bufferService = z, this._coreService = X, this._mouseService = R, this._optionsService = W, this._renderService = Y, this._coreBrowserService = D, this._dragScrollAmount = 0, this._enabled = !0, this._workCell = new _.CellData(), this._mouseDownTimeStamp = 0, this._oldHasSelection = !1, this._oldSelectionStart = void 0, this._oldSelectionEnd = void 0, this._onLinuxMouseSelection = this.register(new Q.EventEmitter()), this.onLinuxMouseSelection = this._onLinuxMouseSelection.event, this._onRedrawRequest = this.register(new Q.EventEmitter()), this.onRequestRedraw = this._onRedrawRequest.event, this._onSelectionChange = this.register(new Q.EventEmitter()), this.onSelectionChange = this._onSelectionChange.event, this._onRequestScrollLines = this.register(new Q.EventEmitter()), this.onRequestScrollLines = this._onRequestScrollLines.event, this._mouseMoveListener = (B) => this._handleMouseMove(B), this._mouseUpListener = (B) => this._handleMouseUp(B), this._coreService.onUserInput((() => {
               this.hasSelection && this.clearSelection();
             })), this._trimListener = this._bufferService.buffer.lines.onTrim(((B) => this._handleTrim(B))), this.register(this._bufferService.buffers.onBufferActivate(((B) => this._handleBufferActivate(B)))), this.enable(), this._model = new d.SelectionModel(this._bufferService), this._activeSelectionMode = 0, this.register((0, f.toDisposable)((() => {
               this._removeMouseDownListeners();
@@ -53600,15 +53600,15 @@ WARNING: This link could potentially be dangerous`)) {
               if (S[0] === v[0]) return "";
               const X = S[0] < v[0] ? S[0] : v[0], R = S[0] < v[0] ? v[0] : S[0];
               for (let W = S[1]; W <= v[1]; W++) {
-                const Z = x.translateBufferLineToString(W, !0, X, R);
-                z.push(Z);
+                const Y = x.translateBufferLineToString(W, !0, X, R);
+                z.push(Y);
               }
             } else {
               const X = S[1] === v[1] ? v[0] : void 0;
               z.push(x.translateBufferLineToString(S[1], !0, S[0], X));
               for (let R = S[1] + 1; R <= v[1] - 1; R++) {
-                const W = x.lines.get(R), Z = x.translateBufferLineToString(R, !0);
-                W != null && W.isWrapped ? z[z.length - 1] += Z : z.push(Z);
+                const W = x.lines.get(R), Y = x.translateBufferLineToString(R, !0);
+                W != null && W.isWrapped ? z[z.length - 1] += Y : z.push(Y);
               }
               if (S[1] !== v[1]) {
                 const R = x.lines.get(v[1]), W = x.translateBufferLineToString(v[1], !0, 0, v[0]);
@@ -53761,30 +53761,30 @@ WARNING: This link could potentially be dangerous`)) {
             const X = this._bufferService.buffer, R = X.lines.get(S[1]);
             if (!R) return;
             const W = X.translateBufferLineToString(S[1], !1);
-            let Z = this._convertViewportColToCharacterIndex(R, S[0]), j = Z;
-            const B = S[0] - Z;
-            let I = 0, T = 0, P = 0, Y = 0;
-            if (W.charAt(Z) === " ") {
-              for (; Z > 0 && W.charAt(Z - 1) === " "; ) Z--;
-              for (; j < W.length && W.charAt(j + 1) === " "; ) j++;
+            let Y = this._convertViewportColToCharacterIndex(R, S[0]), D = Y;
+            const B = S[0] - Y;
+            let I = 0, T = 0, P = 0, Z = 0;
+            if (W.charAt(Y) === " ") {
+              for (; Y > 0 && W.charAt(Y - 1) === " "; ) Y--;
+              for (; D < W.length && W.charAt(D + 1) === " "; ) D++;
             } else {
               let J = S[0], ce = S[0];
               R.getWidth(J) === 0 && (I++, J--), R.getWidth(ce) === 2 && (T++, ce++);
               const ae = R.getString(ce).length;
-              for (ae > 1 && (Y += ae - 1, j += ae - 1); J > 0 && Z > 0 && !this._isCharWordSeparator(R.loadCell(J - 1, this._workCell)); ) {
+              for (ae > 1 && (Z += ae - 1, D += ae - 1); J > 0 && Y > 0 && !this._isCharWordSeparator(R.loadCell(J - 1, this._workCell)); ) {
                 R.loadCell(J - 1, this._workCell);
-                const D = this._workCell.getChars().length;
-                this._workCell.getWidth() === 0 ? (I++, J--) : D > 1 && (P += D - 1, Z -= D - 1), Z--, J--;
+                const j = this._workCell.getChars().length;
+                this._workCell.getWidth() === 0 ? (I++, J--) : j > 1 && (P += j - 1, Y -= j - 1), Y--, J--;
               }
-              for (; ce < R.length && j + 1 < W.length && !this._isCharWordSeparator(R.loadCell(ce + 1, this._workCell)); ) {
+              for (; ce < R.length && D + 1 < W.length && !this._isCharWordSeparator(R.loadCell(ce + 1, this._workCell)); ) {
                 R.loadCell(ce + 1, this._workCell);
-                const D = this._workCell.getChars().length;
-                this._workCell.getWidth() === 2 ? (T++, ce++) : D > 1 && (Y += D - 1, j += D - 1), j++, ce++;
+                const j = this._workCell.getChars().length;
+                this._workCell.getWidth() === 2 ? (T++, ce++) : j > 1 && (Z += j - 1, D += j - 1), D++, ce++;
               }
             }
-            j++;
-            let U = Z + B - I + P, E = Math.min(this._bufferService.cols, j - Z + I + T - P - Y);
-            if (v || W.slice(Z, j).trim() !== "") {
+            D++;
+            let U = Y + B - I + P, E = Math.min(this._bufferService.cols, D - Y + I + T - P - Z);
+            if (v || W.slice(Y, D).trim() !== "") {
               if (x && U === 0 && R.getCodePoint(0) !== 32) {
                 const J = X.lines.get(S[1] - 1);
                 if (J && R.isWrapped && J.getCodePoint(this._bufferService.cols - 1) !== 32) {
@@ -54066,14 +54066,14 @@ WARNING: This link could potentially be dangerous`)) {
         })(Q || (o.rgb = Q = {})), (function(_) {
           function y(m, k, S) {
             const v = m >> 24 & 255, x = m >> 16 & 255, z = m >> 8 & 255;
-            let X = k >> 24 & 255, R = k >> 16 & 255, W = k >> 8 & 255, Z = g(Q.relativeLuminance2(X, R, W), Q.relativeLuminance2(v, x, z));
-            for (; Z < S && (X > 0 || R > 0 || W > 0); ) X -= Math.max(0, Math.ceil(0.1 * X)), R -= Math.max(0, Math.ceil(0.1 * R)), W -= Math.max(0, Math.ceil(0.1 * W)), Z = g(Q.relativeLuminance2(X, R, W), Q.relativeLuminance2(v, x, z));
+            let X = k >> 24 & 255, R = k >> 16 & 255, W = k >> 8 & 255, Y = g(Q.relativeLuminance2(X, R, W), Q.relativeLuminance2(v, x, z));
+            for (; Y < S && (X > 0 || R > 0 || W > 0); ) X -= Math.max(0, Math.ceil(0.1 * X)), R -= Math.max(0, Math.ceil(0.1 * R)), W -= Math.max(0, Math.ceil(0.1 * W)), Y = g(Q.relativeLuminance2(X, R, W), Q.relativeLuminance2(v, x, z));
             return (X << 24 | R << 16 | W << 8 | 255) >>> 0;
           }
           function b(m, k, S) {
             const v = m >> 24 & 255, x = m >> 16 & 255, z = m >> 8 & 255;
-            let X = k >> 24 & 255, R = k >> 16 & 255, W = k >> 8 & 255, Z = g(Q.relativeLuminance2(X, R, W), Q.relativeLuminance2(v, x, z));
-            for (; Z < S && (X < 255 || R < 255 || W < 255); ) X = Math.min(255, X + Math.ceil(0.1 * (255 - X))), R = Math.min(255, R + Math.ceil(0.1 * (255 - R))), W = Math.min(255, W + Math.ceil(0.1 * (255 - W))), Z = g(Q.relativeLuminance2(X, R, W), Q.relativeLuminance2(v, x, z));
+            let X = k >> 24 & 255, R = k >> 16 & 255, W = k >> 8 & 255, Y = g(Q.relativeLuminance2(X, R, W), Q.relativeLuminance2(v, x, z));
+            for (; Y < S && (X < 255 || R < 255 || W < 255); ) X = Math.min(255, X + Math.ceil(0.1 * (255 - X))), R = Math.min(255, R + Math.ceil(0.1 * (255 - R))), W = Math.min(255, W + Math.ceil(0.1 * (255 - W))), Y = g(Q.relativeLuminance2(X, R, W), Q.relativeLuminance2(v, x, z));
             return (X << 24 | R << 16 | W << 8 | 255) >>> 0;
           }
           _.blend = function(m, k) {
@@ -54086,8 +54086,8 @@ WARNING: This link could potentially be dangerous`)) {
               if (x < v) {
                 const R = y(m, k, S), W = g(v, Q.relativeLuminance(R >> 8));
                 if (W < S) {
-                  const Z = b(m, k, S);
-                  return W > g(v, Q.relativeLuminance(Z >> 8)) ? R : Z;
+                  const Y = b(m, k, S);
+                  return W > g(v, Q.relativeLuminance(Y >> 8)) ? R : Y;
                 }
                 return R;
               }
@@ -54228,14 +54228,14 @@ WARNING: This link could potentially be dangerous`)) {
           return O(void 0), l(((h) => O(h)));
         };
       }, 5435: function(a, o, l) {
-        var O = this && this.__decorate || function(I, T, P, Y) {
-          var U, E = arguments.length, J = E < 3 ? T : Y === null ? Y = Object.getOwnPropertyDescriptor(T, P) : Y;
-          if (typeof Reflect == "object" && typeof Reflect.decorate == "function") J = Reflect.decorate(I, T, P, Y);
+        var O = this && this.__decorate || function(I, T, P, Z) {
+          var U, E = arguments.length, J = E < 3 ? T : Z === null ? Z = Object.getOwnPropertyDescriptor(T, P) : Z;
+          if (typeof Reflect == "object" && typeof Reflect.decorate == "function") J = Reflect.decorate(I, T, P, Z);
           else for (var ce = I.length - 1; ce >= 0; ce--) (U = I[ce]) && (J = (E < 3 ? U(J) : E > 3 ? U(T, P, J) : U(T, P)) || J);
           return E > 3 && J && Object.defineProperty(T, P, J), J;
         }, h = this && this.__param || function(I, T) {
-          return function(P, Y) {
-            T(P, Y, I);
+          return function(P, Z) {
+            T(P, Z, I);
           };
         };
         Object.defineProperty(o, "__esModule", { value: !0 }), o.InputHandler = o.WindowsOptionsReportType = void 0;
@@ -54295,12 +54295,12 @@ WARNING: This link could potentially be dangerous`)) {
           I[I.GET_WIN_SIZE_PIXELS = 0] = "GET_WIN_SIZE_PIXELS", I[I.GET_CELL_SIZE_PIXELS = 1] = "GET_CELL_SIZE_PIXELS";
         })(R || (o.WindowsOptionsReportType = R = {}));
         let W = 0;
-        class Z extends $.Disposable {
+        class Y extends $.Disposable {
           getAttrData() {
             return this._curAttrData;
           }
-          constructor(T, P, Y, U, E, J, ce, ae, D = new d.EscapeSequenceParser()) {
-            super(), this._bufferService = T, this._charsetService = P, this._coreService = Y, this._logService = U, this._optionsService = E, this._oscLinkService = J, this._coreMouseService = ce, this._unicodeService = ae, this._parser = D, this._parseBuffer = new Uint32Array(4096), this._stringDecoder = new Q.StringToUtf32(), this._utf8Decoder = new Q.Utf8ToUtf32(), this._workCell = new _.CellData(), this._windowTitle = "", this._iconName = "", this._windowTitleStack = [], this._iconNameStack = [], this._curAttrData = f.DEFAULT_ATTR_DATA.clone(), this._eraseAttrDataInternal = f.DEFAULT_ATTR_DATA.clone(), this._onRequestBell = this.register(new p.EventEmitter()), this.onRequestBell = this._onRequestBell.event, this._onRequestRefreshRows = this.register(new p.EventEmitter()), this.onRequestRefreshRows = this._onRequestRefreshRows.event, this._onRequestReset = this.register(new p.EventEmitter()), this.onRequestReset = this._onRequestReset.event, this._onRequestSendFocus = this.register(new p.EventEmitter()), this.onRequestSendFocus = this._onRequestSendFocus.event, this._onRequestSyncScrollBar = this.register(new p.EventEmitter()), this.onRequestSyncScrollBar = this._onRequestSyncScrollBar.event, this._onRequestWindowsOptionsReport = this.register(new p.EventEmitter()), this.onRequestWindowsOptionsReport = this._onRequestWindowsOptionsReport.event, this._onA11yChar = this.register(new p.EventEmitter()), this.onA11yChar = this._onA11yChar.event, this._onA11yTab = this.register(new p.EventEmitter()), this.onA11yTab = this._onA11yTab.event, this._onCursorMove = this.register(new p.EventEmitter()), this.onCursorMove = this._onCursorMove.event, this._onLineFeed = this.register(new p.EventEmitter()), this.onLineFeed = this._onLineFeed.event, this._onScroll = this.register(new p.EventEmitter()), this.onScroll = this._onScroll.event, this._onTitleChange = this.register(new p.EventEmitter()), this.onTitleChange = this._onTitleChange.event, this._onColor = this.register(new p.EventEmitter()), this.onColor = this._onColor.event, this._parseStack = { paused: !1, cursorStartX: 0, cursorStartY: 0, decodedLength: 0, position: 0 }, this._specialColors = [256, 257, 258], this.register(this._parser), this._dirtyRowTracker = new j(this._bufferService), this._activeBuffer = this._bufferService.buffer, this.register(this._bufferService.buffers.onBufferActivate(((C) => this._activeBuffer = C.activeBuffer))), this._parser.setCsiHandlerFallback(((C, F) => {
+          constructor(T, P, Z, U, E, J, ce, ae, j = new d.EscapeSequenceParser()) {
+            super(), this._bufferService = T, this._charsetService = P, this._coreService = Z, this._logService = U, this._optionsService = E, this._oscLinkService = J, this._coreMouseService = ce, this._unicodeService = ae, this._parser = j, this._parseBuffer = new Uint32Array(4096), this._stringDecoder = new Q.StringToUtf32(), this._utf8Decoder = new Q.Utf8ToUtf32(), this._workCell = new _.CellData(), this._windowTitle = "", this._iconName = "", this._windowTitleStack = [], this._iconNameStack = [], this._curAttrData = f.DEFAULT_ATTR_DATA.clone(), this._eraseAttrDataInternal = f.DEFAULT_ATTR_DATA.clone(), this._onRequestBell = this.register(new p.EventEmitter()), this.onRequestBell = this._onRequestBell.event, this._onRequestRefreshRows = this.register(new p.EventEmitter()), this.onRequestRefreshRows = this._onRequestRefreshRows.event, this._onRequestReset = this.register(new p.EventEmitter()), this.onRequestReset = this._onRequestReset.event, this._onRequestSendFocus = this.register(new p.EventEmitter()), this.onRequestSendFocus = this._onRequestSendFocus.event, this._onRequestSyncScrollBar = this.register(new p.EventEmitter()), this.onRequestSyncScrollBar = this._onRequestSyncScrollBar.event, this._onRequestWindowsOptionsReport = this.register(new p.EventEmitter()), this.onRequestWindowsOptionsReport = this._onRequestWindowsOptionsReport.event, this._onA11yChar = this.register(new p.EventEmitter()), this.onA11yChar = this._onA11yChar.event, this._onA11yTab = this.register(new p.EventEmitter()), this.onA11yTab = this._onA11yTab.event, this._onCursorMove = this.register(new p.EventEmitter()), this.onCursorMove = this._onCursorMove.event, this._onLineFeed = this.register(new p.EventEmitter()), this.onLineFeed = this._onLineFeed.event, this._onScroll = this.register(new p.EventEmitter()), this.onScroll = this._onScroll.event, this._onTitleChange = this.register(new p.EventEmitter()), this.onTitleChange = this._onTitleChange.event, this._onColor = this.register(new p.EventEmitter()), this.onColor = this._onColor.event, this._parseStack = { paused: !1, cursorStartX: 0, cursorStartY: 0, decodedLength: 0, position: 0 }, this._specialColors = [256, 257, 258], this.register(this._parser), this._dirtyRowTracker = new D(this._bufferService), this._activeBuffer = this._bufferService.buffer, this.register(this._bufferService.buffers.onBufferActivate(((C) => this._activeBuffer = C.activeBuffer))), this._parser.setCsiHandlerFallback(((C, F) => {
               this._logService.debug("Unknown CSI code: ", { identifier: this._parser.identToString(C), params: F.toArray() });
             })), this._parser.setEscHandlerFallback(((C) => {
               this._logService.debug("Unknown ESC code: ", { identifier: this._parser.identToString(C) });
@@ -54314,11 +54314,11 @@ WARNING: This link could potentially be dangerous`)) {
             for (const C in u.CHARSETS) this._parser.registerEscHandler({ intermediates: "(", final: C }, (() => this.selectCharset("(" + C))), this._parser.registerEscHandler({ intermediates: ")", final: C }, (() => this.selectCharset(")" + C))), this._parser.registerEscHandler({ intermediates: "*", final: C }, (() => this.selectCharset("*" + C))), this._parser.registerEscHandler({ intermediates: "+", final: C }, (() => this.selectCharset("+" + C))), this._parser.registerEscHandler({ intermediates: "-", final: C }, (() => this.selectCharset("-" + C))), this._parser.registerEscHandler({ intermediates: ".", final: C }, (() => this.selectCharset("." + C))), this._parser.registerEscHandler({ intermediates: "/", final: C }, (() => this.selectCharset("/" + C)));
             this._parser.registerEscHandler({ intermediates: "#", final: "8" }, (() => this.screenAlignmentPattern())), this._parser.setErrorHandler(((C) => (this._logService.error("Parsing error: ", C), C))), this._parser.registerDcsHandler({ intermediates: "$", final: "q" }, new S.DcsHandler(((C, F) => this.requestStatusString(C, F))));
           }
-          _preserveStack(T, P, Y, U) {
-            this._parseStack.paused = !0, this._parseStack.cursorStartX = T, this._parseStack.cursorStartY = P, this._parseStack.decodedLength = Y, this._parseStack.position = U;
+          _preserveStack(T, P, Z, U) {
+            this._parseStack.paused = !0, this._parseStack.cursorStartX = T, this._parseStack.cursorStartY = P, this._parseStack.decodedLength = Z, this._parseStack.position = U;
           }
           _logSlowResolvingAsync(T) {
-            this._logService.logLevel <= b.LogLevelEnum.WARN && Promise.race([T, new Promise(((P, Y) => setTimeout((() => Y("#SLOW_TIMEOUT")), 5e3)))]).catch(((P) => {
+            this._logService.logLevel <= b.LogLevelEnum.WARN && Promise.race([T, new Promise(((P, Z) => setTimeout((() => Z("#SLOW_TIMEOUT")), 5e3)))]).catch(((P) => {
               if (P !== "#SLOW_TIMEOUT") throw P;
               console.warn("async parser handler taking longer than 5000 ms");
             }));
@@ -54327,31 +54327,31 @@ WARNING: This link could potentially be dangerous`)) {
             return this._curAttrData.extended.urlId;
           }
           parse(T, P) {
-            let Y, U = this._activeBuffer.x, E = this._activeBuffer.y, J = 0;
+            let Z, U = this._activeBuffer.x, E = this._activeBuffer.y, J = 0;
             const ce = this._parseStack.paused;
             if (ce) {
-              if (Y = this._parser.parse(this._parseBuffer, this._parseStack.decodedLength, P)) return this._logSlowResolvingAsync(Y), Y;
+              if (Z = this._parser.parse(this._parseBuffer, this._parseStack.decodedLength, P)) return this._logSlowResolvingAsync(Z), Z;
               U = this._parseStack.cursorStartX, E = this._parseStack.cursorStartY, this._parseStack.paused = !1, T.length > z && (J = this._parseStack.position + z);
             }
             if (this._logService.logLevel <= b.LogLevelEnum.DEBUG && this._logService.debug("parsing data" + (typeof T == "string" ? ` "${T}"` : ` "${Array.prototype.map.call(T, ((C) => String.fromCharCode(C))).join("")}"`), typeof T == "string" ? T.split("").map(((C) => C.charCodeAt(0))) : T), this._parseBuffer.length < T.length && this._parseBuffer.length < z && (this._parseBuffer = new Uint32Array(Math.min(T.length, z))), ce || this._dirtyRowTracker.clearRange(), T.length > z) for (let C = J; C < T.length; C += z) {
               const F = C + z < T.length ? C + z : T.length, M = typeof T == "string" ? this._stringDecoder.decode(T.substring(C, F), this._parseBuffer) : this._utf8Decoder.decode(T.subarray(C, F), this._parseBuffer);
-              if (Y = this._parser.parse(this._parseBuffer, M)) return this._preserveStack(U, E, M, C), this._logSlowResolvingAsync(Y), Y;
+              if (Z = this._parser.parse(this._parseBuffer, M)) return this._preserveStack(U, E, M, C), this._logSlowResolvingAsync(Z), Z;
             }
             else if (!ce) {
               const C = typeof T == "string" ? this._stringDecoder.decode(T, this._parseBuffer) : this._utf8Decoder.decode(T, this._parseBuffer);
-              if (Y = this._parser.parse(this._parseBuffer, C)) return this._preserveStack(U, E, C, 0), this._logSlowResolvingAsync(Y), Y;
+              if (Z = this._parser.parse(this._parseBuffer, C)) return this._preserveStack(U, E, C, 0), this._logSlowResolvingAsync(Z), Z;
             }
             this._activeBuffer.x === U && this._activeBuffer.y === E || this._onCursorMove.fire();
-            const ae = this._dirtyRowTracker.end + (this._bufferService.buffer.ybase - this._bufferService.buffer.ydisp), D = this._dirtyRowTracker.start + (this._bufferService.buffer.ybase - this._bufferService.buffer.ydisp);
-            D < this._bufferService.rows && this._onRequestRefreshRows.fire(Math.min(D, this._bufferService.rows - 1), Math.min(ae, this._bufferService.rows - 1));
+            const ae = this._dirtyRowTracker.end + (this._bufferService.buffer.ybase - this._bufferService.buffer.ydisp), j = this._dirtyRowTracker.start + (this._bufferService.buffer.ybase - this._bufferService.buffer.ydisp);
+            j < this._bufferService.rows && this._onRequestRefreshRows.fire(Math.min(j, this._bufferService.rows - 1), Math.min(ae, this._bufferService.rows - 1));
           }
-          print(T, P, Y) {
+          print(T, P, Z) {
             let U, E;
-            const J = this._charsetService.charset, ce = this._optionsService.rawOptions.screenReaderMode, ae = this._bufferService.cols, D = this._coreService.decPrivateModes.wraparound, C = this._coreService.modes.insertMode, F = this._curAttrData;
+            const J = this._charsetService.charset, ce = this._optionsService.rawOptions.screenReaderMode, ae = this._bufferService.cols, j = this._coreService.decPrivateModes.wraparound, C = this._coreService.modes.insertMode, F = this._curAttrData;
             let M = this._activeBuffer.lines.get(this._activeBuffer.ybase + this._activeBuffer.y);
-            this._dirtyRowTracker.markDirty(this._activeBuffer.y), this._activeBuffer.x && Y - P > 0 && M.getWidth(this._activeBuffer.x - 1) === 2 && M.setCellFromCodepoint(this._activeBuffer.x - 1, 0, 1, F);
+            this._dirtyRowTracker.markDirty(this._activeBuffer.y), this._activeBuffer.x && Z - P > 0 && M.getWidth(this._activeBuffer.x - 1) === 2 && M.setCellFromCodepoint(this._activeBuffer.x - 1, 0, 1, F);
             let oe = this._parser.precedingJoinState;
-            for (let se = P; se < Y; ++se) {
+            for (let se = P; se < Z; ++se) {
               if (U = T[se], U < 127 && J) {
                 const ke = J[String.fromCharCode(U)];
                 ke && (U = ke.charCodeAt(0));
@@ -54360,7 +54360,7 @@ WARNING: This link could potentially be dangerous`)) {
               E = m.UnicodeService.extractWidth(Re);
               const Je = m.UnicodeService.extractShouldJoin(Re), Le = Je ? m.UnicodeService.extractWidth(oe) : 0;
               if (oe = Re, ce && this._onA11yChar.fire((0, Q.stringFromCodePoint)(U)), this._getCurrentLinkId() && this._oscLinkService.addLineToLink(this._getCurrentLinkId(), this._activeBuffer.ybase + this._activeBuffer.y), this._activeBuffer.x + E - Le > ae) {
-                if (D) {
+                if (j) {
                   const ke = M;
                   let _e = this._activeBuffer.x - Le;
                   for (this._activeBuffer.x = Le, this._activeBuffer.y++, this._activeBuffer.y === this._activeBuffer.scrollBottom + 1 ? (this._activeBuffer.y--, this._bufferService.scroll(this._eraseAttrData(), !0)) : (this._activeBuffer.y >= this._bufferService.rows && (this._activeBuffer.y = this._bufferService.rows - 1), this._activeBuffer.lines.get(this._activeBuffer.ybase + this._activeBuffer.y).isWrapped = !0), M = this._activeBuffer.lines.get(this._activeBuffer.ybase + this._activeBuffer.y), Le > 0 && M instanceof f.BufferLine && M.copyCellsFrom(ke, _e, 0, Le, !1); _e < ae; ) ke.setCellFromCodepoint(_e++, 0, 1, F);
@@ -54372,10 +54372,10 @@ WARNING: This link could potentially be dangerous`)) {
                 for (let _e = E - Le; --_e >= 0; ) M.setCellFromCodepoint(this._activeBuffer.x++, 0, 0, F);
               } else if (C && (M.insertCells(this._activeBuffer.x, E - Le, this._activeBuffer.getNullCell(F)), M.getWidth(ae - 1) === 2 && M.setCellFromCodepoint(ae - 1, g.NULL_CELL_CODE, g.NULL_CELL_WIDTH, F)), M.setCellFromCodepoint(this._activeBuffer.x++, U, E, F), E > 0) for (; --E; ) M.setCellFromCodepoint(this._activeBuffer.x++, 0, 0, F);
             }
-            this._parser.precedingJoinState = oe, this._activeBuffer.x < ae && Y - P > 0 && M.getWidth(this._activeBuffer.x) === 0 && !M.hasContent(this._activeBuffer.x) && M.setCellFromCodepoint(this._activeBuffer.x, 0, 1, F), this._dirtyRowTracker.markDirty(this._activeBuffer.y);
+            this._parser.precedingJoinState = oe, this._activeBuffer.x < ae && Z - P > 0 && M.getWidth(this._activeBuffer.x) === 0 && !M.hasContent(this._activeBuffer.x) && M.setCellFromCodepoint(this._activeBuffer.x, 0, 1, F), this._dirtyRowTracker.markDirty(this._activeBuffer.y);
           }
           registerCsiHandler(T, P) {
-            return T.final !== "t" || T.prefix || T.intermediates ? this._parser.registerCsiHandler(T, P) : this._parser.registerCsiHandler(T, ((Y) => !X(Y.params[0], this._optionsService.rawOptions.windowOptions) || P(Y)));
+            return T.final !== "t" || T.prefix || T.intermediates ? this._parser.registerCsiHandler(T, P) : this._parser.registerCsiHandler(T, ((Z) => !X(Z.params[0], this._optionsService.rawOptions.windowOptions) || P(Z)));
           }
           registerDcsHandler(T, P) {
             return this._parser.registerDcsHandler(T, new S.DcsHandler(P));
@@ -54487,27 +54487,27 @@ WARNING: This link could potentially be dangerous`)) {
             const P = T.params[0];
             return P === 1 && (this._curAttrData.bg |= 536870912), P !== 2 && P !== 0 || (this._curAttrData.bg &= -536870913), !0;
           }
-          _eraseInBufferLine(T, P, Y, U = !1, E = !1) {
+          _eraseInBufferLine(T, P, Z, U = !1, E = !1) {
             const J = this._activeBuffer.lines.get(this._activeBuffer.ybase + T);
-            J.replaceCells(P, Y, this._activeBuffer.getNullCell(this._eraseAttrData()), E), U && (J.isWrapped = !1);
+            J.replaceCells(P, Z, this._activeBuffer.getNullCell(this._eraseAttrData()), E), U && (J.isWrapped = !1);
           }
           _resetBufferLine(T, P = !1) {
-            const Y = this._activeBuffer.lines.get(this._activeBuffer.ybase + T);
-            Y && (Y.fill(this._activeBuffer.getNullCell(this._eraseAttrData()), P), this._bufferService.buffer.clearMarkers(this._activeBuffer.ybase + T), Y.isWrapped = !1);
+            const Z = this._activeBuffer.lines.get(this._activeBuffer.ybase + T);
+            Z && (Z.fill(this._activeBuffer.getNullCell(this._eraseAttrData()), P), this._bufferService.buffer.clearMarkers(this._activeBuffer.ybase + T), Z.isWrapped = !1);
           }
           eraseInDisplay(T, P = !1) {
-            let Y;
+            let Z;
             switch (this._restrictCursor(this._bufferService.cols), T.params[0]) {
               case 0:
-                for (Y = this._activeBuffer.y, this._dirtyRowTracker.markDirty(Y), this._eraseInBufferLine(Y++, this._activeBuffer.x, this._bufferService.cols, this._activeBuffer.x === 0, P); Y < this._bufferService.rows; Y++) this._resetBufferLine(Y, P);
-                this._dirtyRowTracker.markDirty(Y);
+                for (Z = this._activeBuffer.y, this._dirtyRowTracker.markDirty(Z), this._eraseInBufferLine(Z++, this._activeBuffer.x, this._bufferService.cols, this._activeBuffer.x === 0, P); Z < this._bufferService.rows; Z++) this._resetBufferLine(Z, P);
+                this._dirtyRowTracker.markDirty(Z);
                 break;
               case 1:
-                for (Y = this._activeBuffer.y, this._dirtyRowTracker.markDirty(Y), this._eraseInBufferLine(Y, 0, this._activeBuffer.x + 1, !0, P), this._activeBuffer.x + 1 >= this._bufferService.cols && (this._activeBuffer.lines.get(Y + 1).isWrapped = !1); Y--; ) this._resetBufferLine(Y, P);
+                for (Z = this._activeBuffer.y, this._dirtyRowTracker.markDirty(Z), this._eraseInBufferLine(Z, 0, this._activeBuffer.x + 1, !0, P), this._activeBuffer.x + 1 >= this._bufferService.cols && (this._activeBuffer.lines.get(Z + 1).isWrapped = !1); Z--; ) this._resetBufferLine(Z, P);
                 this._dirtyRowTracker.markDirty(0);
                 break;
               case 2:
-                for (Y = this._bufferService.rows, this._dirtyRowTracker.markDirty(Y - 1); Y--; ) this._resetBufferLine(Y, P);
+                for (Z = this._bufferService.rows, this._dirtyRowTracker.markDirty(Z - 1); Z--; ) this._resetBufferLine(Z, P);
                 this._dirtyRowTracker.markDirty(0);
                 break;
               case 3:
@@ -54533,17 +54533,17 @@ WARNING: This link could potentially be dangerous`)) {
             this._restrictCursor();
             let P = T.params[0] || 1;
             if (this._activeBuffer.y > this._activeBuffer.scrollBottom || this._activeBuffer.y < this._activeBuffer.scrollTop) return !0;
-            const Y = this._activeBuffer.ybase + this._activeBuffer.y, U = this._bufferService.rows - 1 - this._activeBuffer.scrollBottom, E = this._bufferService.rows - 1 + this._activeBuffer.ybase - U + 1;
-            for (; P--; ) this._activeBuffer.lines.splice(E - 1, 1), this._activeBuffer.lines.splice(Y, 0, this._activeBuffer.getBlankLine(this._eraseAttrData()));
+            const Z = this._activeBuffer.ybase + this._activeBuffer.y, U = this._bufferService.rows - 1 - this._activeBuffer.scrollBottom, E = this._bufferService.rows - 1 + this._activeBuffer.ybase - U + 1;
+            for (; P--; ) this._activeBuffer.lines.splice(E - 1, 1), this._activeBuffer.lines.splice(Z, 0, this._activeBuffer.getBlankLine(this._eraseAttrData()));
             return this._dirtyRowTracker.markRangeDirty(this._activeBuffer.y, this._activeBuffer.scrollBottom), this._activeBuffer.x = 0, !0;
           }
           deleteLines(T) {
             this._restrictCursor();
             let P = T.params[0] || 1;
             if (this._activeBuffer.y > this._activeBuffer.scrollBottom || this._activeBuffer.y < this._activeBuffer.scrollTop) return !0;
-            const Y = this._activeBuffer.ybase + this._activeBuffer.y;
+            const Z = this._activeBuffer.ybase + this._activeBuffer.y;
             let U;
-            for (U = this._bufferService.rows - 1 - this._activeBuffer.scrollBottom, U = this._bufferService.rows - 1 + this._activeBuffer.ybase - U; P--; ) this._activeBuffer.lines.splice(Y, 1), this._activeBuffer.lines.splice(U, 0, this._activeBuffer.getBlankLine(this._eraseAttrData()));
+            for (U = this._bufferService.rows - 1 - this._activeBuffer.scrollBottom, U = this._bufferService.rows - 1 + this._activeBuffer.ybase - U; P--; ) this._activeBuffer.lines.splice(Z, 1), this._activeBuffer.lines.splice(U, 0, this._activeBuffer.getBlankLine(this._eraseAttrData()));
             return this._dirtyRowTracker.markRangeDirty(this._activeBuffer.y, this._activeBuffer.scrollBottom), this._activeBuffer.x = 0, !0;
           }
           insertChars(T) {
@@ -54569,8 +54569,8 @@ WARNING: This link could potentially be dangerous`)) {
           scrollLeft(T) {
             if (this._activeBuffer.y > this._activeBuffer.scrollBottom || this._activeBuffer.y < this._activeBuffer.scrollTop) return !0;
             const P = T.params[0] || 1;
-            for (let Y = this._activeBuffer.scrollTop; Y <= this._activeBuffer.scrollBottom; ++Y) {
-              const U = this._activeBuffer.lines.get(this._activeBuffer.ybase + Y);
+            for (let Z = this._activeBuffer.scrollTop; Z <= this._activeBuffer.scrollBottom; ++Z) {
+              const U = this._activeBuffer.lines.get(this._activeBuffer.ybase + Z);
               U.deleteCells(0, P, this._activeBuffer.getNullCell(this._eraseAttrData())), U.isWrapped = !1;
             }
             return this._dirtyRowTracker.markRangeDirty(this._activeBuffer.scrollTop, this._activeBuffer.scrollBottom), !0;
@@ -54578,8 +54578,8 @@ WARNING: This link could potentially be dangerous`)) {
           scrollRight(T) {
             if (this._activeBuffer.y > this._activeBuffer.scrollBottom || this._activeBuffer.y < this._activeBuffer.scrollTop) return !0;
             const P = T.params[0] || 1;
-            for (let Y = this._activeBuffer.scrollTop; Y <= this._activeBuffer.scrollBottom; ++Y) {
-              const U = this._activeBuffer.lines.get(this._activeBuffer.ybase + Y);
+            for (let Z = this._activeBuffer.scrollTop; Z <= this._activeBuffer.scrollBottom; ++Z) {
+              const U = this._activeBuffer.lines.get(this._activeBuffer.ybase + Z);
               U.insertCells(0, P, this._activeBuffer.getNullCell(this._eraseAttrData())), U.isWrapped = !1;
             }
             return this._dirtyRowTracker.markRangeDirty(this._activeBuffer.scrollTop, this._activeBuffer.scrollBottom), !0;
@@ -54587,8 +54587,8 @@ WARNING: This link could potentially be dangerous`)) {
           insertColumns(T) {
             if (this._activeBuffer.y > this._activeBuffer.scrollBottom || this._activeBuffer.y < this._activeBuffer.scrollTop) return !0;
             const P = T.params[0] || 1;
-            for (let Y = this._activeBuffer.scrollTop; Y <= this._activeBuffer.scrollBottom; ++Y) {
-              const U = this._activeBuffer.lines.get(this._activeBuffer.ybase + Y);
+            for (let Z = this._activeBuffer.scrollTop; Z <= this._activeBuffer.scrollBottom; ++Z) {
+              const U = this._activeBuffer.lines.get(this._activeBuffer.ybase + Z);
               U.insertCells(this._activeBuffer.x, P, this._activeBuffer.getNullCell(this._eraseAttrData())), U.isWrapped = !1;
             }
             return this._dirtyRowTracker.markRangeDirty(this._activeBuffer.scrollTop, this._activeBuffer.scrollBottom), !0;
@@ -54596,8 +54596,8 @@ WARNING: This link could potentially be dangerous`)) {
           deleteColumns(T) {
             if (this._activeBuffer.y > this._activeBuffer.scrollBottom || this._activeBuffer.y < this._activeBuffer.scrollTop) return !0;
             const P = T.params[0] || 1;
-            for (let Y = this._activeBuffer.scrollTop; Y <= this._activeBuffer.scrollBottom; ++Y) {
-              const U = this._activeBuffer.lines.get(this._activeBuffer.ybase + Y);
+            for (let Z = this._activeBuffer.scrollTop; Z <= this._activeBuffer.scrollBottom; ++Z) {
+              const U = this._activeBuffer.lines.get(this._activeBuffer.ybase + Z);
               U.deleteCells(this._activeBuffer.x, P, this._activeBuffer.getNullCell(this._eraseAttrData())), U.isWrapped = !1;
             }
             return this._dirtyRowTracker.markRangeDirty(this._activeBuffer.scrollTop, this._activeBuffer.scrollBottom), !0;
@@ -54610,15 +54610,15 @@ WARNING: This link could potentially be dangerous`)) {
           repeatPrecedingCharacter(T) {
             const P = this._parser.precedingJoinState;
             if (!P) return !0;
-            const Y = T.params[0] || 1, U = m.UnicodeService.extractWidth(P), E = this._activeBuffer.x - U, J = this._activeBuffer.lines.get(this._activeBuffer.ybase + this._activeBuffer.y).getString(E), ce = new Uint32Array(J.length * Y);
+            const Z = T.params[0] || 1, U = m.UnicodeService.extractWidth(P), E = this._activeBuffer.x - U, J = this._activeBuffer.lines.get(this._activeBuffer.ybase + this._activeBuffer.y).getString(E), ce = new Uint32Array(J.length * Z);
             let ae = 0;
             for (let C = 0; C < J.length; ) {
               const F = J.codePointAt(C) || 0;
               ce[ae++] = F, C += F > 65535 ? 2 : 1;
             }
-            let D = ae;
-            for (let C = 1; C < Y; ++C) ce.copyWithin(D, 0, ae), D += ae;
-            return this.print(ce, 0, D), !0;
+            let j = ae;
+            for (let C = 1; C < Z; ++C) ce.copyWithin(j, 0, ae), j += ae;
+            return this.print(ce, 0, j), !0;
           }
           sendDeviceAttributesPrimary(T) {
             return T.params[0] > 0 || (this._is("xterm") || this._is("rxvt-unicode") || this._is("screen") ? this._coreService.triggerDataEvent(c.C0.ESC + "[?1;2c") : this._is("linux") && this._coreService.triggerDataEvent(c.C0.ESC + "[?6c")), !0;
@@ -54778,14 +54778,14 @@ WARNING: This link could potentially be dangerous`)) {
             return !0;
           }
           requestMode(T, P) {
-            const Y = this._coreService.decPrivateModes, { activeProtocol: U, activeEncoding: E } = this._coreMouseService, J = this._coreService, { buffers: ce, cols: ae } = this._bufferService, { active: D, alt: C } = ce, F = this._optionsService.rawOptions, M = (Je) => Je ? 1 : 2, oe = T.params[0];
-            return se = oe, Re = P ? oe === 2 ? 4 : oe === 4 ? M(J.modes.insertMode) : oe === 12 ? 3 : oe === 20 ? M(F.convertEol) : 0 : oe === 1 ? M(Y.applicationCursorKeys) : oe === 3 ? F.windowOptions.setWinLines ? ae === 80 ? 2 : ae === 132 ? 1 : 0 : 0 : oe === 6 ? M(Y.origin) : oe === 7 ? M(Y.wraparound) : oe === 8 ? 3 : oe === 9 ? M(U === "X10") : oe === 12 ? M(F.cursorBlink) : oe === 25 ? M(!J.isCursorHidden) : oe === 45 ? M(Y.reverseWraparound) : oe === 66 ? M(Y.applicationKeypad) : oe === 67 ? 4 : oe === 1e3 ? M(U === "VT200") : oe === 1002 ? M(U === "DRAG") : oe === 1003 ? M(U === "ANY") : oe === 1004 ? M(Y.sendFocus) : oe === 1005 ? 4 : oe === 1006 ? M(E === "SGR") : oe === 1015 ? 4 : oe === 1016 ? M(E === "SGR_PIXELS") : oe === 1048 ? 1 : oe === 47 || oe === 1047 || oe === 1049 ? M(D === C) : oe === 2004 ? M(Y.bracketedPasteMode) : 0, J.triggerDataEvent(`${c.C0.ESC}[${P ? "" : "?"}${se};${Re}$y`), !0;
+            const Z = this._coreService.decPrivateModes, { activeProtocol: U, activeEncoding: E } = this._coreMouseService, J = this._coreService, { buffers: ce, cols: ae } = this._bufferService, { active: j, alt: C } = ce, F = this._optionsService.rawOptions, M = (Je) => Je ? 1 : 2, oe = T.params[0];
+            return se = oe, Re = P ? oe === 2 ? 4 : oe === 4 ? M(J.modes.insertMode) : oe === 12 ? 3 : oe === 20 ? M(F.convertEol) : 0 : oe === 1 ? M(Z.applicationCursorKeys) : oe === 3 ? F.windowOptions.setWinLines ? ae === 80 ? 2 : ae === 132 ? 1 : 0 : 0 : oe === 6 ? M(Z.origin) : oe === 7 ? M(Z.wraparound) : oe === 8 ? 3 : oe === 9 ? M(U === "X10") : oe === 12 ? M(F.cursorBlink) : oe === 25 ? M(!J.isCursorHidden) : oe === 45 ? M(Z.reverseWraparound) : oe === 66 ? M(Z.applicationKeypad) : oe === 67 ? 4 : oe === 1e3 ? M(U === "VT200") : oe === 1002 ? M(U === "DRAG") : oe === 1003 ? M(U === "ANY") : oe === 1004 ? M(Z.sendFocus) : oe === 1005 ? 4 : oe === 1006 ? M(E === "SGR") : oe === 1015 ? 4 : oe === 1016 ? M(E === "SGR_PIXELS") : oe === 1048 ? 1 : oe === 47 || oe === 1047 || oe === 1049 ? M(j === C) : oe === 2004 ? M(Z.bracketedPasteMode) : 0, J.triggerDataEvent(`${c.C0.ESC}[${P ? "" : "?"}${se};${Re}$y`), !0;
             var se, Re;
           }
-          _updateAttrColor(T, P, Y, U, E) {
-            return P === 2 ? (T |= 50331648, T &= -16777216, T |= y.AttributeData.fromColorRGB([Y, U, E])) : P === 5 && (T &= -50331904, T |= 33554432 | 255 & Y), T;
+          _updateAttrColor(T, P, Z, U, E) {
+            return P === 2 ? (T |= 50331648, T &= -16777216, T |= y.AttributeData.fromColorRGB([Z, U, E])) : P === 5 && (T &= -50331904, T |= 33554432 | 255 & Z), T;
           }
-          _extractColor(T, P, Y) {
+          _extractColor(T, P, Z) {
             const U = [0, 0, -1, 0, 0, 0];
             let E = 0, J = 0;
             do {
@@ -54803,13 +54803,13 @@ WARNING: This link could potentially be dangerous`)) {
             for (let ce = 2; ce < U.length; ++ce) U[ce] === -1 && (U[ce] = 0);
             switch (U[0]) {
               case 38:
-                Y.fg = this._updateAttrColor(Y.fg, U[1], U[3], U[4], U[5]);
+                Z.fg = this._updateAttrColor(Z.fg, U[1], U[3], U[4], U[5]);
                 break;
               case 48:
-                Y.bg = this._updateAttrColor(Y.bg, U[1], U[3], U[4], U[5]);
+                Z.bg = this._updateAttrColor(Z.bg, U[1], U[3], U[4], U[5]);
                 break;
               case 58:
-                Y.extended = Y.extended.clone(), Y.extended.underlineColor = this._updateAttrColor(Y.extended.underlineColor, U[1], U[3], U[4], U[5]);
+                Z.extended = Z.extended.clone(), Z.extended.underlineColor = this._updateAttrColor(Z.extended.underlineColor, U[1], U[3], U[4], U[5]);
             }
             return J;
           }
@@ -54822,9 +54822,9 @@ WARNING: This link could potentially be dangerous`)) {
           charAttributes(T) {
             if (T.length === 1 && T.params[0] === 0) return this._processSGR0(this._curAttrData), !0;
             const P = T.length;
-            let Y;
+            let Z;
             const U = this._curAttrData;
-            for (let E = 0; E < P; E++) Y = T.params[E], Y >= 30 && Y <= 37 ? (U.fg &= -50331904, U.fg |= 16777216 | Y - 30) : Y >= 40 && Y <= 47 ? (U.bg &= -50331904, U.bg |= 16777216 | Y - 40) : Y >= 90 && Y <= 97 ? (U.fg &= -50331904, U.fg |= 16777224 | Y - 90) : Y >= 100 && Y <= 107 ? (U.bg &= -50331904, U.bg |= 16777224 | Y - 100) : Y === 0 ? this._processSGR0(U) : Y === 1 ? U.fg |= 134217728 : Y === 3 ? U.bg |= 67108864 : Y === 4 ? (U.fg |= 268435456, this._processUnderline(T.hasSubParams(E) ? T.getSubParams(E)[0] : 1, U)) : Y === 5 ? U.fg |= 536870912 : Y === 7 ? U.fg |= 67108864 : Y === 8 ? U.fg |= 1073741824 : Y === 9 ? U.fg |= 2147483648 : Y === 2 ? U.bg |= 134217728 : Y === 21 ? this._processUnderline(2, U) : Y === 22 ? (U.fg &= -134217729, U.bg &= -134217729) : Y === 23 ? U.bg &= -67108865 : Y === 24 ? (U.fg &= -268435457, this._processUnderline(0, U)) : Y === 25 ? U.fg &= -536870913 : Y === 27 ? U.fg &= -67108865 : Y === 28 ? U.fg &= -1073741825 : Y === 29 ? U.fg &= 2147483647 : Y === 39 ? (U.fg &= -67108864, U.fg |= 16777215 & f.DEFAULT_ATTR_DATA.fg) : Y === 49 ? (U.bg &= -67108864, U.bg |= 16777215 & f.DEFAULT_ATTR_DATA.bg) : Y === 38 || Y === 48 || Y === 58 ? E += this._extractColor(T, E, U) : Y === 53 ? U.bg |= 1073741824 : Y === 55 ? U.bg &= -1073741825 : Y === 59 ? (U.extended = U.extended.clone(), U.extended.underlineColor = -1, U.updateExtended()) : Y === 100 ? (U.fg &= -67108864, U.fg |= 16777215 & f.DEFAULT_ATTR_DATA.fg, U.bg &= -67108864, U.bg |= 16777215 & f.DEFAULT_ATTR_DATA.bg) : this._logService.debug("Unknown SGR attribute: %d.", Y);
+            for (let E = 0; E < P; E++) Z = T.params[E], Z >= 30 && Z <= 37 ? (U.fg &= -50331904, U.fg |= 16777216 | Z - 30) : Z >= 40 && Z <= 47 ? (U.bg &= -50331904, U.bg |= 16777216 | Z - 40) : Z >= 90 && Z <= 97 ? (U.fg &= -50331904, U.fg |= 16777224 | Z - 90) : Z >= 100 && Z <= 107 ? (U.bg &= -50331904, U.bg |= 16777224 | Z - 100) : Z === 0 ? this._processSGR0(U) : Z === 1 ? U.fg |= 134217728 : Z === 3 ? U.bg |= 67108864 : Z === 4 ? (U.fg |= 268435456, this._processUnderline(T.hasSubParams(E) ? T.getSubParams(E)[0] : 1, U)) : Z === 5 ? U.fg |= 536870912 : Z === 7 ? U.fg |= 67108864 : Z === 8 ? U.fg |= 1073741824 : Z === 9 ? U.fg |= 2147483648 : Z === 2 ? U.bg |= 134217728 : Z === 21 ? this._processUnderline(2, U) : Z === 22 ? (U.fg &= -134217729, U.bg &= -134217729) : Z === 23 ? U.bg &= -67108865 : Z === 24 ? (U.fg &= -268435457, this._processUnderline(0, U)) : Z === 25 ? U.fg &= -536870913 : Z === 27 ? U.fg &= -67108865 : Z === 28 ? U.fg &= -1073741825 : Z === 29 ? U.fg &= 2147483647 : Z === 39 ? (U.fg &= -67108864, U.fg |= 16777215 & f.DEFAULT_ATTR_DATA.fg) : Z === 49 ? (U.bg &= -67108864, U.bg |= 16777215 & f.DEFAULT_ATTR_DATA.bg) : Z === 38 || Z === 48 || Z === 58 ? E += this._extractColor(T, E, U) : Z === 53 ? U.bg |= 1073741824 : Z === 55 ? U.bg &= -1073741825 : Z === 59 ? (U.extended = U.extended.clone(), U.extended.underlineColor = -1, U.updateExtended()) : Z === 100 ? (U.fg &= -67108864, U.fg |= 16777215 & f.DEFAULT_ATTR_DATA.fg, U.bg &= -67108864, U.bg |= 16777215 & f.DEFAULT_ATTR_DATA.bg) : this._logService.debug("Unknown SGR attribute: %d.", Z);
             return !0;
           }
           deviceStatus(T) {
@@ -54833,15 +54833,15 @@ WARNING: This link could potentially be dangerous`)) {
                 this._coreService.triggerDataEvent(`${c.C0.ESC}[0n`);
                 break;
               case 6:
-                const P = this._activeBuffer.y + 1, Y = this._activeBuffer.x + 1;
-                this._coreService.triggerDataEvent(`${c.C0.ESC}[${P};${Y}R`);
+                const P = this._activeBuffer.y + 1, Z = this._activeBuffer.x + 1;
+                this._coreService.triggerDataEvent(`${c.C0.ESC}[${P};${Z}R`);
             }
             return !0;
           }
           deviceStatusPrivate(T) {
             if (T.params[0] === 6) {
-              const P = this._activeBuffer.y + 1, Y = this._activeBuffer.x + 1;
-              this._coreService.triggerDataEvent(`${c.C0.ESC}[?${P};${Y}R`);
+              const P = this._activeBuffer.y + 1, Z = this._activeBuffer.x + 1;
+              this._coreService.triggerDataEvent(`${c.C0.ESC}[?${P};${Z}R`);
             }
             return !0;
           }
@@ -54863,13 +54863,13 @@ WARNING: This link could potentially be dangerous`)) {
               case 6:
                 this._optionsService.options.cursorStyle = "bar";
             }
-            const Y = P % 2 == 1;
-            return this._optionsService.options.cursorBlink = Y, !0;
+            const Z = P % 2 == 1;
+            return this._optionsService.options.cursorBlink = Z, !0;
           }
           setScrollRegion(T) {
             const P = T.params[0] || 1;
-            let Y;
-            return (T.length < 2 || (Y = T.params[1]) > this._bufferService.rows || Y === 0) && (Y = this._bufferService.rows), Y > P && (this._activeBuffer.scrollTop = P - 1, this._activeBuffer.scrollBottom = Y - 1, this._setCursor(0, 0)), !0;
+            let Z;
+            return (T.length < 2 || (Z = T.params[1]) > this._bufferService.rows || Z === 0) && (Z = this._bufferService.rows), Z > P && (this._activeBuffer.scrollTop = P - 1, this._activeBuffer.scrollBottom = Z - 1, this._setCursor(0, 0)), !0;
           }
           windowOptions(T) {
             if (!X(T.params[0], this._optionsService.rawOptions.windowOptions)) return !0;
@@ -54905,9 +54905,9 @@ WARNING: This link could potentially be dangerous`)) {
             return this._iconName = T, !0;
           }
           setOrReportIndexedColor(T) {
-            const P = [], Y = T.split(";");
-            for (; Y.length > 1; ) {
-              const U = Y.shift(), E = Y.shift();
+            const P = [], Z = T.split(";");
+            for (; Z.length > 1; ) {
+              const U = Z.shift(), E = Z.shift();
               if (/^\d+$/.exec(U)) {
                 const J = parseInt(U);
                 if (B(J)) if (E === "?") P.push({ type: 0, index: J });
@@ -54925,19 +54925,19 @@ WARNING: This link could potentially be dangerous`)) {
           }
           _createHyperlink(T, P) {
             this._getCurrentLinkId() && this._finishHyperlink();
-            const Y = T.split(":");
+            const Z = T.split(":");
             let U;
-            const E = Y.findIndex(((J) => J.startsWith("id=")));
-            return E !== -1 && (U = Y[E].slice(3) || void 0), this._curAttrData.extended = this._curAttrData.extended.clone(), this._curAttrData.extended.urlId = this._oscLinkService.registerLink({ id: U, uri: P }), this._curAttrData.updateExtended(), !0;
+            const E = Z.findIndex(((J) => J.startsWith("id=")));
+            return E !== -1 && (U = Z[E].slice(3) || void 0), this._curAttrData.extended = this._curAttrData.extended.clone(), this._curAttrData.extended.urlId = this._oscLinkService.registerLink({ id: U, uri: P }), this._curAttrData.updateExtended(), !0;
           }
           _finishHyperlink() {
             return this._curAttrData.extended = this._curAttrData.extended.clone(), this._curAttrData.extended.urlId = 0, this._curAttrData.updateExtended(), !0;
           }
           _setOrReportSpecialColor(T, P) {
-            const Y = T.split(";");
-            for (let U = 0; U < Y.length && !(P >= this._specialColors.length); ++U, ++P) if (Y[U] === "?") this._onColor.fire([{ type: 0, index: this._specialColors[P] }]);
+            const Z = T.split(";");
+            for (let U = 0; U < Z.length && !(P >= this._specialColors.length); ++U, ++P) if (Z[U] === "?") this._onColor.fire([{ type: 0, index: this._specialColors[P] }]);
             else {
-              const E = (0, v.parseColor)(Y[U]);
+              const E = (0, v.parseColor)(Z[U]);
               E && this._onColor.fire([{ type: 1, index: this._specialColors[P], color: E }]);
             }
             return !0;
@@ -54953,9 +54953,9 @@ WARNING: This link could potentially be dangerous`)) {
           }
           restoreIndexedColor(T) {
             if (!T) return this._onColor.fire([{ type: 2 }]), !0;
-            const P = [], Y = T.split(";");
-            for (let U = 0; U < Y.length; ++U) if (/^\d+$/.exec(Y[U])) {
-              const E = parseInt(Y[U]);
+            const P = [], Z = T.split(";");
+            for (let U = 0; U < Z.length; ++U) if (/^\d+$/.exec(Z[U])) {
+              const E = parseInt(Z[U]);
               B(E) && P.push({ type: 2, index: E });
             }
             return P.length && this._onColor.fire(P), !0;
@@ -55013,21 +55013,21 @@ WARNING: This link could potentially be dangerous`)) {
             const T = new _.CellData();
             T.content = 4194373, T.fg = this._curAttrData.fg, T.bg = this._curAttrData.bg, this._setCursor(0, 0);
             for (let P = 0; P < this._bufferService.rows; ++P) {
-              const Y = this._activeBuffer.ybase + this._activeBuffer.y + P, U = this._activeBuffer.lines.get(Y);
+              const Z = this._activeBuffer.ybase + this._activeBuffer.y + P, U = this._activeBuffer.lines.get(Z);
               U && (U.fill(T), U.isWrapped = !1);
             }
             return this._dirtyRowTracker.markAllDirty(), this._setCursor(0, 0), !0;
           }
           requestStatusString(T, P) {
-            const Y = this._bufferService.buffer, U = this._optionsService.rawOptions;
-            return ((E) => (this._coreService.triggerDataEvent(`${c.C0.ESC}${E}${c.C0.ESC}\\`), !0))(T === '"q' ? `P1$r${this._curAttrData.isProtected() ? 1 : 0}"q` : T === '"p' ? 'P1$r61;1"p' : T === "r" ? `P1$r${Y.scrollTop + 1};${Y.scrollBottom + 1}r` : T === "m" ? "P1$r0m" : T === " q" ? `P1$r${{ block: 2, underline: 4, bar: 6 }[U.cursorStyle] - (U.cursorBlink ? 1 : 0)} q` : "P0$r");
+            const Z = this._bufferService.buffer, U = this._optionsService.rawOptions;
+            return ((E) => (this._coreService.triggerDataEvent(`${c.C0.ESC}${E}${c.C0.ESC}\\`), !0))(T === '"q' ? `P1$r${this._curAttrData.isProtected() ? 1 : 0}"q` : T === '"p' ? 'P1$r61;1"p' : T === "r" ? `P1$r${Z.scrollTop + 1};${Z.scrollBottom + 1}r` : T === "m" ? "P1$r0m" : T === " q" ? `P1$r${{ block: 2, underline: 4, bar: 6 }[U.cursorStyle] - (U.cursorBlink ? 1 : 0)} q` : "P0$r");
           }
           markRangeDirty(T, P) {
             this._dirtyRowTracker.markRangeDirty(T, P);
           }
         }
-        o.InputHandler = Z;
-        let j = class {
+        o.InputHandler = Y;
+        let D = class {
           constructor(I) {
             this._bufferService = I, this.clearRange();
           }
@@ -55047,7 +55047,7 @@ WARNING: This link could potentially be dangerous`)) {
         function B(I) {
           return 0 <= I && I < 256;
         }
-        j = O([h(0, b.IBufferService)], j);
+        D = O([h(0, b.IBufferService)], D);
       }, 844: (a, o) => {
         function l(O) {
           for (const h of O) h.dispose();
@@ -55522,44 +55522,44 @@ WARNING: This link could potentially be dangerous`)) {
               const z = v[v.length - 1].getTrimmedLength(), X = (0, d.reflowSmallerGetNewLineLengths)(v, this._cols, g), R = X.length - v.length;
               let W;
               W = this.ybase === 0 && this.y !== this.lines.length - 1 ? Math.max(0, this.y - this.lines.maxLength + R) : Math.max(0, this.lines.length - this.lines.maxLength + R);
-              const Z = [];
-              for (let Y = 0; Y < R; Y++) {
+              const Y = [];
+              for (let Z = 0; Z < R; Z++) {
                 const U = this.getBlankLine(u.DEFAULT_ATTR_DATA, !0);
-                Z.push(U);
+                Y.push(U);
               }
-              Z.length > 0 && (b.push({ start: k + v.length + m, newLines: Z }), m += Z.length), v.push(...Z);
-              let j = X.length - 1, B = X[j];
-              B === 0 && (j--, B = X[j]);
+              Y.length > 0 && (b.push({ start: k + v.length + m, newLines: Y }), m += Y.length), v.push(...Y);
+              let D = X.length - 1, B = X[D];
+              B === 0 && (D--, B = X[D]);
               let I = v.length - R - 1, T = z;
               for (; I >= 0; ) {
-                const Y = Math.min(T, B);
-                if (v[j] === void 0) break;
-                if (v[j].copyCellsFrom(v[I], T - Y, B - Y, Y, !0), B -= Y, B === 0 && (j--, B = X[j]), T -= Y, T === 0) {
+                const Z = Math.min(T, B);
+                if (v[D] === void 0) break;
+                if (v[D].copyCellsFrom(v[I], T - Z, B - Z, Z, !0), B -= Z, B === 0 && (D--, B = X[D]), T -= Z, T === 0) {
                   I--;
                   const U = Math.max(I, 0);
                   T = (0, d.getWrappedLineTrimmedLength)(v, U, this._cols);
                 }
               }
-              for (let Y = 0; Y < v.length; Y++) X[Y] < g && v[Y].setCell(X[Y], y);
+              for (let Z = 0; Z < v.length; Z++) X[Z] < g && v[Z].setCell(X[Z], y);
               let P = R - W;
               for (; P-- > 0; ) this.ybase === 0 ? this.y < _ - 1 ? (this.y++, this.lines.pop()) : (this.ybase++, this.ydisp++) : this.ybase < Math.min(this.lines.maxLength, this.lines.length + m) - _ && (this.ybase === this.ydisp && this.ydisp++, this.ybase++);
               this.savedY = Math.min(this.savedY + R, this.ybase + _ - 1);
             }
             if (b.length > 0) {
               const k = [], S = [];
-              for (let j = 0; j < this.lines.length; j++) S.push(this.lines.get(j));
+              for (let D = 0; D < this.lines.length; D++) S.push(this.lines.get(D));
               const v = this.lines.length;
               let x = v - 1, z = 0, X = b[z];
               this.lines.length = Math.min(this.lines.maxLength, this.lines.length + m);
               let R = 0;
-              for (let j = Math.min(this.lines.maxLength - 1, v + m - 1); j >= 0; j--) if (X && X.start > x + R) {
-                for (let B = X.newLines.length - 1; B >= 0; B--) this.lines.set(j--, X.newLines[B]);
-                j++, k.push({ index: x + 1, amount: X.newLines.length }), R += X.newLines.length, X = b[++z];
-              } else this.lines.set(j, S[x--]);
+              for (let D = Math.min(this.lines.maxLength - 1, v + m - 1); D >= 0; D--) if (X && X.start > x + R) {
+                for (let B = X.newLines.length - 1; B >= 0; B--) this.lines.set(D--, X.newLines[B]);
+                D++, k.push({ index: x + 1, amount: X.newLines.length }), R += X.newLines.length, X = b[++z];
+              } else this.lines.set(D, S[x--]);
               let W = 0;
-              for (let j = k.length - 1; j >= 0; j--) k[j].index += W, this.lines.onInsertEmitter.fire(k[j]), W += k[j].amount;
-              const Z = Math.max(0, v + m - this.lines.maxLength);
-              Z > 0 && this.lines.onTrimEmitter.fire(Z);
+              for (let D = k.length - 1; D >= 0; D--) k[D].index += W, this.lines.onInsertEmitter.fire(k[D]), W += k[D].amount;
+              const Y = Math.max(0, v + m - this.lines.maxLength);
+              Y > 0 && this.lines.onTrimEmitter.fire(Y);
             }
           }
           translateBufferLineToString(g, _, y = 0, b) {
@@ -58342,7 +58342,7 @@ class _fe {
 }
 const Fo = new ffe();
 function $fe({ sessionId: t, defaultPath: e, terminalId: r, visible: i }) {
-  const n = or(null), s = or(null), a = or(null), o = or(null), l = or(null), [O, h] = qe(!1), [c, u] = qe(null), d = dr(() => {
+  const n = lr(null), s = lr(null), a = lr(null), o = lr(null), l = lr(null), [O, h] = qe(!1), [c, u] = qe(null), d = or(() => {
     var g;
     u(((g = a.current) == null ? void 0 : g.getHandlePositions()) ?? null);
   }, []);
@@ -58364,8 +58364,8 @@ function $fe({ sessionId: t, defaultPath: e, terminalId: r, visible: i }) {
         },
         onMouseWheel: (X) => {
           if (!b.channelId) return;
-          const R = Math.floor(b.terminal.cols / 2), W = Math.floor(b.terminal.rows / 2), j = `\x1B[<${X === "up" ? 64 : 65};${R};${W}M`;
-          _t.writeToShell({ channelId: b.channelId, data: sO(j) }).catch(() => {
+          const R = Math.floor(b.terminal.cols / 2), W = Math.floor(b.terminal.rows / 2), D = `\x1B[<${X === "up" ? 64 : 65};${R};${W}M`;
+          _t.writeToShell({ channelId: b.channelId, data: sO(D) }).catch(() => {
           });
         }
       });
@@ -58396,16 +58396,16 @@ function $fe({ sessionId: t, defaultPath: e, terminalId: r, visible: i }) {
   }, [t]), er(() => {
     s.current && i && s.current.fitAddon.fit();
   }, [i]);
-  const $ = dr(() => {
+  const $ = or(() => {
     var g, _;
     (g = a.current) == null || g.copySelection(), (_ = a.current) == null || _.clearSelection(), h(!1), u(null);
-  }, []), Q = dr(() => {
+  }, []), Q = or(() => {
     var g, _;
     (g = a.current) == null || g.paste(), (_ = a.current) == null || _.clearSelection(), h(!1), u(null);
-  }, []), f = dr(() => {
+  }, []), f = or(() => {
     var g;
     (g = a.current) == null || g.selectAll(), d();
-  }, [d]), p = dr((g) => {
+  }, [d]), p = or((g) => {
     const _ = a.current;
     if (!_) return;
     _.isHandleDrag = !0;
@@ -58529,10 +58529,10 @@ const Qfe = {
   backgroundColor: "var(--bg-surface1)"
 };
 function bfe({ sessionId: t, defaultPath: e, visible: r }) {
-  const i = or(2), [n, s] = qe(() => [{ id: crypto.randomUUID(), label: "1" }]), [a, o] = qe(n[0].id), l = dr(() => {
+  const i = lr(2), [n, s] = qe(() => [{ id: crypto.randomUUID(), label: "1" }]), [a, o] = qe(n[0].id), l = or(() => {
     const h = crypto.randomUUID(), c = String(i.current++);
     s((u) => [...u, { id: h, label: c }]), o(h);
-  }, []), O = dr(
+  }, []), O = or(
     (h) => {
       s((c) => {
         if (c.length <= 1) return c;
@@ -58664,7 +58664,6 @@ const Sfe = {
   { label: "|", value: "|" },
   { label: "-", value: "-" },
   { label: "_", value: "_" },
-  // Arrow keys handled separately as dpad
   { label: "↑", value: Sa },
   { label: "↓", value: ka },
   { label: "←", value: wa },
@@ -58682,14 +58681,36 @@ const Sfe = {
   { label: "]", value: "]" },
   { label: '"', value: '"' },
   { label: "'", value: "'" },
-  // Arrow keys handled separately as dpad
   { label: "↑", value: Sa },
   { label: "↓", value: ka },
   { label: "←", value: wa },
   { label: "→", value: Pa }
 ], zfe = /* @__PURE__ */ new Set([Sa, ka, wa, Pa]), Efe = 8;
-function Cfe({ keyDef: t, onPress: e }) {
-  const r = or(null);
+function Cfe({ keyDef: t, onPress: e, onSuppress: r }) {
+  const i = lr(null);
+  return /* @__PURE__ */ q.jsx(
+    "button",
+    {
+      tabIndex: -1,
+      onTouchStart: (n) => n.preventDefault(),
+      onMouseDown: (n) => n.preventDefault(),
+      onPointerDown: (n) => {
+        n.preventDefault(), i.current = { x: n.clientX, y: n.clientY };
+      },
+      onPointerUp: (n) => {
+        if (!i.current) return;
+        const s = n.clientX - i.current.x, a = n.clientY - i.current.y;
+        i.current = null, Math.sqrt(s * s + a * a) < Efe && (n.preventDefault(), e(t.value), r == null || r());
+      },
+      onPointerCancel: () => {
+        i.current = null;
+      },
+      style: Wfe,
+      children: t.label
+    }
+  );
+}
+function Zs({ keyDef: t, onPress: e, onSuppress: r }) {
   return /* @__PURE__ */ q.jsx(
     "button",
     {
@@ -58697,53 +58718,32 @@ function Cfe({ keyDef: t, onPress: e }) {
       onTouchStart: (i) => i.preventDefault(),
       onMouseDown: (i) => i.preventDefault(),
       onPointerDown: (i) => {
-        i.preventDefault(), r.current = { x: i.clientX, y: i.clientY };
-      },
-      onPointerUp: (i) => {
-        if (!r.current) return;
-        const n = i.clientX - r.current.x, s = i.clientY - r.current.y;
-        r.current = null, Math.sqrt(n * n + s * s) < Efe && (i.preventDefault(), e(t.value));
-      },
-      onPointerCancel: () => {
-        r.current = null;
-      },
-      style: Wfe,
-      children: t.label
-    }
-  );
-}
-function Zs({ keyDef: t, onPress: e }) {
-  return /* @__PURE__ */ q.jsx(
-    "button",
-    {
-      tabIndex: -1,
-      onTouchStart: (r) => r.preventDefault(),
-      onMouseDown: (r) => r.preventDefault(),
-      onPointerDown: (r) => {
-        r.preventDefault(), e(t.value);
+        i.preventDefault(), e(t.value), r == null || r();
       },
       style: Vfe,
       children: t.label
     }
   );
 }
-function Yfe({ context: t, onKeyPress: e }) {
-  const r = t === "terminal" ? Xfe : t === "code-editor" ? Rfe : [];
-  if (r.length === 0) return null;
-  const i = r.filter((l) => !zfe.has(l.value)), n = r.find((l) => l.value === Sa), s = r.find((l) => l.value === ka), a = r.find((l) => l.value === wa), o = r.find((l) => l.value === Pa);
+function Yfe({ context: t, onKeyPress: e, onSuppressKeyboard: r }) {
+  const i = t === "terminal" ? Xfe : t === "code-editor" ? Rfe : [];
+  if (i.length === 0) return null;
+  const n = i.filter((h) => !zfe.has(h.value)), s = i.find((h) => h.value === Sa), a = i.find((h) => h.value === ka), o = i.find((h) => h.value === wa), l = i.find((h) => h.value === Pa), O = or(() => {
+    r == null || r();
+  }, [r]);
   return /* @__PURE__ */ q.jsxs("div", { style: Zfe, children: [
-    /* @__PURE__ */ q.jsx("div", { style: Ufe, children: i.map((l) => /* @__PURE__ */ q.jsx(Cfe, { keyDef: l, onPress: e }, l.label)) }),
+    /* @__PURE__ */ q.jsx("div", { style: Ufe, children: n.map((h) => /* @__PURE__ */ q.jsx(Cfe, { keyDef: h, onPress: e, onSuppress: O }, h.label)) }),
     /* @__PURE__ */ q.jsxs("div", { style: qfe, children: [
       /* @__PURE__ */ q.jsx(Zs, { keyDef: { label: "⌨", value: "keyboard" }, onPress: e }),
       /* @__PURE__ */ q.jsxs("div", { style: Afe, children: [
         /* @__PURE__ */ q.jsx("div", {}),
-        /* @__PURE__ */ q.jsx(Zs, { keyDef: n, onPress: e }),
+        /* @__PURE__ */ q.jsx(Zs, { keyDef: s, onPress: e, onSuppress: O }),
         /* @__PURE__ */ q.jsx("div", {}),
-        /* @__PURE__ */ q.jsx(Zs, { keyDef: a, onPress: e }),
+        /* @__PURE__ */ q.jsx(Zs, { keyDef: o, onPress: e, onSuppress: O }),
         /* @__PURE__ */ q.jsx("div", {}),
-        /* @__PURE__ */ q.jsx(Zs, { keyDef: o, onPress: e }),
+        /* @__PURE__ */ q.jsx(Zs, { keyDef: l, onPress: e, onSuppress: O }),
         /* @__PURE__ */ q.jsx("div", {}),
-        /* @__PURE__ */ q.jsx(Zs, { keyDef: s, onPress: e }),
+        /* @__PURE__ */ q.jsx(Zs, { keyDef: a, onPress: e, onSuppress: O }),
         /* @__PURE__ */ q.jsx("div", {})
       ] })
     ] })
@@ -58766,7 +58766,7 @@ const Zfe = {
   alignContent: "flex-start"
 }, qfe = {
   display: "flex",
-  flexDirection: "column",
+  flexDirection: "row",
   alignItems: "center",
   gap: 3,
   padding: 4,
@@ -58949,53 +58949,53 @@ function Lfe({ ftm: t, sftpId: e }) {
 function spe() {
   const t = jfe(), [e, r] = qe("workspace-list"), [i, n] = qe("terminal"), [s, a] = qe(() => localStorage.getItem("intode_debug") === "true");
   er(() => {
-    const Z = (j) => j.preventDefault();
-    return document.addEventListener("contextmenu", Z), () => document.removeEventListener("contextmenu", Z);
+    const Y = (D) => D.preventDefault();
+    return document.addEventListener("contextmenu", Y), () => document.removeEventListener("contextmenu", Y);
   }, []);
-  const o = dr((Z) => {
-    a(Z), localStorage.setItem("intode_debug", String(Z));
-  }, []), [l, O] = qe([]), [h, c] = qe(null), [u, d] = qe(null), [$, Q] = qe(null), [f, p] = qe("list"), [g, _] = qe(0), y = or(/* @__PURE__ */ new Map()), b = l.find((Z) => Z.wsId === h) ?? null, m = new Set(l.map((Z) => Z.wsId)), k = dr((Z) => {
-    let j = y.current.get(Z);
-    return j || (j = new Dfe(), y.current.set(Z, j)), j;
-  }, []), S = dr(
-    (Z) => {
-      if (l.find((B) => B.wsId === Z.id)) {
-        c(Z.id), e !== "workspace-view" && r("workspace-view");
+  const o = or((Y) => {
+    a(Y), localStorage.setItem("intode_debug", String(Y));
+  }, []), [l, O] = qe([]), [h, c] = qe(null), [u, d] = qe(null), [$, Q] = qe(null), [f, p] = qe("list"), [g, _] = qe(0), y = lr(/* @__PURE__ */ new Map()), b = l.find((Y) => Y.wsId === h) ?? null, m = new Set(l.map((Y) => Y.wsId)), k = or((Y) => {
+    let D = y.current.get(Y);
+    return D || (D = new Dfe(), y.current.set(Y, D)), D;
+  }, []), S = or(
+    (Y) => {
+      if (l.find((B) => B.wsId === Y.id)) {
+        c(Y.id), e !== "workspace-view" && r("workspace-view");
         return;
       }
-      d(Z), r("connecting");
+      d(Y), r("connecting");
     },
     [l, e]
-  ), v = dr(
-    async (Z) => {
-      const j = u;
-      if (!j) return;
-      dO(`Connected sessionId=${Z}`);
+  ), v = or(
+    async (Y) => {
+      const D = u;
+      if (!D) return;
+      dO(`Connected sessionId=${Y}`);
       let B = null, I = null;
       try {
-        B = (await _t.openSftp({ sessionId: Z })).sftpId, dO(`SFTP opened sftpId=${B}`);
+        B = (await _t.openSftp({ sessionId: Y })).sftpId, dO(`SFTP opened sftpId=${B}`);
       } catch (T) {
         dO(`SFTP error: ${T}`), I = String(T);
       }
-      O((T) => [...T, { wsId: j.id, workspace: j, sessionId: Z, sftpId: B, sftpError: I }]), c(j.id), d(null), r("workspace-view"), n("terminal");
+      O((T) => [...T, { wsId: D.id, workspace: D, sessionId: Y, sftpId: B, sftpError: I }]), c(D.id), d(null), r("workspace-view"), n("terminal");
     },
     [u]
-  ), x = dr(async () => {
+  ), x = or(async () => {
     if (!b) return;
     try {
       b.sftpId && await _t.closeSftp({ sftpId: b.sftpId }), await _t.disconnect({ sessionId: b.sessionId });
     } catch {
     }
     y.current.delete(b.wsId);
-    const Z = l.filter((j) => j.wsId !== b.wsId);
-    O(Z), Z.length > 0 ? c(Z[0].wsId) : (c(null), r("workspace-list"));
-  }, [b, l]), z = or(l);
+    const Y = l.filter((D) => D.wsId !== b.wsId);
+    O(Y), Y.length > 0 ? c(Y[0].wsId) : (c(null), r("workspace-list"));
+  }, [b, l]), z = lr(l);
   z.current = l, er(() => {
-    const Z = async () => {
+    const Y = async () => {
       if (document.visibilityState !== "visible") return;
-      const j = z.current;
-      if (j.length !== 0)
-        for (const B of j) {
+      const D = z.current;
+      if (D.length !== 0)
+        for (const B of D) {
           try {
             const { status: I } = await _t.getStatus({ sessionId: B.sessionId });
             if (I === "connected") continue;
@@ -59014,22 +59014,22 @@ function spe() {
             } catch {
             }
             O(
-              (Y) => Y.map((U) => U.wsId === B.wsId ? { ...U, sessionId: T, sftpId: P, sftpError: null } : U)
+              (Z) => Z.map((U) => U.wsId === B.wsId ? { ...U, sessionId: T, sftpId: P, sftpError: null } : U)
             );
           } catch {
           }
         }
     };
-    return document.addEventListener("visibilitychange", Z), () => document.removeEventListener("visibilitychange", Z);
+    return document.addEventListener("visibilitychange", Y), () => document.removeEventListener("visibilitychange", Y);
   }, []);
-  const X = dr(
-    async (Z, j) => {
+  const X = or(
+    async (Y, D) => {
       let B = null;
       if ($) {
         const I = (await Promise.resolve().then(() => Dk)).getWorkspaceStore();
-        await I.update($.id, Z), j && await I.savePassword($.id, j), Q(null);
+        await I.update($.id, Y), D && await I.savePassword($.id, D), Q(null);
       } else
-        B = await p_(Z, j);
+        B = await p_(Y, D);
       _((I) => I + 1), f === "view" && B ? (d(B), r("connecting")) : r(f === "view" ? "workspace-view" : "workspace-list");
     },
     [$, f]
@@ -59056,8 +59056,8 @@ function spe() {
           onAddWorkspace: () => {
             Q(null), p("list"), r("workspace-add");
           },
-          onEditWorkspace: (Z) => {
-            Q(Z), p("list"), r("workspace-add");
+          onEditWorkspace: (Y) => {
+            Q(Y), p("list"), r("workspace-add");
           },
           onSettings: () => r("settings")
         },
@@ -59107,42 +59107,42 @@ function spe() {
           /* @__PURE__ */ q.jsx("button", { onClick: x, style: Zt.disconnectBtn, children: "HALT_SESSION" })
         ] }),
         /* @__PURE__ */ q.jsxs("div", { style: Zt.content, children: [
-          l.map((Z) => {
-            const j = Z.wsId === h, B = k(Z.wsId);
+          l.map((Y) => {
+            const D = Y.wsId === h, B = k(Y.wsId);
             return /* @__PURE__ */ q.jsxs(du.Fragment, { children: [
-              /* @__PURE__ */ q.jsx("div", { style: { ...Zt.tabContent, display: j && i === "files" ? "flex" : "none" }, children: Z.sftpId ? /* @__PURE__ */ q.jsx(
+              /* @__PURE__ */ q.jsx("div", { style: { ...Zt.tabContent, display: D && i === "files" ? "flex" : "none" }, children: Y.sftpId ? /* @__PURE__ */ q.jsx(
                 zw,
                 {
-                  sftpId: Z.sftpId,
-                  rootPath: Z.workspace.defaultPath,
+                  sftpId: Y.sftpId,
+                  rootPath: Y.workspace.defaultPath,
                   onFileSelect: async (I) => {
-                    Wb(I.split("/").pop() ?? "") !== "binary" && (await B.openFile(Z.sftpId, I), n("editor"));
+                    Wb(I.split("/").pop() ?? "") !== "binary" && (await B.openFile(Y.sftpId, I), n("editor"));
                   }
                 }
-              ) : Z.sftpError ? /* @__PURE__ */ q.jsx("div", { style: Zt.placeholder, children: /* @__PURE__ */ q.jsxs("div", { style: { textAlign: "center" }, children: [
+              ) : Y.sftpError ? /* @__PURE__ */ q.jsx("div", { style: Zt.placeholder, children: /* @__PURE__ */ q.jsxs("div", { style: { textAlign: "center" }, children: [
                 /* @__PURE__ */ q.jsx("p", { style: { color: "var(--accent-red)", marginBottom: 8 }, children: "SFTP connection failed" }),
-                /* @__PURE__ */ q.jsx("p", { style: { color: "var(--text-muted)", fontSize: 13 }, children: Z.sftpError })
+                /* @__PURE__ */ q.jsx("p", { style: { color: "var(--text-muted)", fontSize: 13 }, children: Y.sftpError })
               ] }) }) : /* @__PURE__ */ q.jsx("div", { style: Zt.placeholder, children: /* @__PURE__ */ q.jsx("span", { style: { color: "var(--text-muted)" }, children: "Connecting SFTP..." }) }) }),
               /* @__PURE__ */ q.jsx(
                 "div",
                 {
                   style: {
                     ...Zt.tabContent,
-                    display: j && i === "editor" ? "flex" : "none",
+                    display: D && i === "editor" ? "flex" : "none",
                     flexDirection: "column"
                   },
-                  children: /* @__PURE__ */ q.jsx(Lfe, { ftm: B, sftpId: Z.sftpId })
+                  children: /* @__PURE__ */ q.jsx(Lfe, { ftm: B, sftpId: Y.sftpId })
                 }
               ),
-              /* @__PURE__ */ q.jsx("div", { style: { ...Zt.tabContent, display: j && i === "terminal" ? "flex" : "none" }, children: /* @__PURE__ */ q.jsx(
+              /* @__PURE__ */ q.jsx("div", { style: { ...Zt.tabContent, display: D && i === "terminal" ? "flex" : "none" }, children: /* @__PURE__ */ q.jsx(
                 bfe,
                 {
-                  sessionId: Z.sessionId,
-                  defaultPath: Z.workspace.defaultPath,
-                  visible: j && i === "terminal"
+                  sessionId: Y.sessionId,
+                  defaultPath: Y.workspace.defaultPath,
+                  visible: D && i === "terminal"
                 }
               ) })
-            ] }, Z.wsId);
+            ] }, Y.wsId);
           }),
           /* @__PURE__ */ q.jsx("div", { style: { ...Zt.tabContent, display: i === "settings" ? "flex" : "none" }, children: /* @__PURE__ */ q.jsx(
             Fd,
@@ -59153,34 +59153,38 @@ function spe() {
               onDebugToggle: o
             }
           ) }),
-          Id().map((Z) => {
-            const j = Ak(Z.id);
-            return j ? /* @__PURE__ */ q.jsx("div", { style: { ...Zt.tabContent, display: i === Z.id ? "flex" : "none" }, children: /* @__PURE__ */ q.jsx(j, { visible: i === Z.id }) }, Z.id) : null;
+          Id().map((Y) => {
+            const D = Ak(Y.id);
+            return D ? /* @__PURE__ */ q.jsx("div", { style: { ...Zt.tabContent, display: i === Y.id ? "flex" : "none" }, children: /* @__PURE__ */ q.jsx(D, { visible: i === Y.id }) }, Y.id) : null;
           })
         ] }),
         (i === "terminal" || i === "editor") && /* @__PURE__ */ q.jsx(
           Yfe,
           {
             context: i === "terminal" ? "terminal" : "code-editor",
-            onKeyPress: (Z) => {
-              if (Z === "keyboard") {
+            onSuppressKeyboard: () => {
+              var Y, D, B;
+              (D = (Y = document.activeElement) == null ? void 0 : Y.blur) == null || D.call(Y), (B = window.__intodeHideKeyboard) == null || B.call(window);
+            },
+            onKeyPress: (Y) => {
+              if (Y === "keyboard") {
                 if (i === "terminal") {
-                  const j = document.querySelector(".xterm-helper-textarea");
-                  j && (document.activeElement === j ? j.blur() : j.focus());
+                  const D = document.querySelector(".xterm-helper-textarea");
+                  D && (document.activeElement === D ? D.blur() : D.focus());
                 } else if (i === "editor") {
-                  const j = document.querySelector(".cm-content");
-                  j && (document.activeElement === j ? j.blur() : j.focus());
+                  const D = document.querySelector(".cm-content");
+                  D && (document.activeElement === D ? D.blur() : D.focus());
                 }
                 return;
               }
               if (i === "terminal") {
-                const j = Fo.getActiveSession();
-                j != null && j.channelId && _t.writeToShell({ channelId: j.channelId, data: sO(Z) }).catch(() => {
+                const D = Fo.getActiveSession();
+                D != null && D.channelId && _t.writeToShell({ channelId: D.channelId, data: sO(Y) }).catch(() => {
                 });
               } else if (i === "editor") {
-                const j = ZY();
-                if (!j) return;
-                Z === "save" ? j.save() : Z === "undo" ? j.undo() : Z === "redo" ? j.redo() : Z === "tab" ? j.insertText("	") : Z === Sa ? j.cursorUp() : Z === ka ? j.cursorDown() : Z === wa ? j.cursorLeft() : Z === Pa ? j.cursorRight() : j.insertText(Z);
+                const D = ZY();
+                if (!D) return;
+                Y === "save" ? D.save() : Y === "undo" ? D.undo() : Y === "redo" ? D.redo() : Y === "tab" ? D.insertText("	") : Y === Sa ? D.cursorUp() : Y === ka ? D.cursorDown() : Y === wa ? D.cursorLeft() : Y === Pa ? D.cursorRight() : D.insertText(Y);
               }
             }
           }
@@ -59342,7 +59346,7 @@ export {
   Gt as c,
   di as d,
   Mt as e,
-  hr as f,
+  ur as f,
   Ge as g,
   pa as h,
   tr as i,

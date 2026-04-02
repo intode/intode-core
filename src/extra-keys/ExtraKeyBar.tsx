@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   KEY_ESC, KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT,
 } from '../lib/constants';
@@ -9,6 +9,8 @@ export type ExtraKeysContext = 'terminal' | 'code-editor' | 'md-editor';
 export interface ExtraKeyBarProps {
   context: ExtraKeysContext;
   onKeyPress: (data: string) => void;
+  /** Called after non-keyboard key press to suppress OS keyboard popup */
+  onSuppressKeyboard?: () => void;
 }
 
 interface KeyDef {
@@ -30,7 +32,6 @@ const TERMINAL_KEYS: KeyDef[] = [
   { label: '|', value: '|' },
   { label: '-', value: '-' },
   { label: '_', value: '_' },
-  // Arrow keys handled separately as dpad
   { label: '\u2191', value: KEY_UP },
   { label: '\u2193', value: KEY_DOWN },
   { label: '\u2190', value: KEY_LEFT },
@@ -50,7 +51,6 @@ const EDITOR_KEYS: KeyDef[] = [
   { label: ']', value: ']' },
   { label: '"', value: '"' },
   { label: "'", value: "'" },
-  // Arrow keys handled separately as dpad
   { label: '\u2191', value: KEY_UP },
   { label: '\u2193', value: KEY_DOWN },
   { label: '\u2190', value: KEY_LEFT },
@@ -60,7 +60,7 @@ const EDITOR_KEYS: KeyDef[] = [
 const ARROW_VALUES = new Set([KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT]);
 const MOVE_THRESHOLD = 8;
 
-function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
+function KeyButton({ keyDef, onPress, onSuppress }: { keyDef: KeyDef; onPress: (v: string) => void; onSuppress?: () => void }) {
   const startPos = useRef<{ x: number; y: number } | null>(null);
   return (
     <button
@@ -76,6 +76,7 @@ function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) =
         if (Math.sqrt(dx * dx + dy * dy) < MOVE_THRESHOLD) {
           e.preventDefault();
           onPress(keyDef.value);
+          onSuppress?.();
         }
       }}
       onPointerCancel={() => { startPos.current = null; }}
@@ -86,13 +87,13 @@ function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) =
   );
 }
 
-function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
+function DpadButton({ keyDef, onPress, onSuppress }: { keyDef: KeyDef; onPress: (v: string) => void; onSuppress?: () => void }) {
   return (
     <button
       tabIndex={-1}
       onTouchStart={(e) => e.preventDefault()}
       onMouseDown={(e) => e.preventDefault()}
-      onPointerDown={(e) => { e.preventDefault(); onPress(keyDef.value); }}
+      onPointerDown={(e) => { e.preventDefault(); onPress(keyDef.value); onSuppress?.(); }}
       style={dpadKeyStyle}
     >
       {keyDef.label}
@@ -100,7 +101,7 @@ function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) 
   );
 }
 
-export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
+export function ExtraKeyBar({ context, onKeyPress, onSuppressKeyboard }: ExtraKeyBarProps) {
   const allKeys = context === 'terminal' ? TERMINAL_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
   if (allKeys.length === 0) return null;
 
@@ -110,27 +111,30 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
   const leftKey = allKeys.find((k) => k.value === KEY_LEFT)!;
   const rightKey = allKeys.find((k) => k.value === KEY_RIGHT)!;
 
+  // For non-keyboard keys, suppress after press
+  const suppressAfterPress = useCallback(() => {
+    onSuppressKeyboard?.();
+  }, [onSuppressKeyboard]);
+
   return (
     <div style={containerStyle}>
-      {/* Scrollable key area */}
       <div style={scrollAreaStyle}>
         {otherKeys.map((key) => (
-          <KeyButton key={key.label} keyDef={key} onPress={onKeyPress} />
+          <KeyButton key={key.label} keyDef={key} onPress={onKeyPress} onSuppress={suppressAfterPress} />
         ))}
       </div>
 
-      {/* Fixed: keyboard toggle + dpad */}
       <div style={fixedAreaStyle}>
         <DpadButton keyDef={{ label: '\u2328', value: 'keyboard' }} onPress={onKeyPress} />
         <div style={dpadStyle}>
           <div />
-          <DpadButton keyDef={upKey} onPress={onKeyPress} />
+          <DpadButton keyDef={upKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
           <div />
-          <DpadButton keyDef={leftKey} onPress={onKeyPress} />
+          <DpadButton keyDef={leftKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
           <div />
-          <DpadButton keyDef={rightKey} onPress={onKeyPress} />
+          <DpadButton keyDef={rightKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
           <div />
-          <DpadButton keyDef={downKey} onPress={onKeyPress} />
+          <DpadButton keyDef={downKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
           <div />
         </div>
       </div>
@@ -159,7 +163,7 @@ const scrollAreaStyle: React.CSSProperties = {
 
 const fixedAreaStyle: React.CSSProperties = {
   display: 'flex',
-  flexDirection: 'column',
+  flexDirection: 'row',
   alignItems: 'center',
   gap: 3,
   padding: 4,

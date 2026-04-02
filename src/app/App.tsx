@@ -474,6 +474,12 @@ export function App() {
         {(activeTab === 'terminal' || activeTab === 'editor') && (
           <ExtraKeyBar
             context={activeTab === 'terminal' ? 'terminal' : 'code-editor'}
+            onSuppressKeyboard={() => {
+              // Android WebView ignores JS preventDefault for keyboard.
+              // 1) Blur active element  2) Call Capacitor Keyboard.hide() if available
+              (document.activeElement as HTMLElement)?.blur?.();
+              (window as any).__intodeHideKeyboard?.();
+            }}
             onKeyPress={(data) => {
               // Keyboard toggle
               if (data === 'keyboard') {
