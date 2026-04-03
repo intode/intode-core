@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getPolicy } from '../policies/provider';
 import { SshKeyList } from '../ssh/components/SshKeyList';
 import { getThemeMode, setThemeMode, onThemeChange, type ThemeMode } from '../themes/theme-manager';
+import { getSettingsSections } from './settings-registry';
 
 export interface SettingsScreenProps {
   appVersion: string;
@@ -31,6 +32,9 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
         </div>
       )}
       <div style={styles.content}>
+        {/* Pro-injected sections (subscription, etc.) */}
+        {getSettingsSections().map((Section, i) => <Section key={i} />)}
+
         {/* Appearance */}
         <div style={styles.section}>
           <span style={styles.sectionTitle}>Appearance</span>
