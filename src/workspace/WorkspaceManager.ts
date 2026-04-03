@@ -1,6 +1,14 @@
 import { getPolicy } from '../policies/provider';
 import { checkLimit } from '../policies/provider';
 
+export interface WorkspaceJumpHost {
+  host: string;
+  port: number;
+  username: string;
+  authType: 'password' | 'key';
+  keyId?: string;
+}
+
 export interface Workspace {
   id: string;
   name: string;
@@ -10,6 +18,7 @@ export interface Workspace {
   authType: 'password' | 'key';
   keyId?: string;
   defaultPath: string;
+  jumpHosts?: WorkspaceJumpHost[];
   lastConnectedAt: number | null;
   createdAt: number;
   updatedAt: number;
@@ -24,6 +33,8 @@ export interface WorkspaceStore {
   delete(id: string): Promise<void>;
   getPassword(id: string): Promise<string | null>;
   savePassword(id: string, password: string): Promise<void>;
+  getJumpHostPasswords(id: string): Promise<string[]>;
+  saveJumpHostPasswords(id: string, passwords: string[]): Promise<void>;
 }
 
 let store: WorkspaceStore | null = null;
@@ -37,7 +48,7 @@ export function getWorkspaceStore(): WorkspaceStore {
   return store;
 }
 
-export async function createWorkspace(data: CreateWorkspaceData, password?: string): Promise<Workspace | null> {
+export async function createWorkspace(data: CreateWorkspaceData, password?: string, jumpHostPasswords?: string[]): Promise<Workspace | null> {
   const s = getWorkspaceStore();
   const all = await s.getAll();
   const { maxProjects } = getPolicy();
@@ -46,6 +57,9 @@ export async function createWorkspace(data: CreateWorkspaceData, password?: stri
   const workspace = await s.create(data);
   if (password) {
     await s.savePassword(workspace.id, password);
+  }
+  if (jumpHostPasswords && jumpHostPasswords.length > 0) {
+    await s.saveJumpHostPasswords(workspace.id, jumpHostPasswords);
   }
   return workspace;
 }

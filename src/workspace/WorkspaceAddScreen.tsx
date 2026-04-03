@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Workspace, CreateWorkspaceData } from './WorkspaceManager';
+import { Workspace, CreateWorkspaceData, WorkspaceJumpHost } from './WorkspaceManager';
 import { Ssh } from '../ssh/index';
 import type { SshKey } from '../ssh/plugin-api';
 import { DEFAULT_SSH_PORT } from '../lib/constants';
 import { INPUT_FIELD } from '../lib/styles';
+import { getPolicy } from '../policies/provider';
 
 export interface WorkspaceAddScreenProps {
-  onSave: (data: CreateWorkspaceData, password: string) => void;
+  onSave: (data: CreateWorkspaceData, password: string, jumpHostPasswords?: string[]) => void;
   onCancel: () => void;
   editWorkspace?: Workspace;
 }
@@ -22,6 +23,9 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
   const [selectedKeyId, setSelectedKeyId] = useState<string>(editWorkspace?.keyId ?? '');
   const [sshKeys, setSshKeys] = useState<SshKey[]>([]);
   const [defaultPath, setDefaultPath] = useState(editWorkspace?.defaultPath ?? '~');
+  const [jumpHosts, setJumpHosts] = useState<WorkspaceJumpHost[]>(editWorkspace?.jumpHosts ?? []);
+  const [jumpHostPasswords, setJumpHostPasswords] = useState<string[]>([]);
+  const [showJumpHost, setShowJumpHost] = useState((editWorkspace?.jumpHosts?.length ?? 0) > 0);
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'fail'>('idle');
   const [testError, setTestError] = useState('');
 
@@ -49,7 +53,8 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
       authType,
       keyId: authType === 'key' ? selectedKeyId : undefined,
       defaultPath: defaultPath.trim() || '~',
-    }, password);
+      jumpHosts: jumpHosts.length > 0 ? jumpHosts : undefined,
+    }, password, jumpHostPasswords.length > 0 ? jumpHostPasswords : undefined);
   };
 
   const handleTest = async () => {
@@ -66,6 +71,17 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
         opts.keyId = selectedKeyId;
       } else {
         opts.password = password;
+      }
+      if (jumpHosts.length > 0) {
+        opts.jumpHosts = jumpHosts.map((jh) => ({
+          host: jh.host,
+          port: jh.port,
+          username: jh.username,
+          authType: jh.authType,
+          keyId: jh.keyId,
+          // Password for jump hosts stored in jumpHostPasswords
+          password: jumpHostPasswords[jumpHosts.indexOf(jh)] ?? undefined,
+        }));
       }
       const { sessionId } = await Ssh.connect(opts);
       await Ssh.disconnect({ sessionId });
@@ -133,6 +149,89 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
         )}
 
         <Field label="Default Path" value={defaultPath} onChange={setDefaultPath} placeholder="~" />
+
+        {/* Jump Host (Pro) */}
+        {getPolicy().canJumpHost && (
+          <div style={styles.field}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <label style={styles.label}>Jump Host (Bastion)</label>
+              <button
+                onClick={() => {
+                  if (showJumpHost) { setJumpHosts([]); setJumpHostPasswords([]); }
+                  else { setJumpHosts([{ host: '', port: 22, username: '', authType: 'password' }]); setJumpHostPasswords(['']); }
+                  setShowJumpHost(!showJumpHost);
+                }}
+                style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+              >{showJumpHost ? 'Remove' : '+ Add'}</button>
+            </div>
+            {showJumpHost && jumpHosts.map((jh, idx) => (
+              <div key={idx} style={{ marginTop: 8, padding: 10, backgroundColor: 'var(--bg-surface0)', borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>HOP {idx + 1}</span>
+                  {jumpHosts.length > 1 && (
+                    <button onClick={() => {
+                      setJumpHosts(jumpHosts.filter((_, i) => i !== idx));
+                      setJumpHostPasswords(jumpHostPasswords.filter((_, i) => i !== idx));
+                    }} style={{ background: 'none', border: 'none', color: 'var(--accent-red)', fontSize: 12, cursor: 'pointer' }}>{'\u2715'}</button>
+                  )}
+                </div>
+                <input
+                  value={jh.host} placeholder="bastion.example.com"
+                  onChange={(e) => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], host: e.target.value }; setJumpHosts(nj); }}
+                  style={{ ...styles.input, fontSize: 13, padding: '8px 10px' }}
+                />
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <input
+                    value={String(jh.port)} placeholder="22" inputMode="numeric"
+                    onChange={(e) => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], port: parseInt(e.target.value) || 22 }; setJumpHosts(nj); }}
+                    style={{ ...styles.input, fontSize: 13, padding: '8px 10px', width: 60 }}
+                  />
+                  <input
+                    value={jh.username} placeholder="user"
+                    onChange={(e) => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], username: e.target.value }; setJumpHosts(nj); }}
+                    style={{ ...styles.input, fontSize: 13, padding: '8px 10px', flex: 1 }}
+                  />
+                </div>
+                <div style={styles.authToggle}>
+                  <button
+                    onClick={() => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], authType: 'password' }; setJumpHosts(nj); }}
+                    style={jh.authType === 'password' ? { ...styles.authActive, padding: '6px', fontSize: 11 } : { ...styles.authInactive, padding: '6px', fontSize: 11 }}
+                  >Password</button>
+                  <button
+                    onClick={() => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], authType: 'key' }; setJumpHosts(nj); }}
+                    style={jh.authType === 'key' ? { ...styles.authActive, padding: '6px', fontSize: 11 } : { ...styles.authInactive, padding: '6px', fontSize: 11 }}
+                  >SSH Key</button>
+                </div>
+                {jh.authType === 'password' ? (
+                  <input
+                    type="password" value={jumpHostPasswords[idx] ?? ''} placeholder="Password"
+                    onChange={(e) => { const np = [...jumpHostPasswords]; np[idx] = e.target.value; setJumpHostPasswords(np); }}
+                    style={{ ...styles.input, fontSize: 13, padding: '8px 10px' }}
+                  />
+                ) : (
+                  sshKeys.length > 0 ? (
+                    <select
+                      value={jh.keyId ?? ''}
+                      onChange={(e) => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], keyId: e.target.value || undefined }; setJumpHosts(nj); }}
+                      style={{ ...styles.select, fontSize: 13, padding: '8px 10px' }}
+                    >
+                      <option value="">Select a key...</option>
+                      {sshKeys.map((k) => <option key={k.id} value={k.id}>{k.name} ({k.type})</option>)}
+                    </select>
+                  ) : (
+                    <p style={styles.noKeys}>No SSH keys stored.</p>
+                  )
+                )}
+              </div>
+            ))}
+            {showJumpHost && (
+              <button
+                onClick={() => { setJumpHosts([...jumpHosts, { host: '', port: 22, username: '', authType: 'password' }]); setJumpHostPasswords([...jumpHostPasswords, '']); }}
+                style={{ marginTop: 4, background: 'none', border: 'none', color: 'var(--accent-blue)', fontSize: 12, cursor: 'pointer', textAlign: 'left' }}
+              >+ Add another hop</button>
+            )}
+          </div>
+        )}
 
         <button
           onClick={handleTest}

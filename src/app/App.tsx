@@ -405,6 +405,13 @@ export function App() {
             const password = await getWorkspaceStore().getPassword(conn.wsId);
             connectOpts.password = password ?? undefined;
           }
+          if (conn.workspace.jumpHosts && conn.workspace.jumpHosts.length > 0) {
+            const jumpPasswords = await getWorkspaceStore().getJumpHostPasswords(conn.wsId);
+            connectOpts.jumpHosts = conn.workspace.jumpHosts.map((jh, i) => ({
+              host: jh.host, port: jh.port, username: jh.username, authType: jh.authType,
+              keyId: jh.keyId, password: jumpPasswords[i] ?? undefined,
+            }));
+          }
           const { sessionId } = await Ssh.connect(connectOpts);
           let sftpId: string | null = null;
           try {
@@ -426,15 +433,16 @@ export function App() {
   }, []);
 
   const handleSaveWorkspace = useCallback(
-    async (data: CreateWorkspaceData, password: string) => {
+    async (data: CreateWorkspaceData, password: string, jumpHostPasswords?: string[]) => {
       let newWs: Workspace | null = null;
       if (editingWorkspace) {
         const store = (await import('../workspace/WorkspaceManager')).getWorkspaceStore();
         await store.update(editingWorkspace.id, data);
         if (password) await store.savePassword(editingWorkspace.id, password);
+        if (jumpHostPasswords) await store.saveJumpHostPasswords(editingWorkspace.id, jumpHostPasswords);
         setEditingWorkspace(null);
       } else {
-        newWs = await createWorkspace(data, password);
+        newWs = await createWorkspace(data, password, jumpHostPasswords);
       }
       setListKey((k) => k + 1);
 

@@ -7,6 +7,7 @@ export interface ConnectOptions {
   password?: string;
   keyId?: string;
   passphrase?: string;
+  jumpHosts?: JumpHost[];
 }
 
 export interface SshKey {
@@ -40,6 +41,26 @@ export interface SftpStat {
   modifiedAt: number;
   permissions: string;
   isDirectory: boolean;
+}
+
+export type PortForwardType = 'local' | 'remote' | 'dynamic';
+
+export interface PortForwardEntry {
+  forwardId: string;
+  type: PortForwardType;
+  bindAddress: string;
+  bindPort: number;
+  targetHost: string;
+  targetPort: number;
+}
+
+export interface JumpHost {
+  host: string;
+  port: number;
+  username: string;
+  authType: 'password' | 'key';
+  password?: string;
+  keyId?: string;
 }
 
 export interface SshPlugin {
@@ -78,6 +99,18 @@ export interface SshPlugin {
   listSshKeys(): Promise<{ keys: SshKey[] }>;
   getPublicKey(options: { keyId: string }): Promise<{ publicKey: string }>;
   deleteSshKey(options: { keyId: string }): Promise<void>;
+
+  // Port forwarding
+  addPortForward(options: {
+    sessionId: string;
+    type: PortForwardType;
+    bindAddress?: string;
+    bindPort: number;
+    targetHost?: string;
+    targetPort: number;
+  }): Promise<{ forwardId: string; bindPort: number }>;
+  removePortForward(options: { forwardId: string }): Promise<void>;
+  listPortForwards(options: { sessionId: string }): Promise<{ forwards: PortForwardEntry[] }>;
 
   addListener(
     eventName: 'shellData',

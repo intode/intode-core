@@ -32,6 +32,20 @@ export function ConnectingScreen({ workspace, onConnected, onFailed, onCancel }:
           connectOpts.password = password ?? undefined;
         }
 
+        // Jump hosts
+        if (workspace.jumpHosts && workspace.jumpHosts.length > 0) {
+          const store = getWorkspaceStore();
+          const jumpPasswords = await store.getJumpHostPasswords(workspace.id);
+          connectOpts.jumpHosts = workspace.jumpHosts.map((jh, i) => ({
+            host: jh.host,
+            port: jh.port,
+            username: jh.username,
+            authType: jh.authType,
+            keyId: jh.keyId,
+            password: jumpPasswords[i] ?? undefined,
+          }));
+        }
+
         const { sessionId } = await Ssh.connect(connectOpts);
 
         if (cancelled) return;
