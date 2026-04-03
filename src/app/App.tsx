@@ -200,17 +200,19 @@ export function App() {
   const activeConn = connections.find((c) => c.wsId === activeWsId) ?? null;
   const connectedIds = new Set(connections.map((c) => c.wsId));
 
-  // Expose connection context for Pro split view tab
+  // Expose connection context for Pro split view / git tab
   useEffect(() => {
     if (activeConn) {
       (window as any).__intodeSplitCtx = {
         sessionId: activeConn.sessionId,
+        sftpId: activeConn.sftpId,
         defaultPath: activeConn.workspace.defaultPath,
+        ftm: getFileTabMgr(activeConn.wsId),
       };
     } else {
       delete (window as any).__intodeSplitCtx;
     }
-  }, [activeConn?.sessionId]);
+  }, [activeConn?.sessionId, activeConn?.sftpId, activeConn?.wsId]);
 
   const getFileTabMgr = useCallback((wsId: string): FileTabManager => {
     let mgr = ftmRef.current.get(wsId);
