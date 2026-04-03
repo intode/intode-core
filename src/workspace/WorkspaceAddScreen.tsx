@@ -182,8 +182,9 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
                 />
                 <div style={{ display: 'flex', gap: 6 }}>
                   <input
-                    value={String(jh.port)} placeholder="22" inputMode="numeric"
-                    onChange={(e) => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], port: parseInt(e.target.value) || 22 }; setJumpHosts(nj); }}
+                    value={jh.port === 0 ? '' : String(jh.port)} placeholder="22" inputMode="numeric"
+                    onChange={(e) => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], port: e.target.value === '' ? 0 : (parseInt(e.target.value) || 0) }; setJumpHosts(nj); }}
+                    onBlur={(e) => { if (!e.target.value) { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], port: 22 }; setJumpHosts(nj); } }}
                     style={{ ...styles.input, fontSize: 13, padding: '8px 10px', width: 60 }}
                   />
                   <input
