@@ -86,10 +86,15 @@ function SubPanelBar({ items, active, onChange }: {
 
 // --- Per-workspace Editor panel (self-contained state) ---
 
-function WorkspaceEditor({ ftm, sftpId }: { ftm: FileTabManager; sftpId: string | null }) {
+function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
+  ftm: FileTabManager; sftpId: string | null;
+  editorPanels: Array<{ id: string; label: string; component: React.ComponentType<{ visible: boolean }> }>;
+  visible: boolean;
+}) {
   const [tabs, setTabs] = useState<FileTab[]>([]);
   const [active, setActive] = useState<FileTab | null>(null);
   const [mdPreview, setMdPreview] = useState(false);
+  const [overlay, setOverlay] = useState<string | null>(null); // 'git-file' etc.
 
   useEffect(() => {
     const sync = () => {
@@ -101,56 +106,68 @@ function WorkspaceEditor({ ftm, sftpId }: { ftm: FileTabManager; sftpId: string 
     return () => ftm.setOnChange(() => {});
   }, [ftm]);
 
-  // Reset preview mode when switching files
-  useEffect(() => { setMdPreview(false); }, [active?.id]);
+  useEffect(() => { setMdPreview(false); setOverlay(null); }, [active?.id]);
 
   const isMd = active?.type === 'markdown';
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          <EditorTabs
-            tabs={tabs}
-            activeTabId={active?.id ?? null}
-            onSelect={(id) => ftm.setActiveTab(id)}
-            onClose={(id) => ftm.closeTab(id)}
-          />
-        </div>
-        {isMd && active?.content != null && (
-          <button
-            onClick={() => setMdPreview((v) => !v)}
-            style={{
-              background: 'none', border: 'none', color: mdPreview ? 'var(--accent-blue)' : 'var(--text-muted)',
-              fontSize: 11, fontWeight: 700, padding: '6px 10px', cursor: 'pointer', flexShrink: 0,
-              letterSpacing: 0.5,
-            }}
-          >
-            {mdPreview ? 'EDIT' : 'PREVIEW'}
-          </button>
+      <EditorTabs
+        tabs={tabs}
+        activeTabId={active?.id ?? null}
+        onSelect={(id) => ftm.setActiveTab(id)}
+        onClose={(id) => ftm.closeTab(id)}
+      />
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+        {active?.content != null ? (
+          isMd && mdPreview ? (
+            <MarkdownPreview content={active.content} visible={visible} />
+          ) : (
+            <CodeEditor
+              content={active.content}
+              fileName={active.fileName}
+              visible={visible && !overlay}
+              onContentChange={(c) => ftm.updateContent(active.id, c)}
+              onSave={() => { if (sftpId) ftm.saveFile(sftpId, active.id).catch(() => {}); }}
+            />
+          )
+        ) : active?.isLoading ? (
+          <div style={styles.placeholder}>
+            <span style={{ color: 'var(--text-muted)' }}>Loading...</span>
+          </div>
+        ) : (
+          <div style={styles.placeholder}>
+            <span style={{ color: 'var(--text-muted)' }}>Select a file</span>
+          </div>
+        )}
+
+        {/* Overlay panels (Git file history etc.) */}
+        {overlay && editorPanels.map((panel) => (
+          panel.id === overlay ? (
+            <div key={panel.id} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 5, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-base)' }}>
+              <panel.component visible={visible} />
+            </div>
+          ) : null
+        ))}
+
+        {/* Floating action buttons — bottom right */}
+        {active?.content != null && (
+          <div style={styles.fab}>
+            {editorPanels.map((p) => (
+              <button key={p.id} onClick={() => setOverlay(overlay === p.id ? null : p.id)}
+                style={{ ...styles.fabBtn, backgroundColor: overlay === p.id ? 'var(--accent-blue)' : 'var(--bg-surface1)', color: overlay === p.id ? 'var(--bg-base)' : 'var(--text-secondary)' }}>
+                {p.label}
+              </button>
+            ))}
+            {isMd && (
+              <button onClick={() => { setMdPreview((v) => !v); setOverlay(null); }}
+                style={{ ...styles.fabBtn, backgroundColor: mdPreview ? 'var(--accent-blue)' : 'var(--bg-surface1)', color: mdPreview ? 'var(--bg-base)' : 'var(--text-secondary)' }}>
+                {mdPreview ? 'Edit' : 'MD'}
+              </button>
+            )}
+          </div>
         )}
       </div>
-      {active?.content != null ? (
-        isMd && mdPreview ? (
-          <MarkdownPreview content={active.content} visible={true} />
-        ) : (
-          <CodeEditor
-            content={active.content}
-            fileName={active.fileName}
-            visible={true}
-            onContentChange={(c) => ftm.updateContent(active.id, c)}
-            onSave={() => { if (sftpId) ftm.saveFile(sftpId, active.id).catch(() => {}); }}
-          />
-        )
-      ) : active?.isLoading ? (
-        <div style={styles.placeholder}>
-          <span style={{ color: 'var(--text-muted)' }}>Loading...</span>
-        </div>
-      ) : (
-        <div style={styles.placeholder}>
-          <span style={{ color: 'var(--text-muted)' }}>Select a file</span>
-        </div>
-      )}
     </>
   );
 }
@@ -164,12 +181,10 @@ export function App() {
   const prevTabRef = useRef<string>('terminal');
   const [debugEnabled, setDebugEnabled] = useState(() => localStorage.getItem('intode_debug') === 'true');
   const [fileSubTab, setFileSubTab] = useState('tree');
-  const [editorSubTab, setEditorSubTab] = useState('editor');
 
   const filePanels = getFilePanels();
   const editorPanels = getEditorPanels();
   const fileSubItems = [{ id: 'tree', label: 'Files' }, ...filePanels.map((p) => ({ id: p.id, label: p.label }))];
-  const editorSubItems = [{ id: 'editor', label: 'Editor' }, ...editorPanels.map((p) => ({ id: p.id, label: p.label }))];
 
   const handleTabChange = useCallback((tab: string) => {
     if (tab === 'settings') prevTabRef.current = activeTab;
@@ -581,15 +596,7 @@ export function App() {
                     flexDirection: 'column',
                   }}
                 >
-                  <SubPanelBar items={editorSubItems} active={editorSubTab} onChange={setEditorSubTab} />
-                  <div style={{ flex: 1, overflow: 'hidden', display: editorSubTab === 'editor' ? 'flex' : 'none', flexDirection: 'column' }}>
-                    <WorkspaceEditor ftm={ftm} sftpId={conn.sftpId} />
-                  </div>
-                  {editorPanels.map((panel) => (
-                    <div key={panel.id} style={{ flex: 1, overflow: 'hidden', display: editorSubTab === panel.id ? 'flex' : 'none', flexDirection: 'column' }}>
-                      <panel.component visible={isActive && activeTab === 'editor' && editorSubTab === panel.id} />
-                    </div>
-                  ))}
+                  <WorkspaceEditor ftm={ftm} sftpId={conn.sftpId} editorPanels={editorPanels} visible={isActive && activeTab === 'editor'} />
                 </div>
 
                 {/* Terminal — per workspace, always mounted */}
@@ -769,5 +776,22 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     flex: 1,
     fontSize: 16,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    display: 'flex',
+    gap: 6,
+    zIndex: 10,
+  },
+  fabBtn: {
+    padding: '6px 12px',
+    borderRadius: 16,
+    border: 'none',
+    fontSize: 11,
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
   },
 };
