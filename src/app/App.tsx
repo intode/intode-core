@@ -340,8 +340,8 @@ export function App() {
       setActiveWsId(ws.id);
       setConnectingWorkspace(null);
       setScreen('workspace-view');
-      setActiveTab('terminal');
-      saveSessionState({ workspaceId: ws.id, activeTab: 'terminal' });
+      setActiveTab('files');
+      saveSessionState({ workspaceId: ws.id, activeTab: 'files' });
     },
     [connectingWorkspace],
   );
