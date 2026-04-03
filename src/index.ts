@@ -12,6 +12,10 @@ export { setPolicy, getPolicy, setLimitHandler, checkLimit } from './policies/pr
 export type { TabDefinition, TabRenderer } from './app/tab-registry';
 export { registerTab, getExtraTabs, getTabRenderer } from './app/tab-registry';
 
+// Panel Registry (Pro injects Grep into Files, Git into Editor)
+export type { PanelEntry } from './app/panel-registry';
+export { registerFilePanel, registerEditorPanel, getFilePanels, getEditorPanels } from './app/panel-registry';
+
 // Session hooks (Pro can inject save/restore)
 export { setSessionSaveHook, setSessionLoadHook, saveSessionState, loadSessionState } from './app/session-hooks';
 export type { SessionData } from './app/session-hooks';

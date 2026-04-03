@@ -23,6 +23,7 @@ import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
 import { saveSessionState, loadSessionState } from './session-hooks';
+import { getFilePanels, getEditorPanels } from './panel-registry';
 import '../themes/dark.css';
 
 initTheme();
@@ -53,6 +54,32 @@ function useKeyboardHeight() {
     return () => vv.removeEventListener('resize', handler);
   }, []);
   return height;
+}
+
+// --- Sub-panel bar (for Pro panels injected into Files/Editor tabs) ---
+
+function SubPanelBar({ items, active, onChange }: {
+  items: Array<{ id: string; label: string }>;
+  active: string;
+  onChange: (id: string) => void;
+}) {
+  if (items.length <= 1) return null;
+  return (
+    <div style={{ display: 'flex', gap: 0, backgroundColor: 'var(--bg-mantle)', borderBottom: '1px solid var(--bg-surface0)', flexShrink: 0 }}>
+      {items.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => onChange(item.id)}
+          style={{
+            flex: 1, padding: '6px 0', border: 'none', fontSize: 11, fontWeight: active === item.id ? 700 : 500,
+            cursor: 'pointer', backgroundColor: 'transparent',
+            color: active === item.id ? 'var(--accent-blue)' : 'var(--text-muted)',
+            borderBottom: active === item.id ? '2px solid var(--accent-blue)' : '2px solid transparent',
+          }}
+        >{item.label}</button>
+      ))}
+    </div>
+  );
 }
 
 // --- Per-workspace Editor panel (self-contained state) ---
@@ -134,6 +161,13 @@ export function App() {
   const [activeTab, setActiveTab] = useState<string>('terminal');
   const prevTabRef = useRef<string>('terminal');
   const [debugEnabled, setDebugEnabled] = useState(() => localStorage.getItem('intode_debug') === 'true');
+  const [fileSubTab, setFileSubTab] = useState('tree');
+  const [editorSubTab, setEditorSubTab] = useState('editor');
+
+  const filePanels = getFilePanels();
+  const editorPanels = getEditorPanels();
+  const fileSubItems = [{ id: 'tree', label: 'Files' }, ...filePanels.map((p) => ({ id: p.id, label: p.label }))];
+  const editorSubItems = [{ id: 'editor', label: 'Editor' }, ...editorPanels.map((p) => ({ id: p.id, label: p.label }))];
 
   const handleTabChange = useCallback((tab: string) => {
     if (tab === 'settings') prevTabRef.current = activeTab;
@@ -476,30 +510,38 @@ export function App() {
               <React.Fragment key={conn.wsId}>
                 {/* Files — per workspace, always mounted */}
                 <div style={{ ...styles.tabContent, display: isActive && activeTab === 'files' ? 'flex' : 'none' }}>
-                  {conn.sftpId ? (
-                    <FileTree
-                      sftpId={conn.sftpId}
-                      rootPath={conn.workspace.defaultPath}
-                      sessionId={conn.sessionId}
-                      onFileSelect={async (path) => {
-                        const type = detectFileType(path.split('/').pop() ?? '');
-                        if (type === 'binary') return;
-                        await ftm.openFile(conn.sftpId!, path);
-                        setActiveTab('editor');
-                      }}
-                    />
-                  ) : conn.sftpError ? (
-                    <div style={styles.placeholder}>
-                      <div style={{ textAlign: 'center' }}>
-                        <p style={{ color: 'var(--accent-red)', marginBottom: 8 }}>SFTP connection failed</p>
-                        <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{conn.sftpError}</p>
+                  <SubPanelBar items={fileSubItems} active={fileSubTab} onChange={setFileSubTab} />
+                  <div style={{ flex: 1, overflow: 'hidden', display: fileSubTab === 'tree' ? 'flex' : 'none', flexDirection: 'column' }}>
+                    {conn.sftpId ? (
+                      <FileTree
+                        sftpId={conn.sftpId}
+                        rootPath={conn.workspace.defaultPath}
+                        sessionId={conn.sessionId}
+                        onFileSelect={async (path) => {
+                          const type = detectFileType(path.split('/').pop() ?? '');
+                          if (type === 'binary') return;
+                          await ftm.openFile(conn.sftpId!, path);
+                          setActiveTab('editor');
+                        }}
+                      />
+                    ) : conn.sftpError ? (
+                      <div style={styles.placeholder}>
+                        <div style={{ textAlign: 'center' }}>
+                          <p style={{ color: 'var(--accent-red)', marginBottom: 8 }}>SFTP connection failed</p>
+                          <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{conn.sftpError}</p>
+                        </div>
                       </div>
+                    ) : (
+                      <div style={styles.placeholder}>
+                        <span style={{ color: 'var(--text-muted)' }}>Connecting SFTP...</span>
+                      </div>
+                    )}
+                  </div>
+                  {filePanels.map((panel) => (
+                    <div key={panel.id} style={{ flex: 1, overflow: 'hidden', display: fileSubTab === panel.id ? 'flex' : 'none', flexDirection: 'column' }}>
+                      <panel.component visible={isActive && activeTab === 'files' && fileSubTab === panel.id} />
                     </div>
-                  ) : (
-                    <div style={styles.placeholder}>
-                      <span style={{ color: 'var(--text-muted)' }}>Connecting SFTP...</span>
-                    </div>
-                  )}
+                  ))}
                 </div>
 
                 {/* Editor — per workspace, always mounted */}
@@ -510,7 +552,15 @@ export function App() {
                     flexDirection: 'column',
                   }}
                 >
-                  <WorkspaceEditor ftm={ftm} sftpId={conn.sftpId} />
+                  <SubPanelBar items={editorSubItems} active={editorSubTab} onChange={setEditorSubTab} />
+                  <div style={{ flex: 1, overflow: 'hidden', display: editorSubTab === 'editor' ? 'flex' : 'none', flexDirection: 'column' }}>
+                    <WorkspaceEditor ftm={ftm} sftpId={conn.sftpId} />
+                  </div>
+                  {editorPanels.map((panel) => (
+                    <div key={panel.id} style={{ flex: 1, overflow: 'hidden', display: editorSubTab === panel.id ? 'flex' : 'none', flexDirection: 'column' }}>
+                      <panel.component visible={isActive && activeTab === 'editor' && editorSubTab === panel.id} />
+                    </div>
+                  ))}
                 </div>
 
                 {/* Terminal — per workspace, always mounted */}
