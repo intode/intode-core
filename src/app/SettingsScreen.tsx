@@ -130,6 +130,38 @@ function DeveloperPage({ onBack, debugEnabled, onDebugToggle }: {
   );
 }
 
+function HelpPage({ onBack }: { onBack: () => void }) {
+  const email = 'support@mintcinc.com';
+  return (
+    <div style={s.page}>
+      <PageHeader title="Help Us" onBack={onBack} />
+      <div style={s.pageContent}>
+        <div style={{ textAlign: 'center', padding: '24px 0' }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>{'\uD83D\uDC4B'}</div>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>
+            We'd love to hear from you
+          </h3>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0 0 24px' }}>
+            Found a bug? Have a feature idea?{'\n'}
+            Don't hesitate to reach out — every message helps us make Intode better.
+          </p>
+          <button
+            onClick={() => { window.open(`mailto:${email}?subject=Intode%20Feedback`, '_system'); }}
+            style={{
+              padding: '14px 28px', backgroundColor: 'var(--accent-blue)', color: 'var(--bg-base)',
+              border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer',
+              width: '100%', marginBottom: 12,
+            }}
+          >
+            Send Email
+          </button>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{email}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // --- Main SettingsScreen ---
 
 export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, onDebugToggle }: SettingsScreenProps) {
@@ -157,6 +189,7 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
     if (page === 'appearance') return <AppearancePage onBack={goMenu} />;
     if (page === 'ssh-keys') return <SshKeysPage onBack={goMenu} />;
     if (page === 'about') return <AboutPage onBack={goMenu} appVersion={appVersion} buildNumber={buildNumber} />;
+    if (page === 'help') return <HelpPage onBack={goMenu} />;
     if (page === 'developer') return <DeveloperPage onBack={goMenu} debugEnabled={debugEnabled} onDebugToggle={onDebugToggle} />;
 
     // Pro-injected pages
@@ -176,6 +209,7 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
 
         <MenuItem label="Appearance" subtitle={getThemeMode() === 'system' ? 'Auto' : getThemeMode() === 'dark' ? 'Dark' : 'Light'} onClick={() => setPage('appearance')} />
         <MenuItem label="SSH Keys" onClick={() => setPage('ssh-keys')} />
+        <MenuItem label="Help Us" subtitle="Bug reports & feature requests" onClick={() => setPage('help')} />
         <MenuItem label="About" subtitle={`v${appVersion}`} onClick={() => setPage('about')} />
         {showDebugToggle && (
           <MenuItem label="Developer" onClick={() => setPage('developer')} />

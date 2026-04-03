@@ -86,7 +86,7 @@ const GIT_COLORS: Record<string, string> = {
   A: '#73c991',   // Added/Staged — green
   D: '#c74e39',   // Deleted — red
   '?': '#73c991', // Untracked — green (new file)
-  '!': '#636363', // Ignored — gray
+  '!': '#8b8b8b', // Ignored — gray
   R: '#73c991',   // Renamed — green
   C: '#73c991',   // Copied — green
 };
