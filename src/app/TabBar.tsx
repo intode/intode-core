@@ -28,7 +28,7 @@ export function TabBar({ activeTab, onTabChange, extraTabs = [] }: TabBarProps) 
 
   return (
     <nav style={styles.nav}>
-      {allTabs.map(({ id, label, icon }) => {
+      {allTabs.map(({ id, icon }) => {
         const active = activeTab === id;
         return (
           <button
@@ -37,27 +37,22 @@ export function TabBar({ activeTab, onTabChange, extraTabs = [] }: TabBarProps) 
             style={{
               ...styles.button,
               color: active ? 'var(--accent-blue)' : 'var(--text-muted)',
-              borderTop: active ? '1px solid var(--accent-blue)' : '1px solid transparent',
-              textShadow: active ? 'var(--neon-glow)' : 'none',
+              borderTop: active ? '2px solid var(--accent-blue)' : '2px solid transparent',
             }}
           >
             <svg
-              width="20"
-              height="20"
+              width="22"
+              height="22"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth={active ? "2.5" : "2"}
+              strokeWidth={active ? "2.5" : "1.8"}
               strokeLinecap="round"
               strokeLinejoin="round"
               style={{ filter: active ? 'drop-shadow(var(--neon-glow))' : 'none' }}
             >
               <path d={icon} />
             </svg>
-            <span style={{
-              ...styles.label,
-              color: active ? 'var(--accent-blue)' : 'var(--text-muted)',
-            }}>{label}</span>
           </button>
         );
       })}
@@ -70,7 +65,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-around',
     alignItems: 'center',
-    height: 56,
+    height: 40,
     backgroundColor: 'var(--bg-mantle)',
     borderTop: '1px solid var(--bg-surface0)',
     paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -78,22 +73,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
   button: {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
     flex: 1,
+    height: '100%',
     border: 'none',
     background: 'none',
     cursor: 'pointer',
-    padding: '6px 0',
+    padding: 0,
     WebkitTapHighlightColor: 'transparent',
-  },
-  label: {
-    fontSize: 9,
-    fontWeight: 700,
-    letterSpacing: 1,
-    textTransform: 'uppercase' as const,
-    marginTop: 2,
   },
 };
