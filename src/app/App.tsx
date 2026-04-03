@@ -25,6 +25,7 @@ import { initTheme } from '../themes/theme-manager';
 import { saveSessionState, loadSessionState } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
 import { showSnippetPicker } from './snippet-picker';
+import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
 import { getGitStatusProvider } from '../files/git-status-provider';
 import type { GitStatusMap } from '../files/FileTree';
 import '../themes/dark.css';
@@ -337,12 +338,15 @@ export function App() {
         sftpError = String(e);
       }
 
-      setConnections((prev) => [...prev, { wsId: ws.id, workspace: ws, sessionId: sid, sftpId, sftpError }]);
+      const newConns = [...connections, { wsId: ws.id, workspace: ws, sessionId: sid, sftpId, sftpError }];
+      setConnections(newConns);
       setActiveWsId(ws.id);
       setConnectingWorkspace(null);
       setScreen('workspace-view');
       setActiveTab('files');
       saveSessionState({ workspaceId: ws.id, activeTab: 'files' });
+      keepAliveStart();
+      keepAliveUpdate(newConns.length);
     },
     [connectingWorkspace],
   );
@@ -362,9 +366,11 @@ export function App() {
 
     if (remaining.length > 0) {
       setActiveWsId(remaining[0].wsId);
+      keepAliveUpdate(remaining.length);
     } else {
       setActiveWsId(null);
       setScreen('workspace-list');
+      keepAliveStop();
     }
   }, [activeConn, connections]);
 

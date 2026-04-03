@@ -34,6 +34,9 @@ export {
   getEditorPlugins,
 } from './plugins/registry';
 
+// Keep-alive hooks
+export { setKeepAliveHooks, keepAliveStart, keepAliveStop, keepAliveUpdate } from './app/keepalive-hooks';
+
 // Snippet picker
 export { setSnippetPicker, showSnippetPicker } from './app/snippet-picker';
 
