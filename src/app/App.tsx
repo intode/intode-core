@@ -131,7 +131,13 @@ export function App() {
   const keyboardHeight = useKeyboardHeight();
   const [screen, setScreen] = useState<Screen>('workspace-list');
   const [activeTab, setActiveTab] = useState<string>('terminal');
+  const prevTabRef = useRef<string>('terminal');
   const [debugEnabled, setDebugEnabled] = useState(() => localStorage.getItem('intode_debug') === 'true');
+
+  const handleTabChange = useCallback((tab: string) => {
+    if (tab === 'settings') prevTabRef.current = activeTab;
+    setActiveTab(tab);
+  }, [activeTab]);
 
   // Prevent Android native context menu (복사/번역/모두선택 popup)
   useEffect(() => {
@@ -326,7 +332,6 @@ export function App() {
             debugEnabled={debugEnabled}
             onDebugToggle={toggleDebug}
           />
-          <DebugOverlay enabled={debugEnabled} />
         </div>
       )}
 
@@ -382,6 +387,7 @@ export function App() {
       {hasConnections && (
     <div style={{ ...styles.safeArea, paddingBottom: keyboardHeight, display: showWorkspaceView ? 'flex' : 'none' }}>
       <div style={styles.container}>
+        {activeTab !== 'settings' && (
         <div style={styles.statusBar}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 1, background: 'var(--accent-green)' }} />
           {activeConn && (
@@ -402,6 +408,7 @@ export function App() {
             HALT_SESSION
           </button>
         </div>
+        )}
 
         <div style={styles.content}>
           {connections.map((conn) => {
@@ -459,11 +466,12 @@ export function App() {
               </React.Fragment>
             );
           })}
-          {/* Settings tab */}
+          {/* Settings tab — full screen, hides statusBar + tabBar */}
           <div style={{ ...styles.tabContent, display: activeTab === 'settings' ? 'flex' : 'none' }}>
             <SettingsScreen
               appVersion={APP_VERSION}
               buildNumber={BUILD_NUMBER}
+              onBack={() => setActiveTab(prevTabRef.current)}
               debugEnabled={debugEnabled}
               onDebugToggle={toggleDebug}
             />
@@ -532,7 +540,9 @@ export function App() {
             }}
           />
         )}
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} extraTabs={getExtraTabs()} />
+        {activeTab !== 'settings' && (
+          <TabBar activeTab={activeTab} onTabChange={handleTabChange} extraTabs={getExtraTabs()} />
+        )}
       </div>
       <DebugOverlay enabled={debugEnabled} />
     </div>

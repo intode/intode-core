@@ -12,8 +12,9 @@ export { setPolicy, getPolicy, setLimitHandler, checkLimit } from './policies/pr
 export type { TabDefinition, TabRenderer } from './app/tab-registry';
 export { registerTab, getExtraTabs, getTabRenderer } from './app/tab-registry';
 
-// Settings Registry (Pro can inject settings sections)
-export { registerSettingsSection, getSettingsSections } from './app/settings-registry';
+// Settings Registry (Pro can inject settings pages)
+export type { SettingsMenuItem, SettingsPageComponent } from './app/settings-registry';
+export { registerSettingsPage, getSettingsMenuItems, getSettingsPage } from './app/settings-registry';
 
 // Plugins
 export type { MarkdownPlugin, EditorPlugin } from './plugins/types';
