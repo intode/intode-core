@@ -16,6 +16,7 @@ export interface AppPolicy {
   canCustomTheme: boolean;
   canCustomKeys: boolean;
   canSnippets: boolean;
+  canDebugConsole: boolean;
   mdRenderers: string[];
 
   // === UI config (injectable by Pro) ===
@@ -37,6 +38,7 @@ export const DEFAULT_POLICY: AppPolicy = {
   canCustomTheme: false,
   canCustomKeys: false,
   canSnippets: false,
+  canDebugConsole: false,
   mdRenderers: ['gfm'],
   showDebugToggle: true,
 };
