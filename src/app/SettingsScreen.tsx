@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getPolicy } from '../policies/provider';
 import { SshKeyList } from '../ssh/components/SshKeyList';
 import { getThemeMode, setThemeMode, onThemeChange, type ThemeMode } from '../themes/theme-manager';
@@ -136,6 +136,20 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
   const { showDebugToggle } = getPolicy();
   const [page, setPage] = useState<Page>('menu');
   const proMenuItems = getSettingsMenuItems();
+
+  // Expose sub-page back handler for Android hardware back button
+  const pageRef = useRef(page);
+  pageRef.current = page;
+  useEffect(() => {
+    (window as any).__intodeSettingsBack = (): boolean => {
+      if (pageRef.current !== 'menu') {
+        setPage('menu');
+        return true;
+      }
+      return false;
+    };
+    return () => { delete (window as any).__intodeSettingsBack; };
+  }, []);
 
   if (page !== 'menu') {
     // Render sub-page

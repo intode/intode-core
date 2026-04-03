@@ -174,6 +174,49 @@ export function App() {
     return mgr;
   }, []);
 
+  // --- Android hardware back button ---
+  const screenRef = useRef(screen);
+  const activeTabRef = useRef(activeTab);
+  const connectionsRef2 = useRef(connections);
+  const addReturnToRef = useRef(addReturnTo);
+  screenRef.current = screen;
+  activeTabRef.current = activeTab;
+  connectionsRef2.current = connections;
+  addReturnToRef.current = addReturnTo;
+
+  useEffect(() => {
+    (window as any).__intodeBackHandler = (): boolean => {
+      const s = screenRef.current;
+      const t = activeTabRef.current;
+      const hasConn = connectionsRef2.current.length > 0;
+
+      // Settings sub-page → menu first, then tab/screen back
+      if ((s === 'workspace-view' && t === 'settings') || s === 'settings') {
+        const settingsBack = (window as any).__intodeSettingsBack as (() => boolean) | undefined;
+        if (settingsBack && settingsBack()) return true;
+        if (s === 'workspace-view') { setActiveTab(prevTabRef.current); return true; }
+        setScreen(hasConn ? 'workspace-view' : 'workspace-list');
+        return true;
+      }
+      if (s === 'workspace-add') {
+        setEditingWorkspace(null);
+        setScreen(addReturnToRef.current === 'view' ? 'workspace-view' : 'workspace-list');
+        return true;
+      }
+      if (s === 'connecting') {
+        setConnectingWorkspace(null);
+        setScreen(hasConn ? 'workspace-view' : 'workspace-list');
+        return true;
+      }
+      if (s === 'workspace-view') {
+        setScreen('workspace-list');
+        return true;
+      }
+      return false; // workspace-list → system minimizes app
+    };
+    return () => { delete (window as any).__intodeBackHandler; };
+  }, []);
+
   // --- Handlers ---
 
   const handleSelectWorkspace = useCallback(
