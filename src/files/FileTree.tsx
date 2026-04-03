@@ -82,37 +82,48 @@ function fuzzyMatch(name: string, query: string): { match: boolean; score: numbe
 }
 
 const GIT_COLORS: Record<string, string> = {
-  M: '#cca700',   // Modified — yellow
-  A: '#28a745',   // Added — green
-  D: '#dc3545',   // Deleted — red
-  '?': '#73808c', // Untracked — gray
-  '!': '#4a4f54', // Ignored — dim
-  R: '#17a2b8',   // Renamed — cyan
-  C: '#17a2b8',   // Copied — cyan
+  M: '#e2c08d',   // Modified — warm orange
+  A: '#73c991',   // Added/Staged — green
+  D: '#c74e39',   // Deleted — red
+  '?': '#73c991', // Untracked — green (new file)
+  '!': '#636363', // Ignored — gray
+  R: '#73c991',   // Renamed — green
+  C: '#73c991',   // Copied — green
 };
 
 const GIT_LABELS: Record<string, string> = {
   M: 'M', A: 'A', D: 'D', '?': 'U', '!': 'I', R: 'R', C: 'C',
 };
 
+function parseGitKey(status: string): string {
+  const s = status.trim();
+  // !! = ignored, ?? = untracked
+  if (s === '!!') return '!';
+  if (s === '??') return '?';
+  // First non-space char: XY format (index + worktree)
+  return s.charAt(0) === ' ' ? s.charAt(1) : s.charAt(0);
+}
+
 /** Get git status for a file/folder. Folders inherit from children. */
 function getNodeGitInfo(nodePath: string, nodeName: string, isDir: boolean, gitStatus?: GitStatusMap): { label: string; color: string } | null {
   if (!gitStatus || gitStatus.size === 0) return null;
 
-  // Direct file match
+  // Direct match — check with and without trailing slash
   for (const [filePath, status] of gitStatus) {
-    if (nodePath.endsWith('/' + filePath) || nodePath === filePath || filePath === nodeName) {
-      const key = status.trim().charAt(0) || status.trim();
-      return { label: GIT_LABELS[key] ?? status.trim(), color: GIT_COLORS[key] ?? '#73808c' };
+    const fp = filePath.replace(/\/$/, ''); // strip trailing slash
+    if (nodePath.endsWith('/' + fp) || nodePath === fp || fp === nodeName) {
+      const key = parseGitKey(status);
+      return { label: GIT_LABELS[key] ?? key, color: GIT_COLORS[key] ?? '#636363' };
     }
   }
 
-  // Folder: check if any child has status (hierarchical propagation)
+  // Folder: propagate from children (skip ignored !!)
   if (isDir) {
     const dirSuffix = '/' + nodeName + '/';
-    for (const [filePath] of gitStatus) {
+    for (const [filePath, status] of gitStatus) {
+      if (status.trim() === '!!' || status.trim() === '!!') continue; // skip ignored
       if (filePath.includes(dirSuffix) || filePath.startsWith(nodeName + '/')) {
-        return { label: '\u25CF', color: '#cca700' }; // dot = has changes inside
+        return { label: '\u25CF', color: '#e2c08d' }; // dot = has real changes inside
       }
     }
   }
@@ -247,7 +258,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
     // 2) Content search via grep
     const grepPromise = Ssh.exec({
       sessionId,
-      command: `grep -rn -I '${q}' ${sp} 2>/dev/null | head -50`,
+      command: `grep -rn -I --color=never --exclude-dir=node_modules --exclude-dir=.git '${q}' ${sp} 2>/dev/null | head -50`,
       timeout: 15000,
     }).then(({ stdout }) => {
       const lines = stdout.trim().split('\n').filter(Boolean);
@@ -268,6 +279,27 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
       setSearching(false);
     });
   }, [searchQuery, sessionId, localResults, rootPath]);
+
+  // Navigate to a folder from search results — clear search and expand the path
+  const navigateToFolder = useCallback(async (folderPath: string) => {
+    setSearchQuery('');
+    setNameResults([]);
+    setGrepResults([]);
+    // Expand the folder
+    setNodes((prev) => updateNode(prev, folderPath, (node) => {
+      if (!node.isDirectory) return node;
+      return { ...node, isExpanded: true, isLoading: node.children === undefined };
+    }));
+    // Load children if needed
+    const target = findNode(nodes, folderPath);
+    if (target && target.children === undefined) {
+      try {
+        const { entries } = await Ssh.sftpLs({ sftpId, path: folderPath });
+        const children = sortEntries(entries).map(toNode);
+        setNodes((prev) => updateNode(prev, folderPath, (node) => ({ ...node, children, isLoading: false, isExpanded: true })));
+      } catch {}
+    }
+  }, [sftpId, nodes]);
 
   const handleToggle = useCallback(async (path: string) => {
     setNodes((prev) => updateNode(prev, path, (node) => {
@@ -326,7 +358,10 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
               <div style={styles.sectionLabel}>Files & Folders</div>
               {nameResults.map((node) => (
                 <SearchResultItem key={node.path} node={node} rootPath={rootPath}
-                  onSelect={() => { if (!node.isDirectory) { onFileSelect(node.path); setSearchQuery(''); } }} />
+                  onSelect={() => {
+                    if (node.isDirectory) { navigateToFolder(node.path); }
+                    else { onFileSelect(node.path); setSearchQuery(''); }
+                  }} />
               ))}
             </>
           )}
