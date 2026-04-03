@@ -21,6 +21,7 @@ interface KeyDef {
 const TERMINAL_KEYS: KeyDef[] = [
   { label: 'Esc', value: KEY_ESC },
   { label: 'Tab', value: KEY_TAB },
+  { label: 'S-Tab', value: '\x1b[Z' },
   { label: 'C-c', value: '\x03' },
   { label: 'C-d', value: '\x04' },
   { label: 'C-z', value: '\x1a' },
@@ -143,7 +144,13 @@ export function ExtraKeyBar({ context, onKeyPress, onSuppressKeyboard }: ExtraKe
       </div>
 
       <div style={fixedAreaStyle}>
-        <DpadButton keyDef={{ label: '\u2328', value: 'keyboard' }} onPress={onKeyPress} />
+        <button
+          tabIndex={-1}
+          onTouchStart={(e) => e.preventDefault()}
+          onMouseDown={(e) => e.preventDefault()}
+          onPointerDown={(e) => { e.preventDefault(); onKeyPress('keyboard'); }}
+          style={kbToggleStyle}
+        >{'\u2328'}</button>
         <div style={dpadStyle}>
           <div />
           <DpadButton keyDef={upKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
@@ -211,6 +218,24 @@ const keyStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  ...NO_TAP_HIGHLIGHT,
+};
+
+const kbToggleStyle: React.CSSProperties = {
+  width: 44,
+  height: 78,
+  border: '1px solid var(--bg-surface1)',
+  borderRadius: 2,
+  backgroundColor: 'var(--bg-mantle)',
+  color: 'var(--text-secondary)',
+  fontSize: 18,
+  cursor: 'pointer',
+  touchAction: 'manipulation',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+  flexShrink: 0,
   ...NO_TAP_HIGHLIGHT,
 };
 
