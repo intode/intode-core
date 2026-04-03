@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { getPolicy, checkLimit } from '../policies/provider';
 import { TerminalView } from './TerminalView';
 
 interface Tab {
@@ -18,11 +19,13 @@ export function TerminalTabs({ sessionId, defaultPath, visible }: TerminalTabsPr
   const [activeId, setActiveId] = useState(tabs[0].id);
 
   const addTab = useCallback(() => {
+    const { maxTerminals } = getPolicy();
+    if (!checkLimit('terminals', tabs.length, maxTerminals)) return;
     const id = crypto.randomUUID();
     const label = String(nextLabel.current++);
     setTabs((t) => [...t, { id, label }]);
     setActiveId(id);
-  }, []);
+  }, [tabs.length]);
 
   const closeTab = useCallback(
     (id: string) => {
