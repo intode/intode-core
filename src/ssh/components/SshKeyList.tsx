@@ -3,6 +3,7 @@ import { Ssh } from '../index';
 import type { SshKey } from '../plugin-api';
 import { SshKeyGenerateModal } from './SshKeyGenerateModal';
 import { SshKeyImportModal } from './SshKeyImportModal';
+import { COPY_FEEDBACK_MS } from '../../lib/constants';
 
 export function SshKeyList() {
   const [keys, setKeys] = useState<SshKey[]>([]);
@@ -26,7 +27,7 @@ export function SshKeyList() {
     try {
       await navigator.clipboard.writeText(key.publicKey);
       setCopiedId(key.id);
-      setTimeout(() => setCopiedId(null), 2000);
+      setTimeout(() => setCopiedId(null), COPY_FEEDBACK_MS);
     } catch { /* clipboard not available */ }
   };
 

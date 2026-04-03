@@ -12,24 +12,23 @@ import { CodeEditor } from '../editor/CodeEditor';
 import { MarkdownPreview } from '../md-preview/MarkdownPreview';
 import { EditorTabs } from '../editor/EditorTabs';
 import { TerminalTabs } from '../terminal/TerminalTabs';
-import { terminalManager } from '../terminal/TerminalView';
-import { getActiveEditorApi } from '../editor/CodeEditor';
 import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
-import { encodeUtf8Base64 } from '../lib/encoding';
-import { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT } from '../lib/constants';
 import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } from '../workspace/WorkspaceManager';
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
-import { saveSessionState, loadSessionState } from './session-hooks';
+import { saveSessionState } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
-import { showSnippetPicker } from './snippet-picker';
 import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
 import { autoStartPortForwards } from './port-forward-hooks';
-import { getGitStatusProvider } from '../files/git-status-provider';
-import type { GitStatusMap } from '../files/FileTree';
+import { useAutoReconnect } from './useAutoReconnect';
+import { useGitStatus } from './useGitStatus';
+import { handleKeyPress } from './handleKeyPress';
+import type { ConnectedWorkspace } from './types';
 import '../themes/dark.css';
+
+export type { ConnectedWorkspace } from './types';
 
 initTheme();
 
@@ -38,13 +37,6 @@ type Screen = 'workspace-list' | 'workspace-add' | 'connecting' | 'workspace-vie
 export const APP_VERSION = __APP_VERSION__;
 export const BUILD_NUMBER = __BUILD_NUMBER__;
 
-interface ConnectedWorkspace {
-  wsId: string;
-  workspace: Workspace;
-  sessionId: string;
-  sftpId: string | null;
-  sftpError: string | null;
-}
 
 function useKeyboardHeight() {
   const [height, setHeight] = useState(0);
@@ -236,24 +228,7 @@ export function App() {
     }
   }, [activeConn?.sessionId, activeConn?.sftpId, activeConn?.wsId]);
 
-  // Git status for file tree (Pro injects provider)
-  const [gitStatusMap, setGitStatusMap] = useState<GitStatusMap>(new Map());
-  useEffect(() => {
-    const provider = getGitStatusProvider();
-    if (!provider || !activeConn) { setGitStatusMap(new Map()); return; }
-    let cancelled = false;
-    provider(activeConn.sessionId, activeConn.workspace.defaultPath).then((m) => {
-      if (!cancelled) setGitStatusMap(m);
-    }).catch(() => {});
-    // Refresh every 30s
-    const interval = setInterval(() => {
-      if (!activeConn) return;
-      provider(activeConn.sessionId, activeConn.workspace.defaultPath).then((m) => {
-        if (!cancelled) setGitStatusMap(m);
-      }).catch(() => {});
-    }, 30000);
-    return () => { cancelled = true; clearInterval(interval); };
-  }, [activeConn?.sessionId, activeConn?.workspace.defaultPath]);
+  const gitStatusMap = useGitStatus(activeConn?.sessionId, activeConn?.workspace.defaultPath);
 
   const getFileTabMgr = useCallback((wsId: string): FileTabManager => {
     let mgr = ftmRef.current.get(wsId);
@@ -382,63 +357,7 @@ export function App() {
     }
   }, [activeConn, connections]);
 
-  // --- Auto-reconnect on app resume ---
-  const connectionsRef = useRef(connections);
-  connectionsRef.current = connections;
-
-  useEffect(() => {
-    const handler = async () => {
-      if (document.visibilityState !== 'visible') return;
-      const conns = connectionsRef.current;
-      if (conns.length === 0) return;
-
-      for (const conn of conns) {
-        try {
-          const { status } = await Ssh.getStatus({ sessionId: conn.sessionId });
-          if (status === 'connected') continue;
-        } catch {
-          /* status check failed — assume dead */
-        }
-
-        // Reconnect
-        try {
-          const connectOpts: import('../ssh/plugin-api').ConnectOptions = {
-            host: conn.workspace.host,
-            port: conn.workspace.port,
-            username: conn.workspace.username,
-          };
-          if (conn.workspace.authType === 'key' && conn.workspace.keyId) {
-            connectOpts.keyId = conn.workspace.keyId;
-          } else {
-            const password = await getWorkspaceStore().getPassword(conn.wsId);
-            connectOpts.password = password ?? undefined;
-          }
-          if (conn.workspace.jumpHosts && conn.workspace.jumpHosts.length > 0) {
-            const jumpPasswords = await getWorkspaceStore().getJumpHostPasswords(conn.wsId);
-            connectOpts.jumpHosts = conn.workspace.jumpHosts.map((jh, i) => ({
-              host: jh.host, port: jh.port, username: jh.username, authType: jh.authType,
-              keyId: jh.keyId, password: jumpPasswords[i] ?? undefined,
-            }));
-          }
-          const { sessionId } = await Ssh.connect(connectOpts);
-          let sftpId: string | null = null;
-          try {
-            const res = await Ssh.openSftp({ sessionId });
-            sftpId = res.sftpId;
-          } catch { /* sftp optional */ }
-
-          setConnections((prev) =>
-            prev.map((c) => (c.wsId === conn.wsId ? { ...c, sessionId, sftpId, sftpError: null } : c)),
-          );
-        } catch {
-          /* reconnect failed — user will see dead terminal */
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handler);
-    return () => document.removeEventListener('visibilitychange', handler);
-  }, []);
+  useAutoReconnect(connections, setConnections);
 
   const handleSaveWorkspace = useCallback(
     async (data: CreateWorkspaceData, password: string, jumpHostPasswords?: string[]) => {
@@ -659,61 +578,10 @@ export function App() {
           <ExtraKeyBar
             context={activeTab === 'terminal' ? 'terminal' : (activeConn && getFileTabMgr(activeConn.wsId).getActiveTab()?.type === 'markdown' ? 'md-editor' : 'code-editor')}
             onSuppressKeyboard={() => {
-              // Android WebView ignores JS preventDefault for keyboard.
-              // 1) Blur active element  2) Call Capacitor Keyboard.hide() if available
               (document.activeElement as HTMLElement)?.blur?.();
               (window as any).__intodeHideKeyboard?.();
             }}
-            onKeyPress={(data) => {
-              // Keyboard toggle
-              if (data === 'keyboard') {
-                if (activeTab === 'terminal') {
-                  const el = document.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
-                  if (el) { if (document.activeElement === el) el.blur(); else el.focus(); }
-                } else if (activeTab === 'editor') {
-                  const cm = document.querySelector('.cm-content') as HTMLElement | null;
-                  if (cm) { if (document.activeElement === cm) cm.blur(); else cm.focus(); }
-                }
-                return;
-              }
-
-              if (activeTab === 'terminal') {
-                if (data === 'snippets') {
-                  showSnippetPicker((cmd) => {
-                    const session = terminalManager.getActiveSession();
-                    if (session?.channelId) {
-                      Ssh.writeToShell({ channelId: session.channelId, data: encodeUtf8Base64(cmd) }).catch(() => {});
-                    }
-                  });
-                  return;
-                }
-                const session = terminalManager.getActiveSession();
-                if (session?.channelId) {
-                  Ssh.writeToShell({ channelId: session.channelId, data: encodeUtf8Base64(data) }).catch(() => {});
-                }
-              } else if (activeTab === 'editor') {
-                const editor = getActiveEditorApi();
-                if (!editor) return;
-                if (data === 'save') editor.save();
-                else if (data === 'undo') editor.undo();
-                else if (data === 'redo') editor.redo();
-                else if (data === 'tab') editor.insertText('\t');
-                else if (data === KEY_UP) editor.cursorUp();
-                else if (data === KEY_DOWN) editor.cursorDown();
-                else if (data === KEY_LEFT) editor.cursorLeft();
-                else if (data === KEY_RIGHT) editor.cursorRight();
-                // MD-specific commands
-                else if (data === 'md:heading') editor.prependLine('# ');
-                else if (data === 'md:bold') editor.wrapSelection('**', '**');
-                else if (data === 'md:italic') editor.wrapSelection('_', '_');
-                else if (data === 'md:code') editor.wrapSelection('```\n', '\n```');
-                else if (data === 'md:list') editor.prependLine('- ');
-                else if (data === 'md:quote') editor.prependLine('> ');
-                else if (data === 'md:link') editor.wrapSelection('[', '](url)');
-                else if (data === 'md:image') editor.wrapSelection('![', '](url)');
-                else editor.insertText(data);
-              }
-            }}
+            onKeyPress={(data) => handleKeyPress(data, activeTab)}
           />
         )}
         {activeTab !== 'settings' && (

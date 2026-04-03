@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Ssh } from '../index';
 import { OVERLAY, INPUT_FIELD } from '../../lib/styles';
+import { COPY_FEEDBACK_MS } from '../../lib/constants';
 
 interface Props {
   onDone: () => void;
@@ -34,7 +35,7 @@ export function SshKeyGenerateModal({ onDone, onCancel }: Props) {
     try {
       await navigator.clipboard.writeText(publicKey);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
     } catch { /* clipboard not available */ }
   };
 

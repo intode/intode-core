@@ -1,6 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Ssh, SftpEntry } from '../ssh/index';
 import { INPUT_FIELD } from '../lib/styles';
+import { getNodeGitInfo } from './git-status-utils';
+import { useFileSearch } from './useFileSearch';
+import type { GrepResult } from './useFileSearch';
 
 export interface FileTreeNode {
   name: string;
@@ -24,13 +27,6 @@ export interface FileTreeProps {
   gitStatus?: GitStatusMap;
 }
 
-/** Expand ~ to $HOME for use in shell commands (~ doesn't expand inside quotes) */
-function shellPath(p: string): string {
-  if (p === '~') return '$HOME';
-  if (p.startsWith('~/')) return '$HOME' + p.slice(1);
-  return p.replace(/'/g, "'\\''");
-}
-
 function sortEntries(entries: SftpEntry[]): SftpEntry[] {
   return [...entries].sort((a, b) => {
     if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
@@ -51,101 +47,6 @@ function toNode(entry: SftpEntry): FileTreeNode {
   };
 }
 
-// Collect all entries (files + dirs) from loaded tree
-function collectAll(nodes: FileTreeNode[]): FileTreeNode[] {
-  const result: FileTreeNode[] = [];
-  for (const node of nodes) {
-    result.push(node);
-    if (node.children) result.push(...collectAll(node.children));
-  }
-  return result;
-}
-
-// Simple fuzzy match: all chars of query appear in order in name
-function fuzzyMatch(name: string, query: string): { match: boolean; score: number } {
-  const lower = name.toLowerCase();
-  const q = query.toLowerCase();
-  let qi = 0;
-  let score = 0;
-  let prevMatch = -1;
-  for (let i = 0; i < lower.length && qi < q.length; i++) {
-    if (lower[i] === q[qi]) {
-      score += (i === prevMatch + 1) ? 2 : 1; // consecutive bonus
-      if (i === 0 || name[i - 1] === '/' || name[i - 1] === '.' || name[i - 1] === '_' || name[i - 1] === '-') {
-        score += 3; // word boundary bonus
-      }
-      prevMatch = i;
-      qi++;
-    }
-  }
-  return { match: qi === q.length, score };
-}
-
-const GIT_COLORS: Record<string, string> = {
-  M: '#e2c08d',   // Modified — warm orange
-  A: '#73c991',   // Added/Staged — green
-  D: '#c74e39',   // Deleted — red
-  '?': '#73c991', // Untracked — green (new file)
-  '!': '#9e9e9e', // Ignored — gray
-  R: '#73c991',   // Renamed — green
-  C: '#73c991',   // Copied — green
-};
-
-const GIT_LABELS: Record<string, string> = {
-  M: 'M', A: 'A', D: 'D', '?': 'U', '!': 'I', R: 'R', C: 'C',
-};
-
-function parseGitKey(status: string): string {
-  const s = status.trim();
-  // !! = ignored, ?? = untracked
-  if (s === '!!') return '!';
-  if (s === '??') return '?';
-  // First non-space char: XY format (index + worktree)
-  return s.charAt(0) === ' ' ? s.charAt(1) : s.charAt(0);
-}
-
-const IGNORED_INFO = { label: 'I', color: GIT_COLORS['!'] };
-
-/** Check if any ancestor directory is ignored */
-function isUnderIgnoredDir(nodePath: string, gitStatus: GitStatusMap): boolean {
-  for (const [filePath, status] of gitStatus) {
-    if (status.trim() !== '!!') continue;
-    const fp = filePath.replace(/\/$/, '');
-    // If this ignored path is a prefix of nodePath, the node is under an ignored dir
-    if (nodePath.includes('/' + fp + '/') || nodePath.endsWith('/' + fp)) return true;
-  }
-  return false;
-}
-
-/** Get git status for a file/folder. Folders inherit from children. */
-function getNodeGitInfo(nodePath: string, nodeName: string, isDir: boolean, gitStatus?: GitStatusMap): { label: string; color: string } | null {
-  if (!gitStatus || gitStatus.size === 0) return null;
-
-  // Direct match — check with and without trailing slash
-  for (const [filePath, status] of gitStatus) {
-    const fp = filePath.replace(/\/$/, '');
-    if (nodePath.endsWith('/' + fp) || nodePath === fp || fp === nodeName) {
-      const key = parseGitKey(status);
-      return { label: GIT_LABELS[key] ?? key, color: GIT_COLORS[key] ?? '#9e9e9e' };
-    }
-  }
-
-  // If any parent dir is ignored, this node is also ignored
-  if (isUnderIgnoredDir(nodePath, gitStatus)) return IGNORED_INFO;
-
-  // Folder: propagate from children (skip ignored !!)
-  if (isDir) {
-    const dirSuffix = '/' + nodeName + '/';
-    for (const [filePath, status] of gitStatus) {
-      if (status.trim() === '!!') continue;
-      if (filePath.includes(dirSuffix) || filePath.startsWith(nodeName + '/')) {
-        return { label: '\u25CF', color: '#e2c08d' };
-      }
-    }
-  }
-
-  return null;
-}
 
 function FileTreeItem({
   node, depth, onToggle, onFileSelect, gitStatus,
@@ -210,20 +111,10 @@ function SearchResultItem({ node, rootPath, onSelect }: { node: FileTreeNode; ro
   );
 }
 
-interface GrepResult {
-  path: string;
-  name: string;
-  line: number;
-  text: string;
-}
-
 export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus }: FileTreeProps) {
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [nameResults, setNameResults] = useState<FileTreeNode[]>([]);
-  const [grepResults, setGrepResults] = useState<GrepResult[]>([]);
-  const [searching, setSearching] = useState(false);
+  const { searchQuery, setSearchQuery, nameResults, grepResults, searching, clearSearch } = useFileSearch(nodes, sessionId, rootPath);
 
   useEffect(() => {
     if (!sftpId) return;
@@ -234,73 +125,8 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
     }).catch(() => setLoading(false));
   }, [sftpId, rootPath]);
 
-  // Local fuzzy search on cached tree (files + directories)
-  const localResults = useMemo(() => {
-    if (!searchQuery.trim()) return [];
-    const all = collectAll(nodes);
-    return all
-      .map((f) => ({ node: f, ...fuzzyMatch(f.name, searchQuery.trim()) }))
-      .filter((r) => r.match)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 20)
-      .map((r) => r.node);
-  }, [nodes, searchQuery]);
-
-  // Remote search: run find (name+dir) AND grep (content) in parallel
-  useEffect(() => {
-    if (!searchQuery.trim() || !sessionId) {
-      setNameResults([]);
-      setGrepResults([]);
-      return;
-    }
-
-    setSearching(true);
-    const q = searchQuery.trim().replace(/['"\\]/g, '');
-    const sp = shellPath(rootPath);
-
-    // 1) File/folder name search via find
-    const findPromise = Ssh.exec({
-      sessionId,
-      command: `find ${sp} -maxdepth 5 -iname "*${q}*" -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | head -20`,
-      timeout: 8000,
-    }).then(({ stdout }) => {
-      const paths = stdout.trim().split('\n').filter(Boolean);
-      return paths.map((p) => ({
-        name: p.split('/').pop() ?? p, path: p,
-        isDirectory: !p.includes('.') || p.endsWith('/'), size: 0, modifiedAt: 0,
-      }));
-    }).catch(() => [] as FileTreeNode[]);
-
-    // 2) Content search via grep
-    const grepPromise = Ssh.exec({
-      sessionId,
-      command: `grep -rn -I --color=never --exclude-dir=node_modules --exclude-dir=.git '${q}' ${sp} 2>/dev/null | head -50`,
-      timeout: 15000,
-    }).then(({ stdout }) => {
-      const lines = stdout.trim().split('\n').filter(Boolean);
-      return lines.map((line) => {
-        const m = line.match(/^(.+?):(\d+):(.*)$/);
-        if (!m) return null;
-        return { path: m[1], name: m[1].split('/').pop() ?? m[1], line: parseInt(m[2]), text: m[3].trim() };
-      }).filter(Boolean) as GrepResult[];
-    }).catch(() => [] as GrepResult[]);
-
-    Promise.all([findPromise, grepPromise]).then(([findRes, grepRes]) => {
-      // Merge local + remote name results, deduplicate
-      const seen = new Set(localResults.map((n) => n.path));
-      const merged = [...localResults];
-      for (const n of findRes) { if (!seen.has(n.path)) { merged.push(n); seen.add(n.path); } }
-      setNameResults(merged.slice(0, 20));
-      setGrepResults(grepRes);
-      setSearching(false);
-    });
-  }, [searchQuery, sessionId, localResults, rootPath]);
-
-  // Navigate to a folder from search results — clear search and expand the path
   const navigateToFolder = useCallback(async (folderPath: string) => {
-    setSearchQuery('');
-    setNameResults([]);
-    setGrepResults([]);
+    clearSearch();
     // Expand the folder
     setNodes((prev) => updateNode(prev, folderPath, (node) => {
       if (!node.isDirectory) return node;
@@ -359,7 +185,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
           spellCheck={false}
         />
         {searchQuery && (
-          <button onClick={() => { setSearchQuery(''); setGrepResults([]); setNameResults([]); }} style={styles.clearBtn}>{'\u2715'}</button>
+          <button onClick={clearSearch} style={styles.clearBtn}>{'\u2715'}</button>
         )}
       </div>
 
@@ -376,7 +202,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
                 <SearchResultItem key={node.path} node={node} rootPath={rootPath}
                   onSelect={() => {
                     if (node.isDirectory) { navigateToFolder(node.path); }
-                    else { onFileSelect(node.path); setSearchQuery(''); }
+                    else { onFileSelect(node.path); clearSearch(); }
                   }} />
               ))}
             </>
@@ -387,7 +213,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
             <>
               <div style={styles.sectionLabel}>Content Matches</div>
               {grepResults.map((r, i) => (
-                <div key={`${r.path}:${r.line}:${i}`} onClick={() => { onFileSelect(r.path); setSearchQuery(''); }} style={styles.item}>
+                <div key={`${r.path}:${r.line}:${i}`} onClick={() => { onFileSelect(r.path); clearSearch(); }} style={styles.item}>
                   <div style={{ flex: 1, overflow: 'hidden' }}>
                     <div style={{ fontSize: 11, color: 'var(--accent-blue)', fontFamily: 'monospace' }}>{r.name}:{r.line}</div>
                     <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.text}</div>

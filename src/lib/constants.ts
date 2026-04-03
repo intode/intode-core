@@ -23,6 +23,9 @@ export const MAX_FILE_SIZE = 10_485_760; // 10MB
 // === Timing ===
 export const DOUBLE_TAP_THRESHOLD_MS = 300;
 export const LONG_PRESS_DELAY_MS = 500;
+export const COPY_FEEDBACK_MS = 2000;
+export const MOCK_DELAY_MS = 500;
+export const UPGRADE_CLOSE_DELAY_MS = 1200;
 
 // === ANSI Keys ===
 export const KEY_ESC = '\x1b';
