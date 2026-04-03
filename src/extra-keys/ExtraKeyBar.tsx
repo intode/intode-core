@@ -157,11 +157,8 @@ export function ExtraKeyBar({ context, onKeyPress, onSuppressKeyboard }: ExtraKe
           <DpadButton keyDef={upKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
           <div />
           <DpadButton keyDef={leftKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
-          <div />
-          <DpadButton keyDef={rightKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
-          <div />
           <DpadButton keyDef={downKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
-          <div />
+          <DpadButton keyDef={rightKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
         </div>
       </div>
     </div>
@@ -183,7 +180,7 @@ const scrollAreaStyle: React.CSSProperties = {
   gap: 3,
   padding: 6,
   overflowY: 'auto',
-  maxHeight: 84,
+  maxHeight: 64,
   alignContent: 'flex-start',
 };
 
@@ -200,7 +197,7 @@ const fixedAreaStyle: React.CSSProperties = {
 const dpadStyle: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 30px)',
-  gridTemplateRows: 'repeat(3, 26px)',
+  gridTemplateRows: 'repeat(2, 26px)',
   gap: 2,
 };
 
@@ -224,7 +221,7 @@ const keyStyle: React.CSSProperties = {
 
 const kbToggleStyle: React.CSSProperties = {
   width: 44,
-  height: 78,
+  height: 54,
   border: '1px solid var(--bg-surface1)',
   borderRadius: 2,
   backgroundColor: 'var(--bg-mantle)',

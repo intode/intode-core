@@ -584,7 +584,7 @@ export function App() {
             onKeyPress={(data) => handleKeyPress(data, activeTab)}
           />
         )}
-        {activeTab !== 'settings' && (
+        {activeTab !== 'settings' && keyboardHeight === 0 && (
           <TabBar activeTab={activeTab} onTabChange={handleTabChange} extraTabs={getExtraTabs()} />
         )}
       </div>
