@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { renderMarkdown } from './pipeline';
+import { getPostProcessors } from './pipeline-extensions';
 import './markdown.css';
 
 export interface MarkdownPreviewProps {
@@ -10,6 +11,7 @@ export interface MarkdownPreviewProps {
 export function MarkdownPreview({ content, visible }: MarkdownPreviewProps) {
   const [html, setHtml] = useState('');
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -23,6 +25,15 @@ export function MarkdownPreview({ content, visible }: MarkdownPreviewProps) {
     return () => { cancelled = true; };
   }, [content]);
 
+  // Run post-processors (e.g. mermaid rendering) after HTML is mounted
+  useEffect(() => {
+    if (loading || !containerRef.current) return;
+    const processors = getPostProcessors();
+    for (const fn of processors) {
+      fn(containerRef.current);
+    }
+  }, [html, loading]);
+
   if (!visible) return null;
 
   if (loading) {
@@ -35,6 +46,7 @@ export function MarkdownPreview({ content, visible }: MarkdownPreviewProps) {
 
   return (
     <div
+      ref={containerRef}
       className="md-preview"
       dangerouslySetInnerHTML={{ __html: html }}
       onClick={(e) => {

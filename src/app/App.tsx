@@ -22,6 +22,7 @@ import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } fr
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
+import { saveSessionState, loadSessionState } from './session-hooks';
 import '../themes/dark.css';
 
 initTheme();
@@ -165,6 +166,18 @@ export function App() {
   const activeConn = connections.find((c) => c.wsId === activeWsId) ?? null;
   const connectedIds = new Set(connections.map((c) => c.wsId));
 
+  // Expose connection context for Pro split view tab
+  useEffect(() => {
+    if (activeConn) {
+      (window as any).__intodeSplitCtx = {
+        sessionId: activeConn.sessionId,
+        defaultPath: activeConn.workspace.defaultPath,
+      };
+    } else {
+      delete (window as any).__intodeSplitCtx;
+    }
+  }, [activeConn?.sessionId]);
+
   const getFileTabMgr = useCallback((wsId: string): FileTabManager => {
     let mgr = ftmRef.current.get(wsId);
     if (!mgr) {
@@ -256,6 +269,7 @@ export function App() {
       setConnectingWorkspace(null);
       setScreen('workspace-view');
       setActiveTab('terminal');
+      saveSessionState({ workspaceId: ws.id, activeTab: 'terminal' });
     },
     [connectingWorkspace],
   );

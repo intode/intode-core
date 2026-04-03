@@ -12,6 +12,10 @@ export { setPolicy, getPolicy, setLimitHandler, checkLimit } from './policies/pr
 export type { TabDefinition, TabRenderer } from './app/tab-registry';
 export { registerTab, getExtraTabs, getTabRenderer } from './app/tab-registry';
 
+// Session hooks (Pro can inject save/restore)
+export { setSessionSaveHook, setSessionLoadHook, saveSessionState, loadSessionState } from './app/session-hooks';
+export type { SessionData } from './app/session-hooks';
+
 // Settings Registry (Pro can inject settings pages)
 export type { SettingsMenuItem, SettingsPageComponent } from './app/settings-registry';
 export { registerSettingsPage, getSettingsMenuItems, getSettingsPage } from './app/settings-registry';
@@ -49,6 +53,7 @@ export type { CodeEditorRef } from './editor/CodeEditor';
 // Markdown
 export { MarkdownPreview } from './md-preview/MarkdownPreview';
 export { renderMarkdown } from './md-preview/pipeline';
+export { registerRemarkPlugin, registerRehypePlugin, registerPostProcessor } from './md-preview/pipeline-extensions';
 
 // Extra Keys
 export { ExtraKeyBar } from './extra-keys/ExtraKeyBar';
