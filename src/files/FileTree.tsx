@@ -165,7 +165,7 @@ function FileTreeItem({
 
   return (
     <>
-      <div onClick={handleTap} style={{ ...styles.item, paddingLeft: 12 + depth * 16, opacity: isIgnored ? 0.5 : 1 }}>
+      <div onClick={handleTap} style={{ ...styles.item, paddingLeft: 12 + depth * 16, opacity: isIgnored ? 0.8 : 1 }}>
         <span style={styles.icon}>
           {node.isDirectory ? (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: isIgnored ? '#4a4f54' : node.isExpanded ? 'var(--accent-green)' : 'var(--text-secondary)' }}>

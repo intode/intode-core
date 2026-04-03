@@ -34,6 +34,9 @@ export {
   getEditorPlugins,
 } from './plugins/registry';
 
+// Snippet picker
+export { setSnippetPicker, showSnippetPicker } from './app/snippet-picker';
+
 // SSH
 export { Ssh } from './ssh/index';
 export type { SshPlugin, ConnectOptions, ConnectionStatus, SftpEntry, SftpStat, SshKey } from './ssh/index';

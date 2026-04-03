@@ -24,6 +24,7 @@ import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
 import { saveSessionState, loadSessionState } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
+import { showSnippetPicker } from './snippet-picker';
 import { getGitStatusProvider } from '../files/git-status-provider';
 import type { GitStatusMap } from '../files/FileTree';
 import '../themes/dark.css';
@@ -655,6 +656,15 @@ export function App() {
               }
 
               if (activeTab === 'terminal') {
+                if (data === 'snippets') {
+                  showSnippetPicker((cmd) => {
+                    const session = terminalManager.getActiveSession();
+                    if (session?.channelId) {
+                      Ssh.writeToShell({ channelId: session.channelId, data: encodeUtf8Base64(cmd) }).catch(() => {});
+                    }
+                  });
+                  return;
+                }
                 const session = terminalManager.getActiveSession();
                 if (session?.channelId) {
                   Ssh.writeToShell({ channelId: session.channelId, data: encodeUtf8Base64(data) }).catch(() => {});
