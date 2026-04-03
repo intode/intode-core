@@ -26,6 +26,7 @@ import { saveSessionState, loadSessionState } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
 import { showSnippetPicker } from './snippet-picker';
 import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
+import { autoStartPortForwards } from './port-forward-hooks';
 import { getGitStatusProvider } from '../files/git-status-provider';
 import type { GitStatusMap } from '../files/FileTree';
 import '../themes/dark.css';
@@ -228,8 +229,10 @@ export function App() {
         defaultPath: activeConn.workspace.defaultPath,
         ftm: getFileTabMgr(activeConn.wsId),
       };
+      (window as any).__intodeActiveWsId = activeConn.wsId;
     } else {
       delete (window as any).__intodeSplitCtx;
+      delete (window as any).__intodeActiveWsId;
     }
   }, [activeConn?.sessionId, activeConn?.sftpId, activeConn?.wsId]);
 
@@ -347,6 +350,11 @@ export function App() {
       saveSessionState({ workspaceId: ws.id, activeTab: 'files' });
       keepAliveStart();
       keepAliveUpdate(newConns.length);
+
+      // Auto-start saved port forwards
+      if (ws.portForwards && ws.portForwards.length > 0) {
+        autoStartPortForwards(sid, ws.portForwards);
+      }
     },
     [connectingWorkspace],
   );

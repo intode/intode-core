@@ -9,6 +9,14 @@ export interface WorkspaceJumpHost {
   keyId?: string;
 }
 
+export interface PortForwardConfig {
+  id: string;
+  type: 'local' | 'remote' | 'dynamic';
+  bindPort: number;
+  targetHost: string;
+  targetPort: number;
+}
+
 export interface Workspace {
   id: string;
   name: string;
@@ -19,6 +27,7 @@ export interface Workspace {
   keyId?: string;
   defaultPath: string;
   jumpHosts?: WorkspaceJumpHost[];
+  portForwards?: PortForwardConfig[];
   lastConnectedAt: number | null;
   createdAt: number;
   updatedAt: number;
