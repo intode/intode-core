@@ -209,6 +209,7 @@ export function App() {
         return true;
       }
       if (s === 'workspace-view') {
+        if (t !== 'files') { setActiveTab('files'); return true; }
         setScreen('workspace-list');
         return true;
       }
