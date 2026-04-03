@@ -20,6 +20,13 @@ export interface FileTreeProps {
   sessionId?: string;
 }
 
+/** Expand ~ to $HOME for use in shell commands (~ doesn't expand inside quotes) */
+function shellPath(p: string): string {
+  if (p === '~') return '$HOME';
+  if (p.startsWith('~/')) return '$HOME' + p.slice(1);
+  return p.replace(/'/g, "'\\''");
+}
+
 function sortEntries(entries: SftpEntry[]): SftpEntry[] {
   return [...entries].sort((a, b) => {
     if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
@@ -173,12 +180,12 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId }: FileTree
 
     setSearching(true);
     const q = searchQuery.trim().replace(/['"\\]/g, '');
-    const escapedPath = rootPath.replace(/'/g, "'\\''");
+    const sp = shellPath(rootPath);
 
     // 1) File/folder name search via find
     const findPromise = Ssh.exec({
       sessionId,
-      command: `find '${escapedPath}' -maxdepth 5 -iname "*${q}*" -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | head -20`,
+      command: `find ${sp} -maxdepth 5 -iname "*${q}*" -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | head -20`,
       timeout: 8000,
     }).then(({ stdout }) => {
       const paths = stdout.trim().split('\n').filter(Boolean);
@@ -191,7 +198,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId }: FileTree
     // 2) Content search via grep
     const grepPromise = Ssh.exec({
       sessionId,
-      command: `grep -rn -I --include='*' '${q}' '${escapedPath}' -l 2>/dev/null | head -20 | while read f; do grep -n '${q}' "$f" 2>/dev/null | head -3 | sed "s|^|$f:|"; done`,
+      command: `grep -rn -I '${q}' ${sp} 2>/dev/null | head -50`,
       timeout: 15000,
     }).then(({ stdout }) => {
       const lines = stdout.trim().split('\n').filter(Boolean);
