@@ -81,14 +81,44 @@ function fuzzyMatch(name: string, query: string): { match: boolean; score: numbe
   return { match: qi === q.length, score };
 }
 
-const GIT_STATUS_STYLE: Record<string, { label: string; color: string }> = {
-  M: { label: 'M', color: '#e6a817' },   // Modified
-  A: { label: 'A', color: '#28a745' },   // Added/staged
-  D: { label: 'D', color: '#dc3545' },   // Deleted
-  '?': { label: 'U', color: '#6c757d' }, // Untracked
-  R: { label: 'R', color: '#17a2b8' },   // Renamed
-  C: { label: 'C', color: '#17a2b8' },   // Copied
+const GIT_COLORS: Record<string, string> = {
+  M: '#cca700',   // Modified — yellow
+  A: '#28a745',   // Added — green
+  D: '#dc3545',   // Deleted — red
+  '?': '#73808c', // Untracked — gray
+  '!': '#4a4f54', // Ignored — dim
+  R: '#17a2b8',   // Renamed — cyan
+  C: '#17a2b8',   // Copied — cyan
 };
+
+const GIT_LABELS: Record<string, string> = {
+  M: 'M', A: 'A', D: 'D', '?': 'U', '!': 'I', R: 'R', C: 'C',
+};
+
+/** Get git status for a file/folder. Folders inherit from children. */
+function getNodeGitInfo(nodePath: string, nodeName: string, isDir: boolean, gitStatus?: GitStatusMap): { label: string; color: string } | null {
+  if (!gitStatus || gitStatus.size === 0) return null;
+
+  // Direct file match
+  for (const [filePath, status] of gitStatus) {
+    if (nodePath.endsWith('/' + filePath) || nodePath === filePath || filePath === nodeName) {
+      const key = status.trim().charAt(0) || status.trim();
+      return { label: GIT_LABELS[key] ?? status.trim(), color: GIT_COLORS[key] ?? '#73808c' };
+    }
+  }
+
+  // Folder: check if any child has status (hierarchical propagation)
+  if (isDir) {
+    const dirSuffix = '/' + nodeName + '/';
+    for (const [filePath] of gitStatus) {
+      if (filePath.includes(dirSuffix) || filePath.startsWith(nodeName + '/')) {
+        return { label: '\u25CF', color: '#cca700' }; // dot = has changes inside
+      }
+    }
+  }
+
+  return null;
+}
 
 function FileTreeItem({
   node, depth, onToggle, onFileSelect, gitStatus,
@@ -102,35 +132,27 @@ function FileTreeItem({
     else onFileSelect(node.path);
   };
 
-  // Find git status for this file (match by path suffix)
-  let badge: { label: string; color: string } | null = null;
-  if (gitStatus) {
-    for (const [filePath, status] of gitStatus) {
-      if (node.path.endsWith(filePath) || filePath.endsWith(node.name)) {
-        const key = status.trim().charAt(0) || status.trim();
-        badge = GIT_STATUS_STYLE[key] ?? { label: status.trim(), color: '#6c757d' };
-        break;
-      }
-    }
-  }
+  const badge = getNodeGitInfo(node.path, node.name, node.isDirectory, gitStatus);
+  const isIgnored = badge?.label === 'I';
+  const nameColor = isIgnored ? '#4a4f54' : badge ? badge.color : undefined;
 
   return (
     <>
-      <div onClick={handleTap} style={{ ...styles.item, paddingLeft: 12 + depth * 16 }}>
+      <div onClick={handleTap} style={{ ...styles.item, paddingLeft: 12 + depth * 16, opacity: isIgnored ? 0.5 : 1 }}>
         <span style={styles.icon}>
           {node.isDirectory ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: node.isExpanded ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: isIgnored ? '#4a4f54' : node.isExpanded ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill={node.isExpanded ? 'rgba(0,255,102,0.1)' : 'none'} />
             </svg>
           ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-tertiary)' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: isIgnored ? '#4a4f54' : 'var(--text-tertiary)' }}>
               <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
               <path d="M13 2v7h7" />
             </svg>
           )}
         </span>
-        <span style={styles.name}>{node.name}</span>
-        {badge && <span style={{ ...styles.gitBadge, color: badge.color }}>{badge.label}</span>}
+        <span style={{ ...styles.name, color: nameColor ?? 'var(--text-primary)' }}>{node.name}</span>
+        {badge && !isIgnored && <span style={{ ...styles.gitBadge, color: badge.color }}>{badge.label}</span>}
         {node.isLoading && <span style={styles.spinner}>{'\u27F3'}</span>}
       </div>
       {node.isExpanded && node.children?.map((child) => (
@@ -327,9 +349,11 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
       ) : nodes.length === 0 ? (
         <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Empty directory</span></div>
       ) : (
-        nodes.map((node) => (
-          <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} gitStatus={gitStatus} />
-        ))
+        <div style={styles.treeScroll}>
+          {nodes.map((node) => (
+            <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} gitStatus={gitStatus} />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -363,6 +387,11 @@ const styles: Record<string, React.CSSProperties> = {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+  },
+  treeScroll: {
+    flex: 1,
+    overflowY: 'auto',
+    WebkitOverflowScrolling: 'touch',
   },
   searchBar: {
     display: 'flex',
