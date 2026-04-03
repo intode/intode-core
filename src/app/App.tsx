@@ -24,6 +24,8 @@ import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
 import { saveSessionState, loadSessionState } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
+import { getGitStatusProvider } from '../files/git-status-provider';
+import type { GitStatusMap } from '../files/FileTree';
 import '../themes/dark.css';
 
 initTheme();
@@ -213,6 +215,25 @@ export function App() {
       delete (window as any).__intodeSplitCtx;
     }
   }, [activeConn?.sessionId, activeConn?.sftpId, activeConn?.wsId]);
+
+  // Git status for file tree (Pro injects provider)
+  const [gitStatusMap, setGitStatusMap] = useState<GitStatusMap>(new Map());
+  useEffect(() => {
+    const provider = getGitStatusProvider();
+    if (!provider || !activeConn) { setGitStatusMap(new Map()); return; }
+    let cancelled = false;
+    provider(activeConn.sessionId, activeConn.workspace.defaultPath).then((m) => {
+      if (!cancelled) setGitStatusMap(m);
+    }).catch(() => {});
+    // Refresh every 30s
+    const interval = setInterval(() => {
+      if (!activeConn) return;
+      provider(activeConn.sessionId, activeConn.workspace.defaultPath).then((m) => {
+        if (!cancelled) setGitStatusMap(m);
+      }).catch(() => {});
+    }, 30000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [activeConn?.sessionId, activeConn?.workspace.defaultPath]);
 
   const getFileTabMgr = useCallback((wsId: string): FileTabManager => {
     let mgr = ftmRef.current.get(wsId);
@@ -524,6 +545,7 @@ export function App() {
                         sftpId={conn.sftpId}
                         rootPath={conn.workspace.defaultPath}
                         sessionId={conn.sessionId}
+                        gitStatus={gitStatusMap}
                         onFileSelect={async (path) => {
                           const type = detectFileType(path.split('/').pop() ?? '');
                           if (type === 'binary') return;

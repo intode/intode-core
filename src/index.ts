@@ -46,6 +46,10 @@ export { setWorkspaceStore, getWorkspaceStore, createWorkspace } from './workspa
 export { TerminalManager } from './terminal/TerminalManager';
 export { TerminalView } from './terminal/TerminalView';
 
+// Files + Git status
+export { setGitStatusProvider } from './files/git-status-provider';
+export type { GitStatusMap } from './files/FileTree';
+
 // Files
 export { FileTree } from './files/FileTree';
 export { FileTabManager, detectFileType } from './files/TabManager';

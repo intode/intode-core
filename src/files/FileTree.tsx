@@ -13,11 +13,15 @@ export interface FileTreeNode {
   isLoading?: boolean;
 }
 
+/** Git status per file path — injected from Pro */
+export type GitStatusMap = Map<string, string>;
+
 export interface FileTreeProps {
   sftpId: string;
   rootPath: string;
   onFileSelect: (path: string) => void;
   sessionId?: string;
+  gitStatus?: GitStatusMap;
 }
 
 /** Expand ~ to $HOME for use in shell commands (~ doesn't expand inside quotes) */
@@ -77,16 +81,38 @@ function fuzzyMatch(name: string, query: string): { match: boolean; score: numbe
   return { match: qi === q.length, score };
 }
 
+const GIT_STATUS_STYLE: Record<string, { label: string; color: string }> = {
+  M: { label: 'M', color: '#e6a817' },   // Modified
+  A: { label: 'A', color: '#28a745' },   // Added/staged
+  D: { label: 'D', color: '#dc3545' },   // Deleted
+  '?': { label: 'U', color: '#6c757d' }, // Untracked
+  R: { label: 'R', color: '#17a2b8' },   // Renamed
+  C: { label: 'C', color: '#17a2b8' },   // Copied
+};
+
 function FileTreeItem({
-  node, depth, onToggle, onFileSelect,
+  node, depth, onToggle, onFileSelect, gitStatus,
 }: {
   node: FileTreeNode; depth: number;
   onToggle: (path: string) => void; onFileSelect: (path: string) => void;
+  gitStatus?: GitStatusMap;
 }) {
   const handleTap = () => {
     if (node.isDirectory) onToggle(node.path);
     else onFileSelect(node.path);
   };
+
+  // Find git status for this file (match by path suffix)
+  let badge: { label: string; color: string } | null = null;
+  if (gitStatus) {
+    for (const [filePath, status] of gitStatus) {
+      if (node.path.endsWith(filePath) || filePath.endsWith(node.name)) {
+        const key = status.trim().charAt(0) || status.trim();
+        badge = GIT_STATUS_STYLE[key] ?? { label: status.trim(), color: '#6c757d' };
+        break;
+      }
+    }
+  }
 
   return (
     <>
@@ -104,10 +130,11 @@ function FileTreeItem({
           )}
         </span>
         <span style={styles.name}>{node.name}</span>
+        {badge && <span style={{ ...styles.gitBadge, color: badge.color }}>{badge.label}</span>}
         {node.isLoading && <span style={styles.spinner}>{'\u27F3'}</span>}
       </div>
       {node.isExpanded && node.children?.map((child) => (
-        <FileTreeItem key={child.path} node={child} depth={depth + 1} onToggle={onToggle} onFileSelect={onFileSelect} />
+        <FileTreeItem key={child.path} node={child} depth={depth + 1} onToggle={onToggle} onFileSelect={onFileSelect} gitStatus={gitStatus} />
       ))}
     </>
   );
@@ -141,7 +168,7 @@ interface GrepResult {
   text: string;
 }
 
-export function FileTree({ sftpId, rootPath, onFileSelect, sessionId }: FileTreeProps) {
+export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus }: FileTreeProps) {
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -301,7 +328,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId }: FileTree
         <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Empty directory</span></div>
       ) : (
         nodes.map((node) => (
-          <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} />
+          <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} gitStatus={gitStatus} />
         ))
       )}
     </div>
@@ -365,6 +392,10 @@ const styles: Record<string, React.CSSProperties> = {
   },
   searchHint: {
     padding: '16px', textAlign: 'center', fontSize: 13, color: 'var(--text-muted)',
+  },
+  gitBadge: {
+    fontSize: 10, fontWeight: 700, fontFamily: 'monospace', marginLeft: 'auto',
+    padding: '1px 5px', borderRadius: 3, flexShrink: 0,
   },
   searchDir: {
     fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden',
