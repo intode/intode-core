@@ -127,11 +127,20 @@ function SearchResultItem({ node, rootPath, onSelect }: { node: FileTreeNode; ro
   );
 }
 
+interface GrepResult {
+  path: string;
+  name: string;
+  line: number;
+  text: string;
+}
+
 export function FileTree({ sftpId, rootPath, onFileSelect, sessionId }: FileTreeProps) {
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchMode, setSearchMode] = useState<'name' | 'content'>('name');
   const [searchResults, setSearchResults] = useState<FileTreeNode[]>([]);
+  const [grepResults, setGrepResults] = useState<GrepResult[]>([]);
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
@@ -155,49 +164,57 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId }: FileTree
       .map((r) => r.node);
   }, [nodes, searchQuery]);
 
-  // Remote search via SSH find (when local results are sparse)
+  // Remote search: file name (find) or content (grep)
   useEffect(() => {
     if (!searchQuery.trim() || !sessionId) {
       setSearchResults([]);
-      return;
-    }
-    if (localResults.length >= 5) {
-      setSearchResults(localResults);
+      setGrepResults([]);
       return;
     }
 
-    setSearching(true);
-    const q = searchQuery.trim().replace(/['"\\]/g, '');
-    const escapedPath = rootPath.replace(/'/g, "'\\''");
-    Ssh.exec({
-      sessionId,
-      command: `find '${escapedPath}' -maxdepth 5 -iname "*${q}*" -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | head -30`,
-      timeout: 8000,
-    }).then(({ stdout }) => {
-      const paths = stdout.trim().split('\n').filter(Boolean);
-      const remoteNodes: FileTreeNode[] = paths.map((p) => ({
-        name: p.split('/').pop() ?? p,
-        path: p,
-        isDirectory: false,
-        size: 0,
-        modifiedAt: 0,
-      }));
-      // Merge local + remote, deduplicate by path
-      const seen = new Set(localResults.map((n) => n.path));
-      const merged = [...localResults];
-      for (const n of remoteNodes) {
-        if (!seen.has(n.path)) {
-          merged.push(n);
-          seen.add(n.path);
-        }
-      }
-      setSearchResults(merged.slice(0, 30));
-      setSearching(false);
-    }).catch(() => {
-      setSearchResults(localResults);
-      setSearching(false);
-    });
-  }, [searchQuery, sessionId, localResults, rootPath]);
+    if (searchMode === 'name') {
+      // File name search
+      if (localResults.length >= 5) { setSearchResults(localResults); return; }
+      setSearching(true);
+      const q = searchQuery.trim().replace(/['"\\]/g, '');
+      const escapedPath = rootPath.replace(/'/g, "'\\''");
+      Ssh.exec({
+        sessionId,
+        command: `find '${escapedPath}' -maxdepth 5 -iname "*${q}*" -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | head -30`,
+        timeout: 8000,
+      }).then(({ stdout }) => {
+        const paths = stdout.trim().split('\n').filter(Boolean);
+        const remoteNodes: FileTreeNode[] = paths.map((p) => ({
+          name: p.split('/').pop() ?? p, path: p, isDirectory: false, size: 0, modifiedAt: 0,
+        }));
+        const seen = new Set(localResults.map((n) => n.path));
+        const merged = [...localResults];
+        for (const n of remoteNodes) { if (!seen.has(n.path)) { merged.push(n); seen.add(n.path); } }
+        setSearchResults(merged.slice(0, 30));
+        setSearching(false);
+      }).catch(() => { setSearchResults(localResults); setSearching(false); });
+    } else {
+      // Content search (grep)
+      setSearching(true);
+      setGrepResults([]);
+      const q = searchQuery.trim().replace(/'/g, "'\\''");
+      const escapedPath = rootPath.replace(/'/g, "'\\''");
+      Ssh.exec({
+        sessionId,
+        command: `grep -rn --include='*' -I '${q}' '${escapedPath}' 2>/dev/null | head -50`,
+        timeout: 15000,
+      }).then(({ stdout }) => {
+        const lines = stdout.trim().split('\n').filter(Boolean);
+        const parsed: GrepResult[] = lines.map((line) => {
+          const m = line.match(/^(.+?):(\d+):(.*)$/);
+          if (!m) return null;
+          return { path: m[1], name: m[1].split('/').pop() ?? m[1], line: parseInt(m[2]), text: m[3].trim() };
+        }).filter(Boolean) as GrepResult[];
+        setGrepResults(parsed);
+        setSearching(false);
+      }).catch(() => { setSearching(false); });
+    }
+  }, [searchQuery, sessionId, searchMode, localResults, rootPath]);
 
   const handleToggle = useCallback(async (path: string) => {
     setNodes((prev) => updateNode(prev, path, (node) => {
@@ -232,33 +249,49 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId }: FileTree
   return (
     <div style={styles.container}>
       <div style={styles.searchBar}>
+        <button
+          onClick={() => setSearchMode(searchMode === 'name' ? 'content' : 'name')}
+          style={styles.modeBtn}
+          title={searchMode === 'name' ? 'File name' : 'Content (grep)'}
+        >{searchMode === 'name' ? 'Aa' : 'Ag'}</button>
         <input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search files..."
+          onKeyDown={(e) => { if (e.key === 'Enter' && searchMode === 'content') { /* trigger search */ } }}
+          placeholder={searchMode === 'name' ? 'Search files...' : 'Grep content...'}
           style={styles.searchInput}
           autoComplete="off"
           spellCheck={false}
         />
         {searchQuery && (
-          <button onClick={() => setSearchQuery('')} style={styles.clearBtn}>{'\u2715'}</button>
+          <button onClick={() => { setSearchQuery(''); setGrepResults([]); }} style={styles.clearBtn}>{'\u2715'}</button>
         )}
       </div>
 
       {isSearching ? (
         <div style={styles.resultsList}>
           {searching && <div style={styles.searchHint}>Searching...</div>}
-          {displayResults.length === 0 && !searching && (
-            <div style={styles.searchHint}>No files found</div>
+          {searchMode === 'name' ? (
+            <>
+              {displayResults.length === 0 && !searching && <div style={styles.searchHint}>No files found</div>}
+              {displayResults.map((node) => (
+                <SearchResultItem key={node.path} node={node} rootPath={rootPath}
+                  onSelect={() => { onFileSelect(node.path); setSearchQuery(''); }} />
+              ))}
+            </>
+          ) : (
+            <>
+              {grepResults.length === 0 && !searching && <div style={styles.searchHint}>No matches found</div>}
+              {grepResults.map((r, i) => (
+                <div key={`${r.path}:${r.line}:${i}`} onClick={() => { onFileSelect(r.path); setSearchQuery(''); }} style={styles.item}>
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <div style={{ fontSize: 11, color: 'var(--accent-blue)', fontFamily: 'monospace' }}>{r.name}:{r.line}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.text}</div>
+                  </div>
+                </div>
+              ))}
+            </>
           )}
-          {displayResults.map((node) => (
-            <SearchResultItem
-              key={node.path}
-              node={node}
-              rootPath={rootPath}
-              onSelect={() => { onFileSelect(node.path); setSearchQuery(''); }}
-            />
-          ))}
         </div>
       ) : nodes.length === 0 ? (
         <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Empty directory</span></div>
@@ -306,6 +339,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '8px 12px',
     borderBottom: '1px solid var(--bg-surface0)',
     flexShrink: 0,
+  },
+  modeBtn: {
+    padding: '6px 8px', backgroundColor: 'var(--bg-surface0)', border: '1px solid var(--bg-surface1)',
+    borderRadius: 4, color: 'var(--accent-blue)', fontSize: 11, fontWeight: 700, cursor: 'pointer',
+    fontFamily: 'monospace', flexShrink: 0,
   },
   searchInput: {
     ...INPUT_FIELD,
