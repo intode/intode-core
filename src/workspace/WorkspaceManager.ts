@@ -11,7 +11,7 @@ export interface WorkspaceJumpHost {
 
 export interface PortForwardConfig {
   id: string;
-  type: 'local' | 'remote' | 'dynamic';
+  type: 'local' | 'remote';
   bindPort: number;
   targetHost: string;
   targetPort: number;

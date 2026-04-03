@@ -43,7 +43,7 @@ export interface SftpStat {
   isDirectory: boolean;
 }
 
-export type PortForwardType = 'local' | 'remote' | 'dynamic';
+export type PortForwardType = 'local' | 'remote';
 
 export interface PortForwardEntry {
   forwardId: string;
