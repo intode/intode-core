@@ -4,6 +4,7 @@ import { encodeUtf8Base64 } from '../lib/encoding';
 import { getActiveEditorApi } from '../editor/CodeEditor';
 import { showSnippetPicker } from './snippet-picker';
 import { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT } from '../lib/constants';
+import { getNativeTerminalProvider } from '../terminal/terminal-provider';
 
 /** Find the textarea belonging to the currently active terminal session. */
 function getActiveTerminalTextarea(): HTMLTextAreaElement | null {
@@ -12,8 +13,19 @@ function getActiveTerminalTextarea(): HTMLTextAreaElement | null {
   return session.terminal.element?.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
 }
 
+/** Get the active native terminal ID (stored on TerminalManager). */
+function getActiveNativeTerminalId(): string | null {
+  return (terminalManager as any).__activeNativeId ?? null;
+}
+
 function toggleKeyboard(activeTab: string) {
   if (activeTab === 'terminal') {
+    const nativeProvider = getNativeTerminalProvider();
+    const nativeId = getActiveNativeTerminalId();
+    if (nativeProvider?.isAvailable() && nativeId) {
+      nativeProvider.focusTerminal(nativeId);
+      return;
+    }
     const el = getActiveTerminalTextarea();
     if (!el) return;
     const shouldFocus = document.activeElement !== el;
@@ -47,6 +59,22 @@ export function handleKeyPress(data: string, activeTab: string) {
   }
 
   if (activeTab === 'terminal') {
+    const nativeProvider = getNativeTerminalProvider();
+    const nativeId = getActiveNativeTerminalId();
+
+    if (nativeProvider?.isAvailable() && nativeId) {
+      // Native terminal path
+      if (data === 'snippets') {
+        showSnippetPicker((cmd) => {
+          nativeProvider.writeInput(nativeId, cmd);
+        });
+        return;
+      }
+      nativeProvider.writeInput(nativeId, data);
+      return;
+    }
+
+    // xterm.js path
     if (data === 'snippets') {
       showSnippetPicker((cmd) => {
         const session = terminalManager.getActiveSession();

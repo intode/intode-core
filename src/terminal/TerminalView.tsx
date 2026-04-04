@@ -6,6 +6,7 @@ import { Ssh } from '../ssh/index';
 import { encodeUtf8Base64 } from '../lib/encoding';
 import { TERMINAL_FONT_SIZE } from '../lib/constants';
 import { openInPreview } from '../app/preview-hooks';
+import { getNativeTerminalProvider } from './terminal-provider';
 
 export interface TerminalViewProps {
   sessionId: string;
@@ -22,6 +23,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
   const selectionRef = useRef<TerminalSelection | null>(null);
   const pinchRef = useRef<PinchZoom | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const nativeIdRef = useRef<string | null>(null);
   const [showCopyBar, setShowCopyBar] = useState(false);
   const [handlePos, setHandlePos] = useState<HandlePositions | null>(null);
 
@@ -29,7 +31,60 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
     setHandlePos(selectionRef.current?.getHandlePositions() ?? null);
   }, []);
 
+  const nativeProvider = getNativeTerminalProvider();
+  const useNative = nativeProvider?.isAvailable() ?? false;
+
+  // ====== NATIVE TERMINAL PATH ======
   useEffect(() => {
+    if (!useNative || !containerRef.current || !sessionId) return;
+    let cancelled = false;
+    const container = containerRef.current;
+    const id = terminalId || crypto.randomUUID();
+    nativeIdRef.current = id;
+
+    nativeProvider!.createTerminal(id, sessionId, defaultPath).then(() => {
+      if (cancelled) return;
+      if (visible && container.offsetParent) {
+        const rect = container.getBoundingClientRect();
+        nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+        nativeProvider!.focusTerminal(id);
+      }
+    }).catch(() => {});
+
+    const observer = new ResizeObserver(() => {
+      if (!container.offsetParent || cancelled) return;
+      const rect = container.getBoundingClientRect();
+      nativeProvider!.resizeTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+    });
+    observer.observe(container);
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      nativeProvider!.destroyTerminal(id).catch(() => {});
+      nativeIdRef.current = null;
+    };
+  }, [useNative, sessionId]);
+
+  // Native visibility + active tracking
+  useEffect(() => {
+    if (!useNative || !nativeIdRef.current) return;
+    const id = nativeIdRef.current;
+    const container = containerRef.current;
+    if (visible && container?.offsetParent) {
+      const rect = container.getBoundingClientRect();
+      nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+      nativeProvider!.focusTerminal(id);
+      // Track active native terminal for handleKeyPress routing
+      (manager as any).__activeNativeId = id;
+    } else {
+      nativeProvider!.hideTerminal(id);
+    }
+  }, [useNative, visible]);
+
+  // ====== XTERM.JS PATH (existing) ======
+  useEffect(() => {
+    if (useNative) return;
     if (!containerRef.current || !sessionId) return;
     let cancelled = false;
 
@@ -95,7 +150,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
       pinch.attach();
       pinchRef.current = pinch;
 
-      // Focus terminal after init (visible effect can't — sessionRef is null on first render)
+      // Focus terminal after init
       setTimeout(() => {
         const el = container.querySelector('textarea.xterm-helper-textarea');
         if (el instanceof HTMLTextAreaElement) el.focus();
@@ -103,7 +158,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
 
       const observer = new ResizeObserver(() => {
         const s = sessionRef.current;
-        if (!s || !container.offsetParent) return; // skip when hidden (display:none)
+        if (!s || !container.offsetParent) return;
         s.fitAddon.fit();
         if (s.terminal.cols > 0 && s.terminal.rows > 0) {
           Ssh.resizeShell({ channelId: s.channelId, cols: s.terminal.cols, rows: s.terminal.rows });
@@ -127,17 +182,18 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
         sessionRef.current = null;
       }
     };
-  }, [sessionId]);
+  }, [useNative, sessionId]);
 
+  // xterm.js visibility
   useEffect(() => {
+    if (useNative) return;
     if (sessionRef.current && visible) {
       manager.switchTo(sessionRef.current.id);
       sessionRef.current.fitAddon.fit();
-      // Focus terminal textarea when tab becomes visible
       const el = containerRef.current?.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
       if (el) setTimeout(() => el.focus(), 50);
     }
-  }, [visible]);
+  }, [useNative, visible]);
 
   const handleCopy = useCallback(() => {
     selectionRef.current?.copySelection();
@@ -207,7 +263,8 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
         style={{ width: '100%', height: '100%', backgroundColor: 'var(--term-bg)' }}
       />
 
-      {handlePos && (
+      {/* Selection handles & copy bar only for xterm.js path */}
+      {!useNative && handlePos && (
         <>
           <Handle x={handlePos.start.x} y={handlePos.start.y} side="start"
             onDragStart={() => startHandleDrag('start')} />
@@ -216,7 +273,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
         </>
       )}
 
-      {showCopyBar && handlePos && (() => {
+      {!useNative && showCopyBar && handlePos && (() => {
         const selectedText = getSelectedText();
         const showOpen = isUrl(selectedText);
         const barY = Math.max(4, handlePos.start.y - 44);
