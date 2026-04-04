@@ -18,7 +18,7 @@ import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } fr
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
-import { saveSessionState } from './session-hooks';
+import { saveSessionState, loadSessionState } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
 import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
 import { autoStartPortForwards } from './port-forward-hooks';
@@ -186,6 +186,28 @@ export function App() {
     setActiveTab(tab);
   }, [activeTab]);
 
+  // Expose tab setter for plugins (e.g. terminal URL → Preview tab)
+  useEffect(() => {
+    (window as any).__intodeSetTab = (tab: string) => setActiveTab(tab);
+    return () => { delete (window as any).__intodeSetTab; };
+  }, []);
+
+  // Auto-reconnect to last session on app start
+  const autoReconnectDone = useRef(false);
+  useEffect(() => {
+    if (autoReconnectDone.current) return;
+    autoReconnectDone.current = true;
+    const saved = loadSessionState();
+    if (!saved?.workspaceId) return;
+    getWorkspaceStore().getAll().then((all) => {
+      const ws = all.find((w) => w.id === saved.workspaceId);
+      if (ws) {
+        setConnectingWorkspace(ws);
+        setScreen('connecting');
+      }
+    }).catch(() => {});
+  }, []);
+
   // Prevent Android native context menu (복사/번역/모두선택 popup)
   useEffect(() => {
     const prevent = (e: Event) => e.preventDefault();
@@ -202,6 +224,7 @@ export function App() {
   const [activeWsId, setActiveWsId] = useState<string | null>(null);
   const [connectingWorkspace, setConnectingWorkspace] = useState<Workspace | null>(null);
 
+  const [restoredTerminalTabIds, setRestoredTerminalTabIds] = useState<string[] | undefined>(undefined);
   const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(null);
   const [addReturnTo, setAddReturnTo] = useState<'list' | 'view'>('list');
   const [listKey, setListKey] = useState(0);
@@ -211,6 +234,30 @@ export function App() {
 
   const activeConn = connections.find((c) => c.wsId === activeWsId) ?? null;
   const connectedIds = new Set(connections.map((c) => c.wsId));
+
+  // Save full session state on background / before unload
+  useEffect(() => {
+    const save = () => {
+      if (!activeConn) return;
+      const ftm = getFileTabMgr(activeConn.wsId);
+      const fileTabs = ftm.getTabs();
+      const activeFile = ftm.getActiveTab();
+      saveSessionState({
+        workspaceId: activeConn.wsId,
+        activeTab,
+        openFiles: fileTabs.map((t) => t.path),
+        activeFile: activeFile?.path,
+        terminalTabIds: (window as any).__intodeTerminalTabIds ?? undefined,
+      });
+    };
+    const onVisChange = () => { if (document.visibilityState === 'hidden') save(); };
+    document.addEventListener('visibilitychange', onVisChange);
+    window.addEventListener('beforeunload', save);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisChange);
+      window.removeEventListener('beforeunload', save);
+    };
+  }, [activeConn, activeTab]);
 
   // Expose connection context for Pro split view / git tab
   useEffect(() => {
@@ -321,8 +368,32 @@ export function App() {
       setActiveWsId(ws.id);
       setConnectingWorkspace(null);
       setScreen('workspace-view');
-      setActiveTab('files');
-      saveSessionState({ workspaceId: ws.id, activeTab: 'files' });
+
+      // Restore previous session state (open files, active tab, terminal count)
+      const saved = loadSessionState();
+      const restoredTab = (saved?.workspaceId === ws.id && saved.activeTab) ? saved.activeTab : 'files';
+      setActiveTab(restoredTab);
+      if (saved?.workspaceId === ws.id && saved.terminalTabIds && saved.terminalTabIds.length > 0) {
+        setRestoredTerminalTabIds(saved.terminalTabIds);
+      }
+
+      // Re-open previously open files
+      if (saved?.workspaceId === ws.id && saved.openFiles && saved.openFiles.length > 0 && sftpId) {
+        const ftm = getFileTabMgr(ws.id);
+        for (const filePath of saved.openFiles) {
+          ftm.openFile(sftpId, filePath).catch(() => {});
+        }
+        // Restore active file after all files are opened
+        if (saved.activeFile) {
+          setTimeout(() => {
+            const tabs = ftm.getTabs();
+            const target = tabs.find((t) => t.path === saved.activeFile);
+            if (target) ftm.setActiveTab(target.id);
+          }, 500);
+        }
+      }
+
+      saveSessionState({ workspaceId: ws.id, activeTab: restoredTab });
       keepAliveStart();
       keepAliveUpdate(newConns.length);
 
@@ -547,6 +618,7 @@ export function App() {
                     sessionId={conn.sessionId}
                     defaultPath={conn.workspace.defaultPath}
                     visible={isActive && activeTab === 'terminal'}
+                    initialTabIds={restoredTerminalTabIds}
                   />
                 </div>
               </React.Fragment>
@@ -577,10 +649,6 @@ export function App() {
         {(activeTab === 'terminal' || activeTab === 'editor') && (
           <ExtraKeyBar
             context={activeTab === 'terminal' ? 'terminal' : (activeConn && getFileTabMgr(activeConn.wsId).getActiveTab()?.type === 'markdown' ? 'md-editor' : 'code-editor')}
-            onSuppressKeyboard={() => {
-              (document.activeElement as HTMLElement)?.blur?.();
-              (window as any).__intodeHideKeyboard?.();
-            }}
             onKeyPress={(data) => handleKeyPress(data, activeTab)}
           />
         )}

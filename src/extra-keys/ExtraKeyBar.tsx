@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef } from 'react';
 import {
   KEY_ESC, KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT,
 } from '../lib/constants';
@@ -9,8 +9,6 @@ export type ExtraKeysContext = 'terminal' | 'code-editor' | 'md-editor';
 export interface ExtraKeyBarProps {
   context: ExtraKeysContext;
   onKeyPress: (data: string) => void;
-  /** Called after non-keyboard key press to suppress OS keyboard popup */
-  onSuppressKeyboard?: () => void;
 }
 
 interface KeyDef {
@@ -78,28 +76,31 @@ const MD_KEYS: KeyDef[] = [
 ];
 
 const ARROW_VALUES = new Set([KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT]);
-const MOVE_THRESHOLD = 8;
 
-function KeyButton({ keyDef, onPress, onSuppress }: { keyDef: KeyDef; onPress: (v: string) => void; onSuppress?: () => void }) {
-  const startPos = useRef<{ x: number; y: number } | null>(null);
+/** Restore focus + native keyboard if a text input was focused before button press. */
+function restoreFocus(el: HTMLElement | null) {
+  if (!el) return;
+  if (document.activeElement !== el) el.focus();
+  if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
+    (window as any).__intodeShowKeyboard?.();
+  }
+}
+
+function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
+  const prevFocus = useRef<HTMLElement | null>(null);
   return (
     <button
       tabIndex={-1}
-      onTouchStart={(e) => e.preventDefault()}
-      onMouseDown={(e) => e.preventDefault()}
-      onPointerDown={(e) => { e.preventDefault(); startPos.current = { x: e.clientX, y: e.clientY }; }}
-      onPointerUp={(e) => {
-        if (!startPos.current) return;
-        const dx = e.clientX - startPos.current.x;
-        const dy = e.clientY - startPos.current.y;
-        startPos.current = null;
-        if (Math.sqrt(dx * dx + dy * dy) < MOVE_THRESHOLD) {
-          e.preventDefault();
-          onPress(keyDef.value);
-          onSuppress?.();
-        }
+      onTouchStart={(e) => {
+        e.preventDefault();
+        prevFocus.current = document.activeElement as HTMLElement | null;
+        onPress(keyDef.value);
       }}
-      onPointerCancel={() => { startPos.current = null; }}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        restoreFocus(prevFocus.current);
+        prevFocus.current = null;
+      }}
       style={keyStyle}
     >
       {keyDef.label}
@@ -107,13 +108,21 @@ function KeyButton({ keyDef, onPress, onSuppress }: { keyDef: KeyDef; onPress: (
   );
 }
 
-function DpadButton({ keyDef, onPress, onSuppress }: { keyDef: KeyDef; onPress: (v: string) => void; onSuppress?: () => void }) {
+function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
+  const prevFocus = useRef<HTMLElement | null>(null);
   return (
     <button
       tabIndex={-1}
-      onTouchStart={(e) => e.preventDefault()}
-      onMouseDown={(e) => e.preventDefault()}
-      onPointerDown={(e) => { e.preventDefault(); onPress(keyDef.value); onSuppress?.(); }}
+      onTouchStart={(e) => {
+        e.preventDefault();
+        prevFocus.current = document.activeElement as HTMLElement | null;
+        onPress(keyDef.value);
+      }}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        restoreFocus(prevFocus.current);
+        prevFocus.current = null;
+      }}
       style={dpadKeyStyle}
     >
       {keyDef.label}
@@ -121,7 +130,7 @@ function DpadButton({ keyDef, onPress, onSuppress }: { keyDef: KeyDef; onPress: 
   );
 }
 
-export function ExtraKeyBar({ context, onKeyPress, onSuppressKeyboard }: ExtraKeyBarProps) {
+export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
   const allKeys = context === 'terminal' ? TERMINAL_KEYS : context === 'md-editor' ? MD_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
   if (allKeys.length === 0) return null;
 
@@ -131,34 +140,27 @@ export function ExtraKeyBar({ context, onKeyPress, onSuppressKeyboard }: ExtraKe
   const leftKey = allKeys.find((k) => k.value === KEY_LEFT)!;
   const rightKey = allKeys.find((k) => k.value === KEY_RIGHT)!;
 
-  // For non-keyboard keys, suppress after press
-  const suppressAfterPress = useCallback(() => {
-    onSuppressKeyboard?.();
-  }, [onSuppressKeyboard]);
-
   return (
     <div style={containerStyle}>
       <div style={scrollAreaStyle}>
         {otherKeys.map((key) => (
-          <KeyButton key={key.label} keyDef={key} onPress={onKeyPress} onSuppress={suppressAfterPress} />
+          <KeyButton key={key.label} keyDef={key} onPress={onKeyPress} />
         ))}
       </div>
 
       <div style={fixedAreaStyle}>
         <button
           tabIndex={-1}
-          onTouchStart={(e) => e.preventDefault()}
-          onMouseDown={(e) => e.preventDefault()}
-          onPointerDown={(e) => { e.preventDefault(); onKeyPress('keyboard'); }}
+          onTouchEnd={() => onKeyPress('keyboard')}
           style={kbToggleStyle}
         >{'\u2328'}</button>
         <div style={dpadStyle}>
           <div />
-          <DpadButton keyDef={upKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
+          <DpadButton keyDef={upKey} onPress={onKeyPress} />
           <div />
-          <DpadButton keyDef={leftKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
-          <DpadButton keyDef={downKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
-          <DpadButton keyDef={rightKey} onPress={onKeyPress} onSuppress={suppressAfterPress} />
+          <DpadButton keyDef={leftKey} onPress={onKeyPress} />
+          <DpadButton keyDef={downKey} onPress={onKeyPress} />
+          <DpadButton keyDef={rightKey} onPress={onKeyPress} />
         </div>
       </div>
     </div>

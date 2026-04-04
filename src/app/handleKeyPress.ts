@@ -5,13 +5,38 @@ import { getActiveEditorApi } from '../editor/CodeEditor';
 import { showSnippetPicker } from './snippet-picker';
 import { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT } from '../lib/constants';
 
+/** Find the textarea belonging to the currently active terminal session. */
+function getActiveTerminalTextarea(): HTMLTextAreaElement | null {
+  const session = terminalManager.getActiveSession();
+  if (!session) return null;
+  return session.terminal.element?.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
+}
+
 function toggleKeyboard(activeTab: string) {
   if (activeTab === 'terminal') {
-    const el = document.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
-    if (el) { if (document.activeElement === el) el.blur(); else el.focus(); }
+    const el = getActiveTerminalTextarea();
+    if (!el) return;
+    const shouldFocus = document.activeElement !== el;
+    setTimeout(() => {
+      if (shouldFocus) {
+        el.focus();
+        (window as any).__intodeShowKeyboard?.();
+      } else {
+        el.blur();
+      }
+    }, 50);
   } else if (activeTab === 'editor') {
     const cm = document.querySelector('.cm-content') as HTMLElement | null;
-    if (cm) { if (document.activeElement === cm) cm.blur(); else cm.focus(); }
+    if (!cm) return;
+    const shouldFocus = document.activeElement !== cm;
+    setTimeout(() => {
+      if (shouldFocus) {
+        cm.focus();
+        (window as any).__intodeShowKeyboard?.();
+      } else {
+        cm.blur();
+      }
+    }, 50);
   }
 }
 

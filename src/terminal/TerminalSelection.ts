@@ -15,6 +15,8 @@ export interface SelectionCallbacks {
   onSelectionChange: (hasSelection: boolean) => void;
   /** Called when scrolling in mouse tracking mode (tmux). Parent sends wheel escape sequences. */
   onMouseWheel?: (direction: 'up' | 'down') => void;
+  /** Called when user taps a URL in the terminal. */
+  onLinkActivate?: (url: string) => void;
 }
 
 export class TerminalSelection {
@@ -82,6 +84,9 @@ export class TerminalSelection {
       this.cancelLongPress();
       return;
     }
+    // Let xterm link clicks through (WebLinksAddon)
+    const target = e.target as HTMLElement;
+    if (target.closest('a') || target.classList.contains('xterm-link')) return;
     e.preventDefault(); // Prevent keyboard show/hide on touch
     this.stopMomentum();
     const t = e.touches[0];
@@ -139,6 +144,7 @@ export class TerminalSelection {
     if (this.isHandleDrag) return;
     const wasSelecting = this.isDragging;
     const wasScrolling = this.isScrolling;
+    const tapTouch = this.startTouch;
     this.cancelLongPress();
     this.isDragging = false;
     this.isScrolling = false;
@@ -148,8 +154,12 @@ export class TerminalSelection {
       return;
     }
 
-    if (!wasSelecting && !this.wasMoved && this.terminal.hasSelection()) {
-      this.terminal.clearSelection();
+    if (!wasSelecting && !this.wasMoved) {
+      // Simple tap — check for URL activation
+      if (tapTouch && this.activateLinkAt(tapTouch.x, tapTouch.y)) return;
+      if (this.terminal.hasSelection()) {
+        this.terminal.clearSelection();
+      }
     }
   }
 
@@ -280,6 +290,28 @@ export class TerminalSelection {
     const bufRow = vpRow + this.terminal.buffer.active.viewportY;
 
     return { col, vpRow, bufRow };
+  }
+
+  private activateLinkAt(clientX: number, clientY: number): boolean {
+    if (!this.callbacks.onLinkActivate) return false;
+    const pos = this.toBufPos(clientX, clientY);
+    if (!pos) return false;
+
+    const line = this.terminal.buffer.active.getLine(pos.bufRow);
+    if (!line) return false;
+
+    let text = '';
+    for (let i = 0; i < line.length; i++) text += line.getCell(i)?.getChars() || ' ';
+
+    const URL_RE = /https?:\/\/[^\s'"<>\])}]+/g;
+    let match: RegExpExecArray | null;
+    while ((match = URL_RE.exec(text)) !== null) {
+      if (pos.col >= match.index && pos.col < match.index + match[0].length) {
+        this.callbacks.onLinkActivate(match[0]);
+        return true;
+      }
+    }
+    return false;
   }
 
   private cancelLongPress() {

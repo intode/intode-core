@@ -1,7 +1,7 @@
-import { Terminal } from '@xterm/xterm';
+import { Terminal, type IBufferLine, type ILink, type ILinkProvider } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
-import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Unicode11Addon } from '@xterm/addon-unicode11';
+import { openInPreview } from '../app/preview-hooks';
 import {
   FONT_MONO,
   TERMINAL_FONT_SIZE,
@@ -45,7 +45,39 @@ export function createTerminal(config: TerminalConfig = {}): {
   terminal.loadAddon(unicode11);
   terminal.unicode.activeVersion = '11';
 
-  terminal.loadAddon(new WebLinksAddon());
+  // Custom link provider — always underlines URLs (mobile has no hover)
+  const URL_RE = /https?:\/\/[^\s'"<>\])}]+/g;
+
+  terminal.registerLinkProvider({
+    provideLinks(lineNumber: number, callback: (links: ILink[] | undefined) => void) {
+      const line: IBufferLine | undefined = terminal.buffer.active.getLine(lineNumber - 1);
+      if (!line) { callback(undefined); return; }
+      let text = '';
+      for (let i = 0; i < line.length; i++) text += line.getCell(i)?.getChars() || ' ';
+
+      const links: ILink[] = [];
+      let match: RegExpExecArray | null;
+      URL_RE.lastIndex = 0;
+      while ((match = URL_RE.exec(text)) !== null) {
+        const startX = match.index;
+        const url = match[0];
+        links.push({
+          range: { start: { x: startX + 1, y: lineNumber }, end: { x: startX + url.length, y: lineNumber } },
+          text: url,
+          decorations: { underline: true, pointerCursor: true },
+          activate: () => {
+            try {
+              const parsed = new URL(url);
+              const isLocal = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1' || parsed.hostname === '0.0.0.0';
+              if (isLocal && openInPreview(url)) return;
+            } catch { /* invalid URL */ }
+            window.open(url, '_blank');
+          },
+        });
+      }
+      callback(links.length > 0 ? links : undefined);
+    },
+  } as ILinkProvider);
 
   // Canvas renderer — WebGL disabled (crashes on CJK glyph rendering)
 

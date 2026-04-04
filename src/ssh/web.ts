@@ -477,7 +477,7 @@ function toBase64(str: string): string {
 
 // --- Web Plugin ---
 export class SshWeb extends WebPlugin implements SshPlugin {
-  private listeners = new Map<string, Array<(data: any) => void>>();
+  private eventHandlers: Record<string, Array<(data: any) => void>> = {};
   private channelCount = 0;
 
   async connect(): Promise<{ sessionId: string }> {
@@ -502,7 +502,7 @@ export class SshWeb extends WebPlugin implements SshPlugin {
 
     // Emit shell data after a short delay
     setTimeout(() => {
-      const handlers = this.listeners.get('shellData') ?? [];
+      const handlers = this.eventHandlers['shellData'] ?? [];
       handlers.forEach((h) => h({ channelId, data: toBase64(output) }));
     }, 300);
 
@@ -585,11 +585,11 @@ export class SshWeb extends WebPlugin implements SshPlugin {
   async listPortForwards(): Promise<{ forwards: PortForwardEntry[] }> { return { forwards: [] }; }
 
   async addListener(eventName: string, handler: (data: any) => void): Promise<any> {
-    if (!this.listeners.has(eventName)) this.listeners.set(eventName, []);
-    this.listeners.get(eventName)!.push(handler);
+    if (!this.eventHandlers[eventName]) this.eventHandlers[eventName] = [];
+    this.eventHandlers[eventName].push(handler);
     return {
       remove: async () => {
-        const arr = this.listeners.get(eventName);
+        const arr = this.eventHandlers[eventName];
         if (arr) {
           const idx = arr.indexOf(handler);
           if (idx >= 0) arr.splice(idx, 1);

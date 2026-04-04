@@ -6,6 +6,7 @@ export class SshBridge {
   private dataListener: { remove: () => Promise<void> } | null = null;
   private onDataDisposable: { dispose: () => void } | null = null;
   private channelId: string | null = null;
+  private compositionCleanup: (() => void) | null = null;
 
   constructor(private terminal: Terminal) {}
 
@@ -23,7 +24,23 @@ export class SshBridge {
 
   attach(channelId: string): void {
     this.channelId = channelId;
+
+    // Track IME composition to suppress intermediate jamo during Korean input
+    let composing = false;
+    const textarea = this.terminal.element?.querySelector('.xterm-helper-textarea');
+    if (textarea) {
+      const onStart = () => { composing = true; };
+      const onEnd = () => { composing = false; };
+      textarea.addEventListener('compositionstart', onStart);
+      textarea.addEventListener('compositionend', onEnd);
+      this.compositionCleanup = () => {
+        textarea.removeEventListener('compositionstart', onStart);
+        textarea.removeEventListener('compositionend', onEnd);
+      };
+    }
+
     this.onDataDisposable = this.terminal.onData((data) => {
+      if (composing) return;
       try {
         Ssh.writeToShell({ channelId, data: encodeUtf8Base64(data) }).catch(() => {});
       } catch { /* prevent propagation */ }
@@ -31,6 +48,8 @@ export class SshBridge {
   }
 
   disconnect(): void {
+    this.compositionCleanup?.();
+    this.compositionCleanup = null;
     this.onDataDisposable?.dispose();
     this.onDataDisposable = null;
     this.dataListener?.remove();

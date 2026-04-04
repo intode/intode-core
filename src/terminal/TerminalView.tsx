@@ -5,6 +5,7 @@ import { PinchZoom } from '../gestures/PinchZoom';
 import { Ssh } from '../ssh/index';
 import { encodeUtf8Base64 } from '../lib/encoding';
 import { TERMINAL_FONT_SIZE } from '../lib/constants';
+import { openInPreview } from '../app/preview-hooks';
 
 export interface TerminalViewProps {
   sessionId: string;
@@ -63,6 +64,14 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
           const btn = direction === 'up' ? 64 : 65;
           const seq = `\x1b[<${btn};${col};${row}M`;
           Ssh.writeToShell({ channelId: session.channelId, data: encodeUtf8Base64(seq) }).catch(() => {});
+        },
+        onLinkActivate: (url) => {
+          try {
+            const parsed = new URL(url);
+            const isLocal = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1' || parsed.hostname === '0.0.0.0';
+            if (isLocal && openInPreview(url)) return;
+          } catch { /* */ }
+          window.open(url, '_blank');
         },
       });
       sel.attach(container);
@@ -123,7 +132,11 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
 
   useEffect(() => {
     if (sessionRef.current && visible) {
+      manager.switchTo(sessionRef.current.id);
       sessionRef.current.fitAddon.fit();
+      // Focus terminal textarea when tab becomes visible
+      const el = containerRef.current?.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
+      if (el) setTimeout(() => el.focus(), 50);
     }
   }, [visible]);
 
@@ -145,6 +158,26 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
     selectionRef.current?.selectAll();
     refreshHandles();
   }, [refreshHandles]);
+
+  const getSelectedText = useCallback((): string => {
+    return sessionRef.current?.terminal.getSelection()?.trim() ?? '';
+  }, []);
+
+  const isUrl = (text: string): boolean => /^https?:\/\/\S+$/.test(text);
+
+  const handleOpenLink = useCallback(() => {
+    const text = getSelectedText();
+    if (!isUrl(text)) return;
+    selectionRef.current?.clearSelection();
+    setShowCopyBar(false);
+    setHandlePos(null);
+    try {
+      const parsed = new URL(text);
+      const isLocal = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1' || parsed.hostname === '0.0.0.0';
+      if (isLocal && openInPreview(text)) return;
+    } catch { /* */ }
+    window.open(text, '_blank');
+  }, [getSelectedText]);
 
   const startHandleDrag = useCallback((which: 'start' | 'end') => {
     const sel = selectionRef.current;
@@ -184,15 +217,27 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
         </>
       )}
 
-      {showCopyBar && (
-        <div style={copyBarStyle}>
-          <button onClick={handleCopy} style={btnStyle}>Copy</button>
-          <div style={dividerStyle} />
-          <button onClick={handlePaste} style={btnStyle}>Paste</button>
-          <div style={dividerStyle} />
-          <button onClick={handleSelectAll} style={btnStyle}>All</button>
-        </div>
-      )}
+      {showCopyBar && handlePos && (() => {
+        const selectedText = getSelectedText();
+        const showOpen = isUrl(selectedText);
+        const barY = Math.max(4, handlePos.start.y - 44);
+        const barX = (handlePos.start.x + handlePos.end.x) / 2;
+        return (
+          <div style={{ ...copyBarStyle, top: barY, left: barX }}>
+            <button onClick={handleCopy} style={btnStyle}>Copy</button>
+            <div style={dividerStyle} />
+            <button onClick={handlePaste} style={btnStyle}>Paste</button>
+            <div style={dividerStyle} />
+            <button onClick={handleSelectAll} style={btnStyle}>All</button>
+            {showOpen && (
+              <>
+                <div style={dividerStyle} />
+                <button onClick={handleOpenLink} style={{ ...btnStyle, color: 'var(--accent-blue)' }}>Open</button>
+              </>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -257,8 +302,6 @@ const wrapperStyle: React.CSSProperties = {
 
 const copyBarStyle: React.CSSProperties = {
   position: 'absolute',
-  top: 8,
-  left: '50%',
   transform: 'translateX(-50%)',
   display: 'flex',
   alignItems: 'center',

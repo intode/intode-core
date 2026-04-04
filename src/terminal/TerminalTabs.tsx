@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { getPolicy, checkLimit } from '../policies/provider';
 import { TerminalView } from './TerminalView';
 
@@ -11,12 +11,25 @@ export interface TerminalTabsProps {
   sessionId: string;
   defaultPath?: string;
   visible: boolean;
+  initialTabIds?: string[];
 }
 
-export function TerminalTabs({ sessionId, defaultPath, visible }: TerminalTabsProps) {
+export function TerminalTabs({ sessionId, defaultPath, visible, initialTabIds }: TerminalTabsProps) {
   const nextLabel = useRef(2);
-  const [tabs, setTabs] = useState<Tab[]>(() => [{ id: crypto.randomUUID(), label: '1' }]);
+  const [tabs, setTabs] = useState<Tab[]>(() => {
+    if (initialTabIds && initialTabIds.length > 0) {
+      nextLabel.current = initialTabIds.length + 1;
+      return initialTabIds.map((id, i) => ({ id, label: String(i + 1) }));
+    }
+    return [{ id: crypto.randomUUID(), label: '1' }];
+  });
   const [activeId, setActiveId] = useState(tabs[0].id);
+
+  // Expose current tab IDs for session save
+  useEffect(() => {
+    (window as any).__intodeTerminalTabIds = tabs.map((t) => t.id);
+    return () => { delete (window as any).__intodeTerminalTabIds; };
+  }, [tabs]);
 
   const addTab = useCallback(() => {
     const { maxTerminals } = getPolicy();
@@ -49,6 +62,7 @@ export function TerminalTabs({ sessionId, defaultPath, visible }: TerminalTabsPr
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            data-terminal-tab
             onClick={() => setActiveId(tab.id)}
             style={{ ...tabStyle, ...(tab.id === activeId ? activeTabStyle : {}) }}
           >
