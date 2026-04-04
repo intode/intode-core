@@ -5,7 +5,7 @@ export interface SessionData {
   activeTab: string;
   openFiles?: string[];        // file paths
   activeFile?: string;         // active file path
-  terminalTabIds?: string[];   // terminal tab IDs (for tmux reattach)
+  terminalTabIds?: string[];   // terminal tab IDs to restore
 }
 
 type SaveFn = (data: SessionData) => void;

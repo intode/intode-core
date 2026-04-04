@@ -492,7 +492,7 @@ export class SshWeb extends WebPlugin implements SshPlugin {
 
   async openShell(options: {
     sessionId: string; cols: number; rows: number;
-    term?: string; initialPath?: string; tmuxSession?: string;
+    term?: string; initialPath?: string;
   }): Promise<{ channelId: string }> {
     const channelId = `mock-channel-${++this.channelCount}`;
 

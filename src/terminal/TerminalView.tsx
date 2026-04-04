@@ -78,8 +78,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
       selectionRef.current = sel;
 
       const { cols, rows } = session.terminal;
-      const tmuxId = terminalId?.substring(0, 8);
-      await manager.attachShell(session, sessionId, cols, rows, defaultPath, tmuxId);
+      await manager.attachShell(session, sessionId, cols, rows, defaultPath);
 
       // Pinch zoom for font size
       const pinch = new PinchZoom({

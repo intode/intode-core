@@ -45,7 +45,6 @@ export class TerminalManager {
     cols: number,
     rows: number,
     initialPath?: string,
-    tmuxSession?: string,
   ): Promise<void> {
     // Register listener BEFORE openShell to avoid race condition
     // (Kotlin read thread starts immediately on channel.connect)
@@ -57,7 +56,6 @@ export class TerminalManager {
       cols,
       rows,
       initialPath,
-      tmuxSession,
     });
 
     session.channelId = channelId;
