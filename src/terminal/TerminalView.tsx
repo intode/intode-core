@@ -41,6 +41,8 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
     const container = containerRef.current;
     const id = terminalId || crypto.randomUUID();
     nativeIdRef.current = id;
+    // Set active ID immediately so handleKeyPress can route to it
+    (manager as any).__activeNativeId = id;
 
     nativeProvider!.createTerminal(id, sessionId, defaultPath).then(() => {
       if (cancelled) return;
