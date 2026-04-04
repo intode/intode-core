@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Workspace, getWorkspaceStore } from './WorkspaceManager';
+import { notifyOverlayOpen, notifyOverlayClose } from '../app/overlay-hooks';
 
 interface WorkspaceDropdownProps {
   current: Workspace;
@@ -9,67 +10,94 @@ interface WorkspaceDropdownProps {
 }
 
 export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: WorkspaceDropdownProps) {
-  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [animIn, setAnimIn] = useState(false);
   const [list, setList] = useState<Workspace[]>([]);
+  const closingRef = useRef(false);
 
-  useEffect(() => {
-    if (open) getWorkspaceStore().getAll().then(setList);
-  }, [open]);
+  const open = useCallback(() => {
+    getWorkspaceStore().getAll().then(setList);
+    notifyOverlayOpen();
+    setMounted(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setAnimIn(true)));
+  }, []);
+
+  const close = useCallback((restore = true) => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setAnimIn(false);
+    setTimeout(() => {
+      setMounted(false);
+      closingRef.current = false;
+      notifyOverlayClose(restore);
+    }, 250);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => () => { if (mounted) notifyOverlayClose(); }, []);
 
   return (
-    <div style={rootStyle}>
-      <button onClick={() => setOpen((o) => !o)} style={triggerStyle}>
+    <>
+      <button onClick={open} style={triggerStyle}>
         <span style={nameStyle}>{current.name}</span>
-        <span style={chevronStyle}>{open ? '\u25b4' : '\u25be'}</span>
+        <span style={chevronStyle}>{'\u25be'}</span>
       </button>
 
-      {open && (
-        <>
-          <div style={backdropStyle} onClick={() => setOpen(false)} />
-          <div style={panelStyle}>
-            {list.map((ws) => (
-              <button
-                key={ws.id}
-                onClick={() => {
-                  setOpen(false);
-                  if (ws.id !== current.id) onSwitch(ws);
-                }}
-                style={{
-                  ...itemStyle,
-                  ...(ws.id === current.id ? activeStyle : {}),
-                }}
-              >
-                <div style={itemInfoStyle}>
-                  <div style={itemNameStyle}>{ws.name}</div>
-                  <div style={itemHostStyle}>
-                    {ws.username}@{ws.host}
+      {mounted && (
+        <div
+          style={{ ...backdropStyle, opacity: animIn ? 1 : 0 }}
+          onClick={() => close()}
+        >
+          <div
+            style={{ ...sheetStyle, transform: animIn ? 'translateY(0)' : 'translateY(100%)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={handleBarWrap}><div style={handleBar} /></div>
+            <div style={sheetHeaderStyle}>
+              <span style={sheetTitleStyle}>Workspaces</span>
+              <button onClick={() => close()} style={sheetCloseStyle}>{'\u2715'}</button>
+            </div>
+            <div style={sheetListStyle}>
+              {list.map((ws) => (
+                <button
+                  key={ws.id}
+                  onClick={() => {
+                    const switching = ws.id !== current.id;
+                    close(!switching);
+                    if (switching) setTimeout(() => onSwitch(ws), 260);
+                  }}
+                  style={{
+                    ...itemStyle,
+                    ...(ws.id === current.id ? activeStyle : {}),
+                  }}
+                >
+                  <div style={itemInfoStyle}>
+                    <div style={itemNameStyle}>{ws.name}</div>
+                    <div style={itemHostStyle}>
+                      {ws.username}@{ws.host}
+                    </div>
                   </div>
-                </div>
-                {connectedIds.has(ws.id) && <span style={dotStyle}>{'\u25cf'}</span>}
+                  {connectedIds.has(ws.id) && <span style={dotStyle}>{'\u25cf'}</span>}
+                </button>
+              ))}
+            </div>
+            <div style={sheetFooterStyle}>
+              <button
+                onClick={() => {
+                  close(false);
+                  setTimeout(onAdd, 260);
+                }}
+                style={addBtnStyle}
+              >
+                + Add Workspace
               </button>
-            ))}
-            <div style={sepStyle} />
-            <button
-              onClick={() => {
-                setOpen(false);
-                onAdd();
-              }}
-              style={addBtnStyle}
-            >
-              + Add Workspace
-            </button>
+            </div>
           </div>
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 }
-
-const rootStyle: React.CSSProperties = {
-  position: 'relative',
-  flex: 1,
-  minWidth: 0,
-};
 
 const triggerStyle: React.CSSProperties = {
   display: 'flex',
@@ -103,22 +131,77 @@ const backdropStyle: React.CSSProperties = {
   left: 0,
   right: 0,
   bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.7)',
   zIndex: 200,
+  display: 'flex',
+  alignItems: 'flex-end',
+  justifyContent: 'center',
+  transition: 'opacity 250ms ease',
 };
 
-const panelStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: '100%',
-  left: -8,
-  marginTop: 12,
-  width: 260,
-  maxHeight: 320,
-  overflowY: 'auto',
+const sheetStyle: React.CSSProperties = {
+  width: '100%',
+  height: 'calc(100% - 80px)',
   backgroundColor: 'var(--bg-surface0)',
-  borderRadius: 10,
-  padding: 4,
-  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-  zIndex: 201,
+  borderTopLeftRadius: 16,
+  borderTopRightRadius: 16,
+  border: '1px solid var(--bg-surface1)',
+  borderBottom: 'none',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+  transition: 'transform 250ms cubic-bezier(0.32, 0.72, 0, 1)',
+};
+
+const handleBarWrap: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'center',
+  padding: '10px 0 2px',
+  flexShrink: 0,
+};
+
+const handleBar: React.CSSProperties = {
+  width: 36,
+  height: 4,
+  borderRadius: 2,
+  backgroundColor: 'var(--text-tertiary)',
+  opacity: 0.4,
+};
+
+const sheetHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '8px 20px 12px',
+  borderBottom: '1px solid var(--bg-surface1)',
+  flexShrink: 0,
+};
+
+const sheetTitleStyle: React.CSSProperties = {
+  fontSize: 16,
+  fontWeight: 600,
+  color: 'var(--text-primary)',
+};
+
+const sheetCloseStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  color: 'var(--text-tertiary)',
+  fontSize: 16,
+  cursor: 'pointer',
+  padding: '4px 8px',
+};
+
+const sheetListStyle: React.CSSProperties = {
+  flex: 1,
+  overflowY: 'auto',
+  padding: '8px 12px',
+};
+
+const sheetFooterStyle: React.CSSProperties = {
+  padding: '8px 12px 20px',
+  borderTop: '1px solid var(--bg-surface1)',
+  flexShrink: 0,
 };
 
 const itemStyle: React.CSSProperties = {
@@ -126,10 +209,10 @@ const itemStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 8,
   width: '100%',
-  padding: '10px 12px',
+  padding: '12px 12px',
   background: 'none',
   border: 'none',
-  borderRadius: 8,
+  borderRadius: 10,
   cursor: 'pointer',
   textAlign: 'left',
   touchAction: 'manipulation',
@@ -146,7 +229,7 @@ const itemInfoStyle: React.CSSProperties = {
 };
 
 const itemNameStyle: React.CSSProperties = {
-  fontSize: 14,
+  fontSize: 15,
   fontWeight: 500,
   color: 'var(--text-primary)',
   overflow: 'hidden',
@@ -155,7 +238,7 @@ const itemNameStyle: React.CSSProperties = {
 };
 
 const itemHostStyle: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: 'var(--text-tertiary)',
   marginTop: 2,
   overflow: 'hidden',
@@ -169,23 +252,17 @@ const dotStyle: React.CSSProperties = {
   flexShrink: 0,
 };
 
-const sepStyle: React.CSSProperties = {
-  height: 1,
-  backgroundColor: 'var(--bg-surface1)',
-  margin: '4px 8px',
-};
-
 const addBtnStyle: React.CSSProperties = {
   display: 'block',
   width: '100%',
-  padding: '10px 12px',
+  padding: '12px',
   background: 'none',
-  border: 'none',
-  borderRadius: 8,
-  fontSize: 13,
+  border: '1px solid var(--bg-surface1)',
+  borderRadius: 10,
+  fontSize: 14,
   color: 'var(--accent-blue)',
   fontWeight: 500,
-  textAlign: 'left',
+  textAlign: 'center',
   cursor: 'pointer',
   touchAction: 'manipulation',
   WebkitTapHighlightColor: 'transparent',

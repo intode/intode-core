@@ -26,6 +26,9 @@ export { setTerminalTabRestoreGuard, setTmuxConfigGuard } from './terminal/termi
 // Workspace form hooks (Pro can inject jump host visibility)
 export { setJumpHostVisible } from './workspace/workspace-form-hooks';
 
+// Overlay hooks (Pro can inject native terminal hide/show)
+export { setOverlayHooks, notifyOverlayOpen, notifyOverlayClose } from './app/overlay-hooks';
+
 // Settings Registry (Pro can inject settings pages)
 export type { SettingsMenuItem, SettingsPageComponent } from './app/settings-registry';
 export { registerSettingsPage, getSettingsMenuItems, getSettingsPage } from './app/settings-registry';

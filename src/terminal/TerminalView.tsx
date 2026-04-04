@@ -44,6 +44,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
     nativeIdRef.current = id;
     // Set active ID immediately so handleKeyPress can route to it
     (manager as any).__activeNativeId = id;
+    (window as any).__intodeActiveNativeTerminalId = id;
 
     nativeProvider!.createTerminal(id, sessionId, defaultPath, tmuxSession).then(() => {
       if (cancelled) return;
@@ -78,10 +79,13 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
       const rect = container.getBoundingClientRect();
       nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
       nativeProvider!.focusTerminal(id);
-      // Track active native terminal for handleKeyPress routing
+      // Track active/visible native terminal
       (manager as any).__activeNativeId = id;
+      (window as any).__intodeActiveNativeTerminalId = id;
+      (window as any).__intodeVisibleNativeTerminalId = id;
     } else {
       nativeProvider!.hideTerminal(id);
+      delete (window as any).__intodeVisibleNativeTerminalId;
     }
   }, [useNative, visible]);
 

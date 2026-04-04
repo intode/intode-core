@@ -18,6 +18,7 @@ import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } fr
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
+import { notifyOverlayClose } from './overlay-hooks';
 import { saveSessionState, loadSessionState } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
 import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
@@ -528,7 +529,9 @@ export function App() {
             onSave={handleSaveWorkspace}
             onCancel={() => {
               setEditingWorkspace(null);
-              setScreen(addReturnTo === 'view' ? 'workspace-view' : 'workspace-list');
+              const returnTo = addReturnTo === 'view' ? 'workspace-view' : 'workspace-list';
+              setScreen(returnTo);
+              if (returnTo === 'workspace-view') notifyOverlayClose();
             }}
             editWorkspace={editingWorkspace ?? undefined}
           />
