@@ -1,35 +1,60 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { getPolicy, checkLimit } from '../policies/provider';
 import { TerminalView } from './TerminalView';
+import { getNativeTerminalProvider } from './terminal-provider';
+import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
 
 interface Tab {
   id: string;
   label: string;
+  tmuxSession?: string;
+}
+
+const STORAGE_PREFIX = 'intode_termtabs_';
+
+function saveTabs(wsId: string, tabs: Tab[]) {
+  try {
+    localStorage.setItem(STORAGE_PREFIX + wsId, JSON.stringify(tabs));
+  } catch { /* */ }
+}
+
+function loadTabs(wsId: string): Tab[] | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_PREFIX + wsId);
+    if (!raw) return null;
+    const tabs = JSON.parse(raw) as Tab[];
+    return tabs.length > 0 ? tabs : null;
+  } catch { return null; }
 }
 
 export interface TerminalTabsProps {
   sessionId: string;
+  wsId: string;
   defaultPath?: string;
   visible: boolean;
-  initialTabIds?: string[];
 }
 
-export function TerminalTabs({ sessionId, defaultPath, visible, initialTabIds }: TerminalTabsProps) {
+export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: TerminalTabsProps) {
   const nextLabel = useRef(2);
   const [tabs, setTabs] = useState<Tab[]>(() => {
-    if (initialTabIds && initialTabIds.length > 0) {
-      nextLabel.current = initialTabIds.length + 1;
-      return initialTabIds.map((id, i) => ({ id, label: String(i + 1) }));
+    if (canRestoreTerminalTabs()) {
+      const saved = loadTabs(wsId);
+      if (saved && saved.length > 0) {
+        nextLabel.current = saved.length + 1;
+        return saved;
+      }
     }
     return [{ id: crypto.randomUUID(), label: '1' }];
   });
   const [activeId, setActiveId] = useState(tabs[0].id);
 
-  // Expose current tab IDs for session save
+  // Save tabs to localStorage whenever they change
   useEffect(() => {
+    saveTabs(wsId, tabs);
+    // Also expose for legacy session-hooks
     (window as any).__intodeTerminalTabIds = tabs.map((t) => t.id);
     return () => { delete (window as any).__intodeTerminalTabIds; };
-  }, [tabs]);
+  }, [tabs, wsId]);
 
   const addTab = useCallback(() => {
     const { maxTerminals } = getPolicy();
@@ -56,6 +81,19 @@ export function TerminalTabs({ sessionId, defaultPath, visible, initialTabIds }:
     [activeId],
   );
 
+  const configureTmux = useCallback((id: string) => {
+    const tab = tabs.find((t) => t.id === id);
+    if (!tab) return;
+    const name = prompt('tmux session name (empty to disable)', tab.tmuxSession || '');
+    if (name === null) return;
+    if (name && !canConfigureTmux()) return;
+    setTabs((prev) => prev.map((t) => t.id === id ? { ...t, tmuxSession: name || undefined } : t));
+    if (name) {
+      const provider = getNativeTerminalProvider();
+      provider?.writeInput(id, `tmux new-session -A -s ${name}\n`).catch(() => {});
+    }
+  }, [tabs]);
+
   return (
     <div style={rootStyle}>
       <div style={barStyle}>
@@ -64,9 +102,10 @@ export function TerminalTabs({ sessionId, defaultPath, visible, initialTabIds }:
             key={tab.id}
             data-terminal-tab
             onClick={() => setActiveId(tab.id)}
+            onContextMenu={(e) => { e.preventDefault(); configureTmux(tab.id); }}
             style={{ ...tabStyle, ...(tab.id === activeId ? activeTabStyle : {}) }}
           >
-            <span>Terminal {tab.label}</span>
+            <span>{tab.tmuxSession ? `tmux:${tab.tmuxSession}` : `Terminal ${tab.label}`}</span>
             {tabs.length > 1 && (
               <span
                 onClick={(e) => {
@@ -103,6 +142,7 @@ export function TerminalTabs({ sessionId, defaultPath, visible, initialTabIds }:
               defaultPath={defaultPath}
               terminalId={tab.id}
               visible={visible && tab.id === activeId}
+              tmuxSession={tab.tmuxSession}
             />
           </div>
         ))}

@@ -13,11 +13,12 @@ export interface TerminalViewProps {
   defaultPath?: string;
   terminalId?: string;
   visible: boolean;
+  tmuxSession?: string;
 }
 
 const manager = new TerminalManager();
 
-export function TerminalView({ sessionId, defaultPath, terminalId, visible }: TerminalViewProps) {
+export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmuxSession }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<TerminalSession | null>(null);
   const selectionRef = useRef<TerminalSelection | null>(null);
@@ -44,7 +45,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible }: Te
     // Set active ID immediately so handleKeyPress can route to it
     (manager as any).__activeNativeId = id;
 
-    nativeProvider!.createTerminal(id, sessionId, defaultPath).then(() => {
+    nativeProvider!.createTerminal(id, sessionId, defaultPath, tmuxSession).then(() => {
       if (cancelled) return;
       if (visible && container.offsetParent) {
         const rect = container.getBoundingClientRect();

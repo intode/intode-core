@@ -1,7 +1,7 @@
 /** DI hook for native terminal rendering — Pro injects Android/iOS native terminal provider at bootstrap */
 
 export interface NativeTerminalProvider {
-  createTerminal(terminalId: string, sessionId: string, defaultPath?: string): Promise<void>;
+  createTerminal(terminalId: string, sessionId: string, defaultPath?: string, tmuxSession?: string): Promise<void>;
   destroyTerminal(terminalId: string): Promise<void>;
   showTerminal(terminalId: string, rect: { x: number; y: number; width: number; height: number }): Promise<void>;
   hideTerminal(terminalId: string): Promise<void>;

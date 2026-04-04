@@ -1,11 +1,20 @@
 /** DI hooks for session save/restore — Pro injects these at bootstrap */
 
+export interface FileTabState {
+  path: string;
+  scrollLine?: number;
+  unsavedContent?: string;
+}
+
 export interface SessionData {
   workspaceId: string;
   activeTab: string;
-  openFiles?: string[];        // file paths
-  activeFile?: string;         // active file path
-  terminalTabIds?: string[];   // terminal tab IDs to restore
+  fileSubTab?: string;
+  openFiles?: FileTabState[];
+  activeFile?: string;
+  expandedFolders?: string[];
+  terminalTabIds?: string[];
+  previewUrl?: string;
 }
 
 type SaveFn = (data: SessionData) => void;

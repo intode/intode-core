@@ -25,6 +25,22 @@ export interface FileTreeProps {
   onFileSelect: (path: string) => void;
   sessionId?: string;
   gitStatus?: GitStatusMap;
+  initialExpandedFolders?: string[];
+  onExpandChange?: (expandedFolders: string[]) => void;
+}
+
+function collectExpandedFolders(nodes: FileTreeNode[]): string[] {
+  const result: string[] = [];
+  const walk = (list: FileTreeNode[]) => {
+    for (const n of list) {
+      if (n.isDirectory && n.isExpanded) {
+        result.push(n.path);
+        if (n.children) walk(n.children);
+      }
+    }
+  };
+  walk(nodes);
+  return result;
 }
 
 function sortEntries(entries: SftpEntry[]): SftpEntry[] {
@@ -111,17 +127,30 @@ function SearchResultItem({ node, rootPath, onSelect }: { node: FileTreeNode; ro
   );
 }
 
-export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus }: FileTreeProps) {
+export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus, initialExpandedFolders, onExpandChange }: FileTreeProps) {
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
+  const expandQueueRef = React.useRef<string[]>(initialExpandedFolders ?? []);
   const { searchQuery, setSearchQuery, nameResults, grepResults, searching, clearSearch } = useFileSearch(nodes, sessionId, rootPath);
 
   useEffect(() => {
     if (!sftpId) return;
     setLoading(true);
-    Ssh.sftpLs({ sftpId, path: rootPath }).then(({ entries }) => {
+    Ssh.sftpLs({ sftpId, path: rootPath }).then(async ({ entries }) => {
       setNodes(sortEntries(entries).map(toNode));
       setLoading(false);
+      // Restore expanded folders from saved state
+      const queue = expandQueueRef.current;
+      expandQueueRef.current = [];
+      // Sort by depth (shallow first) to expand parent before child
+      queue.sort((a, b) => a.split('/').length - b.split('/').length);
+      for (const folderPath of queue) {
+        try {
+          const { entries: childEntries } = await Ssh.sftpLs({ sftpId, path: folderPath });
+          const children = sortEntries(childEntries).map(toNode);
+          setNodes((prev) => updateNode(prev, folderPath, (node) => ({ ...node, children, isExpanded: true, isLoading: false })));
+        } catch { /* folder may no longer exist */ }
+      }
     }).catch(() => setLoading(false));
   }, [sftpId, rootPath]);
 
@@ -165,6 +194,13 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus 
       }
     }
   }, [sftpId, nodes]);
+
+  // Notify parent of expand state changes for session persistence
+  useEffect(() => {
+    if (!loading && onExpandChange) {
+      onExpandChange(collectExpandedFolders(nodes));
+    }
+  }, [nodes, loading]);
 
   const isSearching = searchQuery.trim().length > 0;
   const hasResults = nameResults.length > 0 || grepResults.length > 0;

@@ -119,11 +119,14 @@ function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
             <MarkdownPreview content={active.content} visible={visible} />
           ) : (
             <CodeEditor
+              key={active.id}
               content={active.content}
               fileName={active.fileName}
               visible={visible && !overlay}
+              initialScrollLine={active.scrollLine}
               onContentChange={(c) => ftm.updateContent(active.id, c)}
               onSave={() => { if (sftpId) ftm.saveFile(sftpId, active.id).catch(() => {}); }}
+              onScrollChange={(line) => ftm.setScrollLine(active.id, line)}
             />
           )
         ) : active?.isLoading ? (
@@ -224,7 +227,7 @@ export function App() {
   const [activeWsId, setActiveWsId] = useState<string | null>(null);
   const [connectingWorkspace, setConnectingWorkspace] = useState<Workspace | null>(null);
 
-  const [restoredTerminalTabIds, setRestoredTerminalTabIds] = useState<string[] | undefined>(undefined);
+  const [restoredTerminalTabIds, setRestoredTerminalTabIds] = useState<{ wsId: string; tabIds: string[] } | undefined>(undefined);
   const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(null);
   const [addReturnTo, setAddReturnTo] = useState<'list' | 'view'>('list');
   const [listKey, setListKey] = useState(0);
@@ -239,17 +242,21 @@ export function App() {
   useEffect(() => {
     const save = () => {
       if (!activeConn) return;
+      if (activeTab === 'settings') return;
       const ftm = getFileTabMgr(activeConn.wsId);
-      const fileTabs = ftm.getTabs();
       const activeFile = ftm.getActiveTab();
       saveSessionState({
         workspaceId: activeConn.wsId,
         activeTab,
-        openFiles: fileTabs.map((t) => t.path),
+        fileSubTab: (window as any).__intodeFileSubTab,
+        openFiles: ftm.getFileTabStates(),
         activeFile: activeFile?.path,
+        expandedFolders: (window as any).__intodeExpandedFolders,
         terminalTabIds: (window as any).__intodeTerminalTabIds ?? undefined,
+        previewUrl: (window as any).__intodePreviewUrl,
       });
     };
+    if (activeTab !== 'settings') save();
     const onVisChange = () => { if (document.visibilityState === 'hidden') save(); };
     document.addEventListener('visibilitychange', onVisChange);
     window.addEventListener('beforeunload', save);
@@ -264,6 +271,7 @@ export function App() {
     if (activeConn) {
       (window as any).__intodeSplitCtx = {
         sessionId: activeConn.sessionId,
+        wsId: activeConn.wsId,
         sftpId: activeConn.sftpId,
         defaultPath: activeConn.workspace.defaultPath,
         ftm: getFileTabMgr(activeConn.wsId),
@@ -369,31 +377,31 @@ export function App() {
       setConnectingWorkspace(null);
       setScreen('workspace-view');
 
-      // Restore previous session state (open files, active tab, terminal count)
+      // Restore previous session state
       const saved = loadSessionState();
-      const restoredTab = (saved?.workspaceId === ws.id && saved.activeTab) ? saved.activeTab : 'files';
+      const isSameWs = saved?.workspaceId === ws.id;
+      const restoredTab = (isSameWs && saved.activeTab) ? saved.activeTab : 'files';
       setActiveTab(restoredTab);
-      if (saved?.workspaceId === ws.id && saved.terminalTabIds && saved.terminalTabIds.length > 0) {
-        setRestoredTerminalTabIds(saved.terminalTabIds);
+
+      // Expose saved state for child components to pick up
+      if (isSameWs) {
+        if (saved.expandedFolders) (window as any).__intodeRestoreExpandedFolders = saved.expandedFolders;
+        if (saved.fileSubTab) (window as any).__intodeFileSubTab = saved.fileSubTab;
+        if (saved.previewUrl) (window as any).__intodeRestorePreviewUrl = saved.previewUrl;
       }
 
-      // Re-open previously open files
-      if (saved?.workspaceId === ws.id && saved.openFiles && saved.openFiles.length > 0 && sftpId) {
+      // Re-open previously open files with scroll/unsaved content
+      if (isSameWs && saved.openFiles && saved.openFiles.length > 0 && sftpId) {
         const ftm = getFileTabMgr(ws.id);
-        for (const filePath of saved.openFiles) {
-          ftm.openFile(sftpId, filePath).catch(() => {});
+        for (const fs of saved.openFiles) {
+          await ftm.restoreFile(sftpId, fs.path, fs.scrollLine, fs.unsavedContent).catch(() => null);
         }
-        // Restore active file after all files are opened
         if (saved.activeFile) {
-          setTimeout(() => {
-            const tabs = ftm.getTabs();
-            const target = tabs.find((t) => t.path === saved.activeFile);
-            if (target) ftm.setActiveTab(target.id);
-          }, 500);
+          const tabs = ftm.getTabs();
+          const target = tabs.find((t) => t.path === saved.activeFile);
+          if (target) ftm.setActiveTab(target.id);
         }
       }
-
-      saveSessionState({ workspaceId: ws.id, activeTab: restoredTab });
       keepAliveStart();
       keepAliveUpdate(newConns.length);
 
@@ -407,6 +415,21 @@ export function App() {
 
   const handleDisconnect = useCallback(async () => {
     if (!activeConn) return;
+    // Save session state before disconnecting
+    if (activeTab !== 'settings') {
+      const ftm = getFileTabMgr(activeConn.wsId);
+      const activeFile = ftm.getActiveTab();
+      saveSessionState({
+        workspaceId: activeConn.wsId,
+        activeTab,
+        fileSubTab: (window as any).__intodeFileSubTab,
+        openFiles: ftm.getFileTabStates(),
+        activeFile: activeFile?.path,
+        expandedFolders: (window as any).__intodeExpandedFolders,
+        terminalTabIds: (window as any).__intodeTerminalTabIds ?? undefined,
+        previewUrl: (window as any).__intodePreviewUrl,
+      });
+    }
     try {
       if (activeConn.sftpId) await Ssh.closeSftp({ sftpId: activeConn.sftpId });
       await Ssh.disconnect({ sessionId: activeConn.sessionId });
@@ -574,6 +597,8 @@ export function App() {
                         rootPath={conn.workspace.defaultPath}
                         sessionId={conn.sessionId}
                         gitStatus={gitStatusMap}
+                        initialExpandedFolders={(window as any).__intodeRestoreExpandedFolders}
+                        onExpandChange={(folders) => { (window as any).__intodeExpandedFolders = folders; }}
                         onFileSelect={async (path) => {
                           const type = detectFileType(path.split('/').pop() ?? '');
                           if (type === 'binary') return;
@@ -615,10 +640,11 @@ export function App() {
                 {/* Terminal — per workspace, always mounted */}
                 <div style={{ ...styles.tabContent, display: isActive && activeTab === 'terminal' ? 'flex' : 'none' }}>
                   <TerminalTabs
+                    key={conn.sessionId}
                     sessionId={conn.sessionId}
+                    wsId={conn.wsId}
                     defaultPath={conn.workspace.defaultPath}
                     visible={isActive && activeTab === 'terminal'}
-                    initialTabIds={restoredTerminalTabIds}
                   />
                 </div>
               </React.Fragment>

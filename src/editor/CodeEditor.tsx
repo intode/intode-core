@@ -14,8 +14,10 @@ export interface CodeEditorProps {
   content: string;
   fileName: string;
   visible: boolean;
+  initialScrollLine?: number;
   onContentChange?: (content: string) => void;
   onSave?: () => void;
+  onScrollChange?: (line: number) => void;
 }
 
 export interface CodeEditorRef {
@@ -30,6 +32,7 @@ export interface CodeEditorRef {
   cursorRight(): void;
   wrapSelection(before: string, after: string): void;
   prependLine(prefix: string): void;
+  getScrollLine(): number;
 }
 
 // Global ref for active editor — used by ExtraKeyBar routing in App.tsx
@@ -73,7 +76,7 @@ const darkTheme = EditorView.theme({
 }, { dark: true });
 
 export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
-  function CodeEditor({ content, fileName, visible, onContentChange, onSave }, ref) {
+  function CodeEditor({ content, fileName, visible, initialScrollLine, onContentChange, onSave, onScrollChange }, ref) {
     const containerRef = useRef<HTMLDivElement>(null);
     const viewRef = useRef<EditorView | null>(null);
     const pinchRef = useRef<PinchZoom | null>(null);
@@ -149,6 +152,12 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
         }
         view.focus();
       },
+      getScrollLine() {
+        const view = viewRef.current;
+        if (!view) return 0;
+        const top = view.lineBlockAtHeight(view.scrollDOM.scrollTop);
+        return view.state.doc.lineAt(top.from).number;
+      },
     };
 
     useImperativeHandle(ref, () => api);
@@ -195,7 +204,29 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
         const state = EditorState.create({ doc: content, extensions });
 
         if (viewRef.current) viewRef.current.destroy();
-        viewRef.current = new EditorView({ state, parent: container });
+        const view = new EditorView({ state, parent: container });
+        viewRef.current = view;
+
+        // Restore scroll position
+        if (initialScrollLine && initialScrollLine > 1) {
+          requestAnimationFrame(() => {
+            try {
+              const line = view.state.doc.line(Math.min(initialScrollLine, view.state.doc.lines));
+              view.dispatch({ effects: EditorView.scrollIntoView(line.from, { y: 'start' }) });
+            } catch { /* */ }
+          });
+        }
+
+        // Track scroll changes for session persistence
+        let scrollTimer: ReturnType<typeof setTimeout> | null = null;
+        view.scrollDOM.addEventListener('scroll', () => {
+          if (scrollTimer) clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(() => {
+            const top = view.lineBlockAtHeight(view.scrollDOM.scrollTop);
+            const lineNum = view.state.doc.lineAt(top.from).number;
+            onScrollChange?.(lineNum);
+          }, 500);
+        });
 
         // Pinch zoom for editor font size
         pinchRef.current?.detach();

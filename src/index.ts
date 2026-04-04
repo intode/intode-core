@@ -20,6 +20,12 @@ export { registerFilePanel, registerEditorPanel, getFilePanels, getEditorPanels 
 export { setSessionSaveHook, setSessionLoadHook, saveSessionState, loadSessionState } from './app/session-hooks';
 export type { SessionData } from './app/session-hooks';
 
+// Terminal tab hooks (Pro can inject restore/tmux guards)
+export { setTerminalTabRestoreGuard, setTmuxConfigGuard } from './terminal/terminal-tab-hooks';
+
+// Workspace form hooks (Pro can inject jump host visibility)
+export { setJumpHostVisible } from './workspace/workspace-form-hooks';
+
 // Settings Registry (Pro can inject settings pages)
 export type { SettingsMenuItem, SettingsPageComponent } from './app/settings-registry';
 export { registerSettingsPage, getSettingsMenuItems, getSettingsPage } from './app/settings-registry';

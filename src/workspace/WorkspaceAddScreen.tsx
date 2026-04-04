@@ -4,7 +4,7 @@ import { Ssh } from '../ssh/index';
 import type { SshKey } from '../ssh/plugin-api';
 import { DEFAULT_SSH_PORT } from '../lib/constants';
 import { INPUT_FIELD } from '../lib/styles';
-import { getPolicy } from '../policies/provider';
+import { isJumpHostVisible } from './workspace-form-hooks';
 
 export interface WorkspaceAddScreenProps {
   onSave: (data: CreateWorkspaceData, password: string, jumpHostPasswords?: string[]) => void;
@@ -151,7 +151,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
         <Field label="Default Path" value={defaultPath} onChange={setDefaultPath} placeholder="~" />
 
         {/* Jump Host (Pro) */}
-        {getPolicy().canJumpHost && (
+        {isJumpHostVisible() && (
           <div style={styles.field}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <label style={styles.label}>Jump Host (Bastion)</label>

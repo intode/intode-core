@@ -15,6 +15,7 @@ export interface FileTab {
   originalContent: string | null;
   isLoading: boolean;
   isDirty: boolean;
+  scrollLine?: number;
 }
 
 export class FileTabManager {
@@ -114,5 +115,57 @@ export class FileTabManager {
       this.activeTabId = this.tabs[Math.min(idx, this.tabs.length - 1)]?.id ?? null;
     }
     this.onChange?.();
+  }
+
+  /** Restore a file tab from session state — loads from SFTP or uses unsaved content */
+  async restoreFile(sftpId: string, path: string, scrollLine?: number, unsavedContent?: string): Promise<FileTab | null> {
+    const existing = this.tabs.find(t => t.path === path);
+    if (existing) return existing;
+
+    const fileName = getFileName(path);
+    const type = detectFileType(fileName);
+    if (type === 'binary') return null;
+
+    const tab: FileTab = {
+      id: crypto.randomUUID(),
+      path,
+      fileName,
+      type: type as 'code' | 'markdown',
+      content: unsavedContent ?? null,
+      originalContent: null,
+      isLoading: !unsavedContent,
+      isDirty: !!unsavedContent,
+      scrollLine,
+    };
+    this.tabs.push(tab);
+    this.onChange?.();
+
+    if (!unsavedContent) {
+      try {
+        const { content } = await Ssh.sftpRead({ sftpId, path });
+        tab.content = decodeBase64Utf8(content);
+        tab.originalContent = tab.content;
+        tab.isLoading = false;
+      } catch (e: unknown) {
+        tab.isLoading = false;
+        tab.content = `// Error reading file: ${e}`;
+      }
+      this.onChange?.();
+    }
+    return tab;
+  }
+
+  setScrollLine(tabId: string, line: number): void {
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (tab) tab.scrollLine = line;
+  }
+
+  /** Get serializable state for session persistence */
+  getFileTabStates(): { path: string; scrollLine?: number; unsavedContent?: string }[] {
+    return this.tabs.map(t => ({
+      path: t.path,
+      scrollLine: t.scrollLine,
+      unsavedContent: t.isDirty && t.content ? t.content : undefined,
+    }));
   }
 }
