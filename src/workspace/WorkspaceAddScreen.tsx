@@ -33,6 +33,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
   const [showKeyGenerate, setShowKeyGenerate] = useState(false);
   const [showKeyImport, setShowKeyImport] = useState(false);
   const [hasSavedPassword, setHasSavedPassword] = useState(false);
+  const [savedJumpHostCount, setSavedJumpHostCount] = useState(0);
 
   const refreshKeys = useCallback(() => {
     Ssh.listSshKeys().then(({ keys }) => {
@@ -54,7 +55,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
     }).catch(() => {});
     if (editWorkspace.jumpHosts?.length) {
       getWorkspaceStore().getJumpHostPasswords(editWorkspace.id).then((pws) => {
-        if (pws.length > 0) setJumpHostPasswords(pws);
+        if (pws.length > 0) { setJumpHostPasswords(pws); setSavedJumpHostCount(pws.filter(p => !!p).length); }
       }).catch(() => {});
     }
   }, [isEdit, editWorkspace]);
@@ -234,7 +235,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
                 {jh.authType === 'password' ? (
                   <input
                     type="password" value={jumpHostPasswords[idx] ?? ''}
-                    placeholder={isEdit ? 'Leave empty to keep current' : 'Password'}
+                    placeholder={isEdit && idx < savedJumpHostCount ? 'Leave empty to keep current' : 'Password'}
                     onChange={(e) => { const np = [...jumpHostPasswords]; np[idx] = e.target.value; setJumpHostPasswords(np); }}
                     style={{ ...styles.input, fontSize: 13, padding: '8px 10px' }}
                   />
