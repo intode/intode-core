@@ -32,6 +32,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
   const [testError, setTestError] = useState('');
   const [showKeyGenerate, setShowKeyGenerate] = useState(false);
   const [showKeyImport, setShowKeyImport] = useState(false);
+  const [hasSavedPassword, setHasSavedPassword] = useState(false);
 
   const refreshKeys = useCallback(() => {
     Ssh.listSshKeys().then(({ keys }) => {
@@ -49,7 +50,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
   useEffect(() => {
     if (!isEdit || !editWorkspace) return;
     getWorkspaceStore().getPassword(editWorkspace.id).then((pw) => {
-      if (pw) setPassword(pw);
+      if (pw) { setPassword(pw); setHasSavedPassword(true); }
     }).catch(() => {});
     if (editWorkspace.jumpHosts?.length) {
       getWorkspaceStore().getJumpHostPasswords(editWorkspace.id).then((pws) => {
@@ -146,9 +147,9 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
 
         {authType === 'password' ? (
           <Field
-            label={isEdit ? 'Password (enter to change)' : 'Password'}
+            label={isEdit && hasSavedPassword ? 'Password (enter to change)' : 'Password'}
             value={password} onChange={setPassword}
-            placeholder={isEdit ? 'Leave empty to keep current' : '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}
+            placeholder={isEdit && hasSavedPassword ? 'Leave empty to keep current' : '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}
             type="password"
           />
         ) : (
