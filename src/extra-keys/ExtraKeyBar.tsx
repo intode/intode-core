@@ -17,6 +17,7 @@ interface KeyDef {
 }
 
 const TERMINAL_KEYS: KeyDef[] = [
+  { label: 'Snip', value: 'snippets' },
   { label: 'Esc', value: KEY_ESC },
   { label: 'Tab', value: KEY_TAB },
   { label: 'S-Tab', value: '\x1b[Z' },
@@ -31,7 +32,6 @@ const TERMINAL_KEYS: KeyDef[] = [
   { label: '|', value: '|' },
   { label: '-', value: '-' },
   { label: '_', value: '_' },
-  { label: 'Snip', value: 'snippets' },
   { label: '\u2191', value: KEY_UP },
   { label: '\u2193', value: KEY_DOWN },
   { label: '\u2190', value: KEY_LEFT },
