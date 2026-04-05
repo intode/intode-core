@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Workspace, CreateWorkspaceData, WorkspaceJumpHost } from './WorkspaceManager';
+import { Workspace, CreateWorkspaceData, WorkspaceJumpHost, getWorkspaceStore } from './WorkspaceManager';
 import { Ssh } from '../ssh/index';
 import type { SshKey } from '../ssh/plugin-api';
 import { DEFAULT_SSH_PORT } from '../lib/constants';
@@ -44,6 +44,19 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
   }, [selectedKeyId]);
 
   useEffect(() => { refreshKeys(); }, []);
+
+  // Load saved passwords for edit mode (enables Test Connection without re-entry)
+  useEffect(() => {
+    if (!isEdit || !editWorkspace) return;
+    getWorkspaceStore().getPassword(editWorkspace.id).then((pw) => {
+      if (pw) setPassword(pw);
+    }).catch(() => {});
+    if (editWorkspace.jumpHosts?.length) {
+      getWorkspaceStore().getJumpHostPasswords(editWorkspace.id).then((pws) => {
+        if (pws.length > 0) setJumpHostPasswords(pws);
+      }).catch(() => {});
+    }
+  }, [isEdit, editWorkspace]);
 
   const canSave = name.trim() && host.trim() && username.trim() && (
     authType === 'key'
@@ -219,7 +232,8 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
                 </div>
                 {jh.authType === 'password' ? (
                   <input
-                    type="password" value={jumpHostPasswords[idx] ?? ''} placeholder="Password"
+                    type="password" value={jumpHostPasswords[idx] ?? ''}
+                    placeholder={isEdit ? 'Leave empty to keep current' : 'Password'}
                     onChange={(e) => { const np = [...jumpHostPasswords]; np[idx] = e.target.value; setJumpHostPasswords(np); }}
                     style={{ ...styles.input, fontSize: 13, padding: '8px 10px' }}
                   />
