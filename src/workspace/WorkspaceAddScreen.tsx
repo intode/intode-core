@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Workspace, CreateWorkspaceData, WorkspaceJumpHost } from './WorkspaceManager';
 import { Ssh } from '../ssh/index';
 import type { SshKey } from '../ssh/plugin-api';
 import { DEFAULT_SSH_PORT } from '../lib/constants';
 import { INPUT_FIELD } from '../lib/styles';
 import { isJumpHostVisible } from './workspace-form-hooks';
+import { SshKeyGenerateModal } from '../ssh/components/SshKeyGenerateModal';
+import { SshKeyImportModal } from '../ssh/components/SshKeyImportModal';
 
 export interface WorkspaceAddScreenProps {
   onSave: (data: CreateWorkspaceData, password: string, jumpHostPasswords?: string[]) => void;
@@ -28,10 +30,20 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
   const [showJumpHost, setShowJumpHost] = useState((editWorkspace?.jumpHosts?.length ?? 0) > 0);
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'fail'>('idle');
   const [testError, setTestError] = useState('');
+  const [showKeyGenerate, setShowKeyGenerate] = useState(false);
+  const [showKeyImport, setShowKeyImport] = useState(false);
 
-  useEffect(() => {
-    Ssh.listSshKeys().then(({ keys }) => setSshKeys(keys)).catch(() => {});
-  }, []);
+  const refreshKeys = useCallback(() => {
+    Ssh.listSshKeys().then(({ keys }) => {
+      setSshKeys(keys);
+      // Auto-select the newest key if none selected
+      if (!selectedKeyId && keys.length > 0) {
+        setSelectedKeyId(keys[keys.length - 1].id);
+      }
+    }).catch(() => {});
+  }, [selectedKeyId]);
+
+  useEffect(() => { refreshKeys(); }, []);
 
   const canSave = name.trim() && host.trim() && username.trim() && (
     authType === 'key'
@@ -129,9 +141,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
         ) : (
           <div style={styles.field}>
             <label style={styles.label}>SSH Key</label>
-            {sshKeys.length === 0 ? (
-              <p style={styles.noKeys}>No SSH keys stored. Generate or import a key in Settings.</p>
-            ) : (
+            {sshKeys.length > 0 && (
               <select
                 value={selectedKeyId}
                 onChange={(e) => setSelectedKeyId(e.target.value)}
@@ -145,6 +155,10 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
                 ))}
               </select>
             )}
+            <div style={styles.keyActions}>
+              <button onClick={() => setShowKeyGenerate(true)} style={styles.keyActionBtn}>+ Generate</button>
+              <button onClick={() => setShowKeyImport(true)} style={styles.keyActionBtn}>+ Import</button>
+            </div>
           </div>
         )}
 
@@ -256,6 +270,19 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
           Save
         </button>
       </div>
+
+      {showKeyGenerate && (
+        <SshKeyGenerateModal
+          onDone={() => { setShowKeyGenerate(false); refreshKeys(); }}
+          onCancel={() => setShowKeyGenerate(false)}
+        />
+      )}
+      {showKeyImport && (
+        <SshKeyImportModal
+          onDone={() => { setShowKeyImport(false); refreshKeys(); }}
+          onCancel={() => setShowKeyImport(false)}
+        />
+      )}
     </div>
   );
 }
@@ -297,7 +324,11 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundPosition: 'right 12px center',
     paddingRight: 32,
   },
-  noKeys: { fontSize: 13, color: 'var(--text-muted)', margin: 0 },
+  keyActions: { display: 'flex', gap: 8 },
+  keyActionBtn: {
+    background: 'none', border: 'none', color: 'var(--accent-blue)',
+    fontSize: 12, fontWeight: 600, cursor: 'pointer', padding: 0,
+  },
   authToggle: { display: 'flex', gap: 0, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--bg-surface1)' },
   authActive: {
     flex: 1, padding: '10px', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
