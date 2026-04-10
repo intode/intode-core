@@ -212,9 +212,12 @@ export function App() {
     }).catch(() => {});
   }, []);
 
-  // Prevent Android native context menu (복사/번역/모두선택 popup)
+  // Prevent Android native context menu — except inside code editor (.cm-content)
   useEffect(() => {
-    const prevent = (e: Event) => e.preventDefault();
+    const prevent = (e: Event) => {
+      if (e.target instanceof HTMLElement && e.target.closest('.cm-content')) return;
+      e.preventDefault();
+    };
     document.addEventListener('contextmenu', prevent);
     return () => document.removeEventListener('contextmenu', prevent);
   }, []);
