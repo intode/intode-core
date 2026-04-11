@@ -51,7 +51,6 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
       if (visible && container.offsetParent) {
         const rect = container.getBoundingClientRect();
         nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
-        nativeProvider!.focusTerminal(id);
       }
     }).catch(() => {});
 
@@ -156,11 +155,6 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
       pinch.attach();
       pinchRef.current = pinch;
 
-      // Focus terminal after init
-      setTimeout(() => {
-        const el = container.querySelector('textarea.xterm-helper-textarea');
-        if (el instanceof HTMLTextAreaElement) el.focus();
-      }, 100);
 
       const observer = new ResizeObserver(() => {
         const s = sessionRef.current;
