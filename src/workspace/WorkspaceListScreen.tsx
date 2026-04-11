@@ -8,9 +8,10 @@ export interface WorkspaceListScreenProps {
   onAddWorkspace: () => void;
   onEditWorkspace?: (workspace: Workspace) => void;
   onSettings?: () => void;
+  connectedIds?: Set<string>;
 }
 
-export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditWorkspace, onSettings }: WorkspaceListScreenProps) {
+export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditWorkspace, onSettings, connectedIds }: WorkspaceListScreenProps) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
   const [menuTarget, setMenuTarget] = useState<Workspace | null>(null);
@@ -72,7 +73,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
             }}
             style={styles.card}
           >
-            <div style={styles.cardDot} />
+            {connectedIds?.has(ws.id) && <div style={styles.cardDot} />}
             <div style={styles.cardInfo}>
               <span style={styles.cardName}>{ws.name}</span>
               <span style={styles.cardHost}>{ws.host}:{ws.port}</span>
@@ -133,7 +134,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   cardDot: {
     width: 8, height: 8, borderRadius: '50%',
-    backgroundColor: 'var(--accent-blue)', flexShrink: 0, opacity: 0.6,
+    backgroundColor: 'var(--accent-green)', flexShrink: 0,
   },
   cardInfo: { display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 },
   cardName: { fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: 0.5, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const },

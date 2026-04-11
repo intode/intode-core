@@ -582,6 +582,7 @@ export function App() {
         <div style={styles.overlay}>
           <WorkspaceListScreen
             key={listKey}
+            connectedIds={connectedIds}
             onSelectWorkspace={handleSelectWorkspace}
             onAddWorkspace={() => {
               setEditingWorkspace(null);
