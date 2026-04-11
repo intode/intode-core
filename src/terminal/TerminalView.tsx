@@ -78,7 +78,6 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
     if (visible && container?.offsetParent) {
       const rect = container.getBoundingClientRect();
       nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
-      nativeProvider!.focusTerminal(id);
       // Track active/visible native terminal
       (manager as any).__activeNativeId = id;
       (window as any).__intodeActiveNativeTerminalId = id;
@@ -197,8 +196,6 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
     if (sessionRef.current && visible) {
       manager.switchTo(sessionRef.current.id);
       sessionRef.current.fitAddon.fit();
-      const el = containerRef.current?.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
-      if (el) setTimeout(() => el.focus(), 50);
     }
   }, [useNative, visible]);
 
