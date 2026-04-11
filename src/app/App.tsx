@@ -540,6 +540,7 @@ export function App() {
         setEditingWorkspace(null);
       } else {
         newWs = await createWorkspace(data, password, jumpHostPasswords);
+        if (!newWs) return; // 제한 → 폼 유지
       }
       setListKey((k) => k + 1);
 

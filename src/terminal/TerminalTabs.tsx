@@ -56,9 +56,9 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     return () => { delete (window as any).__intodeTerminalTabIds; };
   }, [tabs, wsId]);
 
-  const addTab = useCallback(() => {
+  const addTab = useCallback(async () => {
     const { maxTerminals } = getPolicy();
-    if (!checkLimit('terminals', tabs.length, maxTerminals)) return;
+    if (!(await checkLimit('terminals', tabs.length, maxTerminals))) return;
     const id = crypto.randomUUID();
     const label = String(nextLabel.current++);
     setTabs((t) => [...t, { id, label }]);

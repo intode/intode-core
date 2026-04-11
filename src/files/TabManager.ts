@@ -36,7 +36,7 @@ export class FileTabManager {
     }
 
     const { maxFileTabs } = getPolicy();
-    if (!checkLimit('fileTabs', this.tabs.length, maxFileTabs)) return null;
+    if (!(await checkLimit('fileTabs', this.tabs.length, maxFileTabs))) return null;
 
     const fileName = getFileName(path);
     const type = detectFileType(fileName);

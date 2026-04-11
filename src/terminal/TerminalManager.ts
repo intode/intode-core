@@ -22,7 +22,7 @@ export class TerminalManager {
 
   async createSession(sshSessionId: string): Promise<TerminalSession | null> {
     const { maxTerminals } = getPolicy();
-    if (!checkLimit('terminals', this.sessions.size, maxTerminals)) return null;
+    if (!(await checkLimit('terminals', this.sessions.size, maxTerminals))) return null;
 
     const { terminal, fitAddon } = createTerminal();
     const id = crypto.randomUUID();

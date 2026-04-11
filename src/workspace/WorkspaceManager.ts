@@ -61,7 +61,7 @@ export async function createWorkspace(data: CreateWorkspaceData, password?: stri
   const s = getWorkspaceStore();
   const all = await s.getAll();
   const { maxProjects } = getPolicy();
-  if (!checkLimit('projects', all.length, maxProjects)) return null;
+  if (!(await checkLimit('projects', all.length, maxProjects))) return null;
 
   const workspace = await s.create(data);
   if (password) {

@@ -1,8 +1,9 @@
 import { AppPolicy, DEFAULT_POLICY, LimitHandler } from './types';
 
 let currentPolicy: AppPolicy = DEFAULT_POLICY;
-let limitHandler: LimitHandler = (type, count, max) => {
+let limitHandler: LimitHandler = async (type, count, max) => {
   console.warn(`[Policy] Limit reached: ${type} (${count}/${max})`);
+  return false;
 };
 
 export function setPolicy(policy: AppPolicy): void {
@@ -17,8 +18,7 @@ export function setLimitHandler(handler: LimitHandler): void {
   limitHandler = handler;
 }
 
-export function checkLimit(type: string, currentCount: number, max: number): boolean {
+export async function checkLimit(type: string, currentCount: number, max: number): Promise<boolean> {
   if (currentCount < max) return true;
-  limitHandler(type, currentCount, max);
-  return false;
+  return limitHandler(type, currentCount, max);
 }

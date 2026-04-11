@@ -43,4 +43,4 @@ export const DEFAULT_POLICY: AppPolicy = {
   showDebugToggle: true,
 };
 
-export type LimitHandler = (type: string, currentCount: number, max: number) => void;
+export type LimitHandler = (type: string, currentCount: number, max: number) => Promise<boolean>;
