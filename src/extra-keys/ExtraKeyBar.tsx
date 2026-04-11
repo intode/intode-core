@@ -86,20 +86,39 @@ function restoreFocus(el: HTMLElement | null) {
   }
 }
 
+const MOVE_THRESHOLD = 8;
+
 function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
   const prevFocus = useRef<HTMLElement | null>(null);
+  const startPos = useRef<{ x: number; y: number } | null>(null);
+  const moved = useRef(false);
   return (
     <button
       tabIndex={-1}
       onTouchStart={(e) => {
         e.preventDefault();
+        const t = e.touches[0];
+        startPos.current = { x: t.clientX, y: t.clientY };
+        moved.current = false;
         prevFocus.current = document.activeElement as HTMLElement | null;
-        onPress(keyDef.value);
+      }}
+      onTouchMove={(e) => {
+        if (moved.current || !startPos.current) return;
+        const t = e.touches[0];
+        const dx = t.clientX - startPos.current.x;
+        const dy = t.clientY - startPos.current.y;
+        if (dx * dx + dy * dy > MOVE_THRESHOLD * MOVE_THRESHOLD) {
+          moved.current = true;
+        }
       }}
       onTouchEnd={(e) => {
         e.preventDefault();
-        restoreFocus(prevFocus.current);
+        if (!moved.current) {
+          onPress(keyDef.value);
+          restoreFocus(prevFocus.current);
+        }
         prevFocus.current = null;
+        startPos.current = null;
       }}
       style={keyStyle}
     >
@@ -154,13 +173,18 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
           onTouchEnd={() => onKeyPress('keyboard')}
           style={kbToggleStyle}
         >{'\u2328'}</button>
-        <div style={dpadStyle}>
-          <div />
-          <DpadButton keyDef={upKey} onPress={onKeyPress} />
-          <div />
-          <DpadButton keyDef={leftKey} onPress={onKeyPress} />
-          <DpadButton keyDef={downKey} onPress={onKeyPress} />
-          <DpadButton keyDef={rightKey} onPress={onKeyPress} />
+        <div style={dpadWithEnterStyle}>
+          <div style={dpadStyle}>
+            <div />
+            <DpadButton keyDef={upKey} onPress={onKeyPress} />
+            <div />
+            <DpadButton keyDef={leftKey} onPress={onKeyPress} />
+            <DpadButton keyDef={downKey} onPress={onKeyPress} />
+            <DpadButton keyDef={rightKey} onPress={onKeyPress} />
+          </div>
+          <div style={enterWrapStyle}>
+            <DpadButton keyDef={{ label: '\u23ce', value: '\r' }} onPress={onKeyPress} />
+          </div>
         </div>
       </div>
     </div>
@@ -201,6 +225,18 @@ const dpadStyle: React.CSSProperties = {
   gridTemplateColumns: 'repeat(3, 30px)',
   gridTemplateRows: 'repeat(2, 26px)',
   gap: 2,
+};
+
+const dpadWithEnterStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'stretch',
+  gap: 2,
+};
+
+const enterWrapStyle: React.CSSProperties = {
+  width: 30,
+  alignSelf: 'stretch',
 };
 
 const keyStyle: React.CSSProperties = {
