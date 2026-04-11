@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Ssh, SftpEntry } from '../ssh/index';
 import { INPUT_FIELD } from '../lib/styles';
 import { getNodeGitInfo } from './git-status-utils';
 import { useFileSearch } from './useFileSearch';
 import type { GrepResult } from './useFileSearch';
+import { FileChangeDetector } from './file-change-detector';
 
 export interface FileTreeNode {
   name: string;
@@ -27,6 +28,7 @@ export interface FileTreeProps {
   gitStatus?: GitStatusMap;
   initialExpandedFolders?: string[];
   onExpandChange?: (expandedFolders: string[]) => void;
+  visible?: boolean;
 }
 
 function collectExpandedFolders(nodes: FileTreeNode[]): string[] {
@@ -127,7 +129,7 @@ function SearchResultItem({ node, rootPath, onSelect }: { node: FileTreeNode; ro
   );
 }
 
-export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus, initialExpandedFolders, onExpandChange }: FileTreeProps) {
+export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus, initialExpandedFolders, onExpandChange, visible }: FileTreeProps) {
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
   const expandQueueRef = React.useRef<string[]>(initialExpandedFolders ?? []);
@@ -153,6 +155,121 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
       }
     }).catch(() => setLoading(false));
   }, [sftpId, rootPath]);
+
+  const detectorRef = React.useRef(new FileChangeDetector());
+
+  // Refresh expanded folders on tab visibility change
+  useEffect(() => {
+    if (!visible || !sftpId || loading) return;
+
+    const detector = detectorRef.current;
+    const expandedFolders = collectExpandedFolders(nodes);
+    const pathsToCheck = [rootPath, ...expandedFolders];
+
+    let cancelled = false;
+
+    (async () => {
+      for (const folderPath of pathsToCheck) {
+        if (cancelled) return;
+        try {
+          const diff = await detector.checkDirectory(sftpId, folderPath);
+          if (!diff.changed) continue;
+
+          const children = sortEntries(diff.entries).map(toNode);
+          if (folderPath === rootPath) {
+            setNodes((prev) => {
+              return children.map(child => {
+                const existing = prev.find(n => n.path === child.path);
+                if (existing && existing.isDirectory && existing.isExpanded) {
+                  return { ...child, children: existing.children, isExpanded: true };
+                }
+                return child;
+              });
+            });
+          } else {
+            setNodes((prev) => updateNode(prev, folderPath, (node) => {
+              const merged = children.map(child => {
+                const existing = node.children?.find(n => n.path === child.path);
+                if (existing && existing.isDirectory && existing.isExpanded) {
+                  return { ...child, children: existing.children, isExpanded: true };
+                }
+                return child;
+              });
+              return { ...node, children: merged };
+            }));
+          }
+        } catch { /* folder may have been deleted */ }
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [visible]);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const pullStartY = useRef(0);
+  const [pullDistance, setPullDistance] = useState(0);
+  const treeScrollRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (treeScrollRef.current && treeScrollRef.current.scrollTop === 0) {
+      pullStartY.current = e.touches[0].clientY;
+    } else {
+      pullStartY.current = 0;
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!pullStartY.current) return;
+    const diff = e.touches[0].clientY - pullStartY.current;
+    if (diff > 0 && diff < 120) {
+      setPullDistance(diff);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (pullDistance < 60 || !sftpId) {
+      setPullDistance(0);
+      pullStartY.current = 0;
+      return;
+    }
+
+    setPullDistance(0);
+    pullStartY.current = 0;
+    setRefreshing(true);
+
+    const detector = detectorRef.current;
+    const expandedFolders = collectExpandedFolders(nodes);
+    const pathsToRefresh = [rootPath, ...expandedFolders];
+
+    for (const p of pathsToRefresh) detector.invalidate(p);
+
+    try {
+      const { entries } = await Ssh.sftpLs({ sftpId, path: rootPath });
+      const rootChildren = sortEntries(entries).map(toNode);
+
+      const expanded = new Map<string, FileTreeNode[]>();
+      for (const folderPath of expandedFolders) {
+        try {
+          const { entries: childEntries } = await Ssh.sftpLs({ sftpId, path: folderPath });
+          expanded.set(folderPath, sortEntries(childEntries).map(toNode));
+          detector.checkDirectory(sftpId, folderPath).catch(() => {});
+        } catch { /* folder deleted */ }
+      }
+
+      setNodes(() => {
+        const applyExpanded = (list: FileTreeNode[]): FileTreeNode[] =>
+          list.map(node => {
+            if (node.isDirectory && expanded.has(node.path)) {
+              return { ...node, isExpanded: true, children: applyExpanded(expanded.get(node.path)!) };
+            }
+            return node;
+          });
+        return applyExpanded(rootChildren);
+      });
+    } catch { /* ignore */ }
+
+    setRefreshing(false);
+  }, [pullDistance, sftpId, nodes, rootPath]);
 
   const navigateToFolder = useCallback(async (folderPath: string) => {
     clearSearch();
@@ -262,7 +379,24 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
       ) : nodes.length === 0 ? (
         <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Empty directory</span></div>
       ) : (
-        <div style={styles.treeScroll}>
+        <div
+          ref={treeScrollRef}
+          style={styles.treeScroll}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {(pullDistance > 0 || refreshing) && (
+            <div style={{
+              textAlign: 'center',
+              padding: '8px 0',
+              fontSize: 12,
+              color: 'var(--text-muted)',
+              transition: 'opacity 150ms',
+            }}>
+              {refreshing ? '\u27F3 Refreshing...' : pullDistance >= 60 ? '\u2191 Release to refresh' : '\u2193 Pull to refresh'}
+            </div>
+          )}
           {nodes.map((node) => (
             <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} gitStatus={gitStatus} />
           ))}

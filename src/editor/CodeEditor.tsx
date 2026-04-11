@@ -250,6 +250,30 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
       };
     }, [fileName]);
 
+    // Handle external content replacement (auto-reload from remote changes)
+    const lastContentRef = useRef(content);
+    useEffect(() => {
+      const view = viewRef.current;
+      if (!view || content === lastContentRef.current) return;
+      lastContentRef.current = content;
+
+      // Replace entire document content
+      const currentDoc = view.state.doc.toString();
+      if (currentDoc === content) return;
+
+      // Save scroll position
+      const scrollTop = view.scrollDOM.scrollTop;
+
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: content },
+      });
+
+      // Restore scroll position
+      requestAnimationFrame(() => {
+        view.scrollDOM.scrollTop = scrollTop;
+      });
+    }, [content]);
+
     return (
       <div
         ref={containerRef}

@@ -11,6 +11,7 @@ import { FileTree } from '../files/FileTree';
 import { CodeEditor } from '../editor/CodeEditor';
 import { MarkdownPreview } from '../md-preview/MarkdownPreview';
 import { EditorTabs } from '../editor/EditorTabs';
+import { ConflictBar } from '../editor/ConflictBar';
 import { TerminalTabs } from '../terminal/TerminalTabs';
 import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
@@ -104,16 +105,87 @@ function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
 
   useEffect(() => { setMdPreview(false); setOverlay(null); }, [active?.id]);
 
+  // Check for remote changes when editor tab becomes visible
+  useEffect(() => {
+    if (visible && sftpId && tabs.length > 0) {
+      ftm.checkRemoteChanges(sftpId).catch(() => {});
+    }
+  }, [visible]);
+
+  // Check single file when switching editor tabs
+  const prevActiveRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (active && active.id !== prevActiveRef.current && sftpId) {
+      prevActiveRef.current = active.id;
+      ftm.checkSingleTab(sftpId, active.id).catch(() => {});
+    }
+  }, [active?.id]);
+
+  const [editorRefreshing, setEditorRefreshing] = useState(false);
+  const editorPullStartY = useRef(0);
+  const [editorPullDistance, setEditorPullDistance] = useState(0);
+
+  const handleEditorTouchStart = useCallback((e: React.TouchEvent) => {
+    editorPullStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleEditorTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!editorPullStartY.current) return;
+    const diff = e.touches[0].clientY - editorPullStartY.current;
+    if (diff > 0 && diff < 120) {
+      setEditorPullDistance(diff);
+    }
+  }, []);
+
+  const handleEditorTouchEnd = useCallback(async () => {
+    if (editorPullDistance < 60 || !sftpId || !active) {
+      setEditorPullDistance(0);
+      editorPullStartY.current = 0;
+      return;
+    }
+
+    setEditorPullDistance(0);
+    editorPullStartY.current = 0;
+    setEditorRefreshing(true);
+
+    await ftm.checkSingleTab(sftpId, active.id).catch(() => {});
+
+    setEditorRefreshing(false);
+  }, [editorPullDistance, sftpId, active?.id, ftm]);
+
   const isMd = active?.type === 'markdown';
 
   return (
     <>
-      <EditorTabs
-        tabs={tabs}
-        activeTabId={active?.id ?? null}
-        onSelect={(id) => ftm.setActiveTab(id)}
-        onClose={(id) => ftm.closeTab(id)}
-      />
+      <div
+        onTouchStart={handleEditorTouchStart}
+        onTouchMove={handleEditorTouchMove}
+        onTouchEnd={handleEditorTouchEnd}
+      >
+        {(editorPullDistance > 0 || editorRefreshing) && (
+          <div style={{
+            textAlign: 'center',
+            padding: '4px 0',
+            fontSize: 11,
+            color: 'var(--text-muted)',
+            backgroundColor: 'var(--bg-crust)',
+          }}>
+            {editorRefreshing ? '\u27F3 Checking...' : editorPullDistance >= 60 ? '\u2191 Release to refresh' : '\u2193 Pull to refresh'}
+          </div>
+        )}
+        <EditorTabs
+          tabs={tabs}
+          activeTabId={active?.id ?? null}
+          onSelect={(id) => ftm.setActiveTab(id)}
+          onClose={(id) => ftm.closeTab(id)}
+        />
+      </div>
+      {active?.remoteChanged && active?.isDirty && sftpId && (
+        <ConflictBar
+          onReload={() => ftm.reloadFile(sftpId, active.id).catch(() => {})}
+          onKeepMine={() => ftm.dismissRemoteChange(active.id)}
+        />
+      )}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
         {active?.content != null ? (
           isMd && mdPreview ? (
@@ -603,6 +675,7 @@ export function App() {
                         rootPath={conn.workspace.defaultPath}
                         sessionId={conn.sessionId}
                         gitStatus={gitStatusMap}
+                        visible={isActive && activeTab === 'files' && fileSubTab === 'tree'}
                         initialExpandedFolders={(window as any).__intodeRestoreExpandedFolders}
                         onExpandChange={(folders) => { (window as any).__intodeExpandedFolders = folders; }}
                         onFileSelect={async (path) => {

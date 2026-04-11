@@ -16,6 +16,8 @@ export interface FileTab {
   isLoading: boolean;
   isDirty: boolean;
   scrollLine?: number;
+  remoteChanged: boolean;
+  lastStat: { mtime: number; size: number } | null;
 }
 
 export class FileTabManager {
@@ -49,6 +51,8 @@ export class FileTabManager {
       originalContent: null,
       isLoading: true,
       isDirty: false,
+      remoteChanged: false,
+      lastStat: null,
     };
     this.tabs.push(tab);
     this.activeTabId = tab.id;
@@ -66,6 +70,7 @@ export class FileTabManager {
       const { content } = await Ssh.sftpRead({ sftpId, path });
       tab.content = decodeBase64Utf8(content);
       tab.originalContent = tab.content;
+      tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
       tab.isLoading = false;
     } catch (e: unknown) {
       tab.isLoading = false;
@@ -89,6 +94,11 @@ export class FileTabManager {
     await Ssh.sftpWrite({ sftpId, path: tab.path, content: encodeUtf8Base64(tab.content) });
     tab.originalContent = tab.content;
     tab.isDirty = false;
+    tab.remoteChanged = false;
+    try {
+      const { stat } = await Ssh.sftpStat({ sftpId, path: tab.path });
+      tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
+    } catch { /* stat refresh is best-effort */ }
     this.onChange?.();
     return true;
   }
@@ -136,6 +146,8 @@ export class FileTabManager {
       isLoading: !unsavedContent,
       isDirty: !!unsavedContent,
       scrollLine,
+      remoteChanged: false,
+      lastStat: null,
     };
     this.tabs.push(tab);
     this.onChange?.();
@@ -146,6 +158,10 @@ export class FileTabManager {
         tab.content = decodeBase64Utf8(content);
         tab.originalContent = tab.content;
         tab.isLoading = false;
+        try {
+          const { stat } = await Ssh.sftpStat({ sftpId, path });
+          tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
+        } catch { /* best-effort */ }
       } catch (e: unknown) {
         tab.isLoading = false;
         tab.content = `// Error reading file: ${e}`;
@@ -167,5 +183,84 @@ export class FileTabManager {
       scrollLine: t.scrollLine,
       unsavedContent: t.isDirty && t.content ? t.content : undefined,
     }));
+  }
+
+  async checkRemoteChanges(sftpId: string): Promise<void> {
+    const checks = this.tabs
+      .filter(t => t.content !== null && !t.isLoading && t.lastStat)
+      .map(async (tab) => {
+        try {
+          const { stat } = await Ssh.sftpStat({ sftpId, path: tab.path });
+          const changed = stat.modifiedAt !== tab.lastStat!.mtime || stat.size !== tab.lastStat!.size;
+          if (!changed) return;
+
+          if (!tab.isDirty) {
+            const { content } = await Ssh.sftpRead({ sftpId, path: tab.path });
+            tab.content = decodeBase64Utf8(content);
+            tab.originalContent = tab.content;
+            tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
+            tab.remoteChanged = false;
+          } else {
+            tab.remoteChanged = true;
+          }
+        } catch { /* file may have been deleted — ignore */ }
+      });
+
+    await Promise.all(checks);
+    this.onChange?.();
+  }
+
+  async checkSingleTab(sftpId: string, tabId: string): Promise<void> {
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (!tab || tab.content === null || tab.isLoading || !tab.lastStat) return;
+
+    try {
+      const { stat } = await Ssh.sftpStat({ sftpId, path: tab.path });
+      const changed = stat.modifiedAt !== tab.lastStat.mtime || stat.size !== tab.lastStat.size;
+      if (!changed) return;
+
+      if (!tab.isDirty) {
+        const { content } = await Ssh.sftpRead({ sftpId, path: tab.path });
+        tab.content = decodeBase64Utf8(content);
+        tab.originalContent = tab.content;
+        tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
+        tab.remoteChanged = false;
+      } else {
+        tab.remoteChanged = true;
+      }
+    } catch { /* ignore */ }
+
+    this.onChange?.();
+  }
+
+  async reloadFile(sftpId: string, tabId: string): Promise<void> {
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (!tab) return;
+
+    tab.isLoading = true;
+    this.onChange?.();
+
+    try {
+      const { content } = await Ssh.sftpRead({ sftpId, path: tab.path });
+      tab.content = decodeBase64Utf8(content);
+      tab.originalContent = tab.content;
+      tab.isDirty = false;
+      tab.remoteChanged = false;
+      try {
+        const { stat } = await Ssh.sftpStat({ sftpId, path: tab.path });
+        tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
+      } catch { /* best-effort */ }
+    } catch (e: unknown) {
+      tab.content = `// Error reading file: ${e}`;
+    }
+    tab.isLoading = false;
+    this.onChange?.();
+  }
+
+  dismissRemoteChange(tabId: string): void {
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (!tab) return;
+    tab.remoteChanged = false;
+    this.onChange?.();
   }
 }
