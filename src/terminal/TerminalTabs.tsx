@@ -4,6 +4,12 @@ import { TerminalView } from './TerminalView';
 import { getNativeTerminalProvider } from './terminal-provider';
 import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
 
+function isKeyboardVisible(): boolean {
+  const vv = window.visualViewport;
+  if (!vv) return false;
+  return window.innerHeight - vv.height > 50;
+}
+
 interface Tab {
   id: string;
   label: string;
@@ -61,8 +67,13 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     if (!(await checkLimit('terminals', tabs.length, maxTerminals))) return;
     const id = crypto.randomUUID();
     const label = String(nextLabel.current++);
+    const kbVisible = isKeyboardVisible();
     setTabs((t) => [...t, { id, label }]);
     setActiveId(id);
+    const provider = getNativeTerminalProvider();
+    if (provider?.isAvailable()) {
+      setTimeout(() => provider.focusTerminal(id, { showKeyboard: kbVisible }), 100);
+    }
   }, [tabs.length]);
 
   const closeTab = useCallback(
@@ -77,7 +88,7 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
           setActiveId(newId);
           const provider = getNativeTerminalProvider();
           if (provider?.isAvailable()) {
-            setTimeout(() => provider.focusTerminal(newId), 100);
+            setTimeout(() => provider.focusTerminal(newId, { showKeyboard: isKeyboardVisible() }), 100);
           }
         }
         return next;
@@ -110,7 +121,7 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
               setActiveId(tab.id);
               const provider = getNativeTerminalProvider();
               if (provider?.isAvailable()) {
-                setTimeout(() => provider.focusTerminal(tab.id), 100);
+                setTimeout(() => provider.focusTerminal(tab.id, { showKeyboard: isKeyboardVisible() }), 100);
               }
             }}
             onContextMenu={(e) => { e.preventDefault(); configureTmux(tab.id); }}
