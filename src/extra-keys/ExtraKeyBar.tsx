@@ -127,8 +127,20 @@ function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) =
   );
 }
 
+const REPEAT_DELAY = 400;
+const REPEAT_INTERVAL = 80;
+
 function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
   const prevFocus = useRef<HTMLElement | null>(null);
+  const repeatTimer = useRef<number | null>(null);
+
+  const stopRepeat = () => {
+    if (repeatTimer.current !== null) {
+      clearInterval(repeatTimer.current);
+      repeatTimer.current = null;
+    }
+  };
+
   return (
     <button
       tabIndex={-1}
@@ -136,9 +148,15 @@ function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) 
         e.preventDefault();
         prevFocus.current = document.activeElement as HTMLElement | null;
         onPress(keyDef.value);
+        stopRepeat();
+        const timeout = window.setTimeout(() => {
+          repeatTimer.current = window.setInterval(() => onPress(keyDef.value), REPEAT_INTERVAL);
+        }, REPEAT_DELAY);
+        repeatTimer.current = timeout as unknown as number;
       }}
       onTouchEnd={(e) => {
         e.preventDefault();
+        stopRepeat();
         restoreFocus(prevFocus.current);
         prevFocus.current = null;
       }}
@@ -168,11 +186,6 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
       </div>
 
       <div style={fixedAreaStyle}>
-        <button
-          tabIndex={-1}
-          onTouchEnd={() => onKeyPress('keyboard')}
-          style={kbToggleStyle}
-        >{'\u2328'}</button>
         <div style={dpadWithEnterStyle}>
           <div style={dpadStyle}>
             <div />
@@ -222,8 +235,8 @@ const fixedAreaStyle: React.CSSProperties = {
 
 const dpadStyle: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(3, 30px)',
-  gridTemplateRows: 'repeat(2, 26px)',
+  gridTemplateColumns: 'repeat(3, 36px)',
+  gridTemplateRows: 'repeat(2, 32px)',
   gap: 2,
 };
 
@@ -235,7 +248,7 @@ const dpadWithEnterStyle: React.CSSProperties = {
 };
 
 const enterWrapStyle: React.CSSProperties = {
-  width: 30,
+  width: 44,
   alignSelf: 'stretch',
 };
 
@@ -257,23 +270,6 @@ const keyStyle: React.CSSProperties = {
   ...NO_TAP_HIGHLIGHT,
 };
 
-const kbToggleStyle: React.CSSProperties = {
-  width: 44,
-  height: 54,
-  border: '1px solid var(--bg-surface1)',
-  borderRadius: 2,
-  backgroundColor: 'var(--bg-mantle)',
-  color: 'var(--text-secondary)',
-  fontSize: 18,
-  cursor: 'pointer',
-  touchAction: 'manipulation',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: 0,
-  flexShrink: 0,
-  ...NO_TAP_HIGHLIGHT,
-};
 
 const dpadKeyStyle: React.CSSProperties = {
   width: '100%',
