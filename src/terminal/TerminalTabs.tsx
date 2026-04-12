@@ -42,6 +42,7 @@ export interface TerminalTabsProps {
 
 export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: TerminalTabsProps) {
   const nextLabel = useRef(2);
+  const pendingFocusRef = useRef<{ showKeyboard: boolean } | null>(null);
   const [tabs, setTabs] = useState<Tab[]>(() => {
     if (canRestoreTerminalTabs()) {
       const saved = loadTabs(wsId);
@@ -67,14 +68,20 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     if (!(await checkLimit('terminals', tabs.length, maxTerminals))) return;
     const id = crypto.randomUUID();
     const label = String(nextLabel.current++);
-    const kbVisible = isKeyboardVisible();
+    pendingFocusRef.current = { showKeyboard: isKeyboardVisible() };
     setTabs((t) => [...t, { id, label }]);
     setActiveId(id);
+  }, [tabs.length]);
+
+  const handleTerminalReady = useCallback((terminalId: string) => {
+    const pending = pendingFocusRef.current;
+    if (!pending) return;
+    pendingFocusRef.current = null;
     const provider = getNativeTerminalProvider();
     if (provider?.isAvailable()) {
-      setTimeout(() => provider.focusTerminal(id, { showKeyboard: kbVisible }), 100);
+      provider.focusTerminal(terminalId, pending);
     }
-  }, [tabs.length]);
+  }, []);
 
   const closeTab = useCallback(
     (id: string) => {
@@ -165,6 +172,7 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
               terminalId={tab.id}
               visible={visible && tab.id === activeId}
               tmuxSession={tab.tmuxSession}
+              onReady={handleTerminalReady}
             />
           </div>
         ))}

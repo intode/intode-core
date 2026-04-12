@@ -14,11 +14,12 @@ export interface TerminalViewProps {
   terminalId?: string;
   visible: boolean;
   tmuxSession?: string;
+  onReady?: (terminalId: string) => void;
 }
 
 const manager = new TerminalManager();
 
-export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmuxSession }: TerminalViewProps) {
+export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmuxSession, onReady }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<TerminalSession | null>(null);
   const selectionRef = useRef<TerminalSelection | null>(null);
@@ -52,6 +53,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
         const rect = container.getBoundingClientRect();
         nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
       }
+      onReady?.(id);
     }).catch(() => {});
 
     const observer = new ResizeObserver(() => {
