@@ -73,7 +73,12 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
         const next = prev.filter((t) => t.id !== id);
         if (activeId === id) {
           const newIdx = Math.min(idx, next.length - 1);
-          setActiveId(next[newIdx].id);
+          const newId = next[newIdx].id;
+          setActiveId(newId);
+          const provider = getNativeTerminalProvider();
+          if (provider?.isAvailable()) {
+            setTimeout(() => provider.focusTerminal(newId), 100);
+          }
         }
         return next;
       });
@@ -101,7 +106,13 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
           <button
             key={tab.id}
             data-terminal-tab
-            onClick={() => setActiveId(tab.id)}
+            onClick={() => {
+              setActiveId(tab.id);
+              const provider = getNativeTerminalProvider();
+              if (provider?.isAvailable()) {
+                setTimeout(() => provider.focusTerminal(tab.id), 100);
+              }
+            }}
             onContextMenu={(e) => { e.preventDefault(); configureTmux(tab.id); }}
             style={{ ...tabStyle, ...(tab.id === activeId ? activeTabStyle : {}) }}
           >

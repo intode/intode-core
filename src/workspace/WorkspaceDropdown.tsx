@@ -16,6 +16,7 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: Wo
   const closingRef = useRef(false);
 
   const open = useCallback(() => {
+    (window as any).__intodeHideKeyboard?.();
     getWorkspaceStore().getAll().then(setList);
     notifyOverlayOpen();
     setMounted(true);
