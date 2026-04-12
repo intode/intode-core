@@ -7,7 +7,7 @@ export interface NativeTerminalProvider {
   hideTerminal(terminalId: string): Promise<void>;
   resizeTerminal(terminalId: string, rect: { x: number; y: number; width: number; height: number }): Promise<void>;
   writeInput(terminalId: string, data: string): Promise<void>;
-  focusTerminal(terminalId: string): Promise<void>;
+  focusTerminal(terminalId: string, options?: { showKeyboard?: boolean }): Promise<void>;
   setFontSize(terminalId: string, size: number): Promise<void>;
   isAvailable(): boolean;
 }
