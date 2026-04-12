@@ -492,12 +492,13 @@ export function App() {
   const handleDisconnect = useCallback(async () => {
     if (!activeConn) return;
     // Save session state before disconnecting
-    if (activeTab !== 'settings') {
+    const currentTab = activeTabRef.current;
+    if (currentTab !== 'settings') {
       const ftm = getFileTabMgr(activeConn.wsId);
       const activeFile = ftm.getActiveTab();
       saveSessionState({
         workspaceId: activeConn.wsId,
-        activeTab,
+        activeTab: currentTab,
         fileSubTab: (window as any).__intodeFileSubTab,
         openFiles: ftm.getFileTabStates(),
         activeFile: activeFile?.path,
