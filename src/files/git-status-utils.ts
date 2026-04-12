@@ -22,11 +22,22 @@ function parseGitKey(status: string): string {
 }
 
 const IGNORED_INFO = { label: 'I', color: GIT_COLORS['!'] };
+const UNTRACKED_INFO = { label: 'U', color: GIT_COLORS['?'] };
 
 /** Check if any ancestor directory is ignored */
 function isUnderIgnoredDir(nodePath: string, gitStatus: GitStatusMap): boolean {
   for (const [filePath, status] of gitStatus) {
     if (status.trim() !== '!!') continue;
+    const fp = filePath.replace(/\/$/, '');
+    if (nodePath.includes('/' + fp + '/') || nodePath.endsWith('/' + fp)) return true;
+  }
+  return false;
+}
+
+/** Check if node is inside an untracked directory (git reports `?? dir/` without listing children) */
+function isUnderUntrackedDir(nodePath: string, gitStatus: GitStatusMap): boolean {
+  for (const [filePath, status] of gitStatus) {
+    if (status.trim() !== '??') continue;
     const fp = filePath.replace(/\/$/, '');
     if (nodePath.includes('/' + fp + '/') || nodePath.endsWith('/' + fp)) return true;
   }
@@ -46,6 +57,7 @@ export function getNodeGitInfo(nodePath: string, nodeName: string, isDir: boolea
   }
 
   if (isUnderIgnoredDir(nodePath, gitStatus)) return IGNORED_INFO;
+  if (isUnderUntrackedDir(nodePath, gitStatus)) return UNTRACKED_INFO;
 
   if (isDir) {
     const dirSuffix = '/' + nodeName + '/';
