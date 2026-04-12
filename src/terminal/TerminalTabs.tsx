@@ -3,6 +3,7 @@ import { getPolicy, checkLimit } from '../policies/provider';
 import { TerminalView } from './TerminalView';
 import { getNativeTerminalProvider } from './terminal-provider';
 import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 function isKeyboardVisible(): boolean {
   const vv = window.visualViewport;
@@ -54,6 +55,15 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     return [{ id: crypto.randomUUID(), label: '1' }];
   });
   const [activeId, setActiveId] = useState(tabs[0].id);
+  const activeIdRef = useRef(activeId);
+  useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
+  const tabsRef = useRef(tabs);
+  useEffect(() => { tabsRef.current = tabs; }, [tabs]);
+  const [bounceDir, setBounceDir] = useState<'next' | 'prev' | null>(null);
+  const bounceTimerRef = useRef<number | null>(null);
+  useEffect(() => () => {
+    if (bounceTimerRef.current !== null) window.clearTimeout(bounceTimerRef.current);
+  }, []);
 
   // Save tabs to localStorage whenever they change
   useEffect(() => {
@@ -117,9 +127,61 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     }
   }, [tabs]);
 
+  const triggerBounce = useCallback((dir: 'next' | 'prev') => {
+    Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
+    setBounceDir(dir);
+    if (bounceTimerRef.current !== null) {
+      window.clearTimeout(bounceTimerRef.current);
+    }
+    bounceTimerRef.current = window.setTimeout(() => {
+      setBounceDir(null);
+      bounceTimerRef.current = null;
+    }, 220);
+  }, []);
+
+  const handleSwipe = useCallback((direction: 'next' | 'prev', terminalId: string) => {
+    if (terminalId !== activeIdRef.current) return;
+    const current = tabsRef.current;
+    const idx = current.findIndex((t) => t.id === activeIdRef.current);
+    if (idx < 0) return;
+    const nextIdx = direction === 'next' ? idx + 1 : idx - 1;
+    if (nextIdx < 0 || nextIdx >= current.length) {
+      triggerBounce(direction);
+      return;
+    }
+    const nextId = current[nextIdx].id;
+    setActiveId(nextId);
+    const provider = getNativeTerminalProvider();
+    if (provider?.isAvailable()) {
+      provider.focusTerminal(nextId, { showKeyboard: isKeyboardVisible() });
+    }
+  }, [triggerBounce]);
+
+  useEffect(() => {
+    const provider = getNativeTerminalProvider();
+    if (!provider?.isAvailable() || !provider.addSwipeListener) return;
+    let handle: { remove(): void } | null = null;
+    let cancelled = false;
+    provider.addSwipeListener((e) => handleSwipe(e.direction, e.terminalId))
+      .then((h) => {
+        if (cancelled) { h.remove(); return; }
+        handle = h;
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      handle?.remove();
+    };
+  }, [handleSwipe]);
+
   return (
     <div style={rootStyle}>
-      <div style={barStyle}>
+      <div style={{
+        ...barStyle,
+        transform: bounceDir === 'next' ? 'translateX(-12px)'
+                 : bounceDir === 'prev' ? 'translateX(12px)' : 'translateX(0)',
+        transition: 'transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+      }}>
         {tabs.map((tab) => (
           <button
             key={tab.id}

@@ -1,5 +1,14 @@
 /** DI hook for native terminal rendering — Pro injects Android/iOS native terminal provider at bootstrap */
 
+export interface SwipeListenerHandle {
+  remove(): void;
+}
+
+export interface TerminalSwipeEvent {
+  direction: 'next' | 'prev';
+  terminalId: string;
+}
+
 export interface NativeTerminalProvider {
   createTerminal(terminalId: string, sessionId: string, defaultPath?: string, tmuxSession?: string): Promise<void>;
   destroyTerminal(terminalId: string): Promise<void>;
@@ -10,6 +19,8 @@ export interface NativeTerminalProvider {
   focusTerminal(terminalId: string, options?: { showKeyboard?: boolean }): Promise<void>;
   setFontSize(terminalId: string, size: number): Promise<void>;
   isAvailable(): boolean;
+  /** Optional — only implemented on platforms that support native swipe detection */
+  addSwipeListener?(cb: (e: TerminalSwipeEvent) => void): Promise<SwipeListenerHandle>;
 }
 
 let provider: NativeTerminalProvider | null = null;
