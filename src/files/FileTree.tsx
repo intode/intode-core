@@ -851,7 +851,13 @@ function updateTreeAt(
   rootPath: string,
   newChildren: FileTreeNode[],
 ): FileTreeNode[] {
-  if (targetPath === rootPath) {
+  // Native `sftpLs` returns paths resolved (~ → /home/user). JS rootPath may still be abbreviated,
+  // so compare against the common parent of existing top-level nodes as a fallback.
+  const resolvedRootFromNodes =
+    nodes.length > 0 ? nodes[0].path.substring(0, nodes[0].path.lastIndexOf('/')) : null;
+  const isRootTarget =
+    targetPath === rootPath || (resolvedRootFromNodes !== null && targetPath === resolvedRootFromNodes);
+  if (isRootTarget) {
     const prevMap = new Map<string, FileTreeNode>();
     const collect = (ns: FileTreeNode[]) => {
       for (const n of ns) {
