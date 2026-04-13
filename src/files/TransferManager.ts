@@ -20,6 +20,8 @@ export interface TransferState {
   failedFiles?: string[];
   error?: string;
   startedAt: number;
+  /** For uploads: the destination remote directory. Used by FileTree to refresh after 'done'. */
+  remoteDir?: string;
 }
 
 interface StartDownloadArgs {
@@ -90,6 +92,7 @@ export class TransferManager {
       filesTotal: args.items.filter((i) => !i.isDirectory).length,
       filesDone: 0,
       startedAt: Date.now(),
+      remoteDir: args.remoteDir,
     };
     this.states.set(id, state);
     this.enqueue({ kind: 'upload', args, id });

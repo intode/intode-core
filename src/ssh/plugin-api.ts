@@ -136,6 +136,8 @@ export interface SshPlugin {
   sftpUpload(options: SftpUploadOptions): Promise<void>;
   sftpCancelTransfer(options: { transferId: string }): Promise<void>;
   sftpCheckRemoteExists(options: { sftpId: string; paths: string[] }): Promise<{ existing: string[] }>;
+  sftpRename(options: { sftpId: string; oldPath: string; newPath: string }): Promise<void>;
+  sftpCopy(options: { sftpId: string; sourcePath: string; destPath: string }): Promise<void>;
   sftpPickFilesToUpload(options: { allowMultiple: boolean }): Promise<SftpPickResult>;
   sftpPickFolderToUpload(): Promise<SftpPickResult>;
   sftpPickSaveLocation(options: { suggestedName: string; mimeType?: string }): Promise<{ cancelled: boolean; localUri?: string }>;

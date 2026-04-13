@@ -4,23 +4,41 @@ export type FileActionTarget =
   | { kind: 'file'; name: string; path: string }
   | { kind: 'folder'; name: string; path: string };
 
-export type FileAction = 'download' | 'uploadFiles' | 'uploadFolder';
+export type FileAction =
+  | 'download'
+  | 'uploadFiles'
+  | 'uploadFolder'
+  | 'rename'
+  | 'copy'
+  | 'move'
+  | 'pasteHere';
 
 interface Props {
   target: FileActionTarget | null;
+  /** When true and target is a folder, show "Paste here" action. */
+  clipboardHasContent?: boolean;
   onClose: () => void;
   onAction: (action: FileAction) => void;
 }
 
-export function FileActionSheet({ target, onClose, onAction }: Props) {
+export function FileActionSheet({ target, clipboardHasContent, onClose, onAction }: Props) {
   if (!target) return null;
 
   const actions: Array<{ id: FileAction; label: string }> =
     target.kind === 'file'
-      ? [{ id: 'download', label: 'Download' }]
+      ? [
+          { id: 'download', label: 'Download' },
+          { id: 'rename', label: 'Rename' },
+          { id: 'copy', label: 'Copy' },
+          { id: 'move', label: 'Move' },
+        ]
       : [
           { id: 'uploadFiles', label: 'Upload files here' },
           { id: 'uploadFolder', label: 'Upload folder here' },
+          { id: 'rename', label: 'Rename' },
+          { id: 'copy', label: 'Copy' },
+          { id: 'move', label: 'Move' },
+          ...(clipboardHasContent ? [{ id: 'pasteHere' as FileAction, label: 'Paste here' }] : []),
         ];
 
   return (

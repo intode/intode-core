@@ -8,6 +8,7 @@ import { FileChangeDetector } from './file-change-detector';
 import { FileActionSheet } from './FileActionSheet';
 import { getTransferManager } from './transfer-singleton';
 import { ConflictDialog, type ConflictChoice } from './ConflictDialog';
+import { RenameDialog } from './RenameDialog';
 
 export interface FileTreeNode {
   name: string;
@@ -192,6 +193,8 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionTarget, setActionTarget] = useState<FileTreeNode | null>(null);
+  const [clipboard, setClipboard] = useState<{ op: 'copy' | 'move'; path: string; name: string } | null>(null);
+  const [renameTarget, setRenameTarget] = useState<FileTreeNode | null>(null);
   const [pendingUpload, setPendingUpload] = useState<{
     remoteDir: string;
     items: import('../ssh/plugin-api').SftpUploadItem[];
@@ -355,6 +358,67 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     }
   }, [sftpId, nodes]);
 
+  // Refresh a specific folder's children (or the root if path === rootPath).
+  // Preserves expansion state for existing child folders.
+  const refreshFolder = useCallback(async (path: string) => {
+    if (!sftpId) return;
+    try {
+      const { entries } = await Ssh.sftpLs({ sftpId, path });
+      const freshChildren = sortEntries(entries).map(toNode);
+      // Invalidate detector so subsequent visibility checks see the new state.
+      try { detectorRef.current.invalidate(path); } catch {}
+      setNodes((prev) => updateTreeAt(prev, path, rootPath, freshChildren));
+    } catch { /* folder may have been deleted */ }
+  }, [sftpId, rootPath]);
+
+  const handleRename = useCallback(async (newName: string) => {
+    const target = renameTarget;
+    setRenameTarget(null);
+    if (!target) return;
+    const parent = target.path.substring(0, target.path.lastIndexOf('/')) || rootPath;
+    const newPath = `${parent}/${newName}`;
+    try {
+      await Ssh.sftpRename({ sftpId, oldPath: target.path, newPath });
+      void refreshFolder(parent);
+    } catch (e: unknown) {
+      alert(`Rename failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }, [renameTarget, sftpId, rootPath, refreshFolder]);
+
+  const handlePaste = useCallback(async (destDir: string) => {
+    const cb = clipboard;
+    if (!cb) return;
+    const destPath = `${destDir.replace(/\/$/, '')}/${cb.name}`;
+    try {
+      if (cb.op === 'move') {
+        await Ssh.sftpRename({ sftpId, oldPath: cb.path, newPath: destPath });
+      } else {
+        await Ssh.sftpCopy({ sftpId, sourcePath: cb.path, destPath });
+      }
+      setClipboard(null);
+      const srcParent = cb.path.substring(0, cb.path.lastIndexOf('/')) || rootPath;
+      void refreshFolder(destDir);
+      if (cb.op === 'move' && srcParent !== destDir) void refreshFolder(srcParent);
+    } catch (e: unknown) {
+      alert(`Paste failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }, [clipboard, sftpId, rootPath, refreshFolder]);
+
+  // Auto-refresh when an upload finishes. Uses remoteDir on TransferState.
+  useEffect(() => {
+    const mgr = getTransferManager();
+    const prevPhases = new Map<string, string>();
+    return mgr.subscribe((states) => {
+      for (const s of states) {
+        const prev = prevPhases.get(s.id);
+        if (prev !== 'done' && s.phase === 'done' && s.kind === 'upload' && s.remoteDir) {
+          void refreshFolder(s.remoteDir);
+        }
+        prevPhases.set(s.id, s.phase);
+      }
+    });
+  }, [refreshFolder]);
+
   const handleDownload = useCallback(async (node: FileTreeNode) => {
     const result = await Ssh.sftpPickSaveLocation({ suggestedName: node.name });
     if (result.cancelled || !result.localUri) return;
@@ -486,6 +550,30 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
           </svg>
         </button>
       </div>
+      {clipboard && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '4px 12px',
+            fontSize: 11,
+            background: 'var(--accent-yellow-dim, #3a2e00)',
+            color: 'var(--accent-yellow, #ffcc00)',
+            borderBottom: '1px solid var(--border-subtle)',
+          }}
+        >
+          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {clipboard.op === 'copy' ? 'Copy' : 'Move'}: {clipboard.name}
+          </span>
+          <button
+            onClick={() => setClipboard(null)}
+            style={{ background: 'transparent', border: 'none', color: 'inherit', fontSize: 11 }}
+          >
+            Clear
+          </button>
+        </div>
+      )}
       <div style={styles.searchBar}>
         <input
           value={searchQuery}
@@ -566,6 +654,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
           name: actionTarget.name,
           path: actionTarget.path,
         } : null}
+        clipboardHasContent={!!clipboard}
         onClose={() => setActionTarget(null)}
         onAction={(action) => {
           if (!actionTarget) return;
@@ -575,9 +664,25 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
             void handleUploadFiles(actionTarget.path);
           } else if (action === 'uploadFolder' && actionTarget.isDirectory) {
             void handleUploadFolder(actionTarget.path);
+          } else if (action === 'rename') {
+            setRenameTarget(actionTarget);
+          } else if (action === 'copy') {
+            setClipboard({ op: 'copy', path: actionTarget.path, name: actionTarget.name });
+          } else if (action === 'move') {
+            setClipboard({ op: 'move', path: actionTarget.path, name: actionTarget.name });
+          } else if (action === 'pasteHere' && actionTarget.isDirectory) {
+            void handlePaste(actionTarget.path);
           }
         }}
       />
+      {renameTarget && (
+        <RenameDialog
+          initialName={renameTarget.name}
+          title={renameTarget.isDirectory ? 'Rename folder' : 'Rename file'}
+          onSubmit={(newName) => void handleRename(newName)}
+          onCancel={() => setRenameTarget(null)}
+        />
+      )}
       {pendingUpload && (
         <ConflictDialog
           conflictCount={pendingUpload.conflicts.length}
@@ -609,6 +714,64 @@ function updateNode(
     if (node.path === path) return updater(node);
     if (node.children) return { ...node, children: updateNode(node.children, path, updater) };
     return node;
+  });
+}
+
+function sortNodeList(nodes: FileTreeNode[]): FileTreeNode[] {
+  return [...nodes].sort((a, b) => {
+    if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+  });
+}
+
+// Replace the children at `targetPath` with `newChildren`, preserving expansion
+// state of matching existing subfolders. When targetPath === rootPath, the
+// replacement happens at the top level.
+function updateTreeAt(
+  nodes: FileTreeNode[],
+  targetPath: string,
+  rootPath: string,
+  newChildren: FileTreeNode[],
+): FileTreeNode[] {
+  if (targetPath === rootPath) {
+    const prevMap = new Map<string, FileTreeNode>();
+    const collect = (ns: FileTreeNode[]) => {
+      for (const n of ns) {
+        prevMap.set(n.path, n);
+        if (n.children) collect(n.children);
+      }
+    };
+    collect(nodes);
+    return sortNodeList(
+      newChildren.map((c) => {
+        const prev = prevMap.get(c.path);
+        return {
+          ...c,
+          isExpanded: prev?.isExpanded ?? false,
+          children: prev?.children,
+        };
+      }),
+    );
+  }
+  return nodes.map((n) => {
+    if (n.path === targetPath) {
+      // Preserve expansion state of any child folders that still exist.
+      const prevChildMap = new Map<string, FileTreeNode>();
+      if (n.children) for (const c of n.children) prevChildMap.set(c.path, c);
+      const merged = newChildren.map((c) => {
+        const prev = prevChildMap.get(c.path);
+        return {
+          ...c,
+          isExpanded: prev?.isExpanded ?? false,
+          children: prev?.children,
+        };
+      });
+      return { ...n, children: sortNodeList(merged), isExpanded: true };
+    }
+    if (n.children) {
+      return { ...n, children: updateTreeAt(n.children, targetPath, rootPath, newChildren) };
+    }
+    return n;
   });
 }
 
