@@ -257,6 +257,8 @@ export function App() {
   const [screen, setScreen] = useState<Screen>('workspace-list');
   const [activeTab, setActiveTab] = useState<string>('terminal');
   const prevTabRef = useRef<string>('terminal');
+  // Per-workspace active tab — switching workspace restores the tab last used there
+  const tabPerWsRef = useRef<Map<string, string>>(new Map());
   const [debugEnabled, setDebugEnabled] = useState(() => localStorage.getItem('intode_debug') === 'true');
   const [fileSubTab, setFileSubTab] = useState('tree');
 
@@ -323,6 +325,13 @@ export function App() {
 
   const activeConn = connections.find((c) => c.wsId === activeWsId) ?? null;
   const connectedIds = new Set(connections.map((c) => c.wsId));
+
+  // Keep per-workspace tab map in sync as user changes tabs
+  useEffect(() => {
+    if (activeWsId && activeTab !== 'settings') {
+      tabPerWsRef.current.set(activeWsId, activeTab);
+    }
+  }, [activeTab, activeWsId]);
 
   // Save full session state on background / before unload
   useEffect(() => {
@@ -430,6 +439,10 @@ export function App() {
     (ws: Workspace) => {
       const existing = connections.find((c) => c.wsId === ws.id);
       if (existing) {
+        // Save current workspace's tab, then restore the target's — set tab BEFORE wsId to avoid a one-frame flash
+        if (activeWsId) tabPerWsRef.current.set(activeWsId, activeTab);
+        const restored = tabPerWsRef.current.get(ws.id);
+        if (restored && restored !== activeTab) setActiveTab(restored);
         setActiveWsId(ws.id);
         if (screen !== 'workspace-view') setScreen('workspace-view');
         return;
@@ -437,7 +450,7 @@ export function App() {
       setConnectingWorkspace(ws);
       setScreen('connecting');
     },
-    [connections, screen],
+    [connections, screen, activeWsId, activeTab],
   );
 
   const handleConnected = useCallback(
@@ -468,6 +481,7 @@ export function App() {
       const isSameWs = saved?.workspaceId === ws.id;
       const restoredTab = (isSameWs && saved.activeTab) ? saved.activeTab : 'files';
       setActiveTab(restoredTab);
+      tabPerWsRef.current.set(ws.id, restoredTab);
 
       // Expose saved state for child components to pick up
       if (isSameWs) {
