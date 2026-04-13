@@ -5,6 +5,9 @@ import { getNodeGitInfo } from './git-status-utils';
 import { useFileSearch } from './useFileSearch';
 import type { GrepResult } from './useFileSearch';
 import { FileChangeDetector } from './file-change-detector';
+import { FileActionSheet } from './FileActionSheet';
+import { getTransferManager } from './transfer-singleton';
+import { ConflictDialog, type ConflictChoice } from './ConflictDialog';
 
 export interface FileTreeNode {
   name: string;
@@ -45,6 +48,13 @@ function collectExpandedFolders(nodes: FileTreeNode[]): string[] {
   return result;
 }
 
+function abbreviateHome(path: string): string {
+  const m = path.match(/^\/home\/([^/]+)(\/.*)?$/);
+  if (m) return '~' + (m[2] ?? '');
+  if (path.startsWith('/root')) return '~' + path.slice(5);
+  return path;
+}
+
 function sortEntries(entries: SftpEntry[]): SftpEntry[] {
   return [...entries].sort((a, b) => {
     if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
@@ -67,13 +77,55 @@ function toNode(entry: SftpEntry): FileTreeNode {
 
 
 function FileTreeItem({
-  node, depth, onToggle, onFileSelect, gitStatus,
+  node, depth, onToggle, onFileSelect, onLongPress, gitStatus,
 }: {
   node: FileTreeNode; depth: number;
-  onToggle: (path: string) => void; onFileSelect: (path: string) => void;
+  onToggle: (path: string) => void;
+  onFileSelect: (path: string) => void;
+  onLongPress: (node: FileTreeNode) => void;
   gitStatus?: GitStatusMap;
 }) {
-  const handleTap = () => {
+  const pressTimer = useRef<number | null>(null);
+  const startPos = useRef<{ x: number; y: number } | null>(null);
+  const triggered = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      if (pressTimer.current !== null) {
+        clearTimeout(pressTimer.current);
+        pressTimer.current = null;
+      }
+    };
+  }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    startPos.current = { x: t.clientX, y: t.clientY };
+    triggered.current = false;
+    pressTimer.current = window.setTimeout(() => {
+      triggered.current = true;
+      try { navigator.vibrate?.(10); } catch {}
+      onLongPress(node);
+    }, 500);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!startPos.current || pressTimer.current === null) return;
+    const t = e.touches[0];
+    const dx = t.clientX - startPos.current.x;
+    const dy = t.clientY - startPos.current.y;
+    if (Math.hypot(dx, dy) > 10) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pressTimer.current !== null) { clearTimeout(pressTimer.current); pressTimer.current = null; }
+  };
+
+  const handleClick = () => {
+    if (triggered.current) return;
     if (node.isDirectory) onToggle(node.path);
     else onFileSelect(node.path);
   };
@@ -84,7 +136,14 @@ function FileTreeItem({
 
   return (
     <>
-      <div onClick={handleTap} style={{ ...styles.item, paddingLeft: 12 + depth * 16, opacity: isIgnored ? 0.8 : 1 }}>
+      <div
+        onClick={handleClick}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+        style={{ ...styles.item, paddingLeft: 12 + depth * 16, opacity: isIgnored ? 0.8 : 1 }}
+      >
         <span style={styles.icon}>
           {node.isDirectory ? (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: isIgnored ? '#4a4f54' : node.isExpanded ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
@@ -102,7 +161,7 @@ function FileTreeItem({
         {node.isLoading && <span style={styles.spinner}>{'\u27F3'}</span>}
       </div>
       {node.isExpanded && node.children?.map((child) => (
-        <FileTreeItem key={child.path} node={child} depth={depth + 1} onToggle={onToggle} onFileSelect={onFileSelect} gitStatus={gitStatus} />
+        <FileTreeItem key={child.path} node={child} depth={depth + 1} onToggle={onToggle} onFileSelect={onFileSelect} onLongPress={onLongPress} gitStatus={gitStatus} />
       ))}
     </>
   );
@@ -132,6 +191,13 @@ function SearchResultItem({ node, rootPath, onSelect }: { node: FileTreeNode; ro
 export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus, initialExpandedFolders, onExpandChange, visible }: FileTreeProps) {
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionTarget, setActionTarget] = useState<FileTreeNode | null>(null);
+  const [pendingUpload, setPendingUpload] = useState<{
+    remoteDir: string;
+    items: import('../ssh/plugin-api').SftpUploadItem[];
+    totalBytes: number;
+    conflicts: string[];
+  } | null>(null);
   const expandQueueRef = React.useRef<string[]>(initialExpandedFolders ?? []);
   const { searchQuery, setSearchQuery, nameResults, grepResults, searching, clearSearch } = useFileSearch(nodes, sessionId, rootPath);
 
@@ -289,6 +355,70 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     }
   }, [sftpId, nodes]);
 
+  const handleDownload = useCallback(async (node: FileTreeNode) => {
+    const result = await Ssh.sftpPickSaveLocation({ suggestedName: node.name });
+    if (result.cancelled || !result.localUri) return;
+    getTransferManager().startDownload({
+      sftpId,
+      remotePath: node.path,
+      localUri: result.localUri,
+      label: node.name,
+    });
+  }, [sftpId]);
+
+  const submitUpload = useCallback(async (
+    remoteDir: string,
+    result: import('../ssh/plugin-api').SftpPickResult,
+  ) => {
+    if (result.cancelled || result.items.length === 0) return;
+
+    const remotePaths = result.items
+      .filter((it) => !it.isDirectory)
+      .map((it) => `${remoteDir.replace(/\/$/, '')}/${it.remoteRelativePath}`);
+    const { existing } = await Ssh.sftpCheckRemoteExists({ sftpId, paths: remotePaths });
+
+    if (existing.length === 0) {
+      const fileCount = remotePaths.length;
+      getTransferManager().startUpload({
+        sftpId,
+        remoteDir,
+        items: result.items,
+        totalBytes: result.totalBytes,
+        onConflict: 'overwrite',
+        label: `${remoteDir.split('/').pop() || '/'} (${fileCount} files)`,
+      });
+      return;
+    }
+
+    setPendingUpload({ remoteDir, items: result.items, totalBytes: result.totalBytes, conflicts: existing });
+  }, [sftpId]);
+
+  const handleUploadFiles = useCallback(async (remoteDir: string) => {
+    const result = await Ssh.sftpPickFilesToUpload({ allowMultiple: true });
+    await submitUpload(remoteDir, result);
+  }, [submitUpload]);
+
+  const handleUploadFolder = useCallback(async (remoteDir: string) => {
+    const result = await Ssh.sftpPickFolderToUpload();
+    await submitUpload(remoteDir, result);
+  }, [submitUpload]);
+
+  const finishConflict = useCallback((choice: ConflictChoice) => {
+    const p = pendingUpload;
+    setPendingUpload(null);
+    if (!p || choice === 'cancel') return;
+    const onConflict = choice === 'overwrite' ? 'overwrite' : choice === 'rename' ? 'rename' : 'skip';
+    const fileCount = p.items.filter((it) => !it.isDirectory).length;
+    getTransferManager().startUpload({
+      sftpId,
+      remoteDir: p.remoteDir,
+      items: p.items,
+      totalBytes: p.totalBytes,
+      onConflict,
+      label: `${p.remoteDir.split('/').pop() || '/'} (${fileCount} files)`,
+    });
+  }, [pendingUpload, sftpId]);
+
   const handleToggle = useCallback(async (path: string) => {
     setNodes((prev) => updateNode(prev, path, (node) => {
       if (node.isExpanded) return { ...node, isExpanded: false };
@@ -328,6 +458,34 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
 
   return (
     <div style={styles.container}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '4px 12px', height: 28,
+        borderBottom: '1px solid var(--border-subtle)',
+        color: 'var(--text-secondary)', fontSize: 11,
+        fontFamily: 'var(--font-mono, monospace)',
+        flexShrink: 0,
+      }}>
+        <div style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {abbreviateHome(rootPath)}
+        </div>
+        <button
+          onClick={() => setActionTarget({
+            name: abbreviateHome(rootPath),
+            path: rootPath,
+            isDirectory: true,
+            size: 0,
+            modifiedAt: 0,
+          })}
+          aria-label="Upload to root"
+          style={{ background: 'transparent', border: 'none', padding: 4, color: 'var(--text-secondary)', cursor: 'pointer' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 19V5" />
+            <path d="M5 12l7-7 7 7" />
+          </svg>
+        </button>
+      </div>
       <div style={styles.searchBar}>
         <input
           value={searchQuery}
@@ -398,9 +556,34 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
             </div>
           )}
           {nodes.map((node) => (
-            <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} gitStatus={gitStatus} />
+            <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} onLongPress={setActionTarget} gitStatus={gitStatus} />
           ))}
         </div>
+      )}
+      <FileActionSheet
+        target={actionTarget ? {
+          kind: actionTarget.isDirectory ? 'folder' : 'file',
+          name: actionTarget.name,
+          path: actionTarget.path,
+        } : null}
+        onClose={() => setActionTarget(null)}
+        onAction={(action) => {
+          if (!actionTarget) return;
+          if (action === 'download' && !actionTarget.isDirectory) {
+            void handleDownload(actionTarget);
+          } else if (action === 'uploadFiles' && actionTarget.isDirectory) {
+            void handleUploadFiles(actionTarget.path);
+          } else if (action === 'uploadFolder' && actionTarget.isDirectory) {
+            void handleUploadFolder(actionTarget.path);
+          }
+        }}
+      />
+      {pendingUpload && (
+        <ConflictDialog
+          conflictCount={pendingUpload.conflicts.length}
+          totalCount={pendingUpload.items.filter(i => !i.isDirectory).length}
+          onChoose={finishConflict}
+        />
       )}
     </div>
   );

@@ -63,6 +63,47 @@ export interface JumpHost {
   keyId?: string;
 }
 
+export interface SftpDownloadOptions {
+  sftpId: string;
+  remotePath: string;
+  localUri: string;   // SAF content:// URI
+  transferId: string;
+}
+
+export interface SftpUploadItem {
+  localUri: string;
+  remoteRelativePath: string; // remoteDir 기준, dir 자체는 폴더명, 파일은 상대경로
+  isDirectory: boolean;
+  size: number;               // bytes, dir 은 0
+}
+
+export interface SftpUploadOptions {
+  sftpId: string;
+  remoteDir: string;
+  items: SftpUploadItem[];
+  transferId: string;
+  onConflict: 'overwrite' | 'rename' | 'skip';
+  totalBytes: number;
+}
+
+export interface SftpPickResult {
+  cancelled: boolean;
+  items: SftpUploadItem[];
+  totalBytes: number;
+}
+
+export interface TransferProgressEvent {
+  transferId: string;
+  phase: 'start' | 'progress' | 'done' | 'error' | 'cancelled';
+  bytesTransferred: number;
+  totalBytes: number;        // -1 = unknown
+  currentFile?: string;
+  filesDone?: number;
+  filesTotal?: number;
+  failedFiles?: string[];
+  error?: string;
+}
+
 export interface SshPlugin {
   connect(options: ConnectOptions): Promise<{ sessionId: string }>;
   disconnect(options: { sessionId: string }): Promise<void>;
@@ -91,6 +132,18 @@ export interface SshPlugin {
   sftpRead(options: { sftpId: string; path: string }): Promise<{ content: string; size: number }>;
   sftpWrite(options: { sftpId: string; path: string; content: string }): Promise<void>;
   sftpStat(options: { sftpId: string; path: string }): Promise<{ stat: SftpStat }>;
+  sftpDownload(options: SftpDownloadOptions): Promise<void>;
+  sftpUpload(options: SftpUploadOptions): Promise<void>;
+  sftpCancelTransfer(options: { transferId: string }): Promise<void>;
+  sftpCheckRemoteExists(options: { sftpId: string; paths: string[] }): Promise<{ existing: string[] }>;
+  sftpPickFilesToUpload(options: { allowMultiple: boolean }): Promise<SftpPickResult>;
+  sftpPickFolderToUpload(): Promise<SftpPickResult>;
+  sftpPickSaveLocation(options: { suggestedName: string; mimeType?: string }): Promise<{ cancelled: boolean; localUri?: string }>;
+  sftpEnsureNotificationPermission(): Promise<{ granted: boolean }>;
+  addListener(
+    eventName: 'sftpTransferProgress',
+    listenerFunc: (event: TransferProgressEvent) => void,
+  ): Promise<PluginListenerHandle>;
 
   // SSH key management
   generateSshKey(options: { name: string; type: 'ed25519' | 'rsa' }): Promise<SshKey>;

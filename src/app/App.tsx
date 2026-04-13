@@ -17,6 +17,8 @@ import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
 import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } from '../workspace/WorkspaceManager';
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
+import { getTransferManager } from '../files/transfer-singleton';
+import { TransferSnackbar } from '../files/TransferSnackbar';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
 import { notifyOverlayClose } from './overlay-hooks';
@@ -246,6 +248,11 @@ function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
 // --- Main App ---
 
 export function App() {
+  // 앱 시작 시 TransferManager 초기화 (sftpTransferProgress 리스너 부착)
+  useEffect(() => {
+    getTransferManager();
+  }, []);
+
   const keyboardHeight = useKeyboardHeight();
   const [screen, setScreen] = useState<Screen>('workspace-list');
   const [activeTab, setActiveTab] = useState<string>('terminal');
@@ -767,6 +774,7 @@ export function App() {
         {activeTab !== 'settings' && keyboardHeight === 0 && (
           <TabBar activeTab={activeTab} onTabChange={handleTabChange} extraTabs={getExtraTabs()} />
         )}
+        <TransferSnackbar />
       </div>
       <DebugOverlay enabled={debugEnabled} />
     </div>

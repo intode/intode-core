@@ -568,6 +568,25 @@ export class SshWeb extends WebPlugin implements SshPlugin {
     };
   }
 
+  async sftpDownload(): Promise<void> {}
+  async sftpUpload(): Promise<void> {}
+  async sftpCancelTransfer(): Promise<void> {}
+  async sftpCheckRemoteExists(): Promise<{ existing: string[] }> {
+    return { existing: [] };
+  }
+  async sftpPickFilesToUpload(): Promise<{ cancelled: boolean; items: any[]; totalBytes: number }> {
+    return { cancelled: true, items: [], totalBytes: 0 };
+  }
+  async sftpPickFolderToUpload(): Promise<{ cancelled: boolean; items: any[]; totalBytes: number }> {
+    return { cancelled: true, items: [], totalBytes: 0 };
+  }
+  async sftpPickSaveLocation(): Promise<{ cancelled: boolean; localUri?: string }> {
+    return { cancelled: true };
+  }
+  async sftpEnsureNotificationPermission(): Promise<{ granted: boolean }> {
+    return { granted: false };
+  }
+
   async generateSshKey(): Promise<SshKey> {
     return { id: 'mock-key', name: 'mock', type: 'ed25519', fingerprint: 'SHA256:mock', publicKey: 'ssh-ed25519 AAAA...', createdAt: Date.now() };
   }
