@@ -138,6 +138,9 @@ export interface SshPlugin {
   sftpCheckRemoteExists(options: { sftpId: string; paths: string[] }): Promise<{ existing: string[] }>;
   sftpRename(options: { sftpId: string; oldPath: string; newPath: string }): Promise<void>;
   sftpCopy(options: { sftpId: string; sourcePath: string; destPath: string }): Promise<void>;
+  sftpDelete(options: { sftpId: string; path: string; isDirectory: boolean }): Promise<void>;
+  sftpCreateFile(options: { sftpId: string; path: string }): Promise<void>;
+  sftpCreateFolder(options: { sftpId: string; path: string }): Promise<void>;
   sftpPickFilesToUpload(options: { allowMultiple: boolean }): Promise<SftpPickResult>;
   sftpPickFolderToUpload(): Promise<SftpPickResult>;
   sftpPickSaveLocation(options: { suggestedName: string; mimeType?: string }): Promise<{ cancelled: boolean; localUri?: string }>;

@@ -2,7 +2,7 @@ import React from 'react';
 
 export type FileActionTarget =
   | { kind: 'file'; name: string; path: string }
-  | { kind: 'folder'; name: string; path: string };
+  | { kind: 'folder'; name: string; path: string; isRoot?: boolean };
 
 export type FileAction =
   | 'download'
@@ -11,7 +11,10 @@ export type FileAction =
   | 'rename'
   | 'copy'
   | 'move'
-  | 'pasteHere';
+  | 'pasteHere'
+  | 'delete'
+  | 'newFile'
+  | 'newFolder';
 
 interface Props {
   target: FileActionTarget | null;
@@ -24,22 +27,26 @@ interface Props {
 export function FileActionSheet({ target, clipboardHasContent, onClose, onAction }: Props) {
   if (!target) return null;
 
-  const actions: Array<{ id: FileAction; label: string }> =
-    target.kind === 'file'
-      ? [
-          { id: 'download', label: 'Download' },
-          { id: 'rename', label: 'Rename' },
-          { id: 'copy', label: 'Copy' },
-          { id: 'move', label: 'Move' },
-        ]
-      : [
-          { id: 'uploadFiles', label: 'Upload files here' },
-          { id: 'uploadFolder', label: 'Upload folder here' },
-          { id: 'rename', label: 'Rename' },
-          { id: 'copy', label: 'Copy' },
-          { id: 'move', label: 'Move' },
-          ...(clipboardHasContent ? [{ id: 'pasteHere' as FileAction, label: 'Paste here' }] : []),
-        ];
+  const actions: Array<{ id: FileAction; label: string; destructive?: boolean }> = [];
+  if (target.kind === 'file') {
+    actions.push({ id: 'download', label: 'Download' });
+    actions.push({ id: 'rename', label: 'Rename' });
+    actions.push({ id: 'copy', label: 'Copy' });
+    actions.push({ id: 'move', label: 'Move' });
+    actions.push({ id: 'delete', label: 'Delete', destructive: true });
+  } else {
+    actions.push({ id: 'uploadFiles', label: 'Upload files here' });
+    actions.push({ id: 'uploadFolder', label: 'Upload folder here' });
+    actions.push({ id: 'newFile', label: 'New file' });
+    actions.push({ id: 'newFolder', label: 'New folder' });
+    if (clipboardHasContent) actions.push({ id: 'pasteHere', label: 'Paste here' });
+    if (!target.isRoot) {
+      actions.push({ id: 'rename', label: 'Rename' });
+      actions.push({ id: 'copy', label: 'Copy' });
+      actions.push({ id: 'move', label: 'Move' });
+      actions.push({ id: 'delete', label: 'Delete', destructive: true });
+    }
+  }
 
   return (
     <>
@@ -83,7 +90,7 @@ export function FileActionSheet({ target, clipboardHasContent, onClose, onAction
               background: 'transparent',
               border: 'none',
               borderBottom: '1px solid var(--border-subtle)',
-              color: 'var(--text-primary)',
+              color: a.destructive ? 'var(--accent-red, #ff4444)' : 'var(--text-primary)',
               fontSize: 15,
               textAlign: 'left',
             }}

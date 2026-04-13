@@ -9,6 +9,7 @@ import { FileActionSheet } from './FileActionSheet';
 import { getTransferManager } from './transfer-singleton';
 import { ConflictDialog, type ConflictChoice } from './ConflictDialog';
 import { RenameDialog } from './RenameDialog';
+import { ConfirmDialog } from './ConfirmDialog';
 
 export interface FileTreeNode {
   name: string;
@@ -195,6 +196,8 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
   const [actionTarget, setActionTarget] = useState<FileTreeNode | null>(null);
   const [clipboard, setClipboard] = useState<{ op: 'copy' | 'move'; path: string; name: string } | null>(null);
   const [renameTarget, setRenameTarget] = useState<FileTreeNode | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<FileTreeNode | null>(null);
+  const [createMode, setCreateMode] = useState<{ kind: 'file' | 'folder'; parentPath: string } | null>(null);
   const [pendingUpload, setPendingUpload] = useState<{
     remoteDir: string;
     items: import('../ssh/plugin-api').SftpUploadItem[];
@@ -403,6 +406,83 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
       alert(`Paste failed: ${e instanceof Error ? e.message : String(e)}`);
     }
   }, [clipboard, sftpId, rootPath, refreshFolder]);
+
+  const handleDelete = useCallback(async () => {
+    const target = deleteTarget;
+    setDeleteTarget(null);
+    if (!target) return;
+    try {
+      await Ssh.sftpDelete({ sftpId, path: target.path, isDirectory: target.isDirectory });
+      const parent = target.path.substring(0, target.path.lastIndexOf('/')) || rootPath;
+      void refreshFolder(parent);
+    } catch (e: unknown) {
+      alert(`Delete failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }, [deleteTarget, sftpId, rootPath, refreshFolder]);
+
+  const handleCreate = useCallback(async (name: string) => {
+    const mode = createMode;
+    setCreateMode(null);
+    if (!mode) return;
+    const path = `${mode.parentPath.replace(/\/$/, '')}/${name}`;
+    try {
+      if (mode.kind === 'file') {
+        await Ssh.sftpCreateFile({ sftpId, path });
+      } else {
+        await Ssh.sftpCreateFolder({ sftpId, path });
+      }
+      void refreshFolder(mode.parentPath);
+    } catch (e: unknown) {
+      alert(`Create failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }, [createMode, sftpId, refreshFolder]);
+
+  // Empty-area long-press → root sheet
+  const emptyPressTimer = useRef<number | null>(null);
+  const emptyPressStart = useRef<{ x: number; y: number } | null>(null);
+
+  const openRootSheet = useCallback(() => {
+    setActionTarget({
+      name: abbreviateHome(rootPath),
+      path: rootPath,
+      isDirectory: true,
+      size: 0,
+      modifiedAt: 0,
+      isExpanded: false,
+      isLoading: false,
+    });
+  }, [rootPath]);
+
+  const emptyAreaTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    emptyPressStart.current = { x: t.clientX, y: t.clientY };
+    emptyPressTimer.current = window.setTimeout(() => {
+      try { navigator.vibrate?.(10); } catch {}
+      openRootSheet();
+    }, 500);
+  };
+  const emptyAreaTouchMove = (e: React.TouchEvent) => {
+    if (!emptyPressStart.current || emptyPressTimer.current === null) return;
+    const t = e.touches[0];
+    const dx = t.clientX - emptyPressStart.current.x;
+    const dy = t.clientY - emptyPressStart.current.y;
+    if (Math.hypot(dx, dy) > 10) {
+      clearTimeout(emptyPressTimer.current);
+      emptyPressTimer.current = null;
+    }
+  };
+  const emptyAreaTouchEnd = () => {
+    if (emptyPressTimer.current !== null) {
+      clearTimeout(emptyPressTimer.current);
+      emptyPressTimer.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (emptyPressTimer.current !== null) clearTimeout(emptyPressTimer.current);
+    };
+  }, []);
 
   // Auto-refresh when an upload finishes. Uses remoteDir on TransferState.
   useEffect(() => {
@@ -622,12 +702,10 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
             </>
           )}
         </div>
-      ) : nodes.length === 0 ? (
-        <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Empty directory</span></div>
       ) : (
         <div
           ref={treeScrollRef}
-          style={styles.treeScroll}
+          style={{ ...styles.treeScroll, display: 'flex', flexDirection: 'column' }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -643,17 +721,29 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
               {refreshing ? '\u27F3 Refreshing...' : pullDistance >= 60 ? '\u2191 Release to refresh' : '\u2193 Pull to refresh'}
             </div>
           )}
+          {nodes.length === 0 && (
+            <div style={{ padding: '24px 12px', textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
+              Empty directory
+            </div>
+          )}
           {nodes.map((node) => (
             <FileTreeItem key={node.path} node={node} depth={0} onToggle={handleToggle} onFileSelect={onFileSelect} onLongPress={setActionTarget} gitStatus={gitStatus} />
           ))}
+          <div
+            onTouchStart={emptyAreaTouchStart}
+            onTouchMove={emptyAreaTouchMove}
+            onTouchEnd={emptyAreaTouchEnd}
+            onTouchCancel={emptyAreaTouchEnd}
+            style={{ flex: 1, minHeight: 80 }}
+          />
         </div>
       )}
       <FileActionSheet
-        target={actionTarget ? {
-          kind: actionTarget.isDirectory ? 'folder' : 'file',
-          name: actionTarget.name,
-          path: actionTarget.path,
-        } : null}
+        target={actionTarget ? (
+          actionTarget.path === rootPath
+            ? { kind: 'folder', name: actionTarget.name, path: actionTarget.path, isRoot: true }
+            : { kind: actionTarget.isDirectory ? 'folder' : 'file', name: actionTarget.name, path: actionTarget.path }
+        ) : null}
         clipboardHasContent={!!clipboard}
         onClose={() => setActionTarget(null)}
         onAction={(action) => {
@@ -672,6 +762,12 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
             setClipboard({ op: 'move', path: actionTarget.path, name: actionTarget.name });
           } else if (action === 'pasteHere' && actionTarget.isDirectory) {
             void handlePaste(actionTarget.path);
+          } else if (action === 'delete') {
+            setDeleteTarget(actionTarget);
+          } else if (action === 'newFile' && actionTarget.isDirectory) {
+            setCreateMode({ kind: 'file', parentPath: actionTarget.path });
+          } else if (action === 'newFolder' && actionTarget.isDirectory) {
+            setCreateMode({ kind: 'folder', parentPath: actionTarget.path });
           }
         }}
       />
@@ -681,6 +777,28 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
           title={renameTarget.isDirectory ? 'Rename folder' : 'Rename file'}
           onSubmit={(newName) => void handleRename(newName)}
           onCancel={() => setRenameTarget(null)}
+        />
+      )}
+      {deleteTarget && (
+        <ConfirmDialog
+          title={deleteTarget.isDirectory ? 'Delete folder' : 'Delete file'}
+          message={
+            deleteTarget.isDirectory
+              ? `Delete "${deleteTarget.name}" and all its contents? This cannot be undone.`
+              : `Delete "${deleteTarget.name}"? This cannot be undone.`
+          }
+          confirmLabel="Delete"
+          destructive
+          onConfirm={() => void handleDelete()}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
+      {createMode && (
+        <RenameDialog
+          initialName=""
+          title={createMode.kind === 'file' ? 'New file' : 'New folder'}
+          onSubmit={(name) => void handleCreate(name)}
+          onCancel={() => setCreateMode(null)}
         />
       )}
       {pendingUpload && (
