@@ -1,19 +1,24 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Workspace, getWorkspaceStore } from './WorkspaceManager';
 import { notifyOverlayOpen, notifyOverlayClose } from '../app/overlay-hooks';
+import { useLongPressMenu } from './useLongPressMenu';
+import { WorkspaceContextMenu } from './WorkspaceContextMenu';
 
 interface WorkspaceDropdownProps {
   current: Workspace;
   connectedIds: Set<string>;
   onSwitch: (ws: Workspace) => void;
   onAdd: () => void;
+  onEdit: (ws: Workspace) => void;
+  onDelete: (ws: Workspace) => Promise<void>;
 }
 
-export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: WorkspaceDropdownProps) {
+export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd, onEdit, onDelete }: WorkspaceDropdownProps) {
   const [mounted, setMounted] = useState(false);
   const [animIn, setAnimIn] = useState(false);
   const [list, setList] = useState<Workspace[]>([]);
   const closingRef = useRef(false);
+  const { target: menuTarget, setTarget: setMenuTarget, bind, shouldSuppressClick } = useLongPressMenu<Workspace>();
 
   const open = useCallback(() => {
     (window as any).__intodeHideKeyboard?.();
@@ -26,6 +31,7 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: Wo
   const close = useCallback((restore = true) => {
     if (closingRef.current) return;
     closingRef.current = true;
+    setMenuTarget(null);
     setAnimIn(false);
     setTimeout(() => {
       setMounted(false);
@@ -62,7 +68,9 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: Wo
               {list.map((ws) => (
                 <button
                   key={ws.id}
+                  {...bind(ws)}
                   onClick={() => {
+                    if (shouldSuppressClick()) return;
                     const switching = ws.id !== current.id;
                     close(!switching);
                     if (switching) setTimeout(() => onSwitch(ws), 260);
@@ -95,6 +103,28 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd }: Wo
             </div>
           </div>
         </div>
+      )}
+      {menuTarget && (
+        <WorkspaceContextMenu
+          workspace={menuTarget}
+          onEdit={() => {
+            const ws = menuTarget;
+            setMenuTarget(null);
+            close(false);
+            setTimeout(() => onEdit(ws), 260);
+          }}
+          onDelete={async () => {
+            const ws = menuTarget;
+            setMenuTarget(null);
+            try {
+              await onDelete(ws);
+              getWorkspaceStore().getAll().then(setList);
+            } catch {
+              /* cancelled or failed — keep list as-is */
+            }
+          }}
+          onCancel={() => setMenuTarget(null) /* keep sheet open, just dismiss menu */}
+        />
       )}
     </>
   );

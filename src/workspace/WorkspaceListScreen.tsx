@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Workspace, getWorkspaceStore } from './WorkspaceManager';
-import { LONG_PRESS_DELAY_MS } from '../lib/constants';
-import { CENTER_COLUMN, BUTTON_PRIMARY, TRUNCATE, NO_TAP_HIGHLIGHT, OVERLAY } from '../lib/styles';
+import { useLongPressMenu } from './useLongPressMenu';
+import { WorkspaceContextMenu } from './WorkspaceContextMenu';
 
 export interface WorkspaceListScreenProps {
   onSelectWorkspace: (workspace: Workspace) => void;
   onAddWorkspace: () => void;
   onEditWorkspace?: (workspace: Workspace) => void;
+  onDeleteWorkspace?: (workspace: Workspace) => Promise<void>;
   onSettings?: () => void;
   connectedIds?: Set<string>;
 }
 
-export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditWorkspace, onSettings, connectedIds }: WorkspaceListScreenProps) {
+export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditWorkspace, onDeleteWorkspace, onSettings, connectedIds }: WorkspaceListScreenProps) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
-  const [menuTarget, setMenuTarget] = useState<Workspace | null>(null);
+  const { target: menuTarget, setTarget: setMenuTarget, bind, shouldSuppressClick } = useLongPressMenu<Workspace>();
 
   const reload = () => {
     getWorkspaceStore().getAll().then((ws) => {
@@ -26,9 +27,14 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
   useEffect(reload, []);
 
   const handleDelete = async (ws: Workspace) => {
-    await getWorkspaceStore().delete(ws.id);
     setMenuTarget(null);
-    reload();
+    if (onDeleteWorkspace) {
+      await onDeleteWorkspace(ws);
+      // App-level handler bumps listKey, remounting this screen — no manual reload needed.
+    } else {
+      await getWorkspaceStore().delete(ws.id);
+      reload();
+    }
   };
 
   if (loading) {
@@ -64,13 +70,8 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
         {workspaces.map((ws) => (
           <div
             key={ws.id}
-            onClick={() => onSelectWorkspace(ws)}
-            onContextMenu={(e) => { e.preventDefault(); setMenuTarget(ws); }}
-            onPointerDown={(e) => {
-              const timer = setTimeout(() => setMenuTarget(ws), LONG_PRESS_DELAY_MS);
-              const up = () => { clearTimeout(timer); window.removeEventListener('pointerup', up); };
-              window.addEventListener('pointerup', up);
-            }}
+            {...bind(ws)}
+            onClick={() => { if (shouldSuppressClick()) return; onSelectWorkspace(ws); }}
             style={styles.card}
           >
             {connectedIds?.has(ws.id) && <div style={styles.cardDot} />}
@@ -85,29 +86,13 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
 
       {/* Context menu */}
       {menuTarget && (
-        <div style={styles.overlay} onClick={() => setMenuTarget(null)}>
-          <div style={styles.menu} onClick={(e) => e.stopPropagation()}>
-            <p style={styles.menuTitle}>{menuTarget.name}</p>
-            <button
-              style={styles.menuItem}
-              onClick={() => { setMenuTarget(null); onEditWorkspace?.(menuTarget); }}
-            >
-              Edit
-            </button>
-            <button
-              style={{ ...styles.menuItem, color: 'var(--accent-red)' }}
-              onClick={() => handleDelete(menuTarget)}
-            >
-              Delete
-            </button>
-            <button
-              style={styles.menuItem}
-              onClick={() => setMenuTarget(null)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <WorkspaceContextMenu
+          workspace={menuTarget}
+          onEdit={() => { const t = menuTarget; setMenuTarget(null); onEditWorkspace?.(t); }}
+          onDelete={() => handleDelete(menuTarget)}
+          onCancel={() => setMenuTarget(null)}
+          zIndex={150}
+        />
       )}
 
       <button onClick={onAddWorkspace} style={styles.fab}>+</button>
@@ -125,9 +110,9 @@ const styles: Record<string, React.CSSProperties> = {
   card: {
     display: 'flex', alignItems: 'center', gap: 12,
     padding: '14px 16px', marginBottom: 8,
-    backgroundColor: 'var(--bg-mantle)', 
+    backgroundColor: 'var(--bg-mantle)',
     border: '1px solid var(--bg-surface0)',
-    borderRadius: 2, 
+    borderRadius: 2,
     cursor: 'pointer',
     WebkitTapHighlightColor: 'transparent',
     transition: 'border-color var(--transition)',
@@ -156,19 +141,5 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none', fontSize: 24, fontWeight: 700, cursor: 'pointer',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     boxShadow: 'var(--neon-glow)',
-  },
-  overlay: OVERLAY,
-  menu: {
-    backgroundColor: 'var(--bg-surface0)', borderRadius: 12,
-    padding: '16px 0', minWidth: 250, boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-  },
-  menuTitle: {
-    fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
-    padding: '0 20px 12px', borderBottom: '1px solid var(--bg-surface1)', margin: 0,
-  },
-  menuItem: {
-    display: 'block', width: '100%', padding: '14px 20px',
-    background: 'none', border: 'none', textAlign: 'left' as const,
-    color: 'var(--text-primary)', fontSize: 15, cursor: 'pointer',
   },
 };

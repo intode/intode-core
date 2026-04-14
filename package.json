@@ -51,9 +51,11 @@
     "unified": "^11.0.5"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^29.0.2",
     "typescript": "^5.6.3",
     "vite": "^6.0.5",
     "vite-plugin-dts": "^4.3.0",

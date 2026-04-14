@@ -21,7 +21,7 @@ import { getTransferManager } from '../files/transfer-singleton';
 import { TransferSnackbar } from '../files/TransferSnackbar';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
-import { notifyOverlayClose } from './overlay-hooks';
+import { notifyOverlayOpen, notifyOverlayClose } from './overlay-hooks';
 import { saveSessionState, loadSessionState } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
 import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
@@ -410,7 +410,7 @@ export function App() {
         const settingsBack = (window as any).__intodeSettingsBack as (() => boolean) | undefined;
         if (settingsBack && settingsBack()) return true;
         if (s === 'workspace-view') { setActiveTab(prevTabRef.current); return true; }
-        setScreen(hasConn ? 'workspace-view' : 'workspace-list');
+        setScreen('workspace-list');
         return true;
       }
       if (s === 'workspace-add') {
@@ -428,7 +428,12 @@ export function App() {
         setScreen('workspace-list');
         return true;
       }
-      return false; // workspace-list → system minimizes app
+      if (s === 'workspace-list' && hasConn) {
+        notifyOverlayClose(true);
+        setScreen('workspace-view');
+        return true;
+      }
+      return false; // workspace-list with no connections → system minimizes app
     };
     return () => { delete (window as any).__intodeBackHandler; };
   }, []);
@@ -444,7 +449,10 @@ export function App() {
         const restored = tabPerWsRef.current.get(ws.id);
         if (restored && restored !== activeTab) setActiveTab(restored);
         setActiveWsId(ws.id);
-        if (screen !== 'workspace-view') setScreen('workspace-view');
+        if (screen !== 'workspace-view') {
+          notifyOverlayClose(true);
+          setScreen('workspace-view');
+        }
         return;
       }
       setConnectingWorkspace(ws);
@@ -513,6 +521,31 @@ export function App() {
     [connectingWorkspace],
   );
 
+  const teardownConnection = useCallback(async (wsId: string) => {
+    const conn = connections.find((c) => c.wsId === wsId);
+    if (!conn) return;
+    try {
+      if (conn.sftpId) await Ssh.closeSftp({ sftpId: conn.sftpId });
+      await Ssh.disconnect({ sessionId: conn.sessionId });
+    } catch {
+      /* ignore */
+    }
+    ftmRef.current.delete(wsId);
+    const remaining = connections.filter((c) => c.wsId !== wsId);
+    setConnections(remaining);
+    if (activeWsId === wsId) {
+      if (remaining.length > 0) {
+        setActiveWsId(remaining[0].wsId);
+        keepAliveUpdate(remaining.length);
+      } else {
+        setActiveWsId(null);
+        keepAliveStop();
+      }
+    } else {
+      keepAliveUpdate(remaining.length);
+    }
+  }, [connections, activeWsId]);
+
   const handleDisconnect = useCallback(async () => {
     if (!activeConn) return;
     (window as any).__intodeHideKeyboard?.();
@@ -552,6 +585,24 @@ export function App() {
       keepAliveStop();
     }
   }, [activeConn, connections]);
+
+  const handleDeleteWorkspace = useCallback(async (ws: Workspace) => {
+    const isConnected = connectedIds.has(ws.id);
+    if (isConnected) {
+      const ok = window.confirm(`"${ws.name}" has an active session. End the session and delete?`);
+      if (!ok) return;
+      await teardownConnection(ws.id);
+    }
+    const store = (await import('../workspace/WorkspaceManager')).getWorkspaceStore();
+    await store.delete(ws.id);
+    setListKey((k) => k + 1);
+    // If the deleted workspace was the only/active one and no remaining connections, return to list.
+    // teardownConnection already switched activeWsId if there are remaining conns.
+    const willHaveZero = !connections.some((c) => c.wsId !== ws.id);
+    if (willHaveZero) {
+      setScreen('workspace-list');
+    }
+  }, [connectedIds, connections, teardownConnection]);
 
   useAutoReconnect(connections, setConnections);
 
@@ -597,7 +648,7 @@ export function App() {
           <SettingsScreen
             appVersion={APP_VERSION}
             buildNumber={BUILD_NUMBER}
-            onBack={() => setScreen(hasConnections ? 'workspace-view' : 'workspace-list')}
+            onBack={() => setScreen('workspace-list')}
             debugEnabled={debugEnabled}
             onDebugToggle={toggleDebug}
           />
@@ -610,16 +661,9 @@ export function App() {
             key={listKey}
             connectedIds={connectedIds}
             onSelectWorkspace={handleSelectWorkspace}
-            onAddWorkspace={() => {
-              setEditingWorkspace(null);
-              setAddReturnTo('list');
-              setScreen('workspace-add');
-            }}
-            onEditWorkspace={(ws) => {
-              setEditingWorkspace(ws);
-              setAddReturnTo('list');
-              setScreen('workspace-add');
-            }}
+            onAddWorkspace={() => { setEditingWorkspace(null); setAddReturnTo('list'); setScreen('workspace-add'); }}
+            onEditWorkspace={(ws) => { setEditingWorkspace(ws); setAddReturnTo('list'); setScreen('workspace-add'); }}
+            onDeleteWorkspace={handleDeleteWorkspace}
             onSettings={() => setScreen('settings')}
           />
           <DebugOverlay enabled={debugEnabled} />
@@ -637,6 +681,7 @@ export function App() {
               if (returnTo === 'workspace-view') notifyOverlayClose();
             }}
             editWorkspace={editingWorkspace ?? undefined}
+            hasActiveSession={!!editingWorkspace && connectedIds.has(editingWorkspace.id)}
           />
         </div>
       )}
@@ -672,8 +717,23 @@ export function App() {
                 setAddReturnTo('view');
                 setScreen('workspace-add');
               }}
+              onEdit={(ws) => {
+                setEditingWorkspace(ws);
+                setAddReturnTo('view');
+                setScreen('workspace-add');
+              }}
+              onDelete={handleDeleteWorkspace}
             />
           )}
+          <button
+            onClick={() => { (window as any).__intodeHideKeyboard?.(); notifyOverlayOpen(); setScreen('workspace-list'); }}
+            style={styles.homeBtn}
+            aria-label="Back to workspaces"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4a2 2 0 00-2-2h-0a2 2 0 00-2 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
+          </button>
           <span className="blink" style={{ color: 'var(--accent-green)', fontSize: 10, flexShrink: 0, textShadow: 'var(--neon-glow)' }}>{'\u25cf'}</span>
           <div style={{ flex: 1 }} />
           <button onClick={() => { (window as any).__intodeHideKeyboard?.(); prevTabRef.current = activeTab; setActiveTab('settings'); }} style={styles.settingsBtn}>
@@ -834,6 +894,16 @@ const styles: Record<string, React.CSSProperties> = {
     flexShrink: 0,
     position: 'relative',
     zIndex: 10,
+  },
+  homeBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-muted)',
+    cursor: 'pointer',
+    padding: 4,
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
   },
   settingsBtn: {
     background: 'none',

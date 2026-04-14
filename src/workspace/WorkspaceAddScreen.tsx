@@ -12,9 +12,10 @@ export interface WorkspaceAddScreenProps {
   onSave: (data: CreateWorkspaceData, password: string, jumpHostPasswords?: string[]) => void;
   onCancel: () => void;
   editWorkspace?: Workspace;
+  hasActiveSession?: boolean;
 }
 
-export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: WorkspaceAddScreenProps) {
+export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveSession }: WorkspaceAddScreenProps) {
   const isEdit = !!editWorkspace;
   const [name, setName] = useState(editWorkspace?.name ?? '');
   const [host, setHost] = useState(editWorkspace?.host ?? '');
@@ -126,6 +127,11 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace }: Workspac
         <span style={styles.title}>{isEdit ? 'Edit Workspace' : 'Add Workspace'}</span>
       </div>
       <div style={styles.form}>
+        {isEdit && hasActiveSession && (
+          <div style={bannerStyle}>
+            Connection changes (host, port, user, auth, password, key) will apply on next connect. Current session is unaffected.
+          </div>
+        )}
         <Field label="Name" value={name} onChange={setName} placeholder="My Server" />
         <Field label="Host" value={host} onChange={setHost} placeholder="192.168.1.10" />
         <Field label="Port" value={port} onChange={setPort} placeholder="22" inputMode="numeric" />
@@ -322,6 +328,17 @@ function Field({ label, value, onChange, placeholder, type, inputMode }: {
     </div>
   );
 }
+
+const bannerStyle: React.CSSProperties = {
+  padding: '10px 14px',
+  marginBottom: 12,
+  backgroundColor: 'var(--bg-surface0)',
+  border: '1px solid var(--accent-yellow, #e5c07b)',
+  borderRadius: 4,
+  color: 'var(--text-secondary)',
+  fontSize: 12,
+  lineHeight: 1.4,
+};
 
 const styles: Record<string, React.CSSProperties> = {
   container: { height: '100%', backgroundColor: 'var(--bg-base)', display: 'flex', flexDirection: 'column' },
