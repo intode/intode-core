@@ -8,7 +8,7 @@ import { FileChangeDetector } from './file-change-detector';
 import { FileActionSheet } from './FileActionSheet';
 import { getTransferManager } from './transfer-singleton';
 import { ConflictDialog, type ConflictChoice } from './ConflictDialog';
-import { RenameDialog } from './RenameDialog';
+import { PromptDialog } from '../ui/PromptDialog';
 import { ConfirmDialog } from './ConfirmDialog';
 
 export interface FileTreeNode {
@@ -772,9 +772,11 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
         }}
       />
       {renameTarget && (
-        <RenameDialog
-          initialName={renameTarget.name}
+        <PromptDialog
+          initialValue={renameTarget.name}
           title={renameTarget.isDirectory ? 'Rename folder' : 'Rename file'}
+          submitLabel="Rename"
+          selectStemOnFocus
           onSubmit={(newName) => void handleRename(newName)}
           onCancel={() => setRenameTarget(null)}
         />
@@ -794,9 +796,11 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
         />
       )}
       {createMode && (
-        <RenameDialog
-          initialName=""
+        <PromptDialog
+          initialValue=""
           title={createMode.kind === 'file' ? 'New file' : 'New folder'}
+          submitLabel="Create"
+          validate={(v) => v.trim().length > 0 && !v.includes('/')}
           onSubmit={(name) => void handleCreate(name)}
           onCancel={() => setCreateMode(null)}
         />

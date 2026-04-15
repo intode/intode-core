@@ -4,6 +4,7 @@ import { TerminalView } from './TerminalView';
 import { getNativeTerminalProvider } from './terminal-provider';
 import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { PromptDialog } from '../ui/PromptDialog';
 
 function isKeyboardVisible(): boolean {
   const vv = window.visualViewport;
@@ -61,6 +62,7 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
   useEffect(() => { tabsRef.current = tabs; }, [tabs]);
   const [bounceDir, setBounceDir] = useState<'next' | 'prev' | null>(null);
   const bounceTimerRef = useRef<number | null>(null);
+  const [tmuxTarget, setTmuxTarget] = useState<{ id: string; initial: string } | null>(null);
   useEffect(() => () => {
     if (bounceTimerRef.current !== null) window.clearTimeout(bounceTimerRef.current);
   }, []);
@@ -117,15 +119,18 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
   const configureTmux = useCallback((id: string) => {
     const tab = tabs.find((t) => t.id === id);
     if (!tab) return;
-    const name = prompt('tmux session name (empty to disable)', tab.tmuxSession || '');
-    if (name === null) return;
+    setTmuxTarget({ id, initial: tab.tmuxSession || '' });
+  }, [tabs]);
+
+  const applyTmux = useCallback((id: string, rawName: string) => {
+    const name = rawName.trim();
     if (name && !canConfigureTmux()) return;
     setTabs((prev) => prev.map((t) => t.id === id ? { ...t, tmuxSession: name || undefined } : t));
     if (name) {
       const provider = getNativeTerminalProvider();
       provider?.writeInput(id, `tmux new-session -A -s ${name}\n`).catch(() => {});
     }
-  }, [tabs]);
+  }, []);
 
   const triggerBounce = useCallback((dir: 'next' | 'prev') => {
     Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
@@ -239,6 +244,20 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
           </div>
         ))}
       </div>
+      {tmuxTarget && (
+        <PromptDialog
+          title="tmux session name"
+          initialValue={tmuxTarget.initial}
+          placeholder="empty to disable"
+          submitLabel="OK"
+          validate={(v) => v !== tmuxTarget.initial}
+          onSubmit={(name) => {
+            applyTmux(tmuxTarget.id, name);
+            setTmuxTarget(null);
+          }}
+          onCancel={() => setTmuxTarget(null)}
+        />
+      )}
     </div>
   );
 }

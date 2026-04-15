@@ -1,31 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 interface Props {
-  initialName: string;
-  title?: string;
-  onSubmit: (newName: string) => void;
+  initialValue: string;
+  title: string;
+  submitLabel?: string;
+  cancelLabel?: string;
+  placeholder?: string;
+  selectStemOnFocus?: boolean;
+  validate?: (value: string, initial: string) => boolean;
+  onSubmit: (value: string) => void;
   onCancel: () => void;
 }
 
-export function RenameDialog({ initialName, title = 'Rename', onSubmit, onCancel }: Props) {
-  const [name, setName] = useState(initialName);
+const defaultValidate = (value: string, initial: string) =>
+  value.trim().length > 0 && value !== initial && !value.includes('/');
+
+export function PromptDialog({
+  initialValue,
+  title,
+  submitLabel = 'OK',
+  cancelLabel = 'Cancel',
+  placeholder,
+  selectStemOnFocus = false,
+  validate = defaultValidate,
+  onSubmit,
+  onCancel,
+}: Props) {
+  const [value, setValue] = useState(initialValue);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => {
-      inputRef.current?.focus();
-      // Select stem (before last dot) for easier editing
       const input = inputRef.current;
-      if (input) {
-        const dot = initialName.lastIndexOf('.');
+      if (!input) return;
+      input.focus();
+      if (selectStemOnFocus) {
+        const dot = initialValue.lastIndexOf('.');
         if (dot > 0) input.setSelectionRange(0, dot);
         else input.select();
+      } else {
+        input.select();
       }
     }, 50);
     return () => clearTimeout(t);
   }, []);
 
-  const disabled = name.trim().length === 0 || name === initialName || name.includes('/');
+  const disabled = !validate(value, initialValue);
+  const submit = () => {
+    if (!disabled) onSubmit(value.trim());
+  };
 
   return (
     <>
@@ -50,11 +73,16 @@ export function RenameDialog({ initialName, title = 'Rename', onSubmit, onCancel
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>{title}</div>
         <input
           ref={inputRef}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && !disabled) onSubmit(name.trim());
-            if (e.key === 'Escape') onCancel();
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              submit();
+            } else if (e.key === 'Escape') {
+              onCancel();
+            }
           }}
           style={{
             width: '100%',
@@ -80,10 +108,10 @@ export function RenameDialog({ initialName, title = 'Rename', onSubmit, onCancel
               fontSize: 13,
             }}
           >
-            Cancel
+            {cancelLabel}
           </button>
           <button
-            onClick={() => !disabled && onSubmit(name.trim())}
+            onClick={submit}
             disabled={disabled}
             style={{
               background: disabled ? 'transparent' : 'var(--accent-green, #00ff66)',
@@ -95,7 +123,7 @@ export function RenameDialog({ initialName, title = 'Rename', onSubmit, onCancel
               opacity: disabled ? 0.5 : 1,
             }}
           >
-            Rename
+            {submitLabel}
           </button>
         </div>
       </div>
