@@ -21,6 +21,10 @@ export interface NativeTerminalProvider {
   isAvailable(): boolean;
   /** Optional — only implemented on platforms that support native swipe detection */
   addSwipeListener?(cb: (e: TerminalSwipeEvent) => void): Promise<SwipeListenerHandle>;
+  /** Optional — sticky Ctrl modifier that applies to the next physical/IME key */
+  setControlKey?(terminalId: string, armed: boolean): Promise<void>;
+  /** Fires when the armed Ctrl was consumed by a key event so UI can clear its pressed state */
+  addControlKeyListener?(cb: (e: { terminalId: string; armed: boolean }) => void): Promise<SwipeListenerHandle>;
 }
 
 let provider: NativeTerminalProvider | null = null;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { notifyOverlayOpen, notifyOverlayClose } from '../app/overlay-hooks';
 
 interface Props {
   initialValue: string;
@@ -28,6 +29,11 @@ export function PromptDialog({
 }: Props) {
   const [value, setValue] = useState(initialValue);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    notifyOverlayOpen();
+    return () => notifyOverlayClose();
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { getPolicy, checkLimit } from '../policies/provider';
 import { TerminalView } from './TerminalView';
 import { getNativeTerminalProvider } from './terminal-provider';
+import { setActiveNativeTerminal } from './active-terminal';
 import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PromptDialog } from '../ui/PromptDialog';
@@ -75,6 +76,14 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     return () => { delete (window as any).__intodeTerminalTabIds; };
   }, [tabs, wsId]);
 
+  // Sync active native terminal id — single owner of this global state
+  useEffect(() => {
+    const provider = getNativeTerminalProvider();
+    if (!provider?.isAvailable()) return;
+    setActiveNativeTerminal(activeId);
+    return () => setActiveNativeTerminal(null);
+  }, [activeId]);
+
   const addTab = useCallback(async () => {
     const { maxTerminals } = getPolicy();
     if (!(await checkLimit('terminals', tabs.length, maxTerminals))) return;
@@ -86,13 +95,14 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
   }, [tabs.length]);
 
   const handleTerminalReady = useCallback((terminalId: string) => {
-    const pending = pendingFocusRef.current;
-    if (!pending) return;
-    pendingFocusRef.current = null;
+    // Only focus the tab that's currently active; ignore ready callbacks from hidden tabs
+    if (terminalId !== activeIdRef.current) return;
     const provider = getNativeTerminalProvider();
-    if (provider?.isAvailable()) {
-      provider.focusTerminal(terminalId, pending);
-    }
+    if (!provider?.isAvailable()) return;
+    const pending = pendingFocusRef.current;
+    pendingFocusRef.current = null;
+    // On session restore pending is null — focus without forcing the soft keyboard.
+    provider.focusTerminal(terminalId, { showKeyboard: pending?.showKeyboard ?? false });
   }, []);
 
   const closeTab = useCallback(

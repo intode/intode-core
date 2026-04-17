@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   KEY_ESC, KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT,
 } from '../lib/constants';
 import { NO_TAP_HIGHLIGHT } from '../lib/styles';
+import { getNativeTerminalProvider } from '../terminal/terminal-provider';
+import { getActiveNativeTerminal } from '../terminal/active-terminal';
 
 export type ExtraKeysContext = 'terminal' | 'code-editor' | 'md-editor';
 
@@ -16,12 +18,16 @@ interface KeyDef {
   value: string;
 }
 
+const CTRL_TOGGLE_VALUE = 'ctrl-toggle';
+
 const TERMINAL_KEYS: KeyDef[] = [
   { label: 'Snip', value: 'snippets' },
   { label: 'Esc', value: KEY_ESC },
   { label: 'Tab', value: KEY_TAB },
   { label: 'S-Tab', value: '\x1b[Z' },
+  { label: 'Ctrl', value: CTRL_TOGGLE_VALUE },
   { label: 'C-c', value: '\x03' },
+  { label: 'C-o', value: '\x0f' },
   { label: 'C-d', value: '\x04' },
   { label: 'C-z', value: '\x1a' },
   { label: 'C-a', value: '\x01' },
@@ -88,7 +94,7 @@ function restoreFocus(el: HTMLElement | null) {
 
 const MOVE_THRESHOLD = 8;
 
-function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
+function KeyButton({ keyDef, onPress, active }: { keyDef: KeyDef; onPress: (v: string) => void; active?: boolean }) {
   const prevFocus = useRef<HTMLElement | null>(null);
   const startPos = useRef<{ x: number; y: number } | null>(null);
   const moved = useRef(false);
@@ -120,7 +126,7 @@ function KeyButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) =
         prevFocus.current = null;
         startPos.current = null;
       }}
-      style={keyStyle}
+      style={active ? { ...keyStyle, ...activeKeyStyle } : keyStyle}
     >
       {keyDef.label}
     </button>
@@ -169,6 +175,43 @@ function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) 
 
 export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
   const allKeys = context === 'terminal' ? TERMINAL_KEYS : context === 'md-editor' ? MD_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
+  const [ctrlArmed, setCtrlArmed] = useState(false);
+  const ctrlArmedRef = useRef(false);
+  useEffect(() => { ctrlArmedRef.current = ctrlArmed; }, [ctrlArmed]);
+
+  // Listen for native auto-clear when armed Ctrl is consumed by a key event
+  useEffect(() => {
+    if (context !== 'terminal') return;
+    const provider = getNativeTerminalProvider();
+    if (!provider?.addControlKeyListener) return;
+    let handle: { remove(): void } | null = null;
+    let cancelled = false;
+    provider.addControlKeyListener((e) => {
+      if (!e.armed) setCtrlArmed(false);
+    }).then((h) => {
+      if (cancelled) { h.remove(); return; }
+      handle = h;
+    }).catch(() => {});
+    return () => {
+      cancelled = true;
+      handle?.remove();
+    };
+  }, [context]);
+
+  const handlePress = (value: string) => {
+    if (value === CTRL_TOGGLE_VALUE) {
+      const next = !ctrlArmedRef.current;
+      setCtrlArmed(next);
+      const provider = getNativeTerminalProvider();
+      const activeId = getActiveNativeTerminal();
+      if (provider?.setControlKey && activeId) {
+        provider.setControlKey(activeId, next).catch(() => {});
+      }
+      return;
+    }
+    onKeyPress(value);
+  };
+
   if (allKeys.length === 0) return null;
 
   const otherKeys = allKeys.filter((k) => !ARROW_VALUES.has(k.value));
@@ -181,7 +224,12 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
     <div style={containerStyle}>
       <div style={scrollAreaStyle}>
         {otherKeys.map((key) => (
-          <KeyButton key={key.label} keyDef={key} onPress={onKeyPress} />
+          <KeyButton
+            key={key.label}
+            keyDef={key}
+            onPress={handlePress}
+            active={key.value === CTRL_TOGGLE_VALUE && ctrlArmed}
+          />
         ))}
       </div>
 
@@ -268,6 +316,12 @@ const keyStyle: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   ...NO_TAP_HIGHLIGHT,
+};
+
+const activeKeyStyle: React.CSSProperties = {
+  backgroundColor: 'var(--accent-green, #00ff66)',
+  color: 'var(--bg-base, #0a0e13)',
+  borderColor: 'var(--accent-green, #00ff66)',
 };
 
 
