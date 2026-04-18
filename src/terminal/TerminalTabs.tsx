@@ -7,12 +7,6 @@ import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PromptDialog } from '../ui/PromptDialog';
 
-function isKeyboardVisible(): boolean {
-  const vv = window.visualViewport;
-  if (!vv) return false;
-  return window.innerHeight - vv.height > 50;
-}
-
 interface Tab {
   id: string;
   label: string;
@@ -45,7 +39,6 @@ export interface TerminalTabsProps {
 
 export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: TerminalTabsProps) {
   const nextLabel = useRef(2);
-  const pendingFocusRef = useRef<{ showKeyboard: boolean } | null>(null);
   const [tabs, setTabs] = useState<Tab[]>(() => {
     if (canRestoreTerminalTabs()) {
       const saved = loadTabs(wsId);
@@ -61,8 +54,6 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
   useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
   const tabsRef = useRef(tabs);
   useEffect(() => { tabsRef.current = tabs; }, [tabs]);
-  const visibleRef = useRef(visible);
-  useEffect(() => { visibleRef.current = visible; }, [visible]);
   const [bounceDir, setBounceDir] = useState<'next' | 'prev' | null>(null);
   const bounceTimerRef = useRef<number | null>(null);
   const [tmuxTarget, setTmuxTarget] = useState<{ id: string; initial: string } | null>(null);
@@ -97,25 +88,9 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     if (!(await checkLimit('terminals', tabs.length, maxTerminals))) return;
     const id = crypto.randomUUID();
     const label = String(nextLabel.current++);
-    pendingFocusRef.current = { showKeyboard: isKeyboardVisible() };
     setTabs((t) => [...t, { id, label }]);
     setActiveId(id);
   }, [tabs.length]);
-
-  const handleTerminalReady = useCallback((terminalId: string) => {
-    // Only focus the tab that's currently active; ignore ready callbacks from hidden tabs
-    if (terminalId !== activeIdRef.current) return;
-    // Don't steal focus when our workspace isn't the visible one — otherwise a newly
-    // connected inactive workspace's create completion would call focusTerminal and
-    // suppress WebView focus while the actual visible workspace's terminal loses it.
-    if (!visibleRef.current) return;
-    const provider = getNativeTerminalProvider();
-    if (!provider?.isAvailable()) return;
-    const pending = pendingFocusRef.current;
-    pendingFocusRef.current = null;
-    // On session restore pending is null — focus without forcing the soft keyboard.
-    provider.focusTerminal(terminalId, { showKeyboard: pending?.showKeyboard ?? false });
-  }, []);
 
   const closeTab = useCallback(
     (id: string) => {
@@ -127,10 +102,6 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
           const newIdx = Math.min(idx, next.length - 1);
           const newId = next[newIdx].id;
           setActiveId(newId);
-          const provider = getNativeTerminalProvider();
-          if (provider?.isAvailable()) {
-            setTimeout(() => provider.focusTerminal(newId, { showKeyboard: isKeyboardVisible() }), 100);
-          }
         }
         return next;
       });
@@ -178,10 +149,6 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     }
     const nextId = current[nextIdx].id;
     setActiveId(nextId);
-    const provider = getNativeTerminalProvider();
-    if (provider?.isAvailable()) {
-      provider.focusTerminal(nextId, { showKeyboard: isKeyboardVisible() });
-    }
   }, [triggerBounce]);
 
   useEffect(() => {
@@ -215,10 +182,6 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
             data-terminal-tab
             onClick={() => {
               setActiveId(tab.id);
-              const provider = getNativeTerminalProvider();
-              if (provider?.isAvailable()) {
-                setTimeout(() => provider.focusTerminal(tab.id, { showKeyboard: isKeyboardVisible() }), 100);
-              }
             }}
             onContextMenu={(e) => { e.preventDefault(); configureTmux(tab.id); }}
             style={{ ...tabStyle, ...(tab.id === activeId ? activeTabStyle : {}) }}
@@ -261,7 +224,6 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
               terminalId={tab.id}
               visible={visible && tab.id === activeId}
               tmuxSession={tab.tmuxSession}
-              onReady={handleTerminalReady}
             />
           </div>
         ))}

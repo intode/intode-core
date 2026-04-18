@@ -8,18 +8,23 @@ import { TERMINAL_FONT_SIZE } from '../lib/constants';
 import { openInPreview } from '../app/preview-hooks';
 import { getNativeTerminalProvider } from './terminal-provider';
 
+function isKeyboardVisible(): boolean {
+  const vv = window.visualViewport;
+  if (!vv) return false;
+  return window.innerHeight - vv.height > 50;
+}
+
 export interface TerminalViewProps {
   sessionId: string;
   defaultPath?: string;
   terminalId?: string;
   visible: boolean;
   tmuxSession?: string;
-  onReady?: (terminalId: string) => void;
 }
 
 const manager = new TerminalManager();
 
-export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmuxSession, onReady }: TerminalViewProps) {
+export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmuxSession }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<TerminalSession | null>(null);
   const selectionRef = useRef<TerminalSelection | null>(null);
@@ -48,9 +53,8 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
       if (cancelled) return;
       if (visible && container.offsetParent) {
         const rect = container.getBoundingClientRect();
-        nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+        nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height }, { showKeyboard: isKeyboardVisible() });
       }
-      onReady?.(id);
     }).catch(() => {});
 
     const observer = new ResizeObserver(() => {
@@ -75,7 +79,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
     const container = containerRef.current;
     if (visible && container?.offsetParent) {
       const rect = container.getBoundingClientRect();
-      nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+      nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height }, { showKeyboard: isKeyboardVisible() });
     } else {
       nativeProvider!.hideTerminal(id);
     }

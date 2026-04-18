@@ -12,7 +12,7 @@ export interface TerminalSwipeEvent {
 export interface NativeTerminalProvider {
   createTerminal(terminalId: string, sessionId: string, defaultPath?: string, tmuxSession?: string): Promise<void>;
   destroyTerminal(terminalId: string): Promise<void>;
-  showTerminal(terminalId: string, rect: { x: number; y: number; width: number; height: number }): Promise<void>;
+  showTerminal(terminalId: string, rect: { x: number; y: number; width: number; height: number }, options?: { showKeyboard?: boolean }): Promise<void>;
   hideTerminal(terminalId: string): Promise<void>;
   resizeTerminal(terminalId: string, rect: { x: number; y: number; width: number; height: number }): Promise<void>;
   writeInput(terminalId: string, data: string): Promise<void>;
