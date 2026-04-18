@@ -61,6 +61,8 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
   useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
   const tabsRef = useRef(tabs);
   useEffect(() => { tabsRef.current = tabs; }, [tabs]);
+  const visibleRef = useRef(visible);
+  useEffect(() => { visibleRef.current = visible; }, [visible]);
   const [bounceDir, setBounceDir] = useState<'next' | 'prev' | null>(null);
   const bounceTimerRef = useRef<number | null>(null);
   const [tmuxTarget, setTmuxTarget] = useState<{ id: string; initial: string } | null>(null);
@@ -76,13 +78,19 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     return () => { delete (window as any).__intodeTerminalTabIds; };
   }, [tabs, wsId]);
 
-  // Sync active native terminal id — single owner of this global state
+  // Sync active native terminal id — single owner of this global state.
+  // Only the workspace whose terminal tab is currently visible should claim ownership.
+  // Otherwise, with multiple workspaces connected, every TerminalTabs calls
+  // setActiveNativeTerminal on mount and the last write wins — which means overlay
+  // hooks save the wrong terminal id and later restore a terminal from the inactive
+  // workspace, overlapping native views from different workspaces.
   useEffect(() => {
     const provider = getNativeTerminalProvider();
     if (!provider?.isAvailable()) return;
+    if (!visible) return;
     setActiveNativeTerminal(activeId);
     return () => setActiveNativeTerminal(null);
-  }, [activeId]);
+  }, [activeId, visible]);
 
   const addTab = useCallback(async () => {
     const { maxTerminals } = getPolicy();
@@ -97,6 +105,10 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
   const handleTerminalReady = useCallback((terminalId: string) => {
     // Only focus the tab that's currently active; ignore ready callbacks from hidden tabs
     if (terminalId !== activeIdRef.current) return;
+    // Don't steal focus when our workspace isn't the visible one — otherwise a newly
+    // connected inactive workspace's create completion would call focusTerminal and
+    // suppress WebView focus while the actual visible workspace's terminal loses it.
+    if (!visibleRef.current) return;
     const provider = getNativeTerminalProvider();
     if (!provider?.isAvailable()) return;
     const pending = pendingFocusRef.current;
