@@ -10,6 +10,7 @@ import { DebugOverlay } from './DebugOverlay';
 import { FileTree } from '../files/FileTree';
 import { CodeEditor } from '../editor/CodeEditor';
 import { MarkdownPreview } from '../md-preview/MarkdownPreview';
+import { HtmlPreview } from '../html-preview/HtmlPreview';
 import { EditorTabs } from '../editor/EditorTabs';
 import { ConflictBar } from '../editor/ConflictBar';
 import { TerminalTabs } from '../terminal/TerminalTabs';
@@ -85,14 +86,15 @@ function SubPanelBar({ items, active, onChange }: {
 
 // --- Per-workspace Editor panel (self-contained state) ---
 
-function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
-  ftm: FileTabManager; sftpId: string | null;
+function WorkspaceEditor({ ftm, sftpId, sftpRoot, editorPanels, visible }: {
+  ftm: FileTabManager; sftpId: string | null; sftpRoot: string;
   editorPanels: Array<{ id: string; label: string; component: React.ComponentType<{ visible: boolean }> }>;
   visible: boolean;
 }) {
   const [tabs, setTabs] = useState<FileTab[]>([]);
   const [active, setActive] = useState<FileTab | null>(null);
-  const [mdPreview, setMdPreview] = useState(false);
+  const [preview, setPreview] = useState(false);
+  const [htmlRefreshKey, setHtmlRefreshKey] = useState(0);
   const [overlay, setOverlay] = useState<string | null>(null); // 'git-file' etc.
 
   useEffect(() => {
@@ -105,7 +107,7 @@ function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
     return () => ftm.setOnChange(() => {});
   }, [ftm]);
 
-  useEffect(() => { setMdPreview(false); setOverlay(null); }, [active?.id]);
+  useEffect(() => { setPreview(false); setHtmlRefreshKey(0); setOverlay(null); }, [active?.id]);
 
   // Check for remote changes when editor tab becomes visible
   useEffect(() => {
@@ -156,6 +158,8 @@ function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
   }, [editorPullDistance, sftpId, active?.id, ftm]);
 
   const isMd = active?.type === 'markdown';
+  const isHtml = active?.type === 'html';
+  const isPreviewable = isMd || isHtml;
 
   return (
     <>
@@ -190,8 +194,19 @@ function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
       )}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
         {active?.content != null ? (
-          isMd && mdPreview ? (
-            <MarkdownPreview content={active.content} visible={visible} />
+          isPreviewable && preview ? (
+            isHtml ? (
+              <HtmlPreview
+                content={active.content}
+                filePath={active.path}
+                sftpId={sftpId}
+                sftpRoot={sftpRoot}
+                visible={visible}
+                refreshKey={htmlRefreshKey}
+              />
+            ) : (
+              <MarkdownPreview content={active.content} visible={visible} />
+            )
           ) : (
             <CodeEditor
               key={active.id}
@@ -232,10 +247,17 @@ function WorkspaceEditor({ ftm, sftpId, editorPanels, visible }: {
                 {p.label}
               </button>
             ))}
-            {isMd && (
-              <button onClick={() => { setMdPreview((v) => !v); setOverlay(null); }}
-                style={{ ...styles.fabBtn, backgroundColor: mdPreview ? 'var(--accent-blue)' : 'var(--bg-surface1)', color: mdPreview ? 'var(--bg-base)' : 'var(--text-secondary)' }}>
-                {mdPreview ? 'Edit' : 'MD'}
+            {isPreviewable && (
+              <button onClick={() => { setPreview((v) => !v); setOverlay(null); }}
+                style={{ ...styles.fabBtn, backgroundColor: preview ? 'var(--accent-blue)' : 'var(--bg-surface1)', color: preview ? 'var(--bg-base)' : 'var(--text-secondary)' }}>
+                {preview ? 'Edit' : (isHtml ? 'HTML' : 'MD')}
+              </button>
+            )}
+            {isHtml && preview && (
+              <button onClick={() => setHtmlRefreshKey((k) => k + 1)}
+                style={{ ...styles.fabBtn, backgroundColor: 'var(--bg-surface1)', color: 'var(--text-secondary)' }}
+                aria-label="Reload assets">
+                {'\u21BB'}
               </button>
             )}
           </div>
@@ -801,7 +823,13 @@ export function App() {
                     flexDirection: 'column',
                   }}
                 >
-                  <WorkspaceEditor ftm={ftm} sftpId={conn.sftpId} editorPanels={editorPanels} visible={isActive && activeTab === 'editor'} />
+                  <WorkspaceEditor
+                    ftm={ftm}
+                    sftpId={conn.sftpId}
+                    sftpRoot={conn.workspace.defaultPath}
+                    editorPanels={editorPanels}
+                    visible={isActive && activeTab === 'editor'}
+                  />
                 </div>
 
                 {/* Terminal — per workspace, always mounted */}

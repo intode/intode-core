@@ -10,7 +10,7 @@ export interface FileTab {
   id: string;
   path: string;
   fileName: string;
-  type: 'code' | 'markdown';
+  type: 'code' | 'markdown' | 'html';
   content: string | null;
   originalContent: string | null;
   isLoading: boolean;
@@ -46,7 +46,7 @@ export class FileTabManager {
       id: crypto.randomUUID(),
       path,
       fileName,
-      type: type as 'code' | 'markdown',
+      type: type as 'code' | 'markdown' | 'html',
       content: null,
       originalContent: null,
       isLoading: true,
@@ -140,7 +140,7 @@ export class FileTabManager {
       id: crypto.randomUUID(),
       path,
       fileName,
-      type: type as 'code' | 'markdown',
+      type: type as 'code' | 'markdown' | 'html',
       content: unsavedContent ?? null,
       originalContent: null,
       isLoading: !unsavedContent,

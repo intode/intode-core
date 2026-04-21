@@ -78,6 +78,16 @@ export { MarkdownPreview } from './md-preview/MarkdownPreview';
 export { renderMarkdown } from './md-preview/pipeline';
 export { registerRemarkPlugin, registerRehypePlugin, registerPostProcessor } from './md-preview/pipeline-extensions';
 
+// HTML Preview
+export { HtmlPreview } from './html-preview/HtmlPreview';
+export type { HtmlPreviewProps } from './html-preview/HtmlPreview';
+export { toSrcdoc } from './html-preview/pipeline';
+export {
+  setHtmlAssetResolver,
+  getHtmlAssetResolver,
+} from './html-preview/pipeline-extensions';
+export type { HtmlAssetResolver, HtmlAssetContext } from './html-preview/pipeline-extensions';
+
 // Extra Keys
 export { ExtraKeyBar } from './extra-keys/ExtraKeyBar';
 
