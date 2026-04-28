@@ -1,4 +1,4 @@
-/** DI hook for native terminal rendering — Pro injects Android/iOS native terminal provider at bootstrap */
+/** DI hook for native terminal rendering — bootstrap registers the Android native terminal provider for all users (free and pro) */
 
 export interface SwipeListenerHandle {
   remove(): void;
