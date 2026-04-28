@@ -71,14 +71,15 @@ This means **core has zero premium gates** — all limits and Pro features are i
 
 | Core (MIT) | Pro (proprietary) |
 |:---:|:---:|
-| SSH/SFTP, terminal, file browser, code editor | Native Android terminal (Termux fork) |
-| Basic GFM markdown, extra keys, pinch zoom | Mermaid, KaTeX, MDX rendering |
-| Dark/light themes | Port forwarding, jump host |
-| DI hooks + plugin API | Session restore, background keep-alive |
-| | Git integration, grep search |
+| SSH/SFTP, terminal, file browser, code editor | Mermaid, KaTeX, MDX rendering |
+| Basic GFM markdown, extra keys, pinch zoom | Port forwarding, jump host |
+| Dark/light themes | Session restore, background keep-alive |
+| DI hooks + plugin API | Git integration, grep search |
 | | Custom themes/keys, snippets |
 | | Web preview + DevTools |
 | | Billing + subscription |
+
+> **Note on the native Android terminal:** The Termux terminal-view fork and SSHJ integration live in `pro/`, but the DI provider is registered unconditionally at bootstrap with no policy gate. The shipped app provides the native terminal to all users (free and pro alike).
 
 Core alone is a complete, functional SSH IDE. Pro adds power-user features through the DI system.
 
