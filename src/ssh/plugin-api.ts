@@ -148,6 +148,12 @@ export interface SshPlugin {
   sftpWrite(options: { sftpId: string; path: string; content: string }): Promise<void>;
   sftpStat(options: { sftpId: string; path: string }): Promise<{ stat: SftpStat }>;
   sftpDownload(options: SftpDownloadOptions): Promise<void>;
+  sftpDownloadToCache(options: {
+    sftpId: string;
+    remotePath: string;
+    cacheKey: string;
+  }): Promise<{ localPath: string }>;
+  sftpDeleteCache(options: { localPath: string }): Promise<void>;
   sftpUpload(options: SftpUploadOptions): Promise<void>;
   sftpCancelTransfer(options: { transferId: string }): Promise<void>;
   sftpCheckRemoteExists(options: { sftpId: string; paths: string[] }): Promise<{ existing: string[] }>;

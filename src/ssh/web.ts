@@ -569,6 +569,10 @@ export class SshWeb extends WebPlugin implements SshPlugin {
   }
 
   async sftpDownload(): Promise<void> {}
+  async sftpDownloadToCache(): Promise<{ localPath: string }> {
+    return { localPath: '' };
+  }
+  async sftpDeleteCache(): Promise<void> {}
   async sftpUpload(): Promise<void> {}
   async sftpCancelTransfer(): Promise<void> {}
   async sftpCheckRemoteExists(): Promise<{ existing: string[] }> {

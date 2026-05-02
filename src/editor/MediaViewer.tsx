@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FileTab } from '../files/TabManager';
+import { getMimeType } from '../lib/file-utils';
 
 interface Props {
   tab: FileTab;
   onDownload?: () => void;
+}
+
+function codeText(code: number): string {
+  switch (code) {
+    case 1: return 'aborted';
+    case 2: return 'network error';
+    case 3: return 'decode error (codec not supported)';
+    case 4: return 'source not supported';
+    default: return `code ${code}`;
+  }
 }
 
 function formatBytes(n: number): string {
@@ -13,7 +24,17 @@ function formatBytes(n: number): string {
   return `${(n / 1024 / 1024 / 1024).toFixed(2)} GB`;
 }
 
+function MediaError({ message }: { message: string }) {
+  return (
+    <div style={{ marginTop: 8, color: 'var(--accent-red, #ff4444)', fontSize: 12 }}>
+      {message}
+    </div>
+  );
+}
+
 export function MediaViewer({ tab, onDownload }: Props) {
+  const [audioError, setAudioError] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
   if (tab.isLoading) {
     return (
       <div style={styles.center}>
@@ -80,25 +101,52 @@ export function MediaViewer({ tab, onDownload }: Props) {
   }
 
   if (tab.mediaKind === 'audio') {
+    const mime = getMimeType(tab.fileName);
     return (
       <div style={styles.center}>
         <div style={{ width: '100%', maxWidth: 480, padding: 24 }}>
           <div style={{ fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>{tab.fileName}</div>
-          <audio src={tab.blobUrl} controls style={{ width: '100%' }} />
+          <audio
+            controls
+            preload="metadata"
+            style={{ width: '100%' }}
+            onError={(e) => {
+              const el = e.currentTarget;
+              const err = el.error;
+              setAudioError(err ? `Audio error (code ${err.code}): ${err.message || codeText(err.code)}` : 'Audio failed to load');
+            }}
+          >
+            <source src={tab.blobUrl} type={mime} />
+          </audio>
+          <div style={{ marginTop: 8, fontSize: 11, color: 'var(--text-muted)' }}>{mime}</div>
+          {audioError && <MediaError message={audioError} />}
         </div>
       </div>
     );
   }
 
   if (tab.mediaKind === 'video') {
+    const mime = getMimeType(tab.fileName);
     return (
       <div style={styles.videoWrap}>
         <video
-          src={tab.blobUrl}
           controls
           playsInline
+          preload="metadata"
           style={{ width: '100%', maxHeight: '100%', display: 'block', margin: 'auto', background: '#000' }}
-        />
+          onError={(e) => {
+            const el = e.currentTarget;
+            const err = el.error;
+            setVideoError(err ? `Video error (code ${err.code}): ${err.message || codeText(err.code)}` : 'Video failed to load');
+          }}
+        >
+          <source src={tab.blobUrl} type={mime} />
+        </video>
+        {videoError && (
+          <div style={{ position: 'absolute', bottom: 16, left: 16, right: 16, textAlign: 'center' }}>
+            <MediaError message={videoError} />
+          </div>
+        )}
       </div>
     );
   }

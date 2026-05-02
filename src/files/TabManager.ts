@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { Ssh } from '../ssh/index';
 import { getPolicy, checkLimit } from '../policies/provider';
 import { decodeBase64Utf8, encodeUtf8Base64, base64ToUint8Array } from '../lib/encoding';
@@ -7,7 +8,14 @@ import { MAX_FILE_SIZE } from '../lib/constants';
 export { detectFileType } from '../lib/file-utils';
 
 const IMAGE_MEDIA_CAP = 50 * 1024 * 1024;
-const AV_MEDIA_CAP = 100 * 1024 * 1024;
+const AUDIO_MEDIA_CAP = 100 * 1024 * 1024;
+const VIDEO_MEDIA_CAP = 500 * 1024 * 1024;
+
+function capForMediaKind(kind: 'image' | 'audio' | 'video' | undefined): number {
+  if (kind === 'image') return IMAGE_MEDIA_CAP;
+  if (kind === 'audio') return AUDIO_MEDIA_CAP;
+  return VIDEO_MEDIA_CAP;
+}
 
 export interface FileTab {
   id: string;
@@ -23,6 +31,7 @@ export interface FileTab {
   remoteChanged: boolean;
   lastStat: { mtime: number; size: number } | null;
   blobUrl?: string;
+  cachePath?: string;
 }
 
 export class FileTabManager {
@@ -91,7 +100,7 @@ export class FileTabManager {
 
   private async openMediaFile(sftpId: string, path: string, fileName: string): Promise<FileTab> {
     const mediaKind = detectMediaKind(fileName)!;
-    const cap = mediaKind === 'image' ? IMAGE_MEDIA_CAP : AV_MEDIA_CAP;
+    const cap = capForMediaKind(mediaKind);
 
     const tab: FileTab = {
       id: crypto.randomUUID(),
@@ -119,11 +128,22 @@ export class FileTabManager {
         this.onChange?.();
         return tab;
       }
-      const { content } = await Ssh.sftpRead({ sftpId, path });
-      const bytes = base64ToUint8Array(content);
-      const blob = new Blob([bytes as BlobPart], { type: getMimeType(fileName) });
-      tab.blobUrl = URL.createObjectURL(blob);
-      tab.content = tab.blobUrl;
+      if (mediaKind === 'image') {
+        const { content } = await Ssh.sftpRead({ sftpId, path });
+        const bytes = base64ToUint8Array(content);
+        const blob = new Blob([bytes as BlobPart], { type: getMimeType(fileName) });
+        tab.blobUrl = URL.createObjectURL(blob);
+        tab.content = tab.blobUrl;
+      } else {
+        // audio/video — write to app cache and serve via Capacitor's localhost.
+        // Bypasses JS-side base64 transit (no OOM) and gives the WebView a real
+        // file:// path so codecs/seek work natively.
+        const cacheKey = `${tab.id}-${fileName.replace(/[^A-Za-z0-9._-]/g, '_')}`;
+        const { localPath } = await Ssh.sftpDownloadToCache({ sftpId, remotePath: path, cacheKey });
+        tab.cachePath = localPath;
+        tab.blobUrl = Capacitor.convertFileSrc(localPath);
+        tab.content = tab.blobUrl;
+      }
       tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
       tab.isLoading = false;
     } catch (e: unknown) {
@@ -176,8 +196,11 @@ export class FileTabManager {
     const idx = this.tabs.findIndex(t => t.id === id);
     if (idx === -1) return;
     const tab = this.tabs[idx];
-    if (tab.blobUrl) {
+    if (tab.blobUrl && tab.blobUrl.startsWith('blob:')) {
       try { URL.revokeObjectURL(tab.blobUrl); } catch { /* ignore */ }
+    }
+    if (tab.cachePath) {
+      void Ssh.sftpDeleteCache({ localPath: tab.cachePath }).catch(() => {});
     }
     this.tabs.splice(idx, 1);
     if (this.activeTabId === id) {
@@ -303,8 +326,12 @@ export class FileTabManager {
     if (!tab) return;
 
     if (tab.type === 'media') {
-      if (tab.blobUrl) {
+      if (tab.blobUrl && tab.blobUrl.startsWith('blob:')) {
         try { URL.revokeObjectURL(tab.blobUrl); } catch { /* ignore */ }
+      }
+      if (tab.cachePath) {
+        void Ssh.sftpDeleteCache({ localPath: tab.cachePath }).catch(() => {});
+        tab.cachePath = undefined;
       }
       tab.blobUrl = undefined;
       tab.content = null;
@@ -312,14 +339,20 @@ export class FileTabManager {
       this.onChange?.();
       try {
         const { stat } = await Ssh.sftpStat({ sftpId, path: tab.path });
-        const cap = tab.mediaKind === 'image' ? IMAGE_MEDIA_CAP : AV_MEDIA_CAP;
+        const cap = capForMediaKind(tab.mediaKind);
         if (stat.size > cap) {
           tab.content = `__TOO_LARGE__:${stat.size}:${cap}`;
-        } else {
+        } else if (tab.mediaKind === 'image') {
           const { content } = await Ssh.sftpRead({ sftpId, path: tab.path });
           const bytes = base64ToUint8Array(content);
           const blob = new Blob([bytes as BlobPart], { type: getMimeType(tab.fileName) });
           tab.blobUrl = URL.createObjectURL(blob);
+          tab.content = tab.blobUrl;
+        } else {
+          const cacheKey = `${tab.id}-${tab.fileName.replace(/[^A-Za-z0-9._-]/g, '_')}`;
+          const { localPath } = await Ssh.sftpDownloadToCache({ sftpId, remotePath: tab.path, cacheKey });
+          tab.cachePath = localPath;
+          tab.blobUrl = Capacitor.convertFileSrc(localPath);
           tab.content = tab.blobUrl;
         }
         tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
