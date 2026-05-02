@@ -1,16 +1,20 @@
 import { Ssh } from '../ssh/index';
 import { getPolicy, checkLimit } from '../policies/provider';
-import { decodeBase64Utf8, encodeUtf8Base64 } from '../lib/encoding';
-import { detectFileType, getFileName } from '../lib/file-utils';
+import { decodeBase64Utf8, encodeUtf8Base64, base64ToUint8Array } from '../lib/encoding';
+import { detectFileType, detectMediaKind, getFileName, getMimeType } from '../lib/file-utils';
 import { MAX_FILE_SIZE } from '../lib/constants';
 
 export { detectFileType } from '../lib/file-utils';
+
+const IMAGE_MEDIA_CAP = 50 * 1024 * 1024;
+const AV_MEDIA_CAP = 100 * 1024 * 1024;
 
 export interface FileTab {
   id: string;
   path: string;
   fileName: string;
-  type: 'code' | 'markdown' | 'html';
+  type: 'code' | 'markdown' | 'html' | 'media';
+  mediaKind?: 'image' | 'audio' | 'video';
   content: string | null;
   originalContent: string | null;
   isLoading: boolean;
@@ -18,6 +22,7 @@ export interface FileTab {
   scrollLine?: number;
   remoteChanged: boolean;
   lastStat: { mtime: number; size: number } | null;
+  blobUrl?: string;
 }
 
 export class FileTabManager {
@@ -41,6 +46,10 @@ export class FileTabManager {
     const fileName = getFileName(path);
     const type = detectFileType(fileName);
     if (type === 'binary') return null;
+
+    if (type === 'media') {
+      return this.openMediaFile(sftpId, path, fileName);
+    }
 
     const tab: FileTab = {
       id: crypto.randomUUID(),
@@ -80,6 +89,51 @@ export class FileTabManager {
     return tab;
   }
 
+  private async openMediaFile(sftpId: string, path: string, fileName: string): Promise<FileTab> {
+    const mediaKind = detectMediaKind(fileName)!;
+    const cap = mediaKind === 'image' ? IMAGE_MEDIA_CAP : AV_MEDIA_CAP;
+
+    const tab: FileTab = {
+      id: crypto.randomUUID(),
+      path,
+      fileName,
+      type: 'media',
+      mediaKind,
+      content: null,
+      originalContent: null,
+      isLoading: true,
+      isDirty: false,
+      remoteChanged: false,
+      lastStat: null,
+    };
+    this.tabs.push(tab);
+    this.activeTabId = tab.id;
+    this.onChange?.();
+
+    try {
+      const { stat } = await Ssh.sftpStat({ sftpId, path });
+      if (stat.size > cap) {
+        tab.isLoading = false;
+        tab.content = `__TOO_LARGE__:${stat.size}:${cap}`;
+        tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
+        this.onChange?.();
+        return tab;
+      }
+      const { content } = await Ssh.sftpRead({ sftpId, path });
+      const bytes = base64ToUint8Array(content);
+      const blob = new Blob([bytes as BlobPart], { type: getMimeType(fileName) });
+      tab.blobUrl = URL.createObjectURL(blob);
+      tab.content = tab.blobUrl;
+      tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
+      tab.isLoading = false;
+    } catch (e: unknown) {
+      tab.isLoading = false;
+      tab.content = `__ERROR__:${e instanceof Error ? e.message : String(e)}`;
+    }
+    this.onChange?.();
+    return tab;
+  }
+
   updateContent(tabId: string, newContent: string): void {
     const tab = this.tabs.find(t => t.id === tabId);
     if (!tab) return;
@@ -91,6 +145,7 @@ export class FileTabManager {
   async saveFile(sftpId: string, tabId: string): Promise<boolean> {
     const tab = this.tabs.find(t => t.id === tabId);
     if (!tab || !tab.content || !tab.isDirty) return false;
+    if (tab.type === 'media') return false;
     await Ssh.sftpWrite({ sftpId, path: tab.path, content: encodeUtf8Base64(tab.content) });
     tab.originalContent = tab.content;
     tab.isDirty = false;
@@ -120,6 +175,10 @@ export class FileTabManager {
   closeTab(id: string): void {
     const idx = this.tabs.findIndex(t => t.id === id);
     if (idx === -1) return;
+    const tab = this.tabs[idx];
+    if (tab.blobUrl) {
+      try { URL.revokeObjectURL(tab.blobUrl); } catch { /* ignore */ }
+    }
     this.tabs.splice(idx, 1);
     if (this.activeTabId === id) {
       this.activeTabId = this.tabs[Math.min(idx, this.tabs.length - 1)]?.id ?? null;
@@ -135,6 +194,11 @@ export class FileTabManager {
     const fileName = getFileName(path);
     const type = detectFileType(fileName);
     if (type === 'binary') return null;
+
+    if (type === 'media') {
+      // Media tabs ignore scrollLine/unsavedContent — just re-open from SFTP
+      return this.openMediaFile(sftpId, path, fileName);
+    }
 
     const tab: FileTab = {
       id: crypto.randomUUID(),
@@ -181,13 +245,13 @@ export class FileTabManager {
     return this.tabs.map(t => ({
       path: t.path,
       scrollLine: t.scrollLine,
-      unsavedContent: t.isDirty && t.content ? t.content : undefined,
+      unsavedContent: t.isDirty && t.content && t.type !== 'media' ? t.content : undefined,
     }));
   }
 
   async checkRemoteChanges(sftpId: string): Promise<void> {
     const checks = this.tabs
-      .filter(t => t.content !== null && !t.isLoading && t.lastStat)
+      .filter(t => t.content !== null && !t.isLoading && t.lastStat && t.type !== 'media')
       .map(async (tab) => {
         try {
           const { stat } = await Ssh.sftpStat({ sftpId, path: tab.path });
@@ -213,6 +277,7 @@ export class FileTabManager {
   async checkSingleTab(sftpId: string, tabId: string): Promise<void> {
     const tab = this.tabs.find(t => t.id === tabId);
     if (!tab || tab.content === null || tab.isLoading || !tab.lastStat) return;
+    if (tab.type === 'media') return;
 
     try {
       const { stat } = await Ssh.sftpStat({ sftpId, path: tab.path });
@@ -236,6 +301,35 @@ export class FileTabManager {
   async reloadFile(sftpId: string, tabId: string): Promise<void> {
     const tab = this.tabs.find(t => t.id === tabId);
     if (!tab) return;
+
+    if (tab.type === 'media') {
+      if (tab.blobUrl) {
+        try { URL.revokeObjectURL(tab.blobUrl); } catch { /* ignore */ }
+      }
+      tab.blobUrl = undefined;
+      tab.content = null;
+      tab.isLoading = true;
+      this.onChange?.();
+      try {
+        const { stat } = await Ssh.sftpStat({ sftpId, path: tab.path });
+        const cap = tab.mediaKind === 'image' ? IMAGE_MEDIA_CAP : AV_MEDIA_CAP;
+        if (stat.size > cap) {
+          tab.content = `__TOO_LARGE__:${stat.size}:${cap}`;
+        } else {
+          const { content } = await Ssh.sftpRead({ sftpId, path: tab.path });
+          const bytes = base64ToUint8Array(content);
+          const blob = new Blob([bytes as BlobPart], { type: getMimeType(tab.fileName) });
+          tab.blobUrl = URL.createObjectURL(blob);
+          tab.content = tab.blobUrl;
+        }
+        tab.lastStat = { mtime: stat.modifiedAt, size: stat.size };
+      } catch (e: unknown) {
+        tab.content = `__ERROR__:${e instanceof Error ? e.message : String(e)}`;
+      }
+      tab.isLoading = false;
+      this.onChange?.();
+      return;
+    }
 
     tab.isLoading = true;
     this.onChange?.();

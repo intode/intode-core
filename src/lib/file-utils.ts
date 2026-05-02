@@ -1,9 +1,11 @@
 const MARKDOWN_EXTS = ['md', 'mdx', 'markdown'];
 const HTML_EXTS = ['html', 'htm', 'xhtml', 'svg'];
+const IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'ico'];
+const AUDIO_EXTS = ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac'];
+const VIDEO_EXTS = ['mp4', 'webm', 'mov', 'mkv', 'avi'];
 const BINARY_EXTS = [
-  'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'ico',
   'exe', 'dll', 'so', 'zip', 'tar', 'gz', 'bz2', 'xz', '7z', 'rar',
-  'mp3', 'mp4', 'pdf', 'wasm', 'class', 'pyc',
+  'pdf', 'wasm', 'class', 'pyc',
 ];
 
 /** Extract file extension from filename (lowercase) */
@@ -19,12 +21,22 @@ export function getFileName(path: string): string {
 }
 
 /** Detect file type by extension */
-export function detectFileType(filename: string): 'code' | 'markdown' | 'html' | 'binary' {
+export function detectFileType(filename: string): 'code' | 'markdown' | 'html' | 'media' | 'binary' {
   const ext = getExtension(filename);
   if (MARKDOWN_EXTS.includes(ext)) return 'markdown';
   if (HTML_EXTS.includes(ext)) return 'html';
+  if (IMAGE_EXTS.includes(ext) || AUDIO_EXTS.includes(ext) || VIDEO_EXTS.includes(ext)) return 'media';
   if (BINARY_EXTS.includes(ext)) return 'binary';
   return 'code';
+}
+
+/** Distinguish image vs audio vs video for media files; null for non-media. */
+export function detectMediaKind(filename: string): 'image' | 'audio' | 'video' | null {
+  const ext = getExtension(filename);
+  if (IMAGE_EXTS.includes(ext)) return 'image';
+  if (AUDIO_EXTS.includes(ext)) return 'audio';
+  if (VIDEO_EXTS.includes(ext)) return 'video';
+  return null;
 }
 
 const MIME_MAP: Record<string, string> = {

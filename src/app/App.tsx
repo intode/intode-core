@@ -11,6 +11,7 @@ import { FileTree } from '../files/FileTree';
 import { CodeEditor } from '../editor/CodeEditor';
 import { MarkdownPreview } from '../md-preview/MarkdownPreview';
 import { HtmlPreview } from '../html-preview/HtmlPreview';
+import { MediaViewer } from '../editor/MediaViewer';
 import { EditorTabs } from '../editor/EditorTabs';
 import { ConflictBar } from '../editor/ConflictBar';
 import { TerminalTabs } from '../terminal/TerminalTabs';
@@ -18,6 +19,7 @@ import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
 import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } from '../workspace/WorkspaceManager';
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
+import { getMimeType } from '../lib/file-utils';
 import { getTransferManager } from '../files/transfer-singleton';
 import { TransferSnackbar } from '../files/TransferSnackbar';
 import { debugLog } from '../lib/debug-log';
@@ -159,7 +161,23 @@ function WorkspaceEditor({ ftm, sftpId, sftpRoot, editorPanels, visible }: {
 
   const isMd = active?.type === 'markdown';
   const isHtml = active?.type === 'html';
+  const isMedia = active?.type === 'media';
   const isPreviewable = isMd || isHtml;
+
+  const handleMediaDownload = useCallback(async (tab: FileTab) => {
+    if (!sftpId) return;
+    const result = await Ssh.sftpPickSaveLocation({
+      suggestedName: tab.fileName,
+      mimeType: getMimeType(tab.fileName),
+    });
+    if (result.cancelled || !result.localUri) return;
+    getTransferManager().startDownload({
+      sftpId,
+      remotePath: tab.path,
+      localUri: result.localUri,
+      label: tab.fileName,
+    });
+  }, [sftpId]);
 
   return (
     <>
@@ -193,7 +211,9 @@ function WorkspaceEditor({ ftm, sftpId, sftpRoot, editorPanels, visible }: {
         />
       )}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-        {active?.content != null ? (
+        {active && isMedia ? (
+          <MediaViewer tab={active} onDownload={() => void handleMediaDownload(active)} />
+        ) : active?.content != null ? (
           isPreviewable && preview ? (
             isHtml ? (
               <HtmlPreview

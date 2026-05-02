@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectFileType, getExtension, getFileName, getMimeType } from './file-utils';
+import { detectFileType, detectMediaKind, getExtension, getFileName, getMimeType } from './file-utils';
 
 describe('detectFileType', () => {
   it('returns "markdown" for .md', () => {
@@ -13,14 +13,63 @@ describe('detectFileType', () => {
     expect(detectFileType('icon.svg')).toBe('html');
   });
 
-  it('returns "binary" for image extensions other than svg', () => {
-    expect(detectFileType('photo.png')).toBe('binary');
-    expect(detectFileType('photo.jpg')).toBe('binary');
+  it('returns "media" for image extensions (other than svg)', () => {
+    expect(detectFileType('photo.png')).toBe('media');
+    expect(detectFileType('photo.jpg')).toBe('media');
   });
 
   it('returns "code" for unknown extensions', () => {
     expect(detectFileType('app.ts')).toBe('code');
     expect(detectFileType('Makefile')).toBe('code');
+  });
+});
+
+describe('detectFileType — media branch', () => {
+  it('classifies image extensions as media', () => {
+    expect(detectFileType('photo.png')).toBe('media');
+    expect(detectFileType('photo.JPG')).toBe('media');
+    expect(detectFileType('icon.gif')).toBe('media');
+    expect(detectFileType('anim.webp')).toBe('media');
+  });
+
+  it('classifies audio extensions as media', () => {
+    expect(detectFileType('song.mp3')).toBe('media');
+    expect(detectFileType('voice.wav')).toBe('media');
+    expect(detectFileType('clip.m4a')).toBe('media');
+  });
+
+  it('classifies video extensions as media', () => {
+    expect(detectFileType('movie.mp4')).toBe('media');
+    expect(detectFileType('clip.webm')).toBe('media');
+  });
+
+  it('keeps svg as html (HtmlPreview handles SVG)', () => {
+    expect(detectFileType('icon.svg')).toBe('html');
+  });
+
+  it('keeps non-media binaries as binary', () => {
+    expect(detectFileType('archive.zip')).toBe('binary');
+    expect(detectFileType('book.pdf')).toBe('binary');
+  });
+});
+
+describe('detectMediaKind', () => {
+  it('returns image for image extensions', () => {
+    expect(detectMediaKind('photo.png')).toBe('image');
+    expect(detectMediaKind('photo.JPG')).toBe('image');
+  });
+
+  it('returns audio for audio extensions', () => {
+    expect(detectMediaKind('song.mp3')).toBe('audio');
+  });
+
+  it('returns video for video extensions', () => {
+    expect(detectMediaKind('clip.mp4')).toBe('video');
+  });
+
+  it('returns null for non-media', () => {
+    expect(detectMediaKind('app.ts')).toBeNull();
+    expect(detectMediaKind('icon.svg')).toBeNull();
   });
 });
 
