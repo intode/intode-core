@@ -606,25 +606,11 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     return items;
   }, [sftpId]);
 
-  const handleBatchDownload = useCallback(async () => {
-    if (selectedPaths.size === 0) return;
+  const runBatchDownload = useCallback(async (targets: FileTreeNode[]) => {
+    if (targets.length === 0) return;
     const pickRes = await Ssh.sftpPickDownloadDestination();
     if (pickRes.cancelled || !pickRes.treeUri) return;
     const treeUri = pickRes.treeUri;
-
-    // Resolve each selected path to a node from the current tree.
-    const resolveNode = (p: string): FileTreeNode | null => {
-      let result: FileTreeNode | null = null;
-      const search = (list: FileTreeNode[]): boolean => {
-        for (const n of list) {
-          if (n.path === p) { result = n; return true; }
-          if (n.children && search(n.children)) return true;
-        }
-        return false;
-      };
-      search(nodes);
-      return result;
-    };
 
     setScanning(true);
     const cancel = { cancelled: false };
@@ -633,10 +619,8 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     let allItems: { remotePath: string; relativePath: string; size: number }[] = [];
     let totalBytes = 0;
     try {
-      for (const p of selectedPaths) {
+      for (const node of targets) {
         if (cancel.cancelled) break;
-        const node = resolveNode(p);
-        if (!node) continue;
         if (node.isDirectory) {
           const sub = await expandFolderToItems(node.path, node.name, cancel);
           allItems.push(...sub);
@@ -649,7 +633,6 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     setScanning(false);
     if (cancel.cancelled || allItems.length === 0) return;
 
-    // Conflict check
     const { existing } = await Ssh.sftpCheckLocalExists({
       treeUri,
       relativePaths: allItems.map((i) => i.relativePath),
@@ -668,7 +651,33 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
       return;
     }
     setPendingDownload({ treeUri, items: allItems, totalBytes, conflicts: existing });
-  }, [selectedPaths, nodes, sftpId, expandFolderToItems, exitSelectionMode]);
+  }, [sftpId, expandFolderToItems, exitSelectionMode]);
+
+  const handleBatchDownload = useCallback(async () => {
+    if (selectedPaths.size === 0) return;
+    const resolveNode = (p: string): FileTreeNode | null => {
+      let result: FileTreeNode | null = null;
+      const search = (list: FileTreeNode[]): boolean => {
+        for (const n of list) {
+          if (n.path === p) { result = n; return true; }
+          if (n.children && search(n.children)) return true;
+        }
+        return false;
+      };
+      search(nodes);
+      return result;
+    };
+    const targets: FileTreeNode[] = [];
+    for (const p of selectedPaths) {
+      const node = resolveNode(p);
+      if (node) targets.push(node);
+    }
+    await runBatchDownload(targets);
+  }, [selectedPaths, nodes, runBatchDownload]);
+
+  const handleFolderDownload = useCallback(async (node: FileTreeNode) => {
+    await runBatchDownload([node]);
+  }, [runBatchDownload]);
 
   const finishDownloadConflict = useCallback((choice: ConflictChoice) => {
     const p = pendingDownload;
@@ -947,8 +956,12 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
         onClose={() => setActionTarget(null)}
         onAction={(action) => {
           if (!actionTarget) return;
-          if (action === 'download' && !actionTarget.isDirectory) {
-            void handleDownload(actionTarget);
+          if (action === 'download') {
+            if (actionTarget.isDirectory) {
+              void handleFolderDownload(actionTarget);
+            } else {
+              void handleDownload(actionTarget);
+            }
           } else if (action === 'select') {
             if (actionTarget) enterSelectionMode(actionTarget);
           } else if (action === 'uploadFiles' && actionTarget.isDirectory) {

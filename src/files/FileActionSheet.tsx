@@ -43,6 +43,7 @@ export function FileActionSheet({ target, clipboardHasContent, onClose, onAction
     actions.push({ id: 'newFolder', label: 'New folder' });
     if (clipboardHasContent) actions.push({ id: 'pasteHere', label: 'Paste here' });
     if (!target.isRoot) {
+      actions.push({ id: 'download', label: 'Download' });
       actions.push({ id: 'select', label: 'Select' });
       actions.push({ id: 'rename', label: 'Rename' });
       actions.push({ id: 'copy', label: 'Copy' });
