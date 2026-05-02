@@ -6,6 +6,7 @@ export type FileActionTarget =
 
 export type FileAction =
   | 'download'
+  | 'select'
   | 'uploadFiles'
   | 'uploadFolder'
   | 'rename'
@@ -30,6 +31,7 @@ export function FileActionSheet({ target, clipboardHasContent, onClose, onAction
   const actions: Array<{ id: FileAction; label: string; destructive?: boolean }> = [];
   if (target.kind === 'file') {
     actions.push({ id: 'download', label: 'Download' });
+    actions.push({ id: 'select', label: 'Select' });
     actions.push({ id: 'rename', label: 'Rename' });
     actions.push({ id: 'copy', label: 'Copy' });
     actions.push({ id: 'move', label: 'Move' });
@@ -41,6 +43,7 @@ export function FileActionSheet({ target, clipboardHasContent, onClose, onAction
     actions.push({ id: 'newFolder', label: 'New folder' });
     if (clipboardHasContent) actions.push({ id: 'pasteHere', label: 'Paste here' });
     if (!target.isRoot) {
+      actions.push({ id: 'select', label: 'Select' });
       actions.push({ id: 'rename', label: 'Rename' });
       actions.push({ id: 'copy', label: 'Copy' });
       actions.push({ id: 'move', label: 'Move' });

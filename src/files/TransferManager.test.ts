@@ -6,6 +6,7 @@ function makeDeps() {
   return {
     sftpDownload: vi.fn().mockResolvedValue(undefined),
     sftpUpload: vi.fn().mockResolvedValue(undefined),
+    sftpDownloadBatch: vi.fn().mockResolvedValue(undefined),
     sftpCancelTransfer: vi.fn().mockResolvedValue(undefined),
     newId: (() => {
       let n = 0;
@@ -76,5 +77,54 @@ describe('TransferManager', () => {
     mgr.onProgress({ transferId: 't1', phase: 'done', bytesTransferred: 100, totalBytes: 100 });
     expect(deps.sftpDownload).toHaveBeenCalledTimes(4);
     expect(mgr.getQueueLength()).toBe(0);
+  });
+});
+
+describe('startBatchDownload', () => {
+  it('assigns id, registers state, and calls sftpDownloadBatch', () => {
+    const deps = {
+      sftpDownload: vi.fn().mockResolvedValue(undefined),
+      sftpUpload: vi.fn().mockResolvedValue(undefined),
+      sftpDownloadBatch: vi.fn().mockResolvedValue(undefined),
+      sftpCancelTransfer: vi.fn().mockResolvedValue(undefined),
+      newId: vi.fn().mockReturnValue('b1'),
+    };
+    const mgr = new TransferManager(deps);
+    const id = mgr.startBatchDownload({
+      sftpId: 's',
+      destinationTreeUri: 'content://tree',
+      items: [
+        { remotePath: '/r/a.txt', relativePath: 'a.txt', size: 100 },
+        { remotePath: '/r/sub/b.txt', relativePath: 'sub/b.txt', size: 200 },
+      ],
+      totalBytes: 300,
+      label: 'downloads/ (2 files)',
+      onConflict: 'overwrite',
+    });
+    expect(id).toBe('b1');
+    expect(deps.sftpDownloadBatch).toHaveBeenCalledWith(
+      expect.objectContaining({ transferId: 'b1', destinationTreeUri: 'content://tree' }),
+    );
+    expect(mgr.getState(id)?.kind).toBe('download');
+    expect(mgr.getState(id)?.filesTotal).toBe(2);
+  });
+
+  it('reports failure when sftpDownloadBatch rejects', async () => {
+    const deps = {
+      sftpDownload: vi.fn(),
+      sftpUpload: vi.fn(),
+      sftpDownloadBatch: vi.fn().mockRejectedValue(new Error('boom')),
+      sftpCancelTransfer: vi.fn(),
+      newId: vi.fn().mockReturnValue('b2'),
+    };
+    const mgr = new TransferManager(deps);
+    const id = mgr.startBatchDownload({
+      sftpId: 's', destinationTreeUri: 'content://tree',
+      items: [{ remotePath: '/r/a', relativePath: 'a', size: 1 }],
+      totalBytes: 1, label: 'x', onConflict: 'overwrite',
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(mgr.getState(id)?.phase).toBe('error');
+    expect(mgr.getState(id)?.error).toContain('boom');
   });
 });

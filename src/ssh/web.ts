@@ -588,6 +588,13 @@ export class SshWeb extends WebPlugin implements SshPlugin {
   async sftpPickSaveLocation(): Promise<{ cancelled: boolean; localUri?: string }> {
     return { cancelled: true };
   }
+  async sftpPickDownloadDestination(): Promise<{ cancelled: boolean; treeUri?: string }> {
+    return { cancelled: true };
+  }
+  async sftpCheckLocalExists(): Promise<{ existing: string[] }> {
+    return { existing: [] };
+  }
+  async sftpDownloadBatch(): Promise<void> {}
   async sftpEnsureNotificationPermission(): Promise<{ granted: boolean }> {
     return { granted: false };
   }

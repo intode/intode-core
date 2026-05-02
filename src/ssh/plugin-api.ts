@@ -92,6 +92,21 @@ export interface SftpPickResult {
   totalBytes: number;
 }
 
+export interface SftpDownloadBatchItem {
+  remotePath: string;
+  relativePath: string;  // path inside destination tree, including subdirs
+  size: number;
+}
+
+export interface SftpDownloadBatchOptions {
+  sftpId: string;
+  destinationTreeUri: string;       // SAF tree URI from sftpPickDownloadDestination
+  items: SftpDownloadBatchItem[];
+  totalBytes: number;
+  transferId: string;
+  onConflict: 'overwrite' | 'rename' | 'skip';
+}
+
 export interface TransferProgressEvent {
   transferId: string;
   phase: 'start' | 'progress' | 'done' | 'error' | 'cancelled';
@@ -144,6 +159,12 @@ export interface SshPlugin {
   sftpPickFilesToUpload(options: { allowMultiple: boolean }): Promise<SftpPickResult>;
   sftpPickFolderToUpload(): Promise<SftpPickResult>;
   sftpPickSaveLocation(options: { suggestedName: string; mimeType?: string }): Promise<{ cancelled: boolean; localUri?: string }>;
+  sftpPickDownloadDestination(): Promise<{ cancelled: boolean; treeUri?: string }>;
+  sftpCheckLocalExists(options: {
+    treeUri: string;
+    relativePaths: string[];
+  }): Promise<{ existing: string[] }>;
+  sftpDownloadBatch(options: SftpDownloadBatchOptions): Promise<void>;
   sftpEnsureNotificationPermission(): Promise<{ granted: boolean }>;
   addListener(
     eventName: 'sftpTransferProgress',

@@ -13,6 +13,7 @@ export function getTransferManager(): TransferManager {
   instance = new TransferManager({
     sftpDownload: (o) => Ssh.sftpDownload(o),
     sftpUpload: (o) => Ssh.sftpUpload(o),
+    sftpDownloadBatch: (o) => Ssh.sftpDownloadBatch(o),
     sftpCancelTransfer: (o) => Ssh.sftpCancelTransfer(o),
     newId: genId,
   });

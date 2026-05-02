@@ -1,6 +1,7 @@
 import type {
   SftpDownloadOptions,
   SftpUploadOptions,
+  SftpDownloadBatchOptions,
   TransferProgressEvent,
 } from '../ssh/plugin-api';
 
@@ -40,9 +41,19 @@ interface StartUploadArgs {
   onConflict: SftpUploadOptions['onConflict'];
 }
 
+interface StartBatchDownloadArgs {
+  sftpId: string;
+  destinationTreeUri: string;
+  items: SftpDownloadBatchOptions['items'];
+  totalBytes: number;
+  label: string;
+  onConflict: SftpDownloadBatchOptions['onConflict'];
+}
+
 export interface TransferManagerDeps {
   sftpDownload: (opts: SftpDownloadOptions) => Promise<void>;
   sftpUpload: (opts: SftpUploadOptions) => Promise<void>;
+  sftpDownloadBatch: (opts: SftpDownloadBatchOptions) => Promise<void>;
   sftpCancelTransfer: (opts: { transferId: string }) => Promise<void>;
   newId: () => string;
 }
@@ -51,7 +62,8 @@ type Listener = (states: TransferState[]) => void;
 
 type QueuedJob =
   | { kind: 'download'; args: StartDownloadArgs; id: string }
-  | { kind: 'upload'; args: StartUploadArgs; id: string };
+  | { kind: 'upload'; args: StartUploadArgs; id: string }
+  | { kind: 'batch-download'; args: StartBatchDownloadArgs; id: string };
 
 const MAX_CONCURRENT = 3;
 
@@ -96,6 +108,25 @@ export class TransferManager {
     };
     this.states.set(id, state);
     this.enqueue({ kind: 'upload', args, id });
+    this.notify();
+    return id;
+  }
+
+  startBatchDownload(args: StartBatchDownloadArgs): string {
+    const id = this.deps.newId();
+    const state: TransferState = {
+      id,
+      kind: 'download',
+      label: args.label,
+      phase: 'start',
+      bytesTransferred: 0,
+      totalBytes: args.totalBytes,
+      filesTotal: args.items.length,
+      filesDone: 0,
+      startedAt: Date.now(),
+    };
+    this.states.set(id, state);
+    this.enqueue({ kind: 'batch-download', args, id });
     this.notify();
     return id;
   }
@@ -184,11 +215,30 @@ export class TransferManager {
             error: String(err?.message ?? err),
           });
         });
-    } else {
+    } else if (job.kind === 'upload') {
       this.deps
         .sftpUpload({
           sftpId: job.args.sftpId,
           remoteDir: job.args.remoteDir,
+          items: job.args.items,
+          totalBytes: job.args.totalBytes,
+          onConflict: job.args.onConflict,
+          transferId: job.id,
+        })
+        .catch((err) => {
+          this.onProgress({
+            transferId: job.id,
+            phase: 'error',
+            bytesTransferred: this.states.get(job.id)?.bytesTransferred ?? 0,
+            totalBytes: this.states.get(job.id)?.totalBytes ?? -1,
+            error: String(err?.message ?? err),
+          });
+        });
+    } else {
+      this.deps
+        .sftpDownloadBatch({
+          sftpId: job.args.sftpId,
+          destinationTreeUri: job.args.destinationTreeUri,
           items: job.args.items,
           totalBytes: job.args.totalBytes,
           onConflict: job.args.onConflict,
