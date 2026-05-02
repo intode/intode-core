@@ -579,7 +579,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
   }, []);
 
   const exitSelectionMode = useCallback(() => {
-    scanCancelRef.current = { cancelled: true };
+    if (scanCancelRef.current) scanCancelRef.current.cancelled = true;
     setSelectionMode(false);
     setSelectedPaths(new Set());
     setScanning(false);
