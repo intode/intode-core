@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Ssh, SftpEntry } from '../ssh/index';
 import { INPUT_FIELD } from '../lib/styles';
+import { getMimeType } from '../lib/file-utils';
 import { getNodeGitInfo } from './git-status-utils';
 import { useFileSearch } from './useFileSearch';
 import type { GrepResult } from './useFileSearch';
@@ -500,7 +501,10 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
   }, [refreshFolder]);
 
   const handleDownload = useCallback(async (node: FileTreeNode) => {
-    const result = await Ssh.sftpPickSaveLocation({ suggestedName: node.name });
+    const result = await Ssh.sftpPickSaveLocation({
+      suggestedName: node.name,
+      mimeType: getMimeType(node.name),
+    });
     if (result.cancelled || !result.localUri) return;
     getTransferManager().startDownload({
       sftpId,

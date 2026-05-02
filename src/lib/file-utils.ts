@@ -26,3 +26,28 @@ export function detectFileType(filename: string): 'code' | 'markdown' | 'html' |
   if (BINARY_EXTS.includes(ext)) return 'binary';
   return 'code';
 }
+
+const MIME_MAP: Record<string, string> = {
+  // images
+  jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+  gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml',
+  bmp: 'image/bmp', ico: 'image/x-icon',
+  // audio
+  mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg',
+  m4a: 'audio/mp4', flac: 'audio/flac', aac: 'audio/aac',
+  // video
+  mp4: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime',
+  mkv: 'video/x-matroska', avi: 'video/x-msvideo',
+  // text/code
+  txt: 'text/plain', md: 'text/markdown',
+  json: 'application/json', xml: 'application/xml',
+  html: 'text/html', htm: 'text/html', css: 'text/css', js: 'application/javascript',
+  // archive / doc
+  pdf: 'application/pdf', zip: 'application/zip',
+  tar: 'application/x-tar', gz: 'application/gzip',
+};
+
+/** Best-effort MIME from extension. Falls back to octet-stream. */
+export function getMimeType(filename: string): string {
+  return MIME_MAP[getExtension(filename)] ?? 'application/octet-stream';
+}
