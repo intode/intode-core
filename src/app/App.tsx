@@ -95,7 +95,7 @@ function WorkspaceEditor({ ftm, sftpId, sftpRoot, editorPanels, visible }: {
 }) {
   const [tabs, setTabs] = useState<FileTab[]>([]);
   const [active, setActive] = useState<FileTab | null>(null);
-  const [preview, setPreview] = useState(false);
+  const preview = active?.previewMode ?? false;
   const [htmlRefreshKey, setHtmlRefreshKey] = useState(0);
   const [overlay, setOverlay] = useState<string | null>(null); // 'git-file' etc.
 
@@ -109,7 +109,7 @@ function WorkspaceEditor({ ftm, sftpId, sftpRoot, editorPanels, visible }: {
     return () => ftm.setOnChange(() => {});
   }, [ftm]);
 
-  useEffect(() => { setPreview(false); setHtmlRefreshKey(0); setOverlay(null); }, [active?.id]);
+  useEffect(() => { setHtmlRefreshKey(0); setOverlay(null); }, [active?.id]);
 
   // Check for remote changes when editor tab becomes visible
   useEffect(() => {
@@ -225,7 +225,12 @@ function WorkspaceEditor({ ftm, sftpId, sftpRoot, editorPanels, visible }: {
                 refreshKey={htmlRefreshKey}
               />
             ) : (
-              <MarkdownPreview content={active.content} visible={visible} />
+              <MarkdownPreview
+                content={active.content}
+                visible={visible}
+                initialScrollTop={active.previewScrollTop}
+                onScrollChange={(top) => ftm.setPreviewScrollTop(active.id, top)}
+              />
             )
           ) : (
             <CodeEditor
@@ -268,7 +273,7 @@ function WorkspaceEditor({ ftm, sftpId, sftpRoot, editorPanels, visible }: {
               </button>
             ))}
             {isPreviewable && (
-              <button onClick={() => { setPreview((v) => !v); setOverlay(null); }}
+              <button onClick={() => { if (active) ftm.setPreviewMode(active.id, !preview); setOverlay(null); }}
                 style={{ ...styles.fabBtn, backgroundColor: preview ? 'var(--accent-blue)' : 'var(--bg-surface1)', color: preview ? 'var(--bg-base)' : 'var(--text-secondary)' }}>
                 {preview ? 'Edit' : (isHtml ? 'HTML' : 'MD')}
               </button>

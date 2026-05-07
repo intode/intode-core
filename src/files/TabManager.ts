@@ -28,6 +28,8 @@ export interface FileTab {
   isLoading: boolean;
   isDirty: boolean;
   scrollLine?: number;
+  previewMode?: boolean;
+  previewScrollTop?: number;
   remoteChanged: boolean;
   lastStat: { mtime: number; size: number } | null;
   blobUrl?: string;
@@ -261,6 +263,19 @@ export class FileTabManager {
   setScrollLine(tabId: string, line: number): void {
     const tab = this.tabs.find(t => t.id === tabId);
     if (tab) tab.scrollLine = line;
+  }
+
+  setPreviewMode(tabId: string, value: boolean): void {
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (tab) {
+      tab.previewMode = value;
+      this.onChange?.();
+    }
+  }
+
+  setPreviewScrollTop(tabId: string, top: number): void {
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (tab) tab.previewScrollTop = top;
   }
 
   /** Get serializable state for session persistence */
