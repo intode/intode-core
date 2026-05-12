@@ -5,15 +5,33 @@ interface Props {
   scanning: boolean;
   onCancel: () => void;
   onDownload: () => void;
+  onCopy: () => void;
+  onMove: () => void;
+  onDelete: () => void;
 }
 
-export function SelectionActionBar({ count, scanning, onCancel, onDownload }: Props) {
+export function SelectionActionBar({ count, scanning, onCancel, onDownload, onCopy, onMove, onDelete }: Props) {
+  const disabled = count === 0 || scanning;
+  const btnStyle = (variant: 'default' | 'danger' = 'default'): React.CSSProperties => ({
+    background: disabled
+      ? 'transparent'
+      : variant === 'danger'
+        ? 'var(--accent-red, #ff6b6b)'
+        : 'var(--accent-blue, #4a9eff)',
+    color: disabled ? 'var(--text-muted)' : '#fff',
+    border: 'none',
+    borderRadius: 4,
+    padding: '4px 10px',
+    fontSize: 12,
+    cursor: disabled ? 'default' : 'pointer',
+  });
+
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
+        gap: 6,
         padding: '6px 12px',
         background: 'var(--accent-blue-dim, #1a2a3a)',
         color: 'var(--accent-blue, #4a9eff)',
@@ -32,20 +50,17 @@ export function SelectionActionBar({ count, scanning, onCancel, onDownload }: Pr
       <span style={{ flex: 1 }}>
         {scanning ? 'Scanning…' : `${count} selected`}
       </span>
-      <button
-        onClick={onDownload}
-        disabled={count === 0 || scanning}
-        style={{
-          background: count === 0 || scanning ? 'transparent' : 'var(--accent-blue, #4a9eff)',
-          color: count === 0 || scanning ? 'var(--text-muted)' : '#fff',
-          border: 'none',
-          borderRadius: 4,
-          padding: '4px 12px',
-          fontSize: 12,
-          cursor: count === 0 || scanning ? 'default' : 'pointer',
-        }}
-      >
-        ⬇ Download
+      <button onClick={onDownload} disabled={disabled} style={btnStyle()} aria-label="Download">
+        ⬇
+      </button>
+      <button onClick={onCopy} disabled={disabled} style={btnStyle()} aria-label="Copy">
+        ⎘
+      </button>
+      <button onClick={onMove} disabled={disabled} style={btnStyle()} aria-label="Move">
+        ↪
+      </button>
+      <button onClick={onDelete} disabled={disabled} style={btnStyle('danger')} aria-label="Delete">
+        🗑
       </button>
     </div>
   );

@@ -239,9 +239,10 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionTarget, setActionTarget] = useState<FileTreeNode | null>(null);
-  const [clipboard, setClipboard] = useState<{ op: 'copy' | 'move'; path: string; name: string } | null>(null);
+  const [clipboard, setClipboard] = useState<{ op: 'copy' | 'move'; items: { path: string; name: string }[] } | null>(null);
   const [renameTarget, setRenameTarget] = useState<FileTreeNode | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FileTreeNode | null>(null);
+  const [batchDeleteTargets, setBatchDeleteTargets] = useState<FileTreeNode[] | null>(null);
   const [createMode, setCreateMode] = useState<{ kind: 'file' | 'folder'; parentPath: string } | null>(null);
   const [pendingUpload, setPendingUpload] = useState<{
     remoteDir: string;
@@ -450,21 +451,29 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
 
   const handlePaste = useCallback(async (destDir: string) => {
     const cb = clipboard;
-    if (!cb) return;
-    const destPath = `${destDir.replace(/\/$/, '')}/${cb.name}`;
-    try {
-      if (cb.op === 'move') {
-        await Ssh.sftpRename({ sftpId, oldPath: cb.path, newPath: destPath });
-      } else {
-        await Ssh.sftpCopy({ sftpId, sourcePath: cb.path, destPath });
+    if (!cb || cb.items.length === 0) return;
+    const dest = destDir.replace(/\/$/, '');
+    const failures: string[] = [];
+    const srcParents = new Set<string>();
+    for (const item of cb.items) {
+      const destPath = `${dest}/${item.name}`;
+      try {
+        if (cb.op === 'move') {
+          await Ssh.sftpRename({ sftpId, oldPath: item.path, newPath: destPath });
+        } else {
+          await Ssh.sftpCopy({ sftpId, sourcePath: item.path, destPath });
+        }
+        srcParents.add(item.path.substring(0, item.path.lastIndexOf('/')) || rootPath);
+      } catch (e: unknown) {
+        failures.push(`${item.name}: ${e instanceof Error ? e.message : String(e)}`);
       }
-      setClipboard(null);
-      const srcParent = cb.path.substring(0, cb.path.lastIndexOf('/')) || rootPath;
-      void refreshFolder(destDir);
-      if (cb.op === 'move' && srcParent !== destDir) void refreshFolder(srcParent);
-    } catch (e: unknown) {
-      alert(`Paste failed: ${e instanceof Error ? e.message : String(e)}`);
     }
+    setClipboard(null);
+    void refreshFolder(destDir);
+    if (cb.op === 'move') {
+      for (const p of srcParents) if (p !== destDir) void refreshFolder(p);
+    }
+    if (failures.length > 0) alert(`Paste failed for some items:\n${failures.join('\n')}`);
   }, [clipboard, sftpId, rootPath, refreshFolder]);
 
   const handleDelete = useCallback(async () => {
@@ -653,9 +662,8 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     setPendingDownload({ treeUri, items: allItems, totalBytes, conflicts: existing });
   }, [sftpId, expandFolderToItems, exitSelectionMode]);
 
-  const handleBatchDownload = useCallback(async () => {
-    if (selectedPaths.size === 0) return;
-    const resolveNode = (p: string): FileTreeNode | null => {
+  const resolveSelectedNodes = useCallback((): FileTreeNode[] => {
+    const findNode = (p: string): FileTreeNode | null => {
       let result: FileTreeNode | null = null;
       const search = (list: FileTreeNode[]): boolean => {
         for (const n of list) {
@@ -669,11 +677,55 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     };
     const targets: FileTreeNode[] = [];
     for (const p of selectedPaths) {
-      const node = resolveNode(p);
+      const node = findNode(p);
       if (node) targets.push(node);
     }
-    await runBatchDownload(targets);
-  }, [selectedPaths, nodes, runBatchDownload]);
+    return targets;
+  }, [selectedPaths, nodes]);
+
+  const handleBatchDownload = useCallback(async () => {
+    if (selectedPaths.size === 0) return;
+    await runBatchDownload(resolveSelectedNodes());
+  }, [selectedPaths, resolveSelectedNodes, runBatchDownload]);
+
+  const handleBatchCopy = useCallback(() => {
+    const targets = resolveSelectedNodes();
+    if (targets.length === 0) return;
+    setClipboard({ op: 'copy', items: targets.map(n => ({ path: n.path, name: n.name })) });
+    exitSelectionMode();
+  }, [resolveSelectedNodes, exitSelectionMode]);
+
+  const handleBatchMove = useCallback(() => {
+    const targets = resolveSelectedNodes();
+    if (targets.length === 0) return;
+    setClipboard({ op: 'move', items: targets.map(n => ({ path: n.path, name: n.name })) });
+    exitSelectionMode();
+  }, [resolveSelectedNodes, exitSelectionMode]);
+
+  const handleBatchDelete = useCallback(() => {
+    const targets = resolveSelectedNodes();
+    if (targets.length === 0) return;
+    setBatchDeleteTargets(targets);
+  }, [resolveSelectedNodes]);
+
+  const executeBatchDelete = useCallback(async () => {
+    const targets = batchDeleteTargets;
+    setBatchDeleteTargets(null);
+    if (!targets || targets.length === 0) return;
+    const failures: string[] = [];
+    const parents = new Set<string>();
+    for (const t of targets) {
+      try {
+        await Ssh.sftpDelete({ sftpId, path: t.path, isDirectory: t.isDirectory });
+        parents.add(t.path.substring(0, t.path.lastIndexOf('/')) || rootPath);
+      } catch (e: unknown) {
+        failures.push(`${t.name}: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+    for (const p of parents) void refreshFolder(p);
+    exitSelectionMode();
+    if (failures.length > 0) alert(`Delete failed for some items:\n${failures.join('\n')}`);
+  }, [batchDeleteTargets, sftpId, rootPath, refreshFolder, exitSelectionMode]);
 
   const handleFolderDownload = useCallback(async (node: FileTreeNode) => {
     await runBatchDownload([node]);
@@ -821,6 +873,9 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
           scanning={scanning}
           onCancel={exitSelectionMode}
           onDownload={() => void handleBatchDownload()}
+          onCopy={handleBatchCopy}
+          onMove={handleBatchMove}
+          onDelete={handleBatchDelete}
         />
       )}
       {clipboard && (
@@ -837,7 +892,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
           }}
         >
           <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {clipboard.op === 'copy' ? 'Copy' : 'Move'}: {clipboard.name}
+            {clipboard.op === 'copy' ? 'Copy' : 'Move'}: {clipboard.items.length === 1 ? clipboard.items[0].name : `${clipboard.items.length} items`}
           </span>
           <button
             onClick={() => setClipboard(null)}
@@ -971,9 +1026,9 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
           } else if (action === 'rename') {
             setRenameTarget(actionTarget);
           } else if (action === 'copy') {
-            setClipboard({ op: 'copy', path: actionTarget.path, name: actionTarget.name });
+            setClipboard({ op: 'copy', items: [{ path: actionTarget.path, name: actionTarget.name }] });
           } else if (action === 'move') {
-            setClipboard({ op: 'move', path: actionTarget.path, name: actionTarget.name });
+            setClipboard({ op: 'move', items: [{ path: actionTarget.path, name: actionTarget.name }] });
           } else if (action === 'pasteHere' && actionTarget.isDirectory) {
             void handlePaste(actionTarget.path);
           } else if (action === 'delete') {
@@ -1007,6 +1062,16 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
           destructive
           onConfirm={() => void handleDelete()}
           onCancel={() => setDeleteTarget(null)}
+        />
+      )}
+      {batchDeleteTargets && batchDeleteTargets.length > 0 && (
+        <ConfirmDialog
+          title={`Delete ${batchDeleteTargets.length} ${batchDeleteTargets.length === 1 ? 'item' : 'items'}`}
+          message={`Delete ${batchDeleteTargets.length === 1 ? `"${batchDeleteTargets[0].name}"` : `${batchDeleteTargets.length} selected items`}? This cannot be undone.`}
+          confirmLabel="Delete"
+          destructive
+          onConfirm={() => void executeBatchDelete()}
+          onCancel={() => setBatchDeleteTargets(null)}
         />
       )}
       {createMode && (
