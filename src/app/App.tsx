@@ -32,6 +32,8 @@ import { autoStartPortForwards } from './port-forward-hooks';
 import { useAutoReconnect } from './useAutoReconnect';
 import { useGitStatus } from './useGitStatus';
 import { handleKeyPress } from './handleKeyPress';
+import { ViewerScreen } from '../viewer/ViewerScreen';
+import { getIntentFilesProvider, type IntentFile } from '../intent/provider';
 import type { ConnectedWorkspace } from './types';
 import '../themes/dark.css';
 
@@ -39,7 +41,7 @@ export type { ConnectedWorkspace } from './types';
 
 initTheme();
 
-type Screen = 'workspace-list' | 'workspace-add' | 'connecting' | 'workspace-view' | 'settings';
+type Screen = 'workspace-list' | 'workspace-add' | 'connecting' | 'workspace-view' | 'settings' | 'viewer';
 
 export const APP_VERSION = __APP_VERSION__;
 export const BUILD_NUMBER = __BUILD_NUMBER__;
@@ -343,6 +345,37 @@ export function App() {
     }).catch(() => {});
   }, []);
 
+  // "Open with Intode" — files handed off via Android ACTION_VIEW intent.
+  // Pre-mount queue + live listener; route the first file into ViewerScreen.
+  useEffect(() => {
+    const provider = getIntentFilesProvider();
+    if (!provider || !provider.isAvailable()) return;
+
+    const showIntent = (file: IntentFile) => {
+      const prev = screenRef.current;
+      // Only remember screens we can sensibly return to.
+      viewerReturnToRef.current =
+        prev === 'workspace-view' || prev === 'workspace-list' ? prev : 'workspace-list';
+      setIntentFile(file);
+      setScreen('viewer');
+    };
+
+    let cancelled = false;
+    let handle: { remove(): void } | null = null;
+
+    provider.getPending().then((files) => {
+      if (cancelled) return;
+      if (files.length > 0) showIntent(files[0]);
+    }).catch(() => {});
+
+    provider.addListener((file) => { showIntent(file); }).then((h) => {
+      if (cancelled) h.remove();
+      else handle = h;
+    }).catch(() => {});
+
+    return () => { cancelled = true; handle?.remove(); };
+  }, []);
+
   // Prevent Android native context menu — except inside code editor (.cm-content)
   useEffect(() => {
     const prevent = (e: Event) => {
@@ -366,6 +399,8 @@ export function App() {
   const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(null);
   const [addReturnTo, setAddReturnTo] = useState<'list' | 'view'>('list');
   const [listKey, setListKey] = useState(0);
+  const [intentFile, setIntentFile] = useState<IntentFile | null>(null);
+  const viewerReturnToRef = useRef<Screen>('workspace-list');
 
   // Per-workspace FileTabManagers (stable across renders)
   const ftmRef = useRef(new Map<string, FileTabManager>());
@@ -451,6 +486,12 @@ export function App() {
       const s = screenRef.current;
       const t = activeTabRef.current;
       const hasConn = connectionsRef2.current.length > 0;
+
+      if (s === 'viewer') {
+        setIntentFile(null);
+        setScreen(viewerReturnToRef.current);
+        return true;
+      }
 
       // Settings sub-page → menu first, then tab/screen back
       if ((s === 'workspace-view' && t === 'settings') || s === 'settings') {
@@ -690,6 +731,18 @@ export function App() {
   return (
     <>
       {/* Overlay screens */}
+      {screen === 'viewer' && intentFile && (
+        <div style={styles.overlay}>
+          <ViewerScreen
+            file={intentFile}
+            onClose={() => {
+              setIntentFile(null);
+              setScreen(viewerReturnToRef.current);
+            }}
+          />
+        </div>
+      )}
+
       {screen === 'settings' && (
         <div style={styles.overlay}>
           <SettingsScreen

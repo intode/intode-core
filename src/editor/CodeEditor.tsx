@@ -18,6 +18,7 @@ export interface CodeEditorProps {
   onContentChange?: (content: string) => void;
   onSave?: () => void;
   onScrollChange?: (line: number) => void;
+  readOnly?: boolean;
 }
 
 export interface CodeEditorRef {
@@ -76,7 +77,7 @@ const darkTheme = EditorView.theme({
 }, { dark: true });
 
 export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
-  function CodeEditor({ content, fileName, visible, initialScrollLine, onContentChange, onSave, onScrollChange }, ref) {
+  function CodeEditor({ content, fileName, visible, initialScrollLine, onContentChange, onSave, onScrollChange, readOnly }, ref) {
     const containerRef = useRef<HTMLDivElement>(null);
     const viewRef = useRef<EditorView | null>(null);
     const pinchRef = useRef<PinchZoom | null>(null);
@@ -197,6 +198,11 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
           }),
         ];
 
+        if (readOnly) {
+          extensions.push(EditorState.readOnly.of(true));
+          extensions.push(EditorView.editable.of(false));
+        }
+
         const lang = await getLanguageExtension(fileName);
         if (cancelled) return;
         if (lang) extensions.push(lang);
@@ -248,7 +254,7 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
         viewRef.current?.destroy();
         viewRef.current = null;
       };
-    }, [fileName]);
+    }, [fileName, readOnly]);
 
     // Handle external content replacement (auto-reload from remote changes)
     const lastContentRef = useRef(content);
