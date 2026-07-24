@@ -31,15 +31,19 @@ export interface Workspace {
   lastConnectedAt: number | null;
   createdAt: number;
   updatedAt: number;
+  /** Manual display position (ascending). Absent on pre-migration data; the store backfills it on first load. */
+  sortOrder?: number;
 }
 
-export type CreateWorkspaceData = Omit<Workspace, 'id' | 'createdAt' | 'updatedAt' | 'lastConnectedAt'>;
+export type CreateWorkspaceData = Omit<Workspace, 'id' | 'createdAt' | 'updatedAt' | 'lastConnectedAt' | 'sortOrder'>;
 
 export interface WorkspaceStore {
   getAll(): Promise<Workspace[]>;
   create(data: CreateWorkspaceData): Promise<Workspace>;
   update(id: string, data: Partial<Workspace>): Promise<void>;
   delete(id: string): Promise<void>;
+  /** Persist a user-defined order. orderedIds holds every workspace id in display order. */
+  reorder(orderedIds: string[]): Promise<void>;
   getPassword(id: string): Promise<string | null>;
   savePassword(id: string, password: string): Promise<void>;
   getJumpHostPasswords(id: string): Promise<string[]>;

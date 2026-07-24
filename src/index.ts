@@ -56,6 +56,7 @@ export type { SshPlugin, ConnectOptions, ConnectionStatus, SftpEntry, SftpStat, 
 // Workspace
 export type { Workspace, CreateWorkspaceData, WorkspaceStore } from './workspace/WorkspaceManager';
 export { setWorkspaceStore, getWorkspaceStore, createWorkspace } from './workspace/WorkspaceManager';
+export { sortWorkspaces, normalizeSortOrder, applyOrder } from './workspace/ordering';
 
 // Terminal
 export { TerminalManager } from './terminal/TerminalManager';

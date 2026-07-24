@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Workspace, getWorkspaceStore } from './WorkspaceManager';
 import { useLongPressMenu } from './useLongPressMenu';
 import { WorkspaceContextMenu } from './WorkspaceContextMenu';
+import { useDragReorder } from './useDragReorder';
 
 export interface WorkspaceListScreenProps {
   onSelectWorkspace: (workspace: Workspace) => void;
@@ -25,6 +26,25 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
   };
 
   useEffect(reload, []);
+
+  const [reorderMode, setReorderMode] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
+
+  const handleDrop = (from: number, to: number) => {
+    const next = [...workspaces];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setWorkspaces(next);
+    // Persist on every drop so leaving the mode (e.g. Android back) loses nothing.
+    getWorkspaceStore().reorder(next.map((w) => w.id)).catch(() => reload());
+  };
+
+  const { handleProps, itemStyle } = useDragReorder({
+    enabled: reorderMode,
+    itemCount: workspaces.length,
+    listRef,
+    onDrop: handleDrop,
+  });
 
   const handleDelete = async (ws: Workspace) => {
     setMenuTarget(null);
@@ -59,20 +79,34 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <span style={styles.title}>SYS.WORKSPACES<span className="blink">_</span></span>
-        <button onClick={onSettings} style={styles.settingsBtn}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-          </svg>
-        </button>
+        <span style={styles.title}>
+          {reorderMode ? 'REORDER' : 'SYS.WORKSPACES'}<span className="blink">_</span>
+        </span>
+        {reorderMode ? (
+          <button onClick={() => setReorderMode(false)} style={styles.doneBtn}>DONE</button>
+        ) : (
+          <button onClick={onSettings} style={styles.settingsBtn}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+            </svg>
+          </button>
+        )}
       </div>
-      <div style={styles.list}>
-        {workspaces.map((ws) => (
+      <div style={styles.list} ref={listRef}>
+        {workspaces.map((ws, i) => (
           <div
             key={ws.id}
-            {...bind(ws)}
-            onClick={() => { if (shouldSuppressClick()) return; onSelectWorkspace(ws); }}
-            style={styles.card}
+            {...(reorderMode ? handleProps(i) : bind(ws))}
+            onClick={() => {
+              if (reorderMode) return;
+              if (shouldSuppressClick()) return;
+              onSelectWorkspace(ws);
+            }}
+            style={{
+              ...styles.card,
+              ...(reorderMode ? { touchAction: 'none', cursor: 'grab' } : {}),
+              ...itemStyle(i),
+            }}
           >
             {connectedIds?.has(ws.id) && <div style={styles.cardDot} />}
             <div style={styles.cardInfo}>
@@ -80,6 +114,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
               <span style={styles.cardHost}>{ws.host}:{ws.port}</span>
               <span style={styles.cardPath}>{ws.defaultPath}</span>
             </div>
+            {reorderMode && <span style={styles.dragHandle}>&#8801;</span>}
           </div>
         ))}
       </div>
@@ -88,6 +123,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
       {menuTarget && (
         <WorkspaceContextMenu
           workspace={menuTarget}
+          onReorder={workspaces.length >= 2 ? () => { setMenuTarget(null); setReorderMode(true); } : undefined}
           onEdit={() => { const t = menuTarget; setMenuTarget(null); onEditWorkspace?.(t); }}
           onDelete={() => handleDelete(menuTarget)}
           onCancel={() => setMenuTarget(null)}
@@ -95,7 +131,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
         />
       )}
 
-      <button onClick={onAddWorkspace} style={styles.fab}>+</button>
+      {!reorderMode && <button onClick={onAddWorkspace} style={styles.fab}>+</button>}
     </div>
   );
 }
@@ -106,6 +142,11 @@ const styles: Record<string, React.CSSProperties> = {
   header: { padding: '16px 20px', borderBottom: '1px solid var(--bg-surface0)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: 16, fontWeight: 700, fontFamily: 'Chakra Petch', color: 'var(--accent-green)', letterSpacing: 1, textShadow: 'var(--neon-glow)' },
   settingsBtn: { background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 },
+  doneBtn: {
+    background: 'none', border: '1px solid var(--accent-green)', color: 'var(--accent-green)',
+    fontFamily: 'Chakra Petch', fontWeight: 700, fontSize: 12, letterSpacing: 1,
+    padding: '4px 12px', borderRadius: 2, cursor: 'pointer',
+  },
   list: { overflowY: 'auto', padding: '12px 16px', flex: 1 },
   card: {
     display: 'flex', alignItems: 'center', gap: 12,
@@ -125,6 +166,10 @@ const styles: Record<string, React.CSSProperties> = {
   cardName: { fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: 0.5, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const },
   cardHost: { fontSize: 11, color: 'var(--accent-green)', fontFamily: 'IBM Plex Mono', opacity: 0.8 },
   cardPath: { fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, fontFamily: 'IBM Plex Mono' },
+  dragHandle: {
+    marginLeft: 'auto', color: 'var(--text-muted)', fontSize: 18,
+    flexShrink: 0, userSelect: 'none' as const, paddingLeft: 8,
+  },
   emptyState: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 8 },
   emptyIcon: { fontSize: 48, color: 'var(--text-muted)', fontFamily: 'monospace', marginBottom: 16 },
   emptyText: { fontSize: 14, color: 'var(--text-muted)', margin: 0 },
