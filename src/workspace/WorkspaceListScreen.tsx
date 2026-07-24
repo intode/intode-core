@@ -39,7 +39,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
     getWorkspaceStore().reorder(next.map((w) => w.id)).catch(() => reload());
   };
 
-  const { handleProps, itemStyle } = useDragReorder({
+  const { dragging, handleProps, itemStyle } = useDragReorder({
     enabled: reorderMode,
     itemCount: workspaces.length,
     listRef,
@@ -83,7 +83,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
           {reorderMode ? 'REORDER' : 'SYS.WORKSPACES'}<span className="blink">_</span>
         </span>
         {reorderMode ? (
-          <button onClick={() => setReorderMode(false)} style={styles.doneBtn}>DONE</button>
+          <button onClick={() => setReorderMode(false)} style={styles.doneBtn} disabled={dragging}>DONE</button>
         ) : (
           <button onClick={onSettings} style={styles.settingsBtn}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -96,7 +96,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
         {workspaces.map((ws, i) => (
           <div
             key={ws.id}
-            {...(reorderMode ? handleProps(i) : bind(ws))}
+            {...(reorderMode ? { ...handleProps(i), onContextMenu: (e: React.MouseEvent) => e.preventDefault() } : bind(ws))}
             onClick={() => {
               if (reorderMode) return;
               if (shouldSuppressClick()) return;
@@ -104,7 +104,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
             }}
             style={{
               ...styles.card,
-              ...(reorderMode ? { touchAction: 'none', cursor: 'grab' } : {}),
+              ...(reorderMode ? { touchAction: 'none', cursor: 'grab', userSelect: 'none' as const } : {}),
               ...itemStyle(i),
             }}
           >

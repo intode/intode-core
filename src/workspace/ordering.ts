@@ -29,9 +29,10 @@ export function normalizeSortOrder(list: Workspace[]): { list: Workspace[]; chan
 }
 
 /**
- * Reorder to match orderedIds and renumber 0..n-1. Ids absent from orderedIds
- * keep their current display order after the ordered ones (defensive; the UI
- * always passes the full id list). Does not touch updatedAt.
+ * Reorder to match orderedIds: entries take their rank from orderedIds;
+ * entries absent from orderedIds keep their current display order and are
+ * appended after the ranked ones (defensive; the UI always passes the full
+ * id list, which yields a dense 0..n-1 numbering). Does not touch updatedAt.
  */
 export function applyOrder(list: Workspace[], orderedIds: string[]): Workspace[] {
   const rank = new Map(orderedIds.map((id, i) => [id, i]));
