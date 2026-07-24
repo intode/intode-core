@@ -96,7 +96,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
         {workspaces.map((ws, i) => (
           <div
             key={ws.id}
-            {...(reorderMode ? { ...handleProps(i), onContextMenu: (e: React.MouseEvent) => e.preventDefault() } : bind(ws))}
+            {...(reorderMode ? { onContextMenu: (e: React.MouseEvent) => e.preventDefault() } : bind(ws))}
             onClick={() => {
               if (reorderMode) return;
               if (shouldSuppressClick()) return;
@@ -104,7 +104,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
             }}
             style={{
               ...styles.card,
-              ...(reorderMode ? { touchAction: 'none', cursor: 'grab', userSelect: 'none' as const } : {}),
+              ...(reorderMode ? { userSelect: 'none' as const } : {}),
               ...itemStyle(i),
             }}
           >
@@ -114,7 +114,7 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
               <span style={styles.cardHost}>{ws.host}:{ws.port}</span>
               <span style={styles.cardPath}>{ws.defaultPath}</span>
             </div>
-            {reorderMode && <span style={styles.dragHandle}>&#8801;</span>}
+            {reorderMode && <span {...handleProps(i)} style={styles.dragHandle}>&#8801;</span>}
           </div>
         ))}
       </div>
@@ -167,8 +167,14 @@ const styles: Record<string, React.CSSProperties> = {
   cardHost: { fontSize: 11, color: 'var(--accent-green)', fontFamily: 'IBM Plex Mono', opacity: 0.8 },
   cardPath: { fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, fontFamily: 'IBM Plex Mono' },
   dragHandle: {
-    marginLeft: 'auto', color: 'var(--text-muted)', fontSize: 18,
-    flexShrink: 0, userSelect: 'none' as const, paddingLeft: 8,
+    color: 'var(--text-muted)', fontSize: 18,
+    flexShrink: 0, userSelect: 'none' as const,
+    // The handle is the only drag surface (cards must stay scrollable) —
+    // negative margins bleed the touch target into the card's padding so
+    // it spans the card's full height and right edge.
+    margin: '-14px -16px -14px auto', padding: '14px 16px 14px 20px',
+    display: 'flex', alignItems: 'center',
+    touchAction: 'none', cursor: 'grab',
   },
   emptyState: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 8 },
   emptyIcon: { fontSize: 48, color: 'var(--text-muted)', fontFamily: 'monospace', marginBottom: 16 },

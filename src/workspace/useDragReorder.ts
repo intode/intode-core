@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 
-/** Vertical gap between cards (marginBottom on each card in the list). */
+/** Fallback inter-row gap when the row pitch cannot be measured. */
 const CARD_GAP = 8;
 /** Distance from the list edge (px) that triggers auto-scroll while dragging. */
 const EDGE_ZONE = 48;
@@ -30,6 +30,9 @@ interface DragState {
  * Vertical drag-to-reorder for a uniform-height card list. The list order is
  * NOT changed during the drag — cards shift visually via transforms, and
  * onDrop(from, to) fires once on release for the caller to commit the move.
+ * Spread handleProps(i) on the drag handle (a child of row i, or the row
+ * itself); the row height is measured from listRef's i-th child, so rows
+ * stay free for normal scroll gestures.
  */
 export function useDragReorder({ enabled, itemCount, listRef, onDrop }: {
   enabled: boolean;
@@ -82,7 +85,17 @@ export function useDragReorder({ enabled, itemCount, listRef, onDrop }: {
       e.preventDefault();
       const el = e.currentTarget;
       el.setPointerCapture(e.pointerId);
-      rowHeightRef.current = el.offsetHeight + CARD_GAP;
+      // The handle may be a small child of the row — measure the row pitch
+      // from adjacent children's offsetTop (ignores transforms and works for
+      // any inter-row gap). Falls back to row height + CARD_GAP.
+      const listEl = listRef.current;
+      const row = listEl?.children[index] as HTMLElement | undefined;
+      const next = listEl?.children[index + 1] as HTMLElement | undefined;
+      const prev = listEl?.children[index - 1] as HTMLElement | undefined;
+      rowHeightRef.current =
+        row && next ? next.offsetTop - row.offsetTop :
+        row && prev ? row.offsetTop - prev.offsetTop :
+        (row?.offsetHeight ?? el.offsetHeight) + CARD_GAP;
       startClientYRef.current = e.clientY;
       lastClientYRef.current = e.clientY;
       startScrollTopRef.current = listRef.current?.scrollTop ?? 0;

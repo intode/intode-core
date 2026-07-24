@@ -3,6 +3,7 @@ import { Workspace, getWorkspaceStore } from './WorkspaceManager';
 import { notifyOverlayOpen, notifyOverlayClose } from '../app/overlay-hooks';
 import { useLongPressMenu } from './useLongPressMenu';
 import { WorkspaceContextMenu } from './WorkspaceContextMenu';
+import { useDragReorder } from './useDragReorder';
 
 interface WorkspaceDropdownProps {
   current: Workspace;
@@ -17,8 +18,28 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd, onEd
   const [mounted, setMounted] = useState(false);
   const [animIn, setAnimIn] = useState(false);
   const [list, setList] = useState<Workspace[]>([]);
+  const [reorderMode, setReorderMode] = useState(false);
   const closingRef = useRef(false);
+  const sheetListRef = useRef<HTMLDivElement | null>(null);
   const { target: menuTarget, setTarget: setMenuTarget, bind, shouldSuppressClick } = useLongPressMenu<Workspace>();
+
+  const handleDrop = (from: number, to: number) => {
+    const next = [...list];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setList(next);
+    // Persist on every drop so closing the sheet loses nothing.
+    getWorkspaceStore().reorder(next.map((w) => w.id)).catch(() => {
+      getWorkspaceStore().getAll().then(setList);
+    });
+  };
+
+  const { dragging, handleProps, itemStyle: dragItemStyle } = useDragReorder({
+    enabled: reorderMode,
+    itemCount: list.length,
+    listRef: sheetListRef,
+    onDrop: handleDrop,
+  });
 
   const open = useCallback(() => {
     (window as any).__intodeHideKeyboard?.();
@@ -31,6 +52,7 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd, onEd
   const close = useCallback((restore = true) => {
     if (closingRef.current) return;
     closingRef.current = true;
+    setReorderMode(false);
     setMenuTarget(null);
     setAnimIn(false);
     setTimeout(() => {
@@ -61,15 +83,20 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd, onEd
           >
             <div style={handleBarWrap}><div style={handleBar} /></div>
             <div style={sheetHeaderStyle}>
-              <span style={sheetTitleStyle}>Workspaces</span>
-              <button onClick={() => close()} style={sheetCloseStyle}>{'\u2715'}</button>
+              <span style={sheetTitleStyle}>{reorderMode ? 'Reorder' : 'Workspaces'}</span>
+              {reorderMode ? (
+                <button onClick={() => setReorderMode(false)} style={sheetDoneStyle} disabled={dragging}>DONE</button>
+              ) : (
+                <button onClick={() => close()} style={sheetCloseStyle}>{'\u2715'}</button>
+              )}
             </div>
-            <div style={sheetListStyle}>
-              {list.map((ws) => (
+            <div style={sheetListStyle} ref={sheetListRef}>
+              {list.map((ws, i) => (
                 <button
                   key={ws.id}
-                  {...bind(ws)}
+                  {...(reorderMode ? { onContextMenu: (e: React.MouseEvent) => e.preventDefault() } : bind(ws))}
                   onClick={() => {
+                    if (reorderMode) return;
                     if (shouldSuppressClick()) return;
                     const switching = ws.id !== current.id;
                     close(!switching);
@@ -78,6 +105,8 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd, onEd
                   style={{
                     ...itemStyle,
                     ...(ws.id === current.id ? activeStyle : {}),
+                    ...(reorderMode ? { userSelect: 'none' as const } : {}),
+                    ...dragItemStyle(i),
                   }}
                 >
                   <div style={itemInfoStyle}>
@@ -87,26 +116,30 @@ export function WorkspaceDropdown({ current, connectedIds, onSwitch, onAdd, onEd
                     </div>
                   </div>
                   {connectedIds.has(ws.id) && <span style={dotStyle}>{'\u25cf'}</span>}
+                  {reorderMode && <span {...handleProps(i)} style={sheetHandleStyle}>&#8801;</span>}
                 </button>
               ))}
             </div>
-            <div style={sheetFooterStyle}>
-              <button
-                onClick={() => {
-                  close(false);
-                  setTimeout(onAdd, 260);
-                }}
-                style={addBtnStyle}
-              >
-                + Add Workspace
-              </button>
-            </div>
+            {!reorderMode && (
+              <div style={sheetFooterStyle}>
+                <button
+                  onClick={() => {
+                    close(false);
+                    setTimeout(onAdd, 260);
+                  }}
+                  style={addBtnStyle}
+                >
+                  + Add Workspace
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
       {menuTarget && (
         <WorkspaceContextMenu
           workspace={menuTarget}
+          onReorder={list.length >= 2 ? () => { setMenuTarget(null); setReorderMode(true); } : undefined}
           onEdit={() => {
             const ws = menuTarget;
             setMenuTarget(null);
@@ -281,6 +314,34 @@ const dotStyle: React.CSSProperties = {
   color: 'var(--accent-green)',
   fontSize: 10,
   flexShrink: 0,
+};
+
+// The handle is the only drag surface (rows must stay scrollable) — negative
+// margins bleed the touch target into the row's padding so it spans the row's
+// full height and right edge.
+const sheetHandleStyle: React.CSSProperties = {
+  color: 'var(--text-tertiary)',
+  fontSize: 18,
+  flexShrink: 0,
+  userSelect: 'none',
+  touchAction: 'none',
+  cursor: 'grab',
+  margin: '-12px -12px -12px auto',
+  padding: '12px 14px',
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const sheetDoneStyle: React.CSSProperties = {
+  background: 'none',
+  border: '1px solid var(--accent-green)',
+  color: 'var(--accent-green)',
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: 1,
+  padding: '4px 12px',
+  borderRadius: 6,
+  cursor: 'pointer',
 };
 
 const addBtnStyle: React.CSSProperties = {
