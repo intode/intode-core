@@ -8,7 +8,8 @@ import {
 } from '@codemirror/commands';
 import { getLanguageExtension } from './languages';
 import { PinchZoom } from '../gestures/PinchZoom';
-import { FONT_MONO, EDITOR_FONT_SIZE } from '../lib/constants';
+import { loadZoom, saveZoom } from '../gestures/zoom-store';
+import { FONT_MONO } from '../lib/constants';
 
 export interface CodeEditorProps {
   content: string;
@@ -177,12 +178,13 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
         const container = containerRef.current;
         if (!container) return;
 
+        const initialFontSize = loadZoom('editor');
         const extensions: Extension[] = [
           lineNumbers(),
           highlightActiveLine(),
           syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
           darkTheme,
-          fontSizeCompartment.of(makeFontSizeTheme(EDITOR_FONT_SIZE)),
+          fontSizeCompartment.of(makeFontSizeTheme(initialFontSize)),
           EditorView.lineWrapping,
           history(),
           keymap.of([
@@ -238,8 +240,9 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
         pinchRef.current?.detach();
         const pinch = new PinchZoom({
           element: container,
-          initialFontSize: EDITOR_FONT_SIZE,
+          initialFontSize,
           onFontSizeChange: (size) => api.setFontSize(size),
+          onZoomEnd: (size) => saveZoom('editor', size),
         });
         pinch.attach();
         pinchRef.current = pinch;

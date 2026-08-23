@@ -4,9 +4,9 @@ import { TerminalSelection, HandlePositions } from './TerminalSelection';
 import { PinchZoom } from '../gestures/PinchZoom';
 import { Ssh } from '../ssh/index';
 import { encodeUtf8Base64 } from '../lib/encoding';
-import { TERMINAL_DEFAULT_FONT_SIZE } from '../lib/constants';
+import { loadZoom, saveZoom } from '../gestures/zoom-store';
 import { openInPreview } from '../app/preview-hooks';
-import { getNativeTerminalProvider } from './terminal-provider';
+import { getNativeTerminalProvider, type SwipeListenerHandle } from './terminal-provider';
 
 function isKeyboardVisible(): boolean {
   const vv = window.visualViewport;
@@ -49,12 +49,23 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
     const id = terminalId || crypto.randomUUID();
     nativeIdRef.current = id;
 
-    nativeProvider!.createTerminal(id, sessionId, defaultPath, tmuxSession).then(() => {
+    // Open at the size the user last pinched to — the native view uses it as the
+    // pinch baseline, so it has to be passed at creation rather than set after.
+    nativeProvider!.createTerminal(id, sessionId, defaultPath, tmuxSession, loadZoom('terminal')).then(() => {
       if (cancelled) return;
       if (visible && container.offsetParent) {
         const rect = container.getBoundingClientRect();
         nativeProvider!.showTerminal(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height }, { showKeyboard: isKeyboardVisible() });
       }
+    }).catch(() => {});
+
+    // Native pinch zoom happens entirely in the view; this is how the size gets back here to be saved.
+    let fontSizeListener: SwipeListenerHandle | null = null;
+    nativeProvider!.addFontSizeListener?.((e) => {
+      if (e.terminalId === id) saveZoom('terminal', e.size);
+    }).then((handle) => {
+      if (cancelled) handle.remove();
+      else fontSizeListener = handle;
     }).catch(() => {});
 
     const observer = new ResizeObserver(() => {
@@ -67,6 +78,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
     return () => {
       cancelled = true;
       observer.disconnect();
+      fontSizeListener?.remove();
       nativeProvider!.destroyTerminal(id).catch(() => {});
       nativeIdRef.current = null;
     };
@@ -141,7 +153,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
       // Pinch zoom for font size
       const pinch = new PinchZoom({
         element: container,
-        initialFontSize: TERMINAL_DEFAULT_FONT_SIZE,
+        initialFontSize: session.terminal.options.fontSize ?? loadZoom('terminal'),
         onFontSizeChange: (size) => {
           session.terminal.options.fontSize = size;
           session.fitAddon.fit();
@@ -149,6 +161,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
             Ssh.resizeShell({ channelId: session.channelId, cols: session.terminal.cols, rows: session.terminal.rows });
           }
         },
+        onZoomEnd: (size) => saveZoom('terminal', size),
       });
       pinch.attach();
       pinchRef.current = pinch;

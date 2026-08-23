@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { renderMarkdown } from './pipeline';
 import { getPostProcessors } from './pipeline-extensions';
 import { PinchZoom } from '../gestures/PinchZoom';
-import { MD_PREVIEW_FONT_SIZE } from '../lib/constants';
+import { loadZoom, saveZoom } from '../gestures/zoom-store';
 import './markdown.css';
 
 export interface MarkdownPreviewProps {
@@ -16,10 +16,10 @@ export function MarkdownPreview({ content, visible, initialScrollTop, onScrollCh
   const [html, setHtml] = useState('');
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  // Pinch zoom level. Kept in a ref too so re-attaching the gesture (tab switch,
-  // re-render) resumes from the size the user last pinched to.
-  const [fontSize, setFontSize] = useState(MD_PREVIEW_FONT_SIZE);
-  const fontSizeRef = useRef(MD_PREVIEW_FONT_SIZE);
+  // Pinch zoom level, restored from the last session. Kept in a ref too so
+  // re-attaching the gesture (tab switch, re-render) resumes from the current size.
+  const [fontSize, setFontSize] = useState(() => loadZoom('md-preview'));
+  const fontSizeRef = useRef(fontSize);
   const onScrollChangeRef = useRef(onScrollChange);
   useEffect(() => { onScrollChangeRef.current = onScrollChange; }, [onScrollChange]);
 
@@ -59,6 +59,7 @@ export function MarkdownPreview({ content, visible, initialScrollTop, onScrollCh
         fontSizeRef.current = size;
         setFontSize(size);
       },
+      onZoomEnd: (size) => saveZoom('md-preview', size),
     });
     pinch.attach();
     return () => pinch.detach();

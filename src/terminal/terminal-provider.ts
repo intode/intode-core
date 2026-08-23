@@ -9,8 +9,14 @@ export interface TerminalSwipeEvent {
   terminalId: string;
 }
 
+export interface TerminalFontSizeEvent {
+  terminalId: string;
+  /** Font size in dp, within the pinch zoom range. */
+  size: number;
+}
+
 export interface NativeTerminalProvider {
-  createTerminal(terminalId: string, sessionId: string, defaultPath?: string, tmuxSession?: string): Promise<void>;
+  createTerminal(terminalId: string, sessionId: string, defaultPath?: string, tmuxSession?: string, fontSize?: number): Promise<void>;
   destroyTerminal(terminalId: string): Promise<void>;
   showTerminal(terminalId: string, rect: { x: number; y: number; width: number; height: number }, options?: { showKeyboard?: boolean }): Promise<void>;
   hideTerminal(terminalId: string): Promise<void>;
@@ -25,6 +31,8 @@ export interface NativeTerminalProvider {
   setControlKey?(terminalId: string, armed: boolean): Promise<void>;
   /** Fires when the armed Ctrl was consumed by a key event so UI can clear its pressed state */
   addControlKeyListener?(cb: (e: { terminalId: string; armed: boolean }) => void): Promise<SwipeListenerHandle>;
+  /** Optional — fires while the user pinch-zooms the native terminal, so the size can be persisted */
+  addFontSizeListener?(cb: (e: TerminalFontSizeEvent) => void): Promise<SwipeListenerHandle>;
 }
 
 let provider: NativeTerminalProvider | null = null;
