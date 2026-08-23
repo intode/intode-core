@@ -4,7 +4,7 @@ import { TerminalSelection, HandlePositions } from './TerminalSelection';
 import { PinchZoom } from '../gestures/PinchZoom';
 import { Ssh } from '../ssh/index';
 import { encodeUtf8Base64 } from '../lib/encoding';
-import { TERMINAL_FONT_SIZE } from '../lib/constants';
+import { TERMINAL_DEFAULT_FONT_SIZE } from '../lib/constants';
 import { openInPreview } from '../app/preview-hooks';
 import { getNativeTerminalProvider } from './terminal-provider';
 
@@ -141,7 +141,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
       // Pinch zoom for font size
       const pinch = new PinchZoom({
         element: container,
-        initialFontSize: TERMINAL_FONT_SIZE,
+        initialFontSize: TERMINAL_DEFAULT_FONT_SIZE,
         onFontSizeChange: (size) => {
           session.terminal.options.fontSize = size;
           session.fitAddon.fit();

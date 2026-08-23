@@ -3,7 +3,7 @@ import { EditorState, Extension } from '@codemirror/state';
 import { EditorView, lineNumbers, highlightActiveLine } from '@codemirror/view';
 import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { getLanguageExtension } from './languages';
-import { FONT_MONO, TERMINAL_FONT_SIZE } from '../lib/constants';
+import { FONT_MONO, EDITOR_FONT_SIZE } from '../lib/constants';
 
 export interface CodeViewerProps {
   content: string;
@@ -36,7 +36,7 @@ const darkTheme = EditorView.theme({
   },
   '.cm-content': {
     fontFamily: FONT_MONO,
-    fontSize: `${TERMINAL_FONT_SIZE}px`,
+    fontSize: `${EDITOR_FONT_SIZE}px`,
   },
 }, { dark: true });
 

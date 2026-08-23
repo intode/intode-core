@@ -2,7 +2,6 @@
 export const FONT_MONO = '"Fira Code", "Source Code Pro", "Menlo", monospace, "Noto Sans CJK KR", sans-serif';
 
 // === Terminal ===
-export const TERMINAL_FONT_SIZE = 14;
 export const TERMINAL_LINE_HEIGHT = 1.2;
 export const TERMINAL_SCROLLBACK = 1000;
 export const TERMINAL_SCROLL_SENSITIVITY = 3;
@@ -11,6 +10,17 @@ export const TERMINAL_MIN_CONTRAST_RATIO = 4.5;
 // === Pinch Zoom ===
 export const PINCH_ZOOM_MIN = 8;
 export const PINCH_ZOOM_MAX = 32;
+
+// The terminal opens fully zoomed out so a phone screen shows the most
+// rows/columns; pinch to zoom in from there.
+export const TERMINAL_DEFAULT_FONT_SIZE = PINCH_ZOOM_MIN;
+
+// === Editor ===
+export const EDITOR_FONT_SIZE = 14;
+
+// === Markdown Preview ===
+// Keep in sync with the .md-preview base font-size in md-preview/markdown.css.
+export const MD_PREVIEW_FONT_SIZE = 15;
 
 // === SSH ===
 export const DEFAULT_SSH_PORT = 22;

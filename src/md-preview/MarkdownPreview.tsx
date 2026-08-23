@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { renderMarkdown } from './pipeline';
 import { getPostProcessors } from './pipeline-extensions';
+import { PinchZoom } from '../gestures/PinchZoom';
+import { MD_PREVIEW_FONT_SIZE } from '../lib/constants';
 import './markdown.css';
 
 export interface MarkdownPreviewProps {
@@ -14,6 +16,10 @@ export function MarkdownPreview({ content, visible, initialScrollTop, onScrollCh
   const [html, setHtml] = useState('');
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Pinch zoom level. Kept in a ref too so re-attaching the gesture (tab switch,
+  // re-render) resumes from the size the user last pinched to.
+  const [fontSize, setFontSize] = useState(MD_PREVIEW_FONT_SIZE);
+  const fontSizeRef = useRef(MD_PREVIEW_FONT_SIZE);
   const onScrollChangeRef = useRef(onScrollChange);
   useEffect(() => { onScrollChangeRef.current = onScrollChange; }, [onScrollChange]);
 
@@ -41,6 +47,22 @@ export function MarkdownPreview({ content, visible, initialScrollTop, onScrollCh
       el.scrollTop = initialScrollTop;
     }
   }, [html, loading, initialScrollTop]);
+
+  // Pinch to zoom the whole preview: the container font-size is the em base
+  // that every markdown rule scales from.
+  useEffect(() => {
+    if (loading || !visible || !containerRef.current) return;
+    const pinch = new PinchZoom({
+      element: containerRef.current,
+      initialFontSize: fontSizeRef.current,
+      onFontSizeChange: (size) => {
+        fontSizeRef.current = size;
+        setFontSize(size);
+      },
+    });
+    pinch.attach();
+    return () => pinch.detach();
+  }, [loading, visible]);
 
   // Track scroll for per-tab persistence
   useEffect(() => {
@@ -72,6 +94,7 @@ export function MarkdownPreview({ content, visible, initialScrollTop, onScrollCh
     <div
       ref={containerRef}
       className="md-preview"
+      style={{ fontSize }}
       dangerouslySetInnerHTML={{ __html: html }}
       onClick={(e) => {
         if (!(e.target instanceof HTMLElement)) return;

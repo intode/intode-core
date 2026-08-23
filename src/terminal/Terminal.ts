@@ -4,7 +4,7 @@ import { Unicode11Addon } from '@xterm/addon-unicode11';
 import { openInPreview } from '../app/preview-hooks';
 import {
   FONT_MONO,
-  TERMINAL_FONT_SIZE,
+  TERMINAL_DEFAULT_FONT_SIZE,
   TERMINAL_LINE_HEIGHT,
   TERMINAL_SCROLLBACK,
   TERMINAL_SCROLL_SENSITIVITY,
@@ -25,7 +25,7 @@ export function createTerminal(config: TerminalConfig = {}): {
 } {
   const terminal = new Terminal({
     fontFamily: FONT_MONO,
-    fontSize: config.fontSize ?? TERMINAL_FONT_SIZE,
+    fontSize: config.fontSize ?? TERMINAL_DEFAULT_FONT_SIZE,
     lineHeight: TERMINAL_LINE_HEIGHT,
     cursorBlink: true,
     cursorStyle: 'block',
