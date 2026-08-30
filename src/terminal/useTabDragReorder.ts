@@ -46,6 +46,27 @@ export function shiftBetween(widths: number[], from: number, to: number): number
   return shift;
 }
 
+/**
+ * Delta trimmed to the travel the strip actually has room for.
+ *
+ * Without this the offset keeps growing past the last slot, and since a
+ * transform counts toward a scroll container's scrollable overflow, the strip
+ * grows with it — which gives the edge auto-scroll new room on every frame and
+ * it never stops.
+ */
+export function clampDragDx(widths: number[], fromIndex: number, dx: number): number {
+  let room = 0;
+  if (dx > 0) {
+    for (let j = fromIndex + 1; j < widths.length; j++) room += widths[j];
+    return Math.min(dx, room);
+  }
+  if (dx < 0) {
+    for (let j = 0; j < fromIndex; j++) room += widths[j];
+    return Math.max(dx, -room);
+  }
+  return dx;
+}
+
 /** Copy of `items` with the entry at `from` relocated to `to`. */
 export function moveItem<T>(items: T[], from: number, to: number): T[] {
   const next = items.slice();
@@ -151,8 +172,11 @@ export function useTabDragReorder(options: TabDragReorderOptions) {
     const drag = dragRef.current;
     if (!drag) return;
     drag.lastClientX = clientX;
-    const dx = clientX + scrollLeft() - drag.originX;
-    if (Math.abs(dx) > DRAG_TOLERANCE_PX) drag.moved = true;
+    const travelled = clientX + scrollLeft() - drag.originX;
+    // `moved` asks whether the finger moved, so it reads the raw travel — a
+    // drag that runs past the end is still a drag, not a long-press tap.
+    if (Math.abs(travelled) > DRAG_TOLERANCE_PX) drag.moved = true;
+    const dx = clampDragDx(drag.widths, drag.fromIndex, travelled);
     const target = resolveDropIndex(drag.widths, drag.fromIndex, dx);
     if (target !== drag.currentIndex) {
       drag.currentIndex = target;

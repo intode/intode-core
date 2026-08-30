@@ -7,6 +7,7 @@ import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PromptDialog } from '../ui/PromptDialog';
 import { useTabDragReorder } from './useTabDragReorder';
+import { tabVisualStyle } from './tab-styles';
 
 interface Tab {
   id: string;
@@ -212,13 +213,11 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
               setActiveId(tab.id);
             }}
             {...drag.bind(tab.id)}
-            style={{
-              ...tabStyle,
-              ...(tab.id === activeId ? activeTabStyle : {}),
-              ...(tab.id === drag.draggingId
-                ? { ...draggingTabStyle, transform: `translateX(${drag.dragOffset}px)` }
-                : {}),
-            }}
+            style={tabVisualStyle({
+              active: tab.id === activeId,
+              dragging: tab.id === drag.draggingId,
+              dragOffset: drag.dragOffset,
+            })}
           >
             <span>{tab.tmuxSession ? `tmux:${tab.tmuxSession}` : `Terminal ${tab.label}`}</span>
             {tabs.length > 1 && (
@@ -297,44 +296,6 @@ const barStyle: React.CSSProperties = {
   height: 32,
   overflowX: 'auto',
   paddingLeft: 4,
-};
-
-const tabStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  padding: '0 10px',
-  height: 32,
-  fontSize: 12,
-  fontWeight: 500,
-  border: 'none',
-  background: 'none',
-  color: 'var(--text-tertiary)',
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-  borderBottom: '2px solid transparent',
-  touchAction: 'manipulation',
-  WebkitTapHighlightColor: 'transparent',
-  // A long press is the reorder gesture, so the WebView must not answer it
-  // with text selection handles.
-  userSelect: 'none',
-  WebkitUserSelect: 'none',
-  WebkitTouchCallout: 'none',
-  transition: 'color 150ms ease',
-};
-
-const draggingTabStyle: React.CSSProperties = {
-  position: 'relative',
-  zIndex: 2,
-  backgroundColor: 'var(--bg-surface0)',
-  borderRadius: 6,
-  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
-  opacity: 0.95,
-};
-
-const activeTabStyle: React.CSSProperties = {
-  color: 'var(--text-primary)',
-  borderBottomColor: 'var(--accent-blue)',
 };
 
 const closeStyle: React.CSSProperties = {

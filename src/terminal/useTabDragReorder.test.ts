@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { LONG_PRESS_DELAY_MS } from '../lib/constants';
-import { resolveDropIndex, moveItem, shiftBetween, useTabDragReorder } from './useTabDragReorder';
+import { resolveDropIndex, moveItem, shiftBetween, clampDragDx, useTabDragReorder } from './useTabDragReorder';
 
 // Three tabs, 100px each, dragging the middle one.
 const EQUAL = [100, 100, 100];
@@ -43,6 +43,28 @@ describe('resolveDropIndex', () => {
   });
 });
 
+describe('clampDragDx', () => {
+  it('leaves a delta that lands inside the strip alone', () => {
+    expect(clampDragDx(EQUAL, 1, 60)).toBe(60);
+  });
+
+  it('caps a rightward drag at the width of the tabs that follow', () => {
+    expect(clampDragDx(EQUAL, 1, 9999)).toBe(100);
+  });
+
+  it('caps a leftward drag at the width of the tabs that precede', () => {
+    expect(clampDragDx(EQUAL, 1, -9999)).toBe(-100);
+  });
+
+  it('caps against each tab own width', () => {
+    expect(clampDragDx([100, 240, 100], 0, 9999)).toBe(340);
+  });
+
+  it('leaves the last tab no room to travel right', () => {
+    expect(clampDragDx(EQUAL, 2, 9999)).toBe(0);
+  });
+});
+
 describe('moveItem', () => {
   it('moves an item forward, shifting the passed items back', () => {
     expect(moveItem(['a', 'b', 'c', 'd'], 0, 2)).toEqual(['b', 'c', 'a', 'd']);
@@ -74,14 +96,14 @@ describe('shiftBetween', () => {
 describe('useTabDragReorder', () => {
   const IDS = ['a', 'b', 'c'];
 
-  function setup() {
+  function setup(ids: string[] = IDS, widths: number[] = EQUAL) {
     const onReorder = vi.fn();
     const onLongPressTap = vi.fn();
-    const measureWidths = vi.fn(() => EQUAL);
+    const measureWidths = vi.fn(() => widths);
     const barRef = { current: null } as React.RefObject<HTMLElement | null>;
     const view = renderHook(() =>
       useTabDragReorder({
-        ids: IDS,
+        ids,
         measureWidths,
         onReorder,
         onLongPressTap,
@@ -153,7 +175,8 @@ describe('useTabDragReorder', () => {
   });
 
   it('keeps the dragged tab under the finger by reporting the residual offset', () => {
-    const { result } = setup();
+    // Four tabs, so 120px of travel still has room left in the strip.
+    const { result } = setup(['a', 'b', 'c', 'd'], [100, 100, 100, 100]);
     down(result, 'b', 0);
     hold();
     pointer('pointermove', 120);
@@ -177,6 +200,17 @@ describe('useTabDragReorder', () => {
     pointer('pointermove', 50);
     pointer('pointermove', -50);
     expect(onReorder).toHaveBeenLastCalledWith(['b', 'a', 'c']);
+  });
+
+  it('stops offsetting the tab once it reaches the last slot', () => {
+    const { result } = setup();
+    down(result, 'b', 0);
+    hold();
+    pointer('pointermove', 5000);
+    // Past the end there is nowhere left to go, so the tab sits in its slot.
+    // An offset here would widen the strip's scrollable area and let the edge
+    // auto-scroll run forever.
+    expect(result.current.dragOffset).toBe(0);
   });
 
   it('runs the context action when the press is released without moving', () => {
