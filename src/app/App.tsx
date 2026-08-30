@@ -35,6 +35,7 @@ import { handleKeyPress } from './handleKeyPress';
 import { ViewerScreen } from '../viewer/ViewerScreen';
 import { getIntentFilesProvider, type IntentFile } from '../intent/provider';
 import type { ConnectedWorkspace } from './types';
+import { keepsNativeContextMenu } from './context-menu';
 import '../themes/dark.css';
 
 export type { ConnectedWorkspace } from './types';
@@ -376,10 +377,11 @@ export function App() {
     return () => { cancelled = true; handle?.remove(); };
   }, []);
 
-  // Prevent Android native context menu — except inside code editor (.cm-content)
+  // Prevent Android native context menu — except where it is the only way to
+  // copy and paste (see keepsNativeContextMenu).
   useEffect(() => {
     const prevent = (e: Event) => {
-      if (e.target instanceof HTMLElement && e.target.closest('.cm-content')) return;
+      if (keepsNativeContextMenu(e.target)) return;
       e.preventDefault();
     };
     document.addEventListener('contextmenu', prevent);
