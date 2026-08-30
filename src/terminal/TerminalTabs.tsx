@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { getPolicy, checkLimit } from '../policies/provider';
 import { TerminalView } from './TerminalView';
 import { getNativeTerminalProvider } from './terminal-provider';
@@ -6,6 +6,7 @@ import { setActiveNativeTerminal } from './active-terminal';
 import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PromptDialog } from '../ui/PromptDialog';
+import { useTabDragReorder } from './useTabDragReorder';
 
 interface Tab {
   id: string;
@@ -125,6 +126,32 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     }
   }, []);
 
+  const barRef = useRef<HTMLDivElement | null>(null);
+  const tabIds = useMemo(() => tabs.map((t) => t.id), [tabs]);
+
+  const measureWidths = useCallback(() => {
+    const bar = barRef.current;
+    if (!bar) return [];
+    return Array.from(bar.querySelectorAll<HTMLElement>('[data-terminal-tab]'))
+      .map((el) => el.offsetWidth);
+  }, []);
+
+  const reorderTabs = useCallback((ids: string[]) => {
+    setTabs((prev) => {
+      if (ids.length !== prev.length) return prev;
+      const next = ids.map((id) => prev.find((t) => t.id === id));
+      return next.every((t): t is Tab => t !== undefined) ? next : prev;
+    });
+  }, []);
+
+  const drag = useTabDragReorder({
+    ids: tabIds,
+    measureWidths,
+    onReorder: reorderTabs,
+    onLongPressTap: configureTmux,
+    barRef,
+  });
+
   const triggerBounce = useCallback((dir: 'next' | 'prev') => {
     Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
     setBounceDir(dir);
@@ -170,7 +197,7 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
 
   return (
     <div style={rootStyle}>
-      <div style={{
+      <div ref={barRef} style={{
         ...barStyle,
         transform: bounceDir === 'next' ? 'translateX(-12px)'
                  : bounceDir === 'prev' ? 'translateX(12px)' : 'translateX(0)',
@@ -181,14 +208,22 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
             key={tab.id}
             data-terminal-tab
             onClick={() => {
+              if (drag.shouldSuppressClick()) return;
               setActiveId(tab.id);
             }}
-            onContextMenu={(e) => { e.preventDefault(); configureTmux(tab.id); }}
-            style={{ ...tabStyle, ...(tab.id === activeId ? activeTabStyle : {}) }}
+            {...drag.bind(tab.id)}
+            style={{
+              ...tabStyle,
+              ...(tab.id === activeId ? activeTabStyle : {}),
+              ...(tab.id === drag.draggingId
+                ? { ...draggingTabStyle, transform: `translateX(${drag.dragOffset}px)` }
+                : {}),
+            }}
           >
             <span>{tab.tmuxSession ? `tmux:${tab.tmuxSession}` : `Terminal ${tab.label}`}</span>
             {tabs.length > 1 && (
               <span
+                onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
                   closeTab(tab.id);
@@ -280,7 +315,21 @@ const tabStyle: React.CSSProperties = {
   borderBottom: '2px solid transparent',
   touchAction: 'manipulation',
   WebkitTapHighlightColor: 'transparent',
+  // A long press is the reorder gesture, so the WebView must not answer it
+  // with text selection handles.
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+  WebkitTouchCallout: 'none',
   transition: 'color 150ms ease',
+};
+
+const draggingTabStyle: React.CSSProperties = {
+  position: 'relative',
+  zIndex: 2,
+  backgroundColor: 'var(--bg-surface0)',
+  borderRadius: 6,
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+  opacity: 0.95,
 };
 
 const activeTabStyle: React.CSSProperties = {
