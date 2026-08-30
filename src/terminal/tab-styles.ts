@@ -27,7 +27,7 @@ export function tabVisualStyle({ active, dragging, dragOffset }: TabVisualState)
     alignItems: 'center',
     gap: 6,
     padding: '0 10px',
-    height: 32,
+    height: '100%',
     fontSize: 12,
     fontWeight: 500,
     whiteSpace: 'nowrap',
@@ -55,3 +55,25 @@ export function tabVisualStyle({ active, dragging, dragOffset }: TabVisualState)
     transform: dragging ? `translateX(${dragOffset}px)` : 'none',
   };
 }
+
+/**
+ * The horizontally scrolling strip the tabs sit in.
+ *
+ * Scrollbars are suppressed rather than styled: the horizontal one renders
+ * along the bottom edge, which is exactly where the active tab's underline is
+ * drawn, and it costs client height that clips the underline away. Killing the
+ * vertical overflow matters too — `overflow-x: auto` drags `overflow-y` from
+ * `visible` to `auto`, so any overhang raises a second scrollbar.
+ */
+export const tabStripStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'stretch',
+  backgroundColor: 'var(--bg-mantle)',
+  borderBottom: '1px solid var(--bg-surface0)',
+  flexShrink: 0,
+  height: 32,
+  overflowX: 'auto',
+  overflowY: 'hidden',
+  scrollbarWidth: 'none',
+  paddingLeft: 4,
+};

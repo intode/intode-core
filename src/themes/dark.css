@@ -62,9 +62,20 @@
   -webkit-user-select: none;
   user-select: none;
 }
-.cm-content {
+/* Text fields are the one place selection is the point: without this the
+   WebView refuses to raise selection handles or the copy/paste menu inside an
+   input, so a rename dialog can only be retyped from scratch. */
+.cm-content,
+input,
+textarea {
   -webkit-user-select: text;
   user-select: text;
+}
+
+/* The tab strip's horizontal scrollbar renders on the bottom edge, on top of
+   the active tab's underline, and takes the height that draws it. */
+.tab-strip::-webkit-scrollbar {
+  display: none;
 }
 /* Prevent browser from hijacking touch gestures on terminal canvas.
    We handle scroll (TerminalSelection), zoom (PinchZoom), and selection ourselves.

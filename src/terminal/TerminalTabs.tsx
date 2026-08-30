@@ -7,7 +7,7 @@ import { canRestoreTerminalTabs, canConfigureTmux } from './terminal-tab-hooks';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PromptDialog } from '../ui/PromptDialog';
 import { useTabDragReorder } from './useTabDragReorder';
-import { tabVisualStyle } from './tab-styles';
+import { tabVisualStyle, tabStripStyle } from './tab-styles';
 
 interface Tab {
   id: string;
@@ -198,8 +198,8 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
 
   return (
     <div style={rootStyle}>
-      <div ref={barRef} style={{
-        ...barStyle,
+      <div ref={barRef} className="tab-strip" style={{
+        ...tabStripStyle,
         transform: bounceDir === 'next' ? 'translateX(-12px)'
                  : bounceDir === 'prev' ? 'translateX(12px)' : 'translateX(0)',
         transition: 'transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1)',
@@ -287,17 +287,6 @@ const rootStyle: React.CSSProperties = {
   height: '100%',
 };
 
-const barStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: 'var(--bg-mantle)',
-  borderBottom: '1px solid var(--bg-surface0)',
-  flexShrink: 0,
-  height: 32,
-  overflowX: 'auto',
-  paddingLeft: 4,
-};
-
 const closeStyle: React.CSSProperties = {
   fontSize: 12,
   opacity: 0.4,
@@ -306,7 +295,9 @@ const closeStyle: React.CSSProperties = {
 
 const addStyle: React.CSSProperties = {
   padding: '0 12px',
-  height: 32,
+  // Matches the tabs: a fixed 32px overhangs the strip's 31px content box and
+  // leaves it with vertical overflow it has no use for.
+  height: '100%',
   fontSize: 14,
   color: 'var(--text-tertiary)',
   background: 'none',
