@@ -29,13 +29,23 @@ export function isUnavailableError(e: unknown): boolean {
 export const UNAVAILABLE_TEXT = 'Not available on this platform';
 
 /**
+ * The same sentence when there is no error to inspect — a capability flag said
+ * up front that the runtime does not have the operation, so nothing was called.
+ *
+ * @param action Human wording for what was attempted, e.g. `'Media preview'`.
+ */
+export function unavailableTitle(action: string): string {
+  return `${action} is not available on this platform`;
+}
+
+/**
  * One line for a failed action, safe to show as-is.
  *
  * @param action Human wording for what was attempted, e.g. `'Rename'`.
  */
 export function describeFailure(action: string, e: unknown): { title: string; detail?: string } {
   if (isUnavailableError(e)) {
-    return { title: `${action} is not available on this platform` };
+    return { title: unavailableTitle(action) };
   }
   const detail = e instanceof Error ? e.message : String(e);
   return { title: `${action} failed`, detail };

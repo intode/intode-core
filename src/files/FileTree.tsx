@@ -6,7 +6,7 @@ import { getNodeGitInfo } from './git-status-utils';
 import { useFileSearch } from './useFileSearch';
 import type { GrepResult } from './useFileSearch';
 import { FileChangeDetector } from './file-change-detector';
-import { FileActionSheet } from './FileActionSheet';
+import { FileActionSheet, availableFileActions } from './FileActionSheet';
 import { SelectionActionBar } from './SelectionActionBar';
 import { getTransferManager } from './transfer-singleton';
 import { notify } from '../ui/notice';
@@ -857,6 +857,14 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
   const isSearching = searchQuery.trim().length > 0;
   const hasResults = nameResults.length > 0 || grepResults.length > 0;
 
+  // The root button exists only to open the root's action sheet. When this runtime
+  // can do nothing to the root — no upload, no new file, no paste — the sheet would
+  // come up empty, so the button goes with it.
+  const rootActionsAvailable = availableFileActions(
+    { kind: 'folder', name: abbreviateHome(rootPath), path: rootPath, isRoot: true },
+    !!clipboard,
+  ).length > 0;
+
   if (loading) {
     return <div style={styles.center}><span style={{ color: 'var(--text-muted)' }}>Loading...</span></div>;
   }
@@ -874,22 +882,24 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
         <div style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {abbreviateHome(rootPath)}
         </div>
-        <button
-          onClick={() => setActionTarget({
-            name: abbreviateHome(rootPath),
-            path: rootPath,
-            isDirectory: true,
-            size: 0,
-            modifiedAt: 0,
-          })}
-          aria-label="Upload to root"
-          style={{ background: 'transparent', border: 'none', padding: 4, color: 'var(--text-secondary)', cursor: 'pointer' }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 19V5" />
-            <path d="M5 12l7-7 7 7" />
-          </svg>
-        </button>
+        {rootActionsAvailable && (
+          <button
+            onClick={() => setActionTarget({
+              name: abbreviateHome(rootPath),
+              path: rootPath,
+              isDirectory: true,
+              size: 0,
+              modifiedAt: 0,
+            })}
+            aria-label="Upload to root"
+            style={{ background: 'transparent', border: 'none', padding: 4, color: 'var(--text-secondary)', cursor: 'pointer' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5" />
+              <path d="M5 12l7-7 7 7" />
+            </svg>
+          </button>
+        )}
       </div>
       {selectionMode && (
         <SelectionActionBar

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Workspace, CreateWorkspaceData, WorkspaceJumpHost, getWorkspaceStore } from './WorkspaceManager';
 import { Ssh } from '../ssh/index';
+import { getSshCapabilities } from '../ssh/capabilities';
+import { unavailableTitle } from '../ssh/unavailable';
 import type { SshKey } from '../ssh/plugin-api';
 import { DEFAULT_SSH_PORT } from '../lib/constants';
 import { INPUT_FIELD } from '../lib/styles';
@@ -36,7 +38,18 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
   const [hasSavedPassword, setHasSavedPassword] = useState(false);
   const [savedJumpHostCount, setSavedJumpHostCount] = useState(0);
 
+  // Key auth needs both halves: a runtime that can list and store keys, and a
+  // connect() that actually honours the key it is handed. One without the other
+  // produces a workspace that saves fine and never connects, which is worse than
+  // no option at all — so offer the choice only when both are there.
+  const { keyManagement, keyAuth } = getSshCapabilities();
+  const keyAuthAvailable = keyManagement && keyAuth;
+  // A workspace already set to key auth keeps showing the option, so its owner can
+  // see and change their own setting instead of finding it silently rewritten.
+  const showKeyOption = keyAuthAvailable || authType === 'key';
+
   const refreshKeys = useCallback(() => {
+    if (!keyManagement) return;
     Ssh.listSshKeys().then(({ keys }) => {
       setSshKeys(keys);
       // Auto-select the newest key if none selected
@@ -44,7 +57,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
         setSelectedKeyId(keys[keys.length - 1].id);
       }
     }).catch(() => {});
-  }, [selectedKeyId]);
+  }, [selectedKeyId, keyManagement]);
 
   useEffect(() => { refreshKeys(); }, []);
 
@@ -67,9 +80,19 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
       : (isEdit || password.trim())
   );
 
+  // Saving a key-auth workspace stays allowed even where key auth does not work —
+  // it may have been made on another device and hiding it would lose the setting.
+  // Testing it is another matter: the attempt can only fail, so do not offer it.
   const canTest = host.trim() && username.trim() && (
-    authType === 'key' ? !!selectedKeyId : password.trim()
+    authType === 'key' ? (keyAuthAvailable && !!selectedKeyId) : password.trim()
   );
+
+  // Without listSshKeys the name is unknowable, so fall back to the stored id —
+  // still the user's own setting, still recognisable next to the one they saved.
+  const savedKey = sshKeys.find((k) => k.id === selectedKeyId);
+  const savedKeyLabel = savedKey
+    ? `${savedKey.name} (${savedKey.type})`
+    : selectedKeyId || 'No key selected';
 
   const handleSave = () => {
     if (!canSave) return;
@@ -145,10 +168,12 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
               onClick={() => setAuthType('password')}
               style={authType === 'password' ? styles.authActive : styles.authInactive}
             >Password</button>
-            <button
-              onClick={() => setAuthType('key')}
-              style={authType === 'key' ? styles.authActive : styles.authInactive}
-            >SSH Key</button>
+            {showKeyOption && (
+              <button
+                onClick={() => setAuthType('key')}
+                style={authType === 'key' ? styles.authActive : styles.authInactive}
+              >SSH Key</button>
+            )}
           </div>
         </div>
 
@@ -159,6 +184,12 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
             placeholder={isEdit && hasSavedPassword ? 'Leave empty to keep current' : '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}
             type="password"
           />
+        ) : !keyAuthAvailable ? (
+          <div style={styles.field}>
+            <label style={styles.label}>SSH Key</label>
+            <div style={styles.readOnly}>{savedKeyLabel}</div>
+            <p style={styles.noKeys}>{unavailableTitle('Key authentication')}</p>
+          </div>
         ) : (
           <div style={styles.field}>
             <label style={styles.label}>SSH Key</label>
@@ -233,10 +264,12 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
                     onClick={() => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], authType: 'password' }; setJumpHosts(nj); }}
                     style={jh.authType === 'password' ? { ...styles.authActive, padding: '6px', fontSize: 11 } : { ...styles.authInactive, padding: '6px', fontSize: 11 }}
                   >Password</button>
-                  <button
-                    onClick={() => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], authType: 'key' }; setJumpHosts(nj); }}
-                    style={jh.authType === 'key' ? { ...styles.authActive, padding: '6px', fontSize: 11 } : { ...styles.authInactive, padding: '6px', fontSize: 11 }}
-                  >SSH Key</button>
+                  {(keyAuthAvailable || jh.authType === 'key') && (
+                    <button
+                      onClick={() => { const nj = [...jumpHosts]; nj[idx] = { ...nj[idx], authType: 'key' }; setJumpHosts(nj); }}
+                      style={jh.authType === 'key' ? { ...styles.authActive, padding: '6px', fontSize: 11 } : { ...styles.authInactive, padding: '6px', fontSize: 11 }}
+                    >SSH Key</button>
+                  )}
                 </div>
                 {jh.authType === 'password' ? (
                   <input
@@ -245,6 +278,8 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
                     onChange={(e) => { const np = [...jumpHostPasswords]; np[idx] = e.target.value; setJumpHostPasswords(np); }}
                     style={{ ...styles.input, fontSize: 13, padding: '8px 10px' }}
                   />
+                ) : !keyAuthAvailable ? (
+                  <p style={styles.noKeys}>{unavailableTitle('Key authentication')}</p>
                 ) : (
                   sshKeys.length > 0 ? (
                     <select
@@ -356,6 +391,13 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right 12px center',
     paddingRight: 32,
+  },
+  noKeys: { margin: 0, fontSize: 12, color: 'var(--text-muted)' },
+  readOnly: {
+    ...INPUT_FIELD,
+    color: 'var(--text-secondary)',
+    backgroundColor: 'var(--bg-surface0)',
+    wordBreak: 'break-all' as const,
   },
   keyActions: { display: 'flex', gap: 8 },
   keyActionBtn: {

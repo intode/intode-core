@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isUnavailableError, describeFailure, UNAVAILABLE_TEXT } from './unavailable';
+import { isUnavailableError, describeFailure, unavailableTitle, UNAVAILABLE_TEXT } from './unavailable';
 
 describe('isUnavailableError', () => {
   it('matches the runtime wording for a missing bridge method', () => {
@@ -44,5 +44,17 @@ describe('describeFailure', () => {
 
   it('names no operating system in the neutral text', () => {
     expect(UNAVAILABLE_TEXT).not.toMatch(/ios|android|iphone/i);
+  });
+});
+
+describe('unavailableTitle', () => {
+  it('says the same thing as describeFailure does for an unimplemented call', () => {
+    expect(unavailableTitle('Rename')).toBe(
+      describeFailure('Rename', new Error('Ssh.sftpRename() is not implemented on ios')).title,
+    );
+  });
+
+  it('names no operating system', () => {
+    expect(unavailableTitle('Media preview')).not.toMatch(/ios|android|iphone/i);
   });
 });

@@ -1,5 +1,8 @@
 import { Capacitor } from '@capacitor/core';
 import { Ssh } from '../ssh/index';
+import { getSshCapabilities } from '../ssh/capabilities';
+import { unavailableTitle } from '../ssh/unavailable';
+import { notify } from '../ui/notice';
 import { getPolicy, checkLimit } from '../policies/provider';
 import { decodeBase64Utf8, encodeUtf8Base64, base64ToUint8Array } from '../lib/encoding';
 import { detectFileType, detectMediaKind, getFileName, getMimeType } from '../lib/file-utils';
@@ -51,12 +54,25 @@ export class FileTabManager {
       return existing;
     }
 
-    const { maxFileTabs } = getPolicy();
-    if (!(await checkLimit('fileTabs', this.tabs.length, maxFileTabs))) return null;
-
     const fileName = getFileName(path);
     const type = detectFileType(fileName);
     if (type === 'binary') return null;
+
+    // Audio and video go through a native cache download; images do not (they are
+    // read over SFTP like any other file), so only the first two are gated.
+    //
+    // Checked before the tab limit on purpose: when a runtime cannot play media at
+    // all, the limit dialog would offer an upgrade that buys nothing. Capability
+    // beats policy. The file is listed by the server, so there is no entry point to
+    // hide — say why instead of opening a tab that can only fail.
+    const mediaKind = type === 'media' ? detectMediaKind(fileName) : null;
+    if ((mediaKind === 'audio' || mediaKind === 'video') && !getSshCapabilities().mediaCache) {
+      notify('error', unavailableTitle('Media preview'));
+      return null;
+    }
+
+    const { maxFileTabs } = getPolicy();
+    if (!(await checkLimit('fileTabs', this.tabs.length, maxFileTabs))) return null;
 
     if (type === 'media') {
       return this.openMediaFile(sftpId, path, fileName);

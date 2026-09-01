@@ -17,6 +17,7 @@ import { ConflictBar } from '../editor/ConflictBar';
 import { TerminalTabs } from '../terminal/TerminalTabs';
 import { ExtraKeyBar } from '../extra-keys/ExtraKeyBar';
 import { Ssh } from '../ssh/index';
+import { getSshCapabilities } from '../ssh/capabilities';
 import { createWorkspace, Workspace, CreateWorkspaceData, getWorkspaceStore } from '../workspace/WorkspaceManager';
 import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { getMimeType } from '../lib/file-utils';
@@ -216,7 +217,16 @@ function WorkspaceEditor({ ftm, sftpId, sftpRoot, editorPanels, visible }: {
       )}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
         {active && isMedia ? (
-          <MediaViewer tab={active} onDownload={() => void handleMediaDownload(active)} />
+          <MediaViewer
+            tab={active}
+            // Saving to the device needs a native file picker this runtime may not
+            // have; without it the viewer shows no download button at all.
+            onDownload={
+              getSshCapabilities().fileTransfer
+                ? () => void handleMediaDownload(active)
+                : undefined
+            }
+          />
         ) : active?.content != null ? (
           isPreviewable && preview ? (
             isHtml ? (

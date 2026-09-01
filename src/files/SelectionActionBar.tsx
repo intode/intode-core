@@ -1,4 +1,5 @@
 import React from 'react';
+import { getSshCapabilities } from '../ssh/capabilities';
 
 interface Props {
   count: number;
@@ -11,6 +12,9 @@ interface Props {
 }
 
 export function SelectionActionBar({ count, scanning, onCancel, onDownload, onCopy, onMove, onDelete }: Props) {
+  // Same rule as the action sheet: an action this runtime cannot perform is not
+  // offered. The bar keeps Cancel so a selection is never a trap.
+  const { fileOps, fileTransfer } = getSshCapabilities();
   const disabled = count === 0 || scanning;
   const btnStyle = (variant: 'default' | 'danger' = 'default'): React.CSSProperties => ({
     background: disabled
@@ -50,18 +54,24 @@ export function SelectionActionBar({ count, scanning, onCancel, onDownload, onCo
       <span style={{ flex: 1 }}>
         {scanning ? 'Scanning…' : `${count} selected`}
       </span>
-      <button onClick={onDownload} disabled={disabled} style={btnStyle()} aria-label="Download">
-        ⬇
-      </button>
-      <button onClick={onCopy} disabled={disabled} style={btnStyle()} aria-label="Copy">
-        ⎘
-      </button>
-      <button onClick={onMove} disabled={disabled} style={btnStyle()} aria-label="Move">
-        ↪
-      </button>
-      <button onClick={onDelete} disabled={disabled} style={btnStyle('danger')} aria-label="Delete">
-        🗑
-      </button>
+      {fileTransfer && (
+        <button onClick={onDownload} disabled={disabled} style={btnStyle()} aria-label="Download">
+          ⬇
+        </button>
+      )}
+      {fileOps && (
+        <>
+          <button onClick={onCopy} disabled={disabled} style={btnStyle()} aria-label="Copy">
+            ⎘
+          </button>
+          <button onClick={onMove} disabled={disabled} style={btnStyle()} aria-label="Move">
+            ↪
+          </button>
+          <button onClick={onDelete} disabled={disabled} style={btnStyle('danger')} aria-label="Delete">
+            🗑
+          </button>
+        </>
+      )}
     </div>
   );
 }

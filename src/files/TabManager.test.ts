@@ -23,6 +23,8 @@ vi.mock('../policies/provider', () => ({
 }));
 
 import { Ssh } from '../ssh/index';
+import { setSshCapabilities } from '../ssh/capabilities';
+import { getNotices, dismissNotice } from '../ui/notice';
 
 describe('FileTabManager — media branch', () => {
   let originalCreate: typeof URL.createObjectURL;
@@ -133,5 +135,54 @@ describe('FileTabManager — media branch', () => {
     const tab = (await mgr.openFile('s', '/r/clip.mp4'))!;
     mgr.closeTab(tab.id);
     expect(Ssh.sftpDeleteCache).toHaveBeenCalledWith({ localPath: '/cache/intode-media/file' });
+  });
+});
+
+describe('FileTabManager — media without a cache-capable runtime', () => {
+  beforeEach(() => {
+    vi.mocked(Ssh.sftpStat).mockReset();
+    vi.mocked(Ssh.sftpRead).mockReset();
+    vi.mocked(Ssh.sftpDownloadToCache).mockReset();
+    vi.mocked(Ssh.sftpStat).mockResolvedValue({ stat: { size: 1024, modifiedAt: 1, permissions: '', isDirectory: false } });
+    vi.mocked(Ssh.sftpRead).mockResolvedValue({ content: 'AQIDBA==', size: 4 });
+    URL.createObjectURL = vi.fn(() => 'blob:mock');
+    setSshCapabilities({ mediaCache: false });
+    for (const n of getNotices()) dismissNotice(n.id);
+  });
+
+  afterEach(() => {
+    setSshCapabilities({});
+    for (const n of getNotices()) dismissNotice(n.id);
+  });
+
+  it('opens no tab for video and says why, without naming an OS', async () => {
+    const mgr = new FileTabManager();
+    expect(await mgr.openFile('s', '/r/clip.mp4')).toBeNull();
+    expect(mgr.getTabs()).toHaveLength(0);
+    expect(Ssh.sftpDownloadToCache).not.toHaveBeenCalled();
+
+    const [notice] = getNotices();
+    expect(notice.title).toBe('Media preview is not available on this platform');
+    expect(notice.title).not.toMatch(/\bios\b|android|Ssh\./i);
+  });
+
+  it('opens no tab for audio either', async () => {
+    const mgr = new FileTabManager();
+    expect(await mgr.openFile('s', '/r/song.mp3')).toBeNull();
+  });
+
+  it('still opens images, which never touch the cache', async () => {
+    const mgr = new FileTabManager();
+    const tab = await mgr.openFile('s', '/r/photo.png');
+    expect(tab).not.toBeNull();
+    expect(tab!.mediaKind).toBe('image');
+    expect(getNotices()).toHaveLength(0);
+  });
+
+  it('still opens ordinary files', async () => {
+    const mgr = new FileTabManager();
+    const tab = await mgr.openFile('s', '/r/main.ts');
+    expect(tab).not.toBeNull();
+    expect(tab!.type).toBe('code');
   });
 });

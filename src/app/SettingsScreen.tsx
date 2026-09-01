@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getPolicy } from '../policies/provider';
+import { getSshCapabilities } from '../ssh/capabilities';
 import { getThemeMode } from '../themes/theme-manager';
 import { getSettingsMenuItems, getSettingsPage } from './settings-registry';
 import { PageHeader, MenuItem, AppearancePage, SshKeysPage, AboutPage, DeveloperPage, HelpPage } from './settings-pages';
@@ -17,6 +18,8 @@ type Page = 'menu' | 'appearance' | 'ssh-keys' | 'about' | 'developer' | string;
 
 export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, onDebugToggle }: SettingsScreenProps) {
   const { showDebugToggle } = getPolicy();
+  // Without key management the page is an empty list whose every button fails.
+  const { keyManagement } = getSshCapabilities();
   const [page, setPage] = useState<Page>('menu');
   const proMenuItems = getSettingsMenuItems();
 
@@ -37,7 +40,7 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
   if (page !== 'menu') {
     const goMenu = () => setPage('menu');
     if (page === 'appearance') return <AppearancePage onBack={goMenu} />;
-    if (page === 'ssh-keys') return <SshKeysPage onBack={goMenu} />;
+    if (page === 'ssh-keys' && keyManagement) return <SshKeysPage onBack={goMenu} />;
     if (page === 'about') return <AboutPage onBack={goMenu} appVersion={appVersion} buildNumber={buildNumber} />;
     if (page === 'help') return <HelpPage onBack={goMenu} />;
     if (page === 'developer') return <DeveloperPage onBack={goMenu} debugEnabled={debugEnabled} onDebugToggle={onDebugToggle} />;
@@ -55,7 +58,7 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
         ))}
 
         <MenuItem label="Appearance" subtitle={getThemeMode() === 'system' ? 'Auto' : getThemeMode() === 'dark' ? 'Dark' : 'Light'} onClick={() => setPage('appearance')} />
-        <MenuItem label="SSH Keys" onClick={() => setPage('ssh-keys')} />
+        {keyManagement && <MenuItem label="SSH Keys" onClick={() => setPage('ssh-keys')} />}
         <MenuItem label="Help Us" subtitle="Bug reports & feature requests" onClick={() => setPage('help')} />
         <MenuItem label="About" subtitle={`v${appVersion}`} onClick={() => setPage('about')} />
         {showDebugToggle && (

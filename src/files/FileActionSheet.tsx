@@ -1,4 +1,5 @@
 import React from 'react';
+import { getSshCapabilities } from '../ssh/capabilities';
 
 export type FileActionTarget =
   | { kind: 'file'; name: string; path: string }
@@ -25,32 +26,58 @@ interface Props {
   onAction: (action: FileAction) => void;
 }
 
-export function FileActionSheet({ target, clipboardHasContent, onClose, onAction }: Props) {
-  if (!target) return null;
-
+/**
+ * Which actions this runtime can actually carry out.
+ *
+ * An action the host cannot perform is left out rather than shown and failed —
+ * a button that always errors reads as a broken app, not as a limitation.
+ * Selection mode only exists to run these same actions in bulk, so it goes
+ * when every one of them is gone.
+ */
+export function availableFileActions(
+  target: FileActionTarget,
+  clipboardHasContent: boolean,
+): Array<{ id: FileAction; label: string; destructive?: boolean }> {
+  const { fileOps, fileTransfer } = getSshCapabilities();
   const actions: Array<{ id: FileAction; label: string; destructive?: boolean }> = [];
-  if (target.kind === 'file') {
-    actions.push({ id: 'download', label: 'Download' });
-    actions.push({ id: 'select', label: 'Select' });
-    actions.push({ id: 'rename', label: 'Rename' });
-    actions.push({ id: 'copy', label: 'Copy' });
-    actions.push({ id: 'move', label: 'Move' });
-    actions.push({ id: 'delete', label: 'Delete', destructive: true });
-  } else {
-    actions.push({ id: 'uploadFiles', label: 'Upload files here' });
-    actions.push({ id: 'uploadFolder', label: 'Upload folder here' });
-    actions.push({ id: 'newFile', label: 'New file' });
-    actions.push({ id: 'newFolder', label: 'New folder' });
-    if (clipboardHasContent) actions.push({ id: 'pasteHere', label: 'Paste here' });
-    if (!target.isRoot) {
-      actions.push({ id: 'download', label: 'Download' });
-      actions.push({ id: 'select', label: 'Select' });
+
+  // Download, rename, copy, move and delete are offered on any node that is not
+  // the tree root — the root itself is only a place to put things.
+  const pushNodeActions = () => {
+    if (fileTransfer) actions.push({ id: 'download', label: 'Download' });
+    if (fileOps || fileTransfer) actions.push({ id: 'select', label: 'Select' });
+    if (fileOps) {
       actions.push({ id: 'rename', label: 'Rename' });
       actions.push({ id: 'copy', label: 'Copy' });
       actions.push({ id: 'move', label: 'Move' });
       actions.push({ id: 'delete', label: 'Delete', destructive: true });
     }
+  };
+
+  if (target.kind === 'file') {
+    pushNodeActions();
+  } else {
+    if (fileTransfer) {
+      actions.push({ id: 'uploadFiles', label: 'Upload files here' });
+      actions.push({ id: 'uploadFolder', label: 'Upload folder here' });
+    }
+    if (fileOps) {
+      actions.push({ id: 'newFile', label: 'New file' });
+      actions.push({ id: 'newFolder', label: 'New folder' });
+      if (clipboardHasContent) actions.push({ id: 'pasteHere', label: 'Paste here' });
+    }
+    if (!target.isRoot) pushNodeActions();
   }
+
+  return actions;
+}
+
+export function FileActionSheet({ target, clipboardHasContent, onClose, onAction }: Props) {
+  if (!target) return null;
+
+  const actions = availableFileActions(target, !!clipboardHasContent);
+  // Nothing this runtime can do to the node — show no sheet rather than a lone Cancel.
+  if (actions.length === 0) return null;
 
   return (
     <>
