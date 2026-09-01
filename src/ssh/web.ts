@@ -603,6 +603,10 @@ export class SshWeb extends WebPlugin implements SshPlugin {
     return { granted: false };
   }
 
+  // The mock transport has no host key, so nothing is ever pending and accepting is a no-op.
+  async getPendingHostKey(): Promise<{ prompt: null }> { return { prompt: null }; }
+  async acceptHostKey(): Promise<void> {}
+
   async generateSshKey(): Promise<SshKey> {
     return { id: 'mock-key', name: 'mock', type: 'ed25519', fingerprint: 'SHA256:mock', publicKey: 'ssh-ed25519 AAAA...', createdAt: Date.now() };
   }

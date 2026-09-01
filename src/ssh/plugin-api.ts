@@ -54,6 +54,23 @@ export interface PortForwardEntry {
   targetPort: number;
 }
 
+/**
+ * A host key that stopped a connect attempt.
+ *
+ * `knownFingerprint` tells the two cases apart: absent means this host has never been
+ * seen before (trust-on-first-use), present means the server now offers a different key
+ * than the one that was accepted earlier — either the host was rebuilt or someone is in
+ * the middle of the connection.
+ */
+export interface HostKeyPrompt {
+  host: string;
+  port: number;
+  /** `SHA256:<base64 without padding>`, the same shape `ssh-keygen -lf` prints. */
+  fingerprint: string;
+  keyType: string;
+  knownFingerprint?: string;
+}
+
 export interface JumpHost {
   host: string;
   port: number;
@@ -123,6 +140,25 @@ export interface SshPlugin {
   connect(options: ConnectOptions): Promise<{ sessionId: string }>;
   disconnect(options: { sessionId: string }): Promise<void>;
   getStatus(options: { sessionId: string }): Promise<{ status: ConnectionStatus }>;
+
+  /**
+   * The host key that blocked the most recent `connect`, or null.
+   *
+   * Takes no arguments on purpose: a jump-host chain verifies every hop, and the caller
+   * has no way to know which one refused. The implementation reports the hop it stopped
+   * at, so `prompt.host`/`prompt.port` may be an intermediate rather than the target.
+   *
+   * Platforms that do not verify host keys always answer null.
+   */
+  getPendingHostKey(): Promise<{ prompt: HostKeyPrompt | null }>;
+
+  /**
+   * Trust `fingerprint` for `host:port` from now on, replacing any key stored earlier.
+   *
+   * Pass the fingerprint back so a prompt the user answered cannot be applied to a
+   * different key that arrived in between.
+   */
+  acceptHostKey(options: { host: string; port: number; fingerprint: string }): Promise<void>;
 
   openShell(options: {
     sessionId: string;

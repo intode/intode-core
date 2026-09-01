@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Workspace, getWorkspaceStore } from './WorkspaceManager';
 import { Ssh } from '../ssh/index';
+import type { HostKeyPrompt } from '../ssh/plugin-api';
 
 export interface ConnectingScreenProps {
   workspace: Workspace;
@@ -10,8 +11,13 @@ export interface ConnectingScreenProps {
 }
 
 export function ConnectingScreen({ workspace, onConnected, onFailed, onCancel }: ConnectingScreenProps) {
-  const [status, setStatus] = useState<'connecting' | 'error'>('connecting');
+  const [status, setStatus] = useState<'connecting' | 'error' | 'hostkey'>('connecting');
   const [errorMsg, setErrorMsg] = useState('');
+  const [hostKey, setHostKey] = useState<HostKeyPrompt | null>(null);
+  // Bumped to run the effect again. Retry used to only flip `status`, which left the
+  // effect — keyed on `workspace` alone — sitting on its old run, so the button did
+  // nothing. Accepting a host key needs a real second attempt, so it is a dependency now.
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -52,6 +58,21 @@ export function ConnectingScreen({ workspace, onConnected, onFailed, onCancel }:
         onConnected(sessionId);
       } catch (e) {
         if (cancelled) return;
+        // A refused host key surfaces as a plain connect failure. Ask the plugin whether
+        // one is pending rather than matching on the message — and do it for every
+        // failure, because a jump-host chain can stop at a hop the caller never named.
+        let prompt: HostKeyPrompt | null = null;
+        try {
+          ({ prompt } = await Ssh.getPendingHostKey());
+        } catch {
+          // Platform without host key verification, or an older build. Fall through.
+        }
+        if (cancelled) return;
+        if (prompt) {
+          setHostKey(prompt);
+          setStatus('hostkey');
+          return;
+        }
         setStatus('error');
         setErrorMsg(String(e));
         onFailed(String(e));
@@ -60,7 +81,57 @@ export function ConnectingScreen({ workspace, onConnected, onFailed, onCancel }:
 
     connect();
     return () => { cancelled = true; };
-  }, [workspace]);
+  }, [workspace, attempt]);
+
+  async function trustHostKey() {
+    if (!hostKey) return;
+    try {
+      await Ssh.acceptHostKey({ host: hostKey.host, port: hostKey.port, fingerprint: hostKey.fingerprint });
+    } catch (e) {
+      setStatus('error');
+      setErrorMsg(String(e));
+      onFailed(String(e));
+      return;
+    }
+    setHostKey(null);
+    setStatus('connecting');
+    setAttempt((n) => n + 1);
+  }
+
+  if (status === 'hostkey' && hostKey) {
+    const changed = hostKey.knownFingerprint !== undefined;
+    return (
+      <div style={styles.container}>
+        <div style={changed ? styles.errorIcon : styles.warnIcon}>{changed ? '!' : '?'}</div>
+        <p style={changed ? styles.errorTitle : styles.warnTitle}>
+          {changed ? 'Host Key Changed' : 'Unknown Host Key'}
+        </p>
+        <p style={styles.hostText}>{hostKey.host.toUpperCase()} // PORT_{hostKey.port}</p>
+        <p style={styles.errorMsg}>
+          {changed
+            ? 'This server is offering a different key than the one you trusted. It may have been rebuilt — or someone may be intercepting the connection.'
+            : 'This server has not been seen before. Check the fingerprint against the server itself before trusting it.'}
+        </p>
+        <div style={styles.fingerprintBox}>
+          <p style={styles.fingerprintLabel}>{hostKey.keyType}</p>
+          <p style={styles.fingerprintValue}>{hostKey.fingerprint}</p>
+        </div>
+        {changed && (
+          <div style={styles.fingerprintBox}>
+            <p style={styles.fingerprintLabel}>PREVIOUSLY TRUSTED</p>
+            <p style={styles.fingerprintValue}>{hostKey.knownFingerprint}</p>
+          </div>
+        )}
+        <p style={styles.verifyHint}>ssh-keygen -lf /etc/ssh/ssh_host_*_key.pub</p>
+        <div style={styles.buttonRow}>
+          <button onClick={onCancel} style={styles.secondaryBtn}>Cancel</button>
+          <button onClick={trustHostKey} style={changed ? styles.dangerBtn : styles.primaryBtn}>
+            {changed ? 'Trust New Key' : 'Trust'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (status === 'error') {
     return (
@@ -70,7 +141,7 @@ export function ConnectingScreen({ workspace, onConnected, onFailed, onCancel }:
         <p style={styles.errorMsg}>{errorMsg}</p>
         <div style={styles.buttonRow}>
           <button onClick={onCancel} style={styles.secondaryBtn}>Go Back</button>
-          <button onClick={() => { setStatus('connecting'); setErrorMsg(''); }} style={styles.primaryBtn}>Retry</button>
+          <button onClick={() => { setStatus('connecting'); setErrorMsg(''); setAttempt((n) => n + 1); }} style={styles.primaryBtn}>Retry</button>
         </div>
       </div>
     );
@@ -96,6 +167,13 @@ const styles: Record<string, React.CSSProperties> = {
   hostText: { fontSize: 11, color: 'var(--text-muted)', fontFamily: 'IBM Plex Mono' },
   cancelBtn: { marginTop: 24, background: 'none', border: '1px solid var(--text-muted)', borderRadius: 2, padding: '8px 24px', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, cursor: 'pointer', letterSpacing: 1 },
   errorIcon: { fontSize: 40, color: 'var(--accent-red)', fontWeight: 700, textShadow: '0 0 10px rgba(255, 51, 0, 0.4)' },
+  warnIcon: { fontSize: 40, color: 'var(--accent-yellow, #ffb000)', fontWeight: 700, textShadow: '0 0 10px rgba(255, 176, 0, 0.4)' },
+  warnTitle: { fontSize: 14, color: 'var(--accent-yellow, #ffb000)', fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, letterSpacing: 1 },
+  fingerprintBox: { border: '1px solid var(--text-muted)', borderRadius: 2, padding: '8px 12px', maxWidth: '90%' },
+  fingerprintLabel: { fontSize: 9, color: 'var(--text-muted)', fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, letterSpacing: 1, marginBottom: 4 },
+  fingerprintValue: { fontSize: 11, color: 'var(--text-primary)', fontFamily: 'IBM Plex Mono', wordBreak: 'break-all' as const },
+  verifyHint: { fontSize: 10, color: 'var(--text-muted)', fontFamily: 'IBM Plex Mono', opacity: 0.7 },
+  dangerBtn: { backgroundColor: 'transparent', border: '1px solid var(--accent-red)', color: 'var(--accent-red)', borderRadius: 2, padding: '10px 20px', fontSize: 11, fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, cursor: 'pointer', letterSpacing: 1 },
   errorTitle: { fontSize: 14, color: 'var(--accent-red)', fontWeight: 700, fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const, letterSpacing: 1 },
   errorMsg: { fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', wordBreak: 'break-all', maxWidth: '80%', fontFamily: 'IBM Plex Mono' },
   buttonRow: { display: 'flex', gap: 12, marginTop: 24 },
