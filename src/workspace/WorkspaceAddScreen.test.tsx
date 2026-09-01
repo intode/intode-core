@@ -1,15 +1,22 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import { render, screen, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import React from 'react';
 
 const listSshKeys = vi.fn(async () => ({ keys: [{ id: 'k1', name: 'laptop', type: 'ed25519' }] }));
+const connect = vi.fn(async (_o: unknown) => ({ sessionId: 'sess1' }));
+const disconnect = vi.fn(async (_o: unknown) => {});
+const getPendingHostKey = vi.fn(async () => ({ prompt: null as HostKeyPrompt | null }));
+const acceptHostKey = vi.fn(async (_o: unknown) => {});
 
+// The arrows defer the lookups: vi.mock is hoisted above the consts above.
 vi.mock('../ssh/index', () => ({
   Ssh: {
     listSshKeys: (...a: unknown[]) => listSshKeys(...(a as [])),
-    connect: vi.fn(),
-    disconnect: vi.fn(),
+    connect: (...a: unknown[]) => connect(a[0]),
+    disconnect: (...a: unknown[]) => disconnect(a[0]),
+    getPendingHostKey: () => getPendingHostKey(),
+    acceptHostKey: (...a: unknown[]) => acceptHostKey(a[0]),
   },
 }));
 
@@ -17,6 +24,7 @@ import { WorkspaceAddScreen } from './WorkspaceAddScreen';
 import { setWorkspaceStore } from './WorkspaceManager';
 import type { Workspace, WorkspaceStore } from './WorkspaceManager';
 import { setSshCapabilities } from '../ssh/capabilities';
+import type { HostKeyPrompt } from '../ssh/plugin-api';
 
 const store: WorkspaceStore = {
   getAll: async () => [],
@@ -37,6 +45,14 @@ const keyWorkspace: Workspace = {
 
 beforeEach(() => {
   listSshKeys.mockClear();
+  connect.mockReset();
+  connect.mockResolvedValue({ sessionId: 'sess1' });
+  disconnect.mockReset();
+  disconnect.mockResolvedValue(undefined);
+  getPendingHostKey.mockReset();
+  getPendingHostKey.mockResolvedValue({ prompt: null });
+  acceptHostKey.mockReset();
+  acceptHostKey.mockResolvedValue(undefined);
   setWorkspaceStore(store);
 });
 
@@ -96,5 +112,110 @@ describe('WorkspaceAddScreen key auth availability', () => {
     setSshCapabilities({ keyManagement: false, keyAuth: false });
     const { container } = renderAdd(keyWorkspace);
     expect(container.textContent ?? '').not.toMatch(/\bios\b|android|iphone/i);
+  });
+});
+
+const unknownKey: HostKeyPrompt = {
+  host: 'bastion.example.com', port: 2222,
+  fingerprint: 'SHA256:AAAAnewkey', keyType: 'ssh-ed25519',
+};
+const changedKey: HostKeyPrompt = { ...unknownKey, knownFingerprint: 'SHA256:BBBBoldkey' };
+
+/** Enough of the form for Test Connection to light up. */
+function fillPasswordForm() {
+  fireEvent.change(screen.getByPlaceholderText('192.168.1.10'), { target: { value: '10.0.0.5' } });
+  fireEvent.change(screen.getByPlaceholderText('user'), { target: { value: 'root' } });
+  fireEvent.change(screen.getByPlaceholderText('\u2022'.repeat(8)), { target: { value: 'hunter2' } });
+}
+
+const clickTest = () => fireEvent.click(screen.getByText('Test Connection'));
+
+describe('WorkspaceAddScreen host key prompt on Test Connection', () => {
+  it('offers the unknown host key, then succeeds and drops the session once trusted', async () => {
+    // Adding a workspace is exactly the moment the server is not trusted yet, so the
+    // first attempt is refused and the second — after trusting — goes through.
+    connect.mockRejectedValueOnce(new Error('reject HostKey'));
+    getPendingHostKey.mockResolvedValueOnce({ prompt: unknownKey });
+
+    renderAdd();
+    fillPasswordForm();
+    clickTest();
+
+    expect(await screen.findByText('Unknown Host Key')).toBeTruthy();
+    expect(screen.getByText(unknownKey.fingerprint)).toBeTruthy();
+    // Nothing is trusted by showing the prompt.
+    expect(acceptHostKey).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText('Trust'));
+
+    expect(await screen.findByText(/Connection successful/)).toBeTruthy();
+    // The fingerprint is trusted for the hop that refused it, not for the host typed
+    // into the form — a jump chain can stop somewhere this screen never named.
+    expect(acceptHostKey).toHaveBeenCalledWith({
+      host: 'bastion.example.com', port: 2222, fingerprint: 'SHA256:AAAAnewkey',
+    });
+    expect(connect).toHaveBeenCalledTimes(2);
+    // A test that leaves a session behind is a leak, trusted key or not.
+    expect(disconnect).toHaveBeenCalledTimes(1);
+    expect(disconnect).toHaveBeenCalledWith({ sessionId: 'sess1' });
+  });
+
+  it('marks a changed key as a warning, not another unknown host', async () => {
+    connect.mockRejectedValueOnce(new Error('reject HostKey'));
+    getPendingHostKey.mockResolvedValueOnce({ prompt: changedKey });
+
+    renderAdd();
+    fillPasswordForm();
+    clickTest();
+
+    expect(await screen.findByText('Host Key Changed')).toBeTruthy();
+    // Both fingerprints, so the user can see what changed.
+    expect(screen.getByText(changedKey.fingerprint)).toBeTruthy();
+    expect(screen.getByText('SHA256:BBBBoldkey')).toBeTruthy();
+    // The confirm button is not the one an unknown host gets: no accepting a possible
+    // interception with the same tap that accepts a first-time server.
+    expect(screen.queryByText('Trust')).toBeNull();
+    expect(screen.getByText('Trust New Key')).toBeTruthy();
+    expect(acceptHostKey).not.toHaveBeenCalled();
+  });
+
+  it('leaves the failure alone where the platform verifies no host keys', async () => {
+    // The web bridge answers { prompt: null }; nothing about that path may change.
+    connect.mockRejectedValueOnce(new Error('Auth fail'));
+
+    renderAdd();
+    fillPasswordForm();
+    clickTest();
+
+    expect(await screen.findByText(/Auth fail/)).toBeTruthy();
+    expect(screen.queryByText('Unknown Host Key')).toBeNull();
+  });
+
+  it('leaves the failure alone where the plugin has no getPendingHostKey at all', async () => {
+    connect.mockRejectedValueOnce(new Error('Auth fail'));
+    getPendingHostKey.mockRejectedValueOnce(new Error('not implemented'));
+
+    renderAdd();
+    fillPasswordForm();
+    clickTest();
+
+    expect(await screen.findByText(/Auth fail/)).toBeTruthy();
+    expect(screen.queryByText('Unknown Host Key')).toBeNull();
+  });
+
+  it('reports a rejected key as a failed test and trusts nothing', async () => {
+    connect.mockRejectedValueOnce(new Error('reject HostKey'));
+    getPendingHostKey.mockResolvedValueOnce({ prompt: unknownKey });
+
+    renderAdd();
+    fillPasswordForm();
+    clickTest();
+
+    expect(await screen.findByText('Unknown Host Key')).toBeTruthy();
+    fireEvent.click(screen.getByText('Cancel'));
+
+    await waitFor(() => expect(screen.getByText(/Host key not trusted/)).toBeTruthy());
+    expect(acceptHostKey).not.toHaveBeenCalled();
+    expect(connect).toHaveBeenCalledTimes(1);
   });
 });

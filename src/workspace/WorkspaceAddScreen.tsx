@@ -3,7 +3,9 @@ import { Workspace, CreateWorkspaceData, WorkspaceJumpHost, getWorkspaceStore } 
 import { Ssh } from '../ssh/index';
 import { getSshCapabilities } from '../ssh/capabilities';
 import { unavailableTitle } from '../ssh/unavailable';
-import type { SshKey } from '../ssh/plugin-api';
+import type { SshKey, HostKeyPrompt } from '../ssh/plugin-api';
+import { getPendingHostKeyPrompt, trustHostKey } from '../ssh/host-key';
+import { HostKeyTrustPrompt } from '../ssh/components/HostKeyTrustPrompt';
 import { DEFAULT_SSH_PORT } from '../lib/constants';
 import { INPUT_FIELD } from '../lib/styles';
 import { isJumpHostVisible } from './workspace-form-hooks';
@@ -31,8 +33,9 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
   const [jumpHosts, setJumpHosts] = useState<WorkspaceJumpHost[]>(editWorkspace?.jumpHosts ?? []);
   const [jumpHostPasswords, setJumpHostPasswords] = useState<string[]>([]);
   const [showJumpHost, setShowJumpHost] = useState((editWorkspace?.jumpHosts?.length ?? 0) > 0);
-  const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'fail'>('idle');
+  const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'fail' | 'hostkey'>('idle');
   const [testError, setTestError] = useState('');
+  const [testHostKey, setTestHostKey] = useState<HostKeyPrompt | null>(null);
   const [showKeyGenerate, setShowKeyGenerate] = useState(false);
   const [showKeyImport, setShowKeyImport] = useState(false);
   const [hasSavedPassword, setHasSavedPassword] = useState(false);
@@ -134,13 +137,58 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
           password: jumpHostPasswords[jumpHosts.indexOf(jh)] ?? undefined,
         }));
       }
-      const { sessionId } = await Ssh.connect(opts);
-      await Ssh.disconnect({ sessionId });
+      let sessionId: string;
+      try {
+        ({ sessionId } = await Ssh.connect(opts));
+      } catch (e: unknown) {
+        // Adding a workspace is exactly the moment a server is not trusted yet, so a
+        // refused host key is the likeliest failure here — and it arrives as a plain
+        // connect error. Ask the plugin the same way ConnectingScreen does, on every
+        // failure, because a jump chain can stop at a hop this form never named.
+        const prompt = await getPendingHostKeyPrompt();
+        if (prompt) {
+          setTestHostKey(prompt);
+          setTestStatus('hostkey');
+          return;
+        }
+        setTestStatus('fail');
+        setTestError(e instanceof Error ? e.message : String(e));
+        return;
+      }
+      // The connection answered the question, so hand it straight back — a test must
+      // never leave a session behind. A disconnect that fails leaves nothing the user
+      // could act on and does not unmake a successful login, so it does not become a
+      // failed test.
+      try {
+        await Ssh.disconnect({ sessionId });
+      } catch { /* the session is the plugin's to clean up from here */ }
       setTestStatus('success');
     } catch (e: unknown) {
       setTestStatus('fail');
       setTestError(e instanceof Error ? e.message : String(e));
     }
+  };
+
+  /** Trust the offered key, then run the same test again — a chain may stop at a further hop. */
+  const acceptTestHostKey = async () => {
+    const prompt = testHostKey;
+    if (!prompt) return;
+    setTestStatus('testing');
+    try {
+      await trustHostKey(prompt);
+    } catch (e: unknown) {
+      setTestStatus('fail');
+      setTestError(e instanceof Error ? e.message : String(e));
+      return;
+    }
+    setTestHostKey(null);
+    await handleTest();
+  };
+
+  const rejectTestHostKey = () => {
+    setTestHostKey(null);
+    setTestStatus('fail');
+    setTestError('Host key not trusted.');
   };
 
   return (
@@ -340,6 +388,14 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
           onCancel={() => setShowKeyImport(false)}
         />
       )}
+      {/* Full screen on purpose: the same decision, in the same shape, as the one the
+          connect flow shows. Squeezing it under the button would make an unknown key
+          and a changed key look like two more lines of test output. */}
+      {testStatus === 'hostkey' && testHostKey && (
+        <div style={styles.hostKeyOverlay}>
+          <HostKeyTrustPrompt prompt={testHostKey} onTrust={acceptTestHostKey} onCancel={rejectTestHostKey} />
+        </div>
+      )}
     </div>
   );
 }
@@ -399,6 +455,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: 'var(--bg-surface0)',
     wordBreak: 'break-all' as const,
   },
+  hostKeyOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 },
   keyActions: { display: 'flex', gap: 8 },
   keyActionBtn: {
     background: 'none', border: 'none', color: 'var(--accent-blue)',
