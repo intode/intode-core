@@ -8,6 +8,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PromptDialog } from '../ui/PromptDialog';
 import { useTabDragReorder } from './useTabDragReorder';
 import { tabVisualStyle, tabStripStyle } from './tab-styles';
+import { getSshCapabilities } from '../ssh/capabilities';
 
 interface Tab {
   id: string;
@@ -196,9 +197,15 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
     };
   }, [handleSwipe]);
 
+  // Without a shell channel every tab opens onto the same "not available" notice, so the
+  // strip only offers ways to reach it again. Hide the whole control surface and let the
+  // single view state the reason. This is a platform fact, never a paid gate — do not
+  // offer an upgrade here.
+  const hasShell = getSshCapabilities().shell;
+
   return (
     <div style={rootStyle}>
-      <div ref={barRef} className="tab-strip" style={{
+      {hasShell && <div ref={barRef} className="tab-strip" style={{
         ...tabStripStyle,
         transform: bounceDir === 'next' ? 'translateX(-12px)'
                  : bounceDir === 'prev' ? 'translateX(12px)' : 'translateX(0)',
@@ -237,7 +244,7 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
         <button onClick={addTab} style={addStyle}>
           +
         </button>
-      </div>
+      </div>}
 
       <div style={bodyStyle}>
         {tabs.map((tab) => (

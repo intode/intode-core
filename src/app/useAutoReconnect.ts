@@ -22,11 +22,27 @@ export function useAutoReconnect(
       if (conns.length === 0) return;
 
       for (const conn of conns) {
+        // Only a definitive non-connected answer authorizes tearing the old session down.
+        // A probe that threw is not proof of death, and disconnecting a live session would
+        // take its shell channels and port forwards with it.
+        let staleSessionId: string | null = null;
         try {
           const { status } = await Ssh.getStatus({ sessionId: conn.sessionId });
           if (status === 'connected') continue;
+          staleSessionId = conn.sessionId;
         } catch {
-          /* status check failed — assume dead */
+          /* status check failed — assume dead, but leave the old session alone */
+        }
+
+        if (staleSessionId) {
+          // Release the dead session before replacing it. The native side frees the transport
+          // and everything hanging off it (jump-host intermediates, local forward listeners,
+          // SFTP channels); without this every foreground return stacked one more of them.
+          try {
+            await Ssh.disconnect({ sessionId: staleSessionId });
+          } catch {
+            /* already gone — nothing left to release */
+          }
         }
 
         try {

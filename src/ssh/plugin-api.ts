@@ -135,6 +135,17 @@ export interface SshPlugin {
   resizeShell(options: { channelId: string; cols: number; rows: number }): Promise<void>;
   closeShell(options: { channelId: string }): Promise<void>;
 
+  /**
+   * Runs a command on its own channel and waits for it to finish.
+   *
+   * `timeout` (default 30000ms) is a deadline for the whole call, not just for opening
+   * the channel: once it expires the call rejects instead of waiting for the command.
+   * Callers pick it to match how long they are willing to block, so an implementation
+   * that only bounds the connect step silently breaks them.
+   *
+   * A non-zero `exitCode` is a normal result, not a rejection — `grep` with no match
+   * and `... | head` (SIGPIPE) both land here.
+   */
   exec(options: {
     sessionId: string;
     command: string;

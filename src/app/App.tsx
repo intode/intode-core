@@ -958,7 +958,10 @@ export function App() {
           })}
         </div>
 
-        {(activeTab === 'terminal' || activeTab === 'editor') && (
+        {/* On a runtime with no shell channel the terminal tab has nowhere to send these
+            keys, so the bar would be decoration over an empty state. The editor tab keeps
+            it — that path is SFTP, not shell. */}
+        {((activeTab === 'terminal' && getSshCapabilities().shell) || activeTab === 'editor') && (
           <ExtraKeyBar
             context={activeTab === 'terminal' ? 'terminal' : (activeConn && getFileTabMgr(activeConn.wsId).getActiveTab()?.type === 'markdown' ? 'md-editor' : 'code-editor')}
             onKeyPress={(data) => handleKeyPress(data, activeTab)}
