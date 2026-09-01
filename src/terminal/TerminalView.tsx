@@ -7,6 +7,7 @@ import { encodeUtf8Base64 } from '../lib/encoding';
 import { loadZoom, saveZoom } from '../gestures/zoom-store';
 import { openInPreview } from '../app/preview-hooks';
 import { getNativeTerminalProvider, type SwipeListenerHandle } from './terminal-provider';
+import { describeFailure } from '../ssh/unavailable';
 
 function isKeyboardVisible(): boolean {
   const vv = window.visualViewport;
@@ -33,6 +34,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
   const nativeIdRef = useRef<string | null>(null);
   const [showCopyBar, setShowCopyBar] = useState(false);
   const [handlePos, setHandlePos] = useState<HandlePositions | null>(null);
+  const [shellError, setShellError] = useState<{ title: string; detail?: string } | null>(null);
 
   const refreshHandles = useCallback(() => {
     setHandlePos(selectionRef.current?.getHandlePositions() ?? null);
@@ -102,6 +104,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
     if (useNative) return;
     if (!containerRef.current || !sessionId) return;
     let cancelled = false;
+    setShellError(null);
 
     async function init() {
       const container = containerRef.current;
@@ -179,7 +182,13 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
       resizeObserverRef.current = observer;
     }
 
-    init();
+    // The shell can fail to open — no implementation in this build, or the
+    // server refused. Before this catch the rejection escaped and the terminal
+    // body stayed blank forever with nothing on screen to explain it.
+    init().catch((e: unknown) => {
+      if (cancelled) return;
+      setShellError(describeFailure('Terminal', e));
+    });
 
     return () => {
       cancelled = true;
@@ -272,6 +281,18 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
         style={{ width: '100%', height: '100%', backgroundColor: 'var(--term-bg)' }}
       />
 
+      {!useNative && shellError && (
+        <div style={shellErrorStyle}>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)"
+            strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}>
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="M6 9l3 3-3 3M13 15h5" />
+          </svg>
+          <p style={shellErrorTitleStyle}>{shellError.title}</p>
+          {shellError.detail && <p style={shellErrorDetailStyle}>{shellError.detail}</p>}
+        </div>
+      )}
+
       {/* Selection handles & copy bar only for xterm.js path */}
       {!useNative && handlePos && (
         <>
@@ -363,6 +384,35 @@ const wrapperStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
   position: 'relative',
+};
+
+const shellErrorStyle: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 8,
+  padding: '0 24px',
+  textAlign: 'center',
+  backgroundColor: 'var(--term-bg)',
+  zIndex: 1,
+};
+
+const shellErrorTitleStyle: React.CSSProperties = {
+  fontSize: 15,
+  fontWeight: 500,
+  color: 'var(--text-secondary)',
+  margin: 0,
+};
+
+const shellErrorDetailStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: 'var(--text-muted)',
+  margin: 0,
+  maxWidth: 320,
+  wordBreak: 'break-word',
 };
 
 const copyBarStyle: React.CSSProperties = {

@@ -9,6 +9,8 @@ import { FileChangeDetector } from './file-change-detector';
 import { FileActionSheet } from './FileActionSheet';
 import { SelectionActionBar } from './SelectionActionBar';
 import { getTransferManager } from './transfer-singleton';
+import { notify } from '../ui/notice';
+import { describeFailure, isUnavailableError, UNAVAILABLE_TEXT } from '../ssh/unavailable';
 import { ConflictDialog, type ConflictChoice } from './ConflictDialog';
 import { PromptDialog } from '../ui/PromptDialog';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -235,6 +237,25 @@ function SearchResultItem({ node, rootPath, onSelect }: { node: FileTreeNode; ro
   );
 }
 
+/**
+ * A batch where some items failed. One notice, not one per item: a folder paste
+ * that hits a read-only remote would otherwise post a notice per file.
+ *
+ * `failures` entries are `"<name>: <reason>"`; when every reason is "this build
+ * cannot do it" we drop the reasons entirely, because repeating the same
+ * internal sentence per file tells the reader nothing.
+ */
+function reportPartialFailure(action: string, failures: string[]): void {
+  const allUnavailable = failures.every((f) => isUnavailableError(f));
+  const count = failures.length;
+  const subject = `${count} item${count === 1 ? '' : 's'}`;
+  if (allUnavailable) {
+    notify('error', `${action} is not available on this platform`, UNAVAILABLE_TEXT);
+    return;
+  }
+  notify('error', `${action} failed for ${subject}`, failures.join('\n'));
+}
+
 export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus, initialExpandedFolders, onExpandChange, visible }: FileTreeProps) {
   const [nodes, setNodes] = useState<FileTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -445,7 +466,8 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
       await Ssh.sftpRename({ sftpId, oldPath: target.path, newPath });
       void refreshFolder(parent);
     } catch (e: unknown) {
-      alert(`Rename failed: ${e instanceof Error ? e.message : String(e)}`);
+      const { title, detail } = describeFailure('Rename', e);
+      notify('error', title, detail);
     }
   }, [renameTarget, sftpId, rootPath, refreshFolder]);
 
@@ -473,7 +495,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     if (cb.op === 'move') {
       for (const p of srcParents) if (p !== destDir) void refreshFolder(p);
     }
-    if (failures.length > 0) alert(`Paste failed for some items:\n${failures.join('\n')}`);
+    if (failures.length > 0) reportPartialFailure(cb.op === 'move' ? 'Move' : 'Copy', failures);
   }, [clipboard, sftpId, rootPath, refreshFolder]);
 
   const handleDelete = useCallback(async () => {
@@ -485,7 +507,8 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
       const parent = target.path.substring(0, target.path.lastIndexOf('/')) || rootPath;
       void refreshFolder(parent);
     } catch (e: unknown) {
-      alert(`Delete failed: ${e instanceof Error ? e.message : String(e)}`);
+      const { title, detail } = describeFailure('Delete', e);
+      notify('error', title, detail);
     }
   }, [deleteTarget, sftpId, rootPath, refreshFolder]);
 
@@ -502,7 +525,8 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
       }
       void refreshFolder(mode.parentPath);
     } catch (e: unknown) {
-      alert(`Create failed: ${e instanceof Error ? e.message : String(e)}`);
+      const { title, detail } = describeFailure(mode.kind === 'file' ? 'New file' : 'New folder', e);
+      notify('error', title, detail);
     }
   }, [createMode, sftpId, refreshFolder]);
 
@@ -724,7 +748,7 @@ export function FileTree({ sftpId, rootPath, onFileSelect, sessionId, gitStatus,
     }
     for (const p of parents) void refreshFolder(p);
     exitSelectionMode();
-    if (failures.length > 0) alert(`Delete failed for some items:\n${failures.join('\n')}`);
+    if (failures.length > 0) reportPartialFailure('Delete', failures);
   }, [batchDeleteTargets, sftpId, rootPath, refreshFolder, exitSelectionMode]);
 
   const handleFolderDownload = useCallback(async (node: FileTreeNode) => {

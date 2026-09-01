@@ -22,6 +22,7 @@ import { detectFileType, FileTab, FileTabManager } from '../files/TabManager';
 import { getMimeType } from '../lib/file-utils';
 import { getTransferManager } from '../files/transfer-singleton';
 import { TransferSnackbar } from '../files/TransferSnackbar';
+import { Toaster } from '../ui/Toaster';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
 import { notifyOverlayOpen, notifyOverlayClose } from './overlay-hooks';
@@ -957,6 +958,7 @@ export function App() {
           <TabBar activeTab={activeTab} onTabChange={handleTabChange} extraTabs={getExtraTabs()} />
         )}
         <TransferSnackbar />
+        <Toaster />
       </div>
       <DebugOverlay enabled={debugEnabled} />
     </div>

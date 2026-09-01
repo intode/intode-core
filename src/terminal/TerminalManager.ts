@@ -51,12 +51,22 @@ export class TerminalManager {
     const bridge = new SshBridge(session.terminal);
     await bridge.registerListener();
 
-    const { channelId } = await Ssh.openShell({
-      sessionId: sshSessionId,
-      cols,
-      rows,
-      initialPath,
-    });
+    let channelId: string;
+    try {
+      ({ channelId } = await Ssh.openShell({
+        sessionId: sshSessionId,
+        cols,
+        rows,
+        initialPath,
+      }));
+    } catch (e) {
+      // Without this the rejection escaped as an unhandled promise rejection and
+      // the tab kept its chrome — tab strip, extra key bar — around an empty
+      // body with no error anywhere. Drop the listener we just registered so a
+      // retry does not stack a second one, and let the caller render the reason.
+      bridge.disconnect();
+      throw e;
+    }
 
     session.channelId = channelId;
     session.bridge = bridge;
@@ -78,7 +88,12 @@ export class TerminalManager {
     if (!session) return;
 
     session.bridge?.disconnect();
-    await Ssh.closeShell({ channelId: session.channelId });
+    // channelId stays empty when attachShell failed before openShell resolved.
+    // Closing "" makes the runtime reject, which turned a failed attach into a
+    // second unhandled rejection on teardown.
+    if (session.channelId) {
+      await Ssh.closeShell({ channelId: session.channelId });
+    }
     session.terminal.dispose();
     this.sessions.delete(sessionId);
 
