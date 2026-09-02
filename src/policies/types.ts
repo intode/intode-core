@@ -6,7 +6,6 @@ export interface AppPolicy {
 
   // === Feature flags (Pro plugin activation) ===
   canEdit: boolean;
-  canSplitView: boolean;
   canBackgroundKeepAlive: boolean;
   canSessionRestore: boolean;
   canPortForward: boolean;
@@ -28,7 +27,6 @@ export const DEFAULT_POLICY: AppPolicy = {
   maxTerminals: Infinity,
   maxFileTabs: Infinity,
   canEdit: true,
-  canSplitView: false,
   canBackgroundKeepAlive: false,
   canSessionRestore: false,
   canPortForward: false,
