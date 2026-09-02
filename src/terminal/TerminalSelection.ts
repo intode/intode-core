@@ -160,6 +160,23 @@ export class TerminalSelection {
       if (this.terminal.hasSelection()) {
         this.terminal.clearSelection();
       }
+      // A plain tap has to raise the soft keyboard, and this is the only place that
+      // can do it.
+      //
+      // onTouchStart() preventDefault()s every single-finger touch so this class can
+      // own scrolling and long-press selection. That also suppresses the synthesized
+      // click xterm.js relies on to focus its helper textarea, so without this line a
+      // tap leaves the terminal unfocused and no keyboard ever appears.
+      //
+      // It must run here, inside the touch handler: iOS only opens the keyboard for a
+      // focus() that happens during a user gesture, and there is no way to ask for it
+      // afterwards — @capacitor/keyboard's show() is documented Android-only and its
+      // iOS package ships no implementation at all.
+      //
+      // On Android this path is the xterm.js fallback; the native terminal runs its own
+      // IME and never reaches this code. That is why the gap survived: the platform
+      // where this is the only terminal is iOS.
+      this.terminal.focus();
     }
   }
 
