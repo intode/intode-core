@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SshKeyList } from '../ssh/components/SshKeyList';
+import { KnownHostList } from '../ssh/components/KnownHostList';
 import { getThemeMode, setThemeMode, onThemeChange, type ThemeMode } from '../themes/theme-manager';
 import { s } from './settings-styles';
 
@@ -68,6 +69,17 @@ export function SshKeysPage({ onBack }: { onBack: () => void }) {
       <PageHeader title="SSH Keys" onBack={onBack} />
       <div style={s.pageContent}>
         <SshKeyList />
+      </div>
+    </div>
+  );
+}
+
+export function KnownHostsPage({ onBack }: { onBack: () => void }) {
+  return (
+    <div style={s.page}>
+      <PageHeader title="Known Hosts" onBack={onBack} />
+      <div style={s.pageContent}>
+        <KnownHostList />
       </div>
     </div>
   );

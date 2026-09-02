@@ -36,3 +36,19 @@ describe('SettingsScreen SSH Keys entry', () => {
     expect(screen.getByText('About')).toBeTruthy();
   });
 });
+
+describe('SettingsScreen Known Hosts entry', () => {
+  it('is there', () => {
+    renderSettings();
+    expect(screen.getByText('Known Hosts')).toBeTruthy();
+  });
+
+  // Host key trust is written by the connect prompt on every platform that verifies, and
+  // this is the only way to undo it. Gating it behind key management would hide the exit
+  // from a user whose server was rebuilt.
+  it('survives a runtime that cannot manage SSH keys', () => {
+    setSshCapabilities({ keyManagement: false });
+    renderSettings();
+    expect(screen.getByText('Known Hosts')).toBeTruthy();
+  });
+});

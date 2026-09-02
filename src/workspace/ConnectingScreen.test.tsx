@@ -79,6 +79,8 @@ describe('ConnectingScreen host key prompt', () => {
     await waitFor(() => expect(onConnected).toHaveBeenCalledWith('sess1'));
     expect(acceptHostKey).toHaveBeenCalledWith({
       host: 'bastion.example.com', port: 2222, fingerprint: 'SHA256:AAAAnewkey',
+      // Recorded alongside the trust so the Known Hosts screen can name the algorithm.
+      keyType: 'ssh-ed25519',
     });
     expect(connect).toHaveBeenCalledTimes(2);
   });

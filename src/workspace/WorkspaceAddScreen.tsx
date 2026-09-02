@@ -203,7 +203,7 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
             Connection changes (host, port, user, auth, password, key) will apply on next connect. Current session is unaffected.
           </div>
         )}
-        <Field label="Name" value={name} onChange={setName} placeholder="My Server" />
+        <Field label="Name" value={name} onChange={setName} placeholder="My Server" autoCapitalize="sentences" />
         <Field label="Host" value={host} onChange={setHost} placeholder="192.168.1.10" />
         <Field label="Port" value={port} onChange={setPort} placeholder="22" inputMode="numeric" />
         <Field label="Username" value={username} onChange={setUsername} placeholder="user" />
@@ -400,9 +400,10 @@ export function WorkspaceAddScreen({ onSave, onCancel, editWorkspace, hasActiveS
   );
 }
 
-function Field({ label, value, onChange, placeholder, type, inputMode }: {
+function Field({ label, value, onChange, placeholder, type, inputMode, autoCapitalize = 'none' }: {
   label: string; value: string; onChange: (v: string) => void;
   placeholder?: string; type?: string; inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  autoCapitalize?: 'none' | 'sentences';
 }) {
   return (
     <div style={styles.field}>
@@ -415,6 +416,15 @@ function Field({ label, value, onChange, placeholder, type, inputMode }: {
         inputMode={inputMode}
         style={styles.input}
         autoComplete="off"
+        // iOS capitalises the first letter of a plain text field by default, so a
+        // user typing "reviewer" actually sends "Reviewer". Usernames, hostnames
+        // and paths are all case-sensitive, and the failure surfaces only as
+        // "Permission denied" with nothing on screen explaining why. Everything on
+        // this form is a technical identifier except the display Name, so the
+        // default here is off and Name opts back in.
+        autoCapitalize={autoCapitalize}
+        autoCorrect="off"
+        spellCheck={false}
       />
     </div>
   );

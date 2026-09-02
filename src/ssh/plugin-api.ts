@@ -71,6 +71,28 @@ export interface HostKeyPrompt {
   knownFingerprint?: string;
 }
 
+/**
+ * One host key the user has already trusted.
+ *
+ * `host`/`port` identify the entry and are what `removeKnownHost` takes back. `host` is
+ * normalised to lower case by the store, because DNS is case-insensitive and a user who
+ * writes `Example.com` in one workspace and `example.com` in another must not end up
+ * trusting the same server twice.
+ *
+ * `keyType` and `trustedAt` are optional because entries trusted before the app recorded
+ * them exist on devices in the field. Absent means "not recorded", never "none".
+ */
+export interface KnownHostEntry {
+  host: string;
+  port: number;
+  /** `SHA256:<base64 without padding>`, the same shape `ssh-keygen -lf` prints. */
+  fingerprint: string;
+  /** `ssh-ed25519`, `ecdsa-sha2-nistp256`, ... */
+  keyType?: string;
+  /** Epoch milliseconds. */
+  trustedAt?: number;
+}
+
 export interface JumpHost {
   host: string;
   port: number;
@@ -157,8 +179,43 @@ export interface SshPlugin {
    *
    * Pass the fingerprint back so a prompt the user answered cannot be applied to a
    * different key that arrived in between.
+   *
+   * `keyType` is recorded alongside the fingerprint for the management screen to show.
+   * It is display metadata, not part of the trust decision — an implementation that
+   * cannot record it still stores the fingerprint.
    */
-  acceptHostKey(options: { host: string; port: number; fingerprint: string }): Promise<void>;
+  acceptHostKey(options: {
+    host: string;
+    port: number;
+    fingerprint: string;
+    keyType?: string;
+  }): Promise<void>;
+
+  /**
+   * Every host key this device trusts.
+   *
+   * Trust granted through `acceptHostKey` is otherwise invisible and permanent: without
+   * this the only way back is wiping the app's data. Entries whose stored value cannot be
+   * read back are left out rather than shown as broken — the verifier already treats them
+   * as absent, so listing them would show a trust that does not exist.
+   */
+  listKnownHosts(): Promise<{ hosts: KnownHostEntry[] }>;
+
+  /**
+   * Stop trusting `host:port`. The next connection there asks again.
+   *
+   * Removing an entry that is not there is a success, so a caller never has to check
+   * first.
+   */
+  removeKnownHost(options: { host: string; port: number }): Promise<void>;
+
+  /**
+   * Drop every trusted host key and answer how many entries went.
+   *
+   * The count is what was actually removed, including entries `listKnownHosts` hides
+   * because their value no longer decodes.
+   */
+  clearKnownHosts(): Promise<{ removed: number }>;
 
   openShell(options: {
     sessionId: string;

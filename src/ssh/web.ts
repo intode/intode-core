@@ -3,7 +3,7 @@
  * Provides fake file system, terminal output, and git data.
  */
 import { WebPlugin } from '@capacitor/core';
-import type { SshPlugin, SftpEntry, ConnectionStatus, PortForwardEntry, SshKey } from './plugin-api';
+import type { SshPlugin, SftpEntry, ConnectionStatus, PortForwardEntry, SshKey, KnownHostEntry } from './plugin-api';
 
 // --- Mock file system ---
 const MOCK_FILES: Record<string, SftpEntry[]> = {
@@ -606,6 +606,29 @@ export class SshWeb extends WebPlugin implements SshPlugin {
   // The mock transport has no host key, so nothing is ever pending and accepting is a no-op.
   async getPendingHostKey(): Promise<{ prompt: null }> { return { prompt: null }; }
   async acceptHostKey(): Promise<void> {}
+
+  // Seeded so the Known Hosts screen has rows to draw for screenshots. Removal is real
+  // within the session — the screen's buttons should do something when clicked here too.
+  private knownHosts: KnownHostEntry[] = [
+    { host: 'dev.example.com', port: 22, fingerprint: 'SHA256:9kM1qL0pXcZ7vHnRt3wYbA6eS2dJfU8gQxK4iOyPzNc', keyType: 'ssh-ed25519', trustedAt: 1712200000000 },
+    { host: 'build.example.com', port: 2222, fingerprint: 'SHA256:4bT7xW2nEoV5rP9cLmJ1kQaD6sZ8yGhU3fXiN0uRvBw', keyType: 'ecdsa-sha2-nistp256', trustedAt: 1710500000000 },
+  ];
+
+  async listKnownHosts(): Promise<{ hosts: KnownHostEntry[] }> {
+    return { hosts: [...this.knownHosts] };
+  }
+
+  async removeKnownHost(options: { host: string; port: number }): Promise<void> {
+    this.knownHosts = this.knownHosts.filter(
+      (h) => !(h.host === options.host.toLowerCase() && h.port === options.port),
+    );
+  }
+
+  async clearKnownHosts(): Promise<{ removed: number }> {
+    const removed = this.knownHosts.length;
+    this.knownHosts = [];
+    return { removed };
+  }
 
   async generateSshKey(): Promise<SshKey> {
     return { id: 'mock-key', name: 'mock', type: 'ed25519', fingerprint: 'SHA256:mock', publicKey: 'ssh-ed25519 AAAA...', createdAt: Date.now() };

@@ -4,6 +4,6 @@ import type { SshPlugin } from './plugin-api';
 export const Ssh = registerPlugin<SshPlugin>('Ssh', {
   web: () => import('./web').then((m) => new m.SshWeb()),
 });
-export type { SshPlugin, ConnectOptions, ConnectionStatus, SftpEntry, SftpStat, SshKey, HostKeyPrompt } from './plugin-api';
+export type { SshPlugin, ConnectOptions, ConnectionStatus, SftpEntry, SftpStat, SshKey, HostKeyPrompt, KnownHostEntry } from './plugin-api';
 export { getSshCapabilities, setSshCapabilities } from './capabilities';
 export type { SshCapabilities } from './capabilities';

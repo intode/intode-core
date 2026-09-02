@@ -113,6 +113,27 @@ describe('WorkspaceAddScreen key auth availability', () => {
     const { container } = renderAdd(keyWorkspace);
     expect(container.textContent ?? '').not.toMatch(/\bios\b|android|iphone/i);
   });
+
+  // iOS capitalises the first letter of a plain text field, so a typed "reviewer"
+  // arrives as "Reviewer". Usernames, hosts and paths are case-sensitive, and the
+  // only symptom is "Permission denied" — nothing on screen says why. Guard it.
+  it('never auto-capitalises the case-sensitive fields', () => {
+    setSshCapabilities({ keyManagement: true, keyAuth: true });
+    const { container } = renderAdd();
+    const byLabel = (label: string): HTMLInputElement => {
+      const field = [...container.querySelectorAll('label')].find((l) => l.textContent === label);
+      if (!field) throw new Error(`no field labelled ${label}`);
+      const input = field.parentElement?.querySelector('input');
+      if (!input) throw new Error(`no input under ${label}`);
+      return input as HTMLInputElement;
+    };
+
+    for (const label of ['Host', 'Username', 'Port', 'Default Path']) {
+      expect(byLabel(label).getAttribute('autocapitalize')).toBe('none');
+    }
+    // The display name is prose, so it keeps the platform default.
+    expect(byLabel('Name').getAttribute('autocapitalize')).toBe('sentences');
+  });
 });
 
 const unknownKey: HostKeyPrompt = {
@@ -153,6 +174,8 @@ describe('WorkspaceAddScreen host key prompt on Test Connection', () => {
     // into the form — a jump chain can stop somewhere this screen never named.
     expect(acceptHostKey).toHaveBeenCalledWith({
       host: 'bastion.example.com', port: 2222, fingerprint: 'SHA256:AAAAnewkey',
+      // Recorded alongside the trust so the Known Hosts screen can name the algorithm.
+      keyType: 'ssh-ed25519',
     });
     expect(connect).toHaveBeenCalledTimes(2);
     // A test that leaves a session behind is a leak, trusted key or not.

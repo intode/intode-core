@@ -3,7 +3,7 @@ import { getPolicy } from '../policies/provider';
 import { getSshCapabilities } from '../ssh/capabilities';
 import { getThemeMode } from '../themes/theme-manager';
 import { getSettingsMenuItems, getSettingsPage } from './settings-registry';
-import { PageHeader, MenuItem, AppearancePage, SshKeysPage, AboutPage, DeveloperPage, HelpPage } from './settings-pages';
+import { PageHeader, MenuItem, AppearancePage, SshKeysPage, KnownHostsPage, AboutPage, DeveloperPage, HelpPage } from './settings-pages';
 import { s } from './settings-styles';
 
 export interface SettingsScreenProps {
@@ -14,7 +14,7 @@ export interface SettingsScreenProps {
   onDebugToggle: (enabled: boolean) => void;
 }
 
-type Page = 'menu' | 'appearance' | 'ssh-keys' | 'about' | 'developer' | string;
+type Page = 'menu' | 'appearance' | 'ssh-keys' | 'known-hosts' | 'about' | 'developer' | string;
 
 export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, onDebugToggle }: SettingsScreenProps) {
   const { showDebugToggle } = getPolicy();
@@ -41,6 +41,7 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
     const goMenu = () => setPage('menu');
     if (page === 'appearance') return <AppearancePage onBack={goMenu} />;
     if (page === 'ssh-keys' && keyManagement) return <SshKeysPage onBack={goMenu} />;
+    if (page === 'known-hosts') return <KnownHostsPage onBack={goMenu} />;
     if (page === 'about') return <AboutPage onBack={goMenu} appVersion={appVersion} buildNumber={buildNumber} />;
     if (page === 'help') return <HelpPage onBack={goMenu} />;
     if (page === 'developer') return <DeveloperPage onBack={goMenu} debugEnabled={debugEnabled} onDebugToggle={onDebugToggle} />;
@@ -59,6 +60,10 @@ export function SettingsScreen({ appVersion, buildNumber, onBack, debugEnabled, 
 
         <MenuItem label="Appearance" subtitle={getThemeMode() === 'system' ? 'Auto' : getThemeMode() === 'dark' ? 'Dark' : 'Light'} onClick={() => setPage('appearance')} />
         {keyManagement && <MenuItem label="SSH Keys" onClick={() => setPage('ssh-keys')} />}
+        {/* Not capability-gated: every runtime that verifies host keys also implements the
+            three known-hosts methods, and the web mock implements them too. A gate here
+            would hide the only way to undo a trust decision. */}
+        <MenuItem label="Known Hosts" subtitle="Trusted server fingerprints" onClick={() => setPage('known-hosts')} />
         <MenuItem label="Help Us" subtitle="Bug reports & feature requests" onClick={() => setPage('help')} />
         <MenuItem label="About" subtitle={`v${appVersion}`} onClick={() => setPage('about')} />
         {showDebugToggle && (
