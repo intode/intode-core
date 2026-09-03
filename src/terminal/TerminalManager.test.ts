@@ -95,6 +95,26 @@ describe('TerminalManager.destroySession', () => {
     expect(Ssh.closeShell).toHaveBeenCalledWith({ channelId: 'ch-9' });
   });
 
+  it('frees the slot even when closeShell rejects — teardown kills the SSH session first', async () => {
+    // `handleDisconnect` awaits `Ssh.disconnect` and only then drops the connection from
+    // state, so React unmounts the terminal and lands here with a channel the native side
+    // has already torn down. It rejects. Before the fix the throw skipped `sessions.delete`,
+    // so the slot leaked — and since the free tier counts those slots against
+    // `maxTerminals`, a second disconnect made every later connect hit "Limit Reached".
+    vi.mocked(Ssh.openShell).mockResolvedValueOnce({ channelId: 'ch-9' });
+    vi.mocked(Ssh.closeShell).mockRejectedValueOnce(new Error('session not found'));
+    const mgr = new TerminalManager();
+    const s = session();
+    s.terminal = { dispose: vi.fn() } as unknown as TerminalSession['terminal'];
+    await mgr.attachShell(s, 'ssh-1', 80, 24);
+
+    await mgr.destroySession(s.id);
+
+    expect(mgr.getActiveCount()).toBe(0);
+    expect(mgr.getActiveSession()).toBeNull();
+    expect(s.terminal.dispose).toHaveBeenCalled();
+  });
+
   it('does not close an empty channel id — that rejection was a second unhandled failure', async () => {
     const mgr = new TerminalManager();
     const s = session();

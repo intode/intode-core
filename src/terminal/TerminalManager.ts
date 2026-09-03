@@ -92,7 +92,19 @@ export class TerminalManager {
     // Closing "" makes the runtime reject, which turned a failed attach into a
     // second unhandled rejection on teardown.
     if (session.channelId) {
-      await Ssh.closeShell({ channelId: session.channelId });
+      try {
+        await Ssh.closeShell({ channelId: session.channelId });
+      } catch {
+        // Disconnecting a workspace closes the SSH session first and only then drops it
+        // from state, so React unmounts the terminal and reaches this line with a channel
+        // the native side has already torn down. That rejection is expected, and it must
+        // not stop the teardown: everything below is local cleanup.
+        //
+        // Letting it escape leaked the session into `this.sessions` permanently — nothing
+        // awaits or catches this call, so it vanished as an unhandled rejection. The free
+        // tier counts those slots against `maxTerminals`, which meant a second disconnect
+        // made every later connect open the "Limit Reached" dialog with no way back.
+      }
     }
     session.terminal.dispose();
     this.sessions.delete(sessionId);
