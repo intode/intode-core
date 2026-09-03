@@ -38,9 +38,11 @@ export interface TerminalTabsProps {
   wsId: string;
   defaultPath?: string;
   visible: boolean;
+  /** Passed through to every tab's disconnected banner. */
+  onReconnect?: () => Promise<void>;
 }
 
-export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: TerminalTabsProps) {
+export function TerminalTabs({ sessionId, wsId, defaultPath, visible, onReconnect }: TerminalTabsProps) {
   const nextLabel = useRef(2);
   const [tabs, setTabs] = useState<Tab[]>(() => {
     if (canRestoreTerminalTabs()) {
@@ -265,6 +267,7 @@ export function TerminalTabs({ sessionId, wsId, defaultPath, visible }: Terminal
               terminalId={tab.id}
               visible={visible && tab.id === activeId}
               tmuxSession={tab.tmuxSession}
+              onReconnect={onReconnect}
             />
           </div>
         ))}

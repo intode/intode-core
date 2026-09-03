@@ -21,11 +21,16 @@ export interface TerminalViewProps {
   terminalId?: string;
   visible: boolean;
   tmuxSession?: string;
+  /**
+   * Reconnects the workspace this terminal belongs to. Without it the disconnected banner
+   * still reports the state but cannot offer the retry.
+   */
+  onReconnect?: () => Promise<void>;
 }
 
 const manager = new TerminalManager();
 
-export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmuxSession }: TerminalViewProps) {
+export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmuxSession, onReconnect }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<TerminalSession | null>(null);
   const selectionRef = useRef<TerminalSelection | null>(null);
@@ -35,6 +40,8 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
   const [showCopyBar, setShowCopyBar] = useState(false);
   const [handlePos, setHandlePos] = useState<HandlePositions | null>(null);
   const [shellError, setShellError] = useState<{ title: string; detail?: string } | null>(null);
+  const [sessionDown, setSessionDown] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
 
   const refreshHandles = useCallback(() => {
     setHandlePos(selectionRef.current?.getHandlePositions() ?? null);
@@ -42,6 +49,42 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
 
   const nativeProvider = getNativeTerminalProvider();
   const useNative = nativeProvider?.isAvailable() ?? false;
+
+  // ====== SESSION LIVENESS ======
+  // The only push notification that a session died. Everything else has to ask, and nothing
+  // asks on a schedule — so without this the shell just stops answering and the terminal keeps
+  // looking normal. On a half-open socket `getStatus` reports `connected`, which is why
+  // polling it would not have worked either.
+  //
+  // Resubscribing on sessionId also resets the banner: a successful reconnect hands this
+  // component a new id, and that is exactly when the old failure stops being true.
+  useEffect(() => {
+    setSessionDown(false);
+    setReconnecting(false);
+    let handle: { remove(): void } | null = null;
+    let cancelled = false;
+    Ssh.addListener('connectionStatus', (e) => {
+      if (e.sessionId !== sessionId) return;
+      if (e.status === 'connected') setSessionDown(false);
+      else if (e.status === 'disconnected' || e.status === 'error') setSessionDown(true);
+    }).then((h) => {
+      if (cancelled) h.remove();
+      else handle = h;
+    }).catch(() => { /* platform without the event — banner simply never shows */ });
+    return () => { cancelled = true; handle?.remove(); };
+  }, [sessionId]);
+
+  const handleReconnect = useCallback(async () => {
+    if (!onReconnect || reconnecting) return;
+    setReconnecting(true);
+    try {
+      await onReconnect();
+      // Success swaps sessionId, and the effect above clears the banner. Leave the spinner
+      // up until that happens so the button cannot be double-fired.
+    } catch {
+      setReconnecting(false);
+    }
+  }, [onReconnect, reconnecting]);
 
   // ====== NATIVE TERMINAL PATH ======
   useEffect(() => {
@@ -276,6 +319,30 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
 
   return (
     <div style={wrapperStyle}>
+      {/*
+        Above the terminal, not over it. Native terminal views always render on top of the
+        WebView (see .claude/rules/native-terminal.md), so a DOM overlay placed inside the
+        terminal's rect would be hidden by the very thing it describes. Sitting outside it
+        also shrinks the container, and the ResizeObserver below forwards that to the native
+        view — which keeps the dead terminal's contents readable instead of covering them.
+      */}
+      {sessionDown && (
+        <div
+          style={bannerStyle}
+          onClick={handleReconnect}
+          role="button"
+          aria-label="Reconnect"
+        >
+          <span style={bannerTitleStyle}>
+            {reconnecting ? 'Reconnecting…' : 'Disconnected — Tap to reconnect'}
+          </span>
+          {tmuxSession && (
+            <span style={bannerDetailStyle}>Your tmux session is still running on the server.</span>
+          )}
+        </div>
+      )}
+
+      <div style={surfaceStyle}>
       <div
         ref={containerRef}
         style={{ width: '100%', height: '100%', backgroundColor: 'var(--term-bg)' }}
@@ -324,6 +391,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
           </div>
         );
       })()}
+      </div>
     </div>
   );
 }
@@ -383,7 +451,44 @@ function Handle({ x, y, side, onDragStart }: {
 const wrapperStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+/**
+ * Holds the terminal and everything positioned against it. The absolute children (selection
+ * handles, copy bar, shell error) measure from this box, so it has to be the same box the
+ * terminal fills — putting the banner in here instead would shift all of them by its height.
+ */
+const surfaceStyle: React.CSSProperties = {
   position: 'relative',
+  flex: 1,
+  minHeight: 0,
+  width: '100%',
+};
+
+const bannerStyle: React.CSSProperties = {
+  flexShrink: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
+  padding: '8px 12px',
+  backgroundColor: 'var(--bg-surface0)',
+  borderBottom: '1px solid var(--bg-surface1)',
+  cursor: 'pointer',
+  touchAction: 'manipulation',
+  WebkitTapHighlightColor: 'transparent',
+};
+
+const bannerTitleStyle: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 500,
+  color: 'var(--accent-blue)',
+};
+
+const bannerDetailStyle: React.CSSProperties = {
+  fontSize: 11,
+  color: 'var(--text-muted)',
 };
 
 const shellErrorStyle: React.CSSProperties = {

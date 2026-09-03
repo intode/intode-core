@@ -705,7 +705,7 @@ export function App() {
     }
   }, [connectedIds, connections, teardownConnection]);
 
-  useAutoReconnect(connections, setConnections);
+  const { reconnect } = useAutoReconnect(connections, setConnections);
 
   const handleSaveWorkspace = useCallback(
     async (data: CreateWorkspaceData, password: string, jumpHostPasswords?: string[]) => {
@@ -931,6 +931,7 @@ export function App() {
                     wsId={conn.wsId}
                     defaultPath={conn.workspace.defaultPath}
                     visible={isActive && activeTab === 'terminal'}
+                    onReconnect={() => reconnect(conn.wsId)}
                   />
                 </div>
               </React.Fragment>

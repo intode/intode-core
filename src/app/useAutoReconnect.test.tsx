@@ -97,3 +97,50 @@ describe('useAutoReconnect', () => {
     spy.mockRestore();
   });
 });
+
+describe('reconnect()', () => {
+  /** Mount the hook without firing visibilitychange, so only the explicit call runs. */
+  function mountControls(conns: ConnectedWorkspace[]) {
+    const setConnections = vi.fn();
+    const { result } = renderHook(() => useAutoReconnect(conns, setConnections));
+    return { controls: result.current, setConnections };
+  }
+
+  it('releases the dead session and connects a new one', async () => {
+    const { controls, setConnections } = mountControls([connection]);
+
+    await act(async () => { await controls.reconnect('ws1'); });
+
+    expect(Ssh.disconnect).toHaveBeenCalledWith({ sessionId: 'old-session' });
+    expect(Ssh.connect).toHaveBeenCalled();
+    expect(setConnections).toHaveBeenCalled();
+  });
+
+  it('never asks getStatus — the caller already knows it is dead', async () => {
+    // On a half-open socket getStatus answers `connected`, which is the whole reason the
+    // banner exists. Consulting it here would refuse to reconnect exactly when it matters.
+    const { controls } = mountControls([connection]);
+
+    await act(async () => { await controls.reconnect('ws1'); });
+
+    expect(Ssh.getStatus).not.toHaveBeenCalled();
+  });
+
+  it('does nothing for a workspace that is no longer connected', async () => {
+    const { controls } = mountControls([connection]);
+
+    await act(async () => { await controls.reconnect('ws-gone'); });
+
+    expect(Ssh.disconnect).not.toHaveBeenCalled();
+    expect(Ssh.connect).not.toHaveBeenCalled();
+  });
+
+  it('propagates a failed connect so the banner can stay up', async () => {
+    Ssh.connect.mockRejectedValueOnce(new Error('host unreachable'));
+    const { controls } = mountControls([connection]);
+
+    await expect(
+      act(async () => { await controls.reconnect('ws1'); }),
+    ).rejects.toThrow('host unreachable');
+  });
+});
