@@ -186,7 +186,14 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: 'Chakra Petch', textTransform: 'uppercase' as const,
   },
   fab: {
-    position: 'absolute', bottom: 24, right: 24,
+    // This screen has no tab bar, so nothing else reserves the system strip at
+    // the bottom. A flat `bottom: 24` puts the button 10px inside the home
+    // indicator on a notched iPhone (34px inset).
+    //
+    // `max()`, not `24px + inset`: Android reports 24px here for the gesture
+    // navigation bar, so adding would double the gap and move the button on a
+    // platform that was already correct. Measured: iPhone 17 Pro 34, Pixel 9 24.
+    position: 'absolute', bottom: 'max(24px, env(safe-area-inset-bottom, 0px))', right: 24,
     width: 52, height: 52, borderRadius: 2,
     backgroundColor: 'var(--accent-green)', color: 'var(--bg-base)',
     border: 'none', fontSize: 24, fontWeight: 700, cursor: 'pointer',

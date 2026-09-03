@@ -991,6 +991,12 @@ const styles: Record<string, React.CSSProperties> = {
     zIndex: 50,
     height: '100%',
     paddingTop: 'env(safe-area-inset-top, 0px)',
+    // Landscape is the only state where the side insets are non-zero: on a
+    // notched iPhone both sides report 62px. Without these two the header,
+    // the tab strip and the search field run under the notch — measured on an
+    // iPhone 17 Pro simulator, see the iPhone layout observation note.
+    paddingLeft: 'env(safe-area-inset-left, 0px)',
+    paddingRight: 'env(safe-area-inset-right, 0px)',
     backgroundColor: 'var(--bg-base)',
     display: 'flex',
     flexDirection: 'column',
@@ -998,6 +1004,10 @@ const styles: Record<string, React.CSSProperties> = {
   safeArea: {
     height: '100%',
     paddingTop: 'env(safe-area-inset-top, 0px)',
+    // Same reason as `overlay` above. This is also what keeps the workspace
+    // FAB clear of the notch: it is positioned against this box.
+    paddingLeft: 'env(safe-area-inset-left, 0px)',
+    paddingRight: 'env(safe-area-inset-right, 0px)',
     backgroundColor: 'var(--bg-base)',
     display: 'flex',
     flexDirection: 'column',
