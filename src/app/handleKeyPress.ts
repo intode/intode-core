@@ -7,53 +7,7 @@ import { showSnippetPicker } from './snippet-picker';
 import { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT } from '../lib/constants';
 import { getNativeTerminalProvider } from '../terminal/terminal-provider';
 
-/** Find the textarea belonging to the currently active terminal session (xterm.js fallback). */
-function getActiveTerminalTextarea(): HTMLTextAreaElement | null {
-  const session = terminalManager.getActiveSession();
-  if (!session) return null;
-  return session.terminal.element?.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement | null;
-}
-
-function toggleKeyboard(activeTab: string) {
-  if (activeTab === 'terminal') {
-    const nativeProvider = getNativeTerminalProvider();
-    const nativeId = getActiveNativeTerminal();
-    if (nativeProvider?.isAvailable() && nativeId) {
-      nativeProvider.focusTerminal(nativeId);
-      return;
-    }
-    const el = getActiveTerminalTextarea();
-    if (!el) return;
-    const shouldFocus = document.activeElement !== el;
-    setTimeout(() => {
-      if (shouldFocus) {
-        el.focus();
-        (window as any).__intodeShowKeyboard?.();
-      } else {
-        el.blur();
-      }
-    }, 50);
-  } else if (activeTab === 'editor') {
-    const cm = document.querySelector('.cm-content') as HTMLElement | null;
-    if (!cm) return;
-    const shouldFocus = document.activeElement !== cm;
-    setTimeout(() => {
-      if (shouldFocus) {
-        cm.focus();
-        (window as any).__intodeShowKeyboard?.();
-      } else {
-        cm.blur();
-      }
-    }, 50);
-  }
-}
-
 export function handleKeyPress(data: string, activeTab: string) {
-  if (data === 'keyboard') {
-    toggleKeyboard(activeTab);
-    return;
-  }
-
   if (activeTab === 'terminal') {
     const nativeProvider = getNativeTerminalProvider();
     const nativeId = getActiveNativeTerminal();
