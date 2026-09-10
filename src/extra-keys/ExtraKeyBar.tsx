@@ -5,6 +5,7 @@ import {
 import { NO_TAP_HIGHLIGHT } from '../lib/styles';
 import { getNativeTerminalProvider } from '../terminal/terminal-provider';
 import { getActiveNativeTerminal } from '../terminal/active-terminal';
+import { applyModifiers } from './modifiers';
 
 export type ExtraKeysContext = 'terminal' | 'code-editor' | 'md-editor';
 
@@ -19,12 +20,16 @@ interface KeyDef {
 }
 
 const CTRL_TOGGLE_VALUE = 'ctrl-toggle';
+const SHIFT_TOGGLE_VALUE = 'shift-toggle';
+
+/** Opens a picker instead of sending bytes, so it must not consume an armed modifier. */
+const SNIPPETS_VALUE = 'snippets';
 
 const TERMINAL_KEYS: KeyDef[] = [
-  { label: 'Snip', value: 'snippets' },
+  { label: 'Snip', value: SNIPPETS_VALUE },
   { label: 'Esc', value: KEY_ESC },
   { label: 'Tab', value: KEY_TAB },
-  { label: 'S-Tab', value: '\x1b[Z' },
+  { label: 'Shift', value: SHIFT_TOGGLE_VALUE },
   { label: 'Ctrl', value: CTRL_TOGGLE_VALUE },
   { label: 'C-c', value: '\x03' },
   { label: 'C-o', value: '\x0f' },
@@ -136,7 +141,12 @@ function KeyButton({ keyDef, onPress, active }: { keyDef: KeyDef; onPress: (v: s
 const REPEAT_DELAY = 400;
 const REPEAT_INTERVAL = 80;
 
-function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) => void }) {
+function DpadButton({ keyDef, onPress, resolve }: {
+  keyDef: KeyDef;
+  onPress: (v: string) => void;
+  /** Applies and consumes the armed modifiers, returning the bytes to send. */
+  resolve: (v: string) => string;
+}) {
   const prevFocus = useRef<HTMLElement | null>(null);
   const repeatTimer = useRef<number | null>(null);
 
@@ -153,10 +163,13 @@ function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) 
       onTouchStart={(e) => {
         e.preventDefault();
         prevFocus.current = document.activeElement as HTMLElement | null;
-        onPress(keyDef.value);
+        // Resolve once and repeat that: consuming the modifier per tick would send
+        // e.g. one shift+up followed by a stream of plain ups while the key is held.
+        const value = resolve(keyDef.value);
+        onPress(value);
         stopRepeat();
         const timeout = window.setTimeout(() => {
-          repeatTimer.current = window.setInterval(() => onPress(keyDef.value), REPEAT_INTERVAL);
+          repeatTimer.current = window.setInterval(() => onPress(value), REPEAT_INTERVAL);
         }, REPEAT_DELAY);
         repeatTimer.current = timeout as unknown as number;
       }}
@@ -176,8 +189,36 @@ function DpadButton({ keyDef, onPress }: { keyDef: KeyDef; onPress: (v: string) 
 export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
   const allKeys = context === 'terminal' ? TERMINAL_KEYS : context === 'md-editor' ? MD_KEYS : context === 'code-editor' ? EDITOR_KEYS : [];
   const [ctrlArmed, setCtrlArmed] = useState(false);
+  const [shiftArmed, setShiftArmed] = useState(false);
+  // Read while resolving a press: setState is async, but a D-pad touchStart both
+  // consumes and sends within the same tick.
   const ctrlArmedRef = useRef(false);
-  useEffect(() => { ctrlArmedRef.current = ctrlArmed; }, [ctrlArmed]);
+  const shiftArmedRef = useRef(false);
+
+  /**
+   * Ctrl is mirrored onto the native view as well: while armed there, the next key
+   * event from the soft or hardware keyboard picks it up (that is how C-r, C-x etc.
+   * are reachable without a dedicated button).
+   */
+  const armCtrl = (next: boolean) => {
+    ctrlArmedRef.current = next;
+    setCtrlArmed(next);
+    const provider = getNativeTerminalProvider();
+    const activeId = getActiveNativeTerminal();
+    if (provider?.setControlKey && activeId) {
+      provider.setControlKey(activeId, next).catch(() => {});
+    }
+  };
+
+  /**
+   * Shift stays in JS. Soft keyboards already have a Shift of their own, and the only
+   * thing a native sticky Shift would add is upper-casing the next typed character —
+   * for which SwiftTerm exposes no hook, so it would be an Android-only method.
+   */
+  const armShift = (next: boolean) => {
+    shiftArmedRef.current = next;
+    setShiftArmed(next);
+  };
 
   // Listen for native auto-clear when armed Ctrl is consumed by a key event
   useEffect(() => {
@@ -187,7 +228,9 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
     let handle: { remove(): void } | null = null;
     let cancelled = false;
     provider.addControlKeyListener((e) => {
-      if (!e.armed) setCtrlArmed(false);
+      if (e.armed) return;
+      ctrlArmedRef.current = false;
+      setCtrlArmed(false);
     }).then((h) => {
       if (cancelled) { h.remove(); return; }
       handle = h;
@@ -198,18 +241,31 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
     };
   }, [context]);
 
+  /**
+   * Apply the armed modifiers to a key that is about to be sent, consuming them.
+   *
+   * Clearing Ctrl here also clears it natively — otherwise Ctrl + a bar key would send
+   * the combination *and* leave Ctrl armed to swallow the next character typed.
+   */
+  const resolveKey = (value: string): string => {
+    if (value === SNIPPETS_VALUE) return value;
+    const mods = { ctrl: ctrlArmedRef.current, shift: shiftArmedRef.current };
+    if (!mods.ctrl && !mods.shift) return value;
+    if (mods.ctrl) armCtrl(false);
+    if (mods.shift) armShift(false);
+    return applyModifiers(value, mods);
+  };
+
   const handlePress = (value: string) => {
     if (value === CTRL_TOGGLE_VALUE) {
-      const next = !ctrlArmedRef.current;
-      setCtrlArmed(next);
-      const provider = getNativeTerminalProvider();
-      const activeId = getActiveNativeTerminal();
-      if (provider?.setControlKey && activeId) {
-        provider.setControlKey(activeId, next).catch(() => {});
-      }
+      armCtrl(!ctrlArmedRef.current);
       return;
     }
-    onKeyPress(value);
+    if (value === SHIFT_TOGGLE_VALUE) {
+      armShift(!shiftArmedRef.current);
+      return;
+    }
+    onKeyPress(resolveKey(value));
   };
 
   if (allKeys.length === 0) return null;
@@ -228,7 +284,8 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
             key={key.label}
             keyDef={key}
             onPress={handlePress}
-            active={key.value === CTRL_TOGGLE_VALUE && ctrlArmed}
+            active={(key.value === CTRL_TOGGLE_VALUE && ctrlArmed)
+              || (key.value === SHIFT_TOGGLE_VALUE && shiftArmed)}
           />
         ))}
       </div>
@@ -237,14 +294,14 @@ export function ExtraKeyBar({ context, onKeyPress }: ExtraKeyBarProps) {
         <div style={dpadWithEnterStyle}>
           <div style={dpadStyle}>
             <div />
-            <DpadButton keyDef={upKey} onPress={onKeyPress} />
+            <DpadButton keyDef={upKey} onPress={onKeyPress} resolve={resolveKey} />
             <div />
-            <DpadButton keyDef={leftKey} onPress={onKeyPress} />
-            <DpadButton keyDef={downKey} onPress={onKeyPress} />
-            <DpadButton keyDef={rightKey} onPress={onKeyPress} />
+            <DpadButton keyDef={leftKey} onPress={onKeyPress} resolve={resolveKey} />
+            <DpadButton keyDef={downKey} onPress={onKeyPress} resolve={resolveKey} />
+            <DpadButton keyDef={rightKey} onPress={onKeyPress} resolve={resolveKey} />
           </div>
           <div style={enterWrapStyle}>
-            <DpadButton keyDef={{ label: '\u23ce', value: '\r' }} onPress={onKeyPress} />
+            <DpadButton keyDef={{ label: '\u23ce', value: '\r' }} onPress={onKeyPress} resolve={resolveKey} />
           </div>
         </div>
       </div>
@@ -318,10 +375,12 @@ const keyStyle: React.CSSProperties = {
   ...NO_TAP_HIGHLIGHT,
 };
 
+// Declares `border` rather than `borderColor`: keyStyle sets the shorthand, and mixing the
+// two makes React leave the old border behind when the armed state clears.
 const activeKeyStyle: React.CSSProperties = {
   backgroundColor: 'var(--accent-green, #00ff66)',
   color: 'var(--bg-base, #0a0e13)',
-  borderColor: 'var(--accent-green, #00ff66)',
+  border: '1px solid var(--accent-green, #00ff66)',
 };
 
 
