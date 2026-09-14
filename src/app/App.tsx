@@ -27,7 +27,7 @@ import { Toaster } from '../ui/Toaster';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
 import { notifyOverlayOpen, notifyOverlayClose } from './overlay-hooks';
-import { saveSessionState, loadSessionState, launchResumeWorkspaceId } from './session-hooks';
+import { saveSessionState, loadSessionState, launchResumeWorkspaceId, haltedSessionFor } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
 import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
 import { autoStartPortForwards } from './port-forward-hooks';
@@ -700,6 +700,12 @@ export function App() {
     }
   }, [activeConn, connections]);
 
+  const handleDisconnectWorkspace = useCallback(async (ws: Workspace) => {
+    await teardownConnection(ws.id);
+    const halted = haltedSessionFor(loadSessionState(), ws.id);
+    if (halted) saveSessionState(halted);
+  }, [teardownConnection]);
+
   const handleDeleteWorkspace = useCallback(async (ws: Workspace) => {
     const isConnected = connectedIds.has(ws.id);
     if (isConnected) {
@@ -790,6 +796,7 @@ export function App() {
             onAddWorkspace={() => { setEditingWorkspace(null); setAddReturnTo('list'); setScreen('workspace-add'); }}
             onEditWorkspace={(ws) => { setEditingWorkspace(ws); setAddReturnTo('list'); setScreen('workspace-add'); }}
             onDeleteWorkspace={handleDeleteWorkspace}
+            onDisconnectWorkspace={handleDisconnectWorkspace}
             onSettings={() => setScreen('settings')}
           />
           <DebugOverlay enabled={debugEnabled} />
@@ -943,7 +950,11 @@ export function App() {
                     sessionId={conn.sessionId}
                     wsId={conn.wsId}
                     defaultPath={conn.workspace.defaultPath}
-                    visible={isActive && activeTab === 'terminal'}
+                    // showWorkspaceView too: the native terminal shows only when its show effect
+                    // runs with the view laid out. Without it, a workspace that became active while
+                    // the list was on screen (e.g. after disconnecting another) was hidden then and
+                    // never shown again when opened, since `visible` had not changed.
+                    visible={showWorkspaceView && isActive && activeTab === 'terminal'}
                     onReconnect={() => reconnect(conn.wsId)}
                   />
                 </div>

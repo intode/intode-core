@@ -8,14 +8,17 @@ interface Props {
   onDelete: () => void;
   onCancel: () => void;
   onReorder?: () => void;
+  /** Shown only when given — for a workspace that is connected right now. */
+  onDisconnect?: () => void;
   zIndex?: number;
 }
 
-export function WorkspaceContextMenu({ workspace, onEdit, onDelete, onCancel, onReorder, zIndex = 300 }: Props) {
+export function WorkspaceContextMenu({ workspace, onEdit, onDelete, onCancel, onReorder, onDisconnect, zIndex = 300 }: Props) {
   return (
     <div style={{ ...overlayStyle, zIndex }} onClick={onCancel}>
       <div style={menuStyle} onClick={(e) => e.stopPropagation()}>
         <p style={menuTitle}>{workspace.name}</p>
+        {onDisconnect && <button style={menuItem} onClick={onDisconnect}>Disconnect</button>}
         {onReorder && <button style={menuItem} onClick={onReorder}>Reorder</button>}
         <button style={menuItem} onClick={onEdit}>Edit</button>
         <button style={{ ...menuItem, color: 'var(--accent-red)' }} onClick={onDelete}>Delete</button>

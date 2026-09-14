@@ -71,3 +71,38 @@ describe('WorkspaceListScreen reorder mode', () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 });
+
+describe('WorkspaceListScreen disconnect', () => {
+  it('offers Disconnect for a connected workspace and hands it over', async () => {
+    installStore([ws('alpha', 0), ws('beta', 1)]);
+    const onDisconnect = vi.fn(async () => {});
+    render(
+      <WorkspaceListScreen
+        onSelectWorkspace={vi.fn()}
+        onAddWorkspace={vi.fn()}
+        connectedIds={new Set(['alpha'])}
+        onDisconnectWorkspace={onDisconnect}
+      />,
+    );
+    fireEvent.contextMenu(await screen.findByText('alpha'));
+    fireEvent.click(screen.getByText('Disconnect'));
+
+    expect(onDisconnect).toHaveBeenCalledWith(expect.objectContaining({ id: 'alpha' }));
+    expect(screen.queryByText('Disconnect')).toBeNull(); // menu closed
+  });
+
+  it('does not offer Disconnect for a workspace that is not connected', async () => {
+    installStore([ws('alpha', 0), ws('beta', 1)]);
+    render(
+      <WorkspaceListScreen
+        onSelectWorkspace={vi.fn()}
+        onAddWorkspace={vi.fn()}
+        connectedIds={new Set(['alpha'])}
+        onDisconnectWorkspace={vi.fn()}
+      />,
+    );
+    fireEvent.contextMenu(await screen.findByText('beta'));
+    expect(screen.getByText('Edit')).toBeTruthy();
+    expect(screen.queryByText('Disconnect')).toBeNull();
+  });
+});

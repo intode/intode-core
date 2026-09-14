@@ -18,6 +18,7 @@ import { autoStartPortForwards } from './port-forward-hooks';
 async function reconnectWorkspace(
   conn: ConnectedWorkspace,
   setConnections: React.Dispatch<React.SetStateAction<ConnectedWorkspace[]>>,
+  stillWanted: () => boolean,
 ): Promise<void> {
   const connectOpts: ConnectOptions = {
     host: conn.workspace.host,
@@ -43,6 +44,18 @@ async function reconnectWorkspace(
     const res = await Ssh.openSftp({ sessionId });
     sftpId = res.sftpId;
   } catch { /* sftp optional */ }
+
+  // Connecting takes seconds, and the user can disconnect or halt the workspace meanwhile. The
+  // session that arrives then belongs to nothing: close it, and do not bring back the keep-alive
+  // or the port forwards — otherwise the notification claims a live session nobody can reach.
+  if (!stillWanted()) {
+    try {
+      await Ssh.disconnect({ sessionId });
+    } catch {
+      /* already gone */
+    }
+    return;
+  }
 
   setConnections((prev) =>
     prev.map((c) => (c.wsId === conn.wsId ? { ...c, sessionId, sftpId, sftpError: null } : c)),
@@ -99,6 +112,7 @@ export function useAutoReconnect(
   // both fire on the same return to the app — two connects would leave one live session that
   // nothing refers to, keep-alives and all.
   const inFlight = useRef(new Map<string, Promise<void>>());
+  const isConnected = (wsId: string) => connectionsRef.current.some((c) => c.wsId === wsId);
 
   const once = useCallback((wsId: string, work: () => Promise<void>): Promise<void> => {
     const running = inFlight.current.get(wsId);
@@ -136,7 +150,7 @@ export function useAutoReconnect(
         try {
           await once(conn.wsId, async () => {
             if (staleSessionId) await releaseSession(staleSessionId);
-            await reconnectWorkspace(conn, setConnections);
+            await reconnectWorkspace(conn, setConnections, () => isConnected(conn.wsId));
           });
         } catch {
           /* reconnect failed — the terminal banner offers a manual retry */
@@ -153,7 +167,7 @@ export function useAutoReconnect(
     if (!conn) return;
     await once(wsId, async () => {
       await releaseSession(conn.sessionId);
-      await reconnectWorkspace(conn, setConnections);
+      await reconnectWorkspace(conn, setConnections, () => isConnected(conn.wsId));
     });
   }, [setConnections, once]);
 

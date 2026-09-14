@@ -51,3 +51,13 @@ export function launchResumeWorkspaceId(saved: SessionData | null): string | nul
   if (saved.resumeOnLaunch === false) return null;
   return saved.workspaceId;
 }
+
+/**
+ * The saved session with auto-resume turned off, if it belongs to the workspace that was just
+ * disconnected; `null` when there is nothing to change. Disconnecting from the workspace list
+ * means the same as HALT_SESSION: the next launch must not reconnect it.
+ */
+export function haltedSessionFor(saved: SessionData | null, wsId: string): SessionData | null {
+  if (!saved || saved.workspaceId !== wsId) return null;
+  return { ...saved, resumeOnLaunch: false };
+}

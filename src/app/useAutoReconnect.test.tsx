@@ -233,3 +233,33 @@ describe('concurrent reconnects', () => {
     expect(Ssh.disconnect).not.toHaveBeenCalledWith({ sessionId: 'new-session' });
   });
 });
+
+describe('a workspace disconnected while its reconnect is in flight', () => {
+  it('closes the session that arrives late and does not restart the keep-alive', async () => {
+    let finishConnect: (v: { sessionId: string }) => void = () => {};
+    Ssh.connect.mockImplementationOnce(() => new Promise((resolve) => { finishConnect = resolve; }));
+    Ssh.getStatus.mockResolvedValue({ status: 'disconnected' });
+    const setConnections = vi.fn();
+    const withForwards: ConnectedWorkspace = {
+      ...connection,
+      workspace: { ...workspace, portForwards: [{ id: 'pf1', type: 'local', bindPort: 3000, targetHost: 'localhost', targetPort: 3000 }] },
+    };
+    const { rerender } = renderHook(
+      ({ conns }) => useAutoReconnect(conns, setConnections),
+      { initialProps: { conns: [withForwards] } },
+    );
+
+    await act(async () => { document.dispatchEvent(new Event('visibilitychange')); });
+    await waitFor(() => expect(Ssh.connect).toHaveBeenCalledTimes(1));
+
+    // The user disconnects the workspace from the list (or halts it) before connect returns.
+    rerender({ conns: [] });
+    Ssh.disconnect.mockClear();
+    await act(async () => { finishConnect({ sessionId: 'late-session' }); });
+
+    await waitFor(() => expect(Ssh.disconnect).toHaveBeenCalledWith({ sessionId: 'late-session' }));
+    expect(hooks.keepAliveStart).not.toHaveBeenCalled();
+    expect(hooks.autoStartPortForwards).not.toHaveBeenCalled();
+    expect(setConnections).not.toHaveBeenCalled();
+  });
+});

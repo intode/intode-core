@@ -9,11 +9,16 @@ export interface WorkspaceListScreenProps {
   onAddWorkspace: () => void;
   onEditWorkspace?: (workspace: Workspace) => void;
   onDeleteWorkspace?: (workspace: Workspace) => Promise<void>;
+  /**
+   * Ends a connected workspace's session from the list, without opening it first — the way out
+   * for a session left running in the background.
+   */
+  onDisconnectWorkspace?: (workspace: Workspace) => void | Promise<void>;
   onSettings?: () => void;
   connectedIds?: Set<string>;
 }
 
-export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditWorkspace, onDeleteWorkspace, onSettings, connectedIds }: WorkspaceListScreenProps) {
+export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditWorkspace, onDeleteWorkspace, onDisconnectWorkspace, onSettings, connectedIds }: WorkspaceListScreenProps) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
   const { target: menuTarget, setTarget: setMenuTarget, bind, shouldSuppressClick } = useLongPressMenu<Workspace>();
@@ -124,6 +129,9 @@ export function WorkspaceListScreen({ onSelectWorkspace, onAddWorkspace, onEditW
         <WorkspaceContextMenu
           workspace={menuTarget}
           onReorder={workspaces.length >= 2 ? () => { setMenuTarget(null); setReorderMode(true); } : undefined}
+          onDisconnect={onDisconnectWorkspace && connectedIds?.has(menuTarget.id)
+            ? () => { const t = menuTarget; setMenuTarget(null); void onDisconnectWorkspace(t); }
+            : undefined}
           onEdit={() => { const t = menuTarget; setMenuTarget(null); onEditWorkspace?.(t); }}
           onDelete={() => handleDelete(menuTarget)}
           onCancel={() => setMenuTarget(null)}
