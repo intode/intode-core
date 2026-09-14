@@ -10,6 +10,12 @@ const Ssh = vi.hoisted(() => ({
   openSftp: vi.fn(async () => ({ sftpId: 'new-sftp' })),
 }));
 vi.mock('../ssh/index', () => ({ Ssh }));
+const hooks = vi.hoisted(() => ({
+  keepAliveStart: vi.fn(),
+  autoStartPortForwards: vi.fn(async () => {}),
+}));
+vi.mock('./keepalive-hooks', () => ({ keepAliveStart: hooks.keepAliveStart }));
+vi.mock('./port-forward-hooks', () => ({ autoStartPortForwards: hooks.autoStartPortForwards }));
 
 import { useAutoReconnect } from './useAutoReconnect';
 import { setWorkspaceStore } from '../workspace/WorkspaceManager';
@@ -46,6 +52,8 @@ beforeEach(() => {
   Ssh.disconnect.mockClear();
   Ssh.connect.mockClear();
   Ssh.openSftp.mockClear();
+  hooks.keepAliveStart.mockClear();
+  hooks.autoStartPortForwards.mockClear();
 });
 afterEach(cleanup);
 
@@ -142,5 +150,86 @@ describe('reconnect()', () => {
     await expect(
       act(async () => { await controls.reconnect('ws1'); }),
     ).rejects.toThrow('host unreachable');
+  });
+});
+
+describe('after a reconnect', () => {
+  it('restarts the background keep-alive', async () => {
+    // A session that died or was paused in the background may have taken the keep-alive
+    // service down with it; nothing else starts it again for the new session.
+    Ssh.getStatus.mockResolvedValue({ status: 'disconnected' });
+    await becomeVisible([connection]);
+
+    await waitFor(() => expect(hooks.keepAliveStart).toHaveBeenCalled());
+    expect(hooks.keepAliveStart.mock.invocationCallOrder[0])
+      .toBeGreaterThan(Ssh.connect.mock.invocationCallOrder[0]);
+  });
+
+  it('restarts it without asking for permission', async () => {
+    // Every return that reconnects would otherwise raise the notification prompt again, for a
+    // user who already declined it — and the native terminal view can cover that prompt.
+    Ssh.getStatus.mockResolvedValue({ status: 'disconnected' });
+    await becomeVisible([connection]);
+
+    await waitFor(() => expect(hooks.keepAliveStart).toHaveBeenCalledWith({ askPermission: false }));
+  });
+
+  it('restores the saved port forwards on the new session', async () => {
+    const forwards = [{ id: 'pf1', type: 'local' as const, bindPort: 3000, targetHost: 'localhost', targetPort: 3000 }];
+    const withForwards: ConnectedWorkspace = {
+      ...connection,
+      workspace: { ...workspace, portForwards: forwards },
+    };
+    Ssh.getStatus.mockResolvedValue({ status: 'disconnected' });
+    await becomeVisible([withForwards]);
+
+    await waitFor(() => expect(hooks.autoStartPortForwards).toHaveBeenCalledWith('new-session', forwards));
+  });
+
+  it('does not start forwards for a workspace without any', async () => {
+    Ssh.getStatus.mockResolvedValue({ status: 'disconnected' });
+    await becomeVisible([connection]);
+
+    await waitFor(() => expect(hooks.keepAliveStart).toHaveBeenCalled());
+    expect(hooks.autoStartPortForwards).not.toHaveBeenCalled();
+  });
+});
+
+describe('concurrent reconnects', () => {
+  it('a tap on the banner during the automatic reconnect does not open a second session', async () => {
+    let finishConnect: (v: { sessionId: string }) => void = () => {};
+    Ssh.connect.mockImplementationOnce(() => new Promise((resolve) => { finishConnect = resolve; }));
+    Ssh.getStatus.mockResolvedValue({ status: 'disconnected' });
+    const setConnections = vi.fn();
+    const { result } = renderHook(() => useAutoReconnect([connection], setConnections));
+
+    await act(async () => { document.dispatchEvent(new Event('visibilitychange')); });
+    await waitFor(() => expect(Ssh.connect).toHaveBeenCalledTimes(1));
+
+    let tapped: Promise<void> = Promise.resolve();
+    await act(async () => { tapped = result.current.reconnect('ws1'); });
+    await act(async () => { finishConnect({ sessionId: 'new-session' }); await tapped; });
+
+    expect(Ssh.connect).toHaveBeenCalledTimes(1);
+  });
+
+  it('the sweep skips a workspace that got a new session while its status was checked', async () => {
+    let answerStatus: (v: { status: 'disconnected' }) => void = () => {};
+    Ssh.getStatus.mockImplementationOnce(() => new Promise((resolve) => { answerStatus = resolve; }));
+    const setConnections = vi.fn();
+    const { result, rerender } = renderHook(
+      ({ conns }) => useAutoReconnect(conns, setConnections),
+      { initialProps: { conns: [connection] } },
+    );
+
+    await act(async () => { document.dispatchEvent(new Event('visibilitychange')); });
+    await act(async () => { await result.current.reconnect('ws1'); });
+    expect(Ssh.connect).toHaveBeenCalledTimes(1);
+
+    rerender({ conns: [{ ...connection, sessionId: 'new-session', sftpId: 'new-sftp' }] });
+    await act(async () => { answerStatus({ status: 'disconnected' }); });
+
+    expect(Ssh.connect).toHaveBeenCalledTimes(1);
+    expect(Ssh.disconnect).not.toHaveBeenCalledWith({ sessionId: 'new-session' });
   });
 });

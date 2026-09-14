@@ -3,6 +3,8 @@ import { Ssh } from '../ssh/index';
 import { getWorkspaceStore } from '../workspace/WorkspaceManager';
 import type { ConnectOptions } from '../ssh/plugin-api';
 import type { ConnectedWorkspace } from './types';
+import { keepAliveStart } from './keepalive-hooks';
+import { autoStartPortForwards } from './port-forward-hooks';
 
 /**
  * Replaces one workspace's dead session with a fresh one.
@@ -45,6 +47,18 @@ async function reconnectWorkspace(
   setConnections((prev) =>
     prev.map((c) => (c.wsId === conn.wsId ? { ...c, sessionId, sftpId, sftpError: null } : c)),
   );
+
+  // Everything a first connect sets up beyond the session itself has to come back too. The
+  // host may have stopped its keep-alive when the old session died or was paused in the
+  // background, and port forwards lived on the old session. Before this, a reconnect silently
+  // dropped both.
+  // Never prompts from here: this runs on every return to the app that reconnects, often with
+  // no one looking at a dialog — and a native terminal can cover it.
+  keepAliveStart({ askPermission: false });
+  const forwards = conn.workspace.portForwards;
+  if (forwards && forwards.length > 0) {
+    void autoStartPortForwards(sessionId, forwards);
+  }
 }
 
 /** Frees a session known to be dead, along with everything hanging off its transport. */
@@ -81,6 +95,18 @@ export function useAutoReconnect(
 ): AutoReconnectControls {
   const connectionsRef = useRef(connections);
   connectionsRef.current = connections;
+  // One reconnect per workspace at a time. The automatic sweep and a tap on the banner can
+  // both fire on the same return to the app — two connects would leave one live session that
+  // nothing refers to, keep-alives and all.
+  const inFlight = useRef(new Map<string, Promise<void>>());
+
+  const once = useCallback((wsId: string, work: () => Promise<void>): Promise<void> => {
+    const running = inFlight.current.get(wsId);
+    if (running) return running;
+    const task = work().finally(() => { inFlight.current.delete(wsId); });
+    inFlight.current.set(wsId, task);
+    return task;
+  }, []);
 
   useEffect(() => {
     const handler = async () => {
@@ -101,12 +127,17 @@ export function useAutoReconnect(
           /* status check failed — assume dead, but leave the old session alone */
         }
 
-        if (staleSessionId) {
-          await releaseSession(staleSessionId);
-        }
+        // getStatus can take a while (the host may probe the link first). If the workspace got
+        // a new session in the meantime — the banner was tapped — this answer is about a
+        // session that is already gone.
+        const current = connectionsRef.current.find((c) => c.wsId === conn.wsId);
+        if (!current || current.sessionId !== conn.sessionId) continue;
 
         try {
-          await reconnectWorkspace(conn, setConnections);
+          await once(conn.wsId, async () => {
+            if (staleSessionId) await releaseSession(staleSessionId);
+            await reconnectWorkspace(conn, setConnections);
+          });
         } catch {
           /* reconnect failed — the terminal banner offers a manual retry */
         }
@@ -120,9 +151,11 @@ export function useAutoReconnect(
   const reconnect = useCallback(async (wsId: string) => {
     const conn = connectionsRef.current.find((c) => c.wsId === wsId);
     if (!conn) return;
-    await releaseSession(conn.sessionId);
-    await reconnectWorkspace(conn, setConnections);
-  }, [setConnections]);
+    await once(wsId, async () => {
+      await releaseSession(conn.sessionId);
+      await reconnectWorkspace(conn, setConnections);
+    });
+  }, [setConnections, once]);
 
   return { reconnect };
 }

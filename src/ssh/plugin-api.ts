@@ -25,7 +25,9 @@ export type ConnectionStatus =
   | 'authenticating'
   | 'connected'
   | 'reconnecting'
-  | 'error';
+  | 'error'
+  /** Closed on purpose by the host while the app was in the background, to save battery. */
+  | 'suspended';
 
 export interface SftpEntry {
   name: string;

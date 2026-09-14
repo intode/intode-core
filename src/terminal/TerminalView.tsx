@@ -8,6 +8,7 @@ import { loadZoom, saveZoom } from '../gestures/zoom-store';
 import { openInPreview } from '../app/preview-hooks';
 import { getNativeTerminalProvider, type SwipeListenerHandle } from './terminal-provider';
 import { describeFailure } from '../ssh/unavailable';
+import { sessionDownReason, sessionBannerTitle, type SessionDownReason } from './session-banner';
 
 function isKeyboardVisible(): boolean {
   const vv = window.visualViewport;
@@ -40,7 +41,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
   const [showCopyBar, setShowCopyBar] = useState(false);
   const [handlePos, setHandlePos] = useState<HandlePositions | null>(null);
   const [shellError, setShellError] = useState<{ title: string; detail?: string } | null>(null);
-  const [sessionDown, setSessionDown] = useState(false);
+  const [sessionDown, setSessionDown] = useState<SessionDownReason | null>(null);
   const [reconnecting, setReconnecting] = useState(false);
 
   const refreshHandles = useCallback(() => {
@@ -59,14 +60,13 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
   // Resubscribing on sessionId also resets the banner: a successful reconnect hands this
   // component a new id, and that is exactly when the old failure stops being true.
   useEffect(() => {
-    setSessionDown(false);
+    setSessionDown(null);
     setReconnecting(false);
     let handle: { remove(): void } | null = null;
     let cancelled = false;
     Ssh.addListener('connectionStatus', (e) => {
       if (e.sessionId !== sessionId) return;
-      if (e.status === 'connected') setSessionDown(false);
-      else if (e.status === 'disconnected' || e.status === 'error') setSessionDown(true);
+      setSessionDown((current) => sessionDownReason(e.status, current));
     }).then((h) => {
       if (cancelled) h.remove();
       else handle = h;
@@ -334,7 +334,7 @@ export function TerminalView({ sessionId, defaultPath, terminalId, visible, tmux
           aria-label="Reconnect"
         >
           <span style={bannerTitleStyle}>
-            {reconnecting ? 'Reconnecting…' : 'Disconnected — Tap to reconnect'}
+            {sessionBannerTitle(sessionDown, reconnecting)}
           </span>
           {tmuxSession && (
             <span style={bannerDetailStyle}>Your tmux session is still running on the server.</span>
