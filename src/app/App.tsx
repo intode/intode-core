@@ -27,7 +27,7 @@ import { Toaster } from '../ui/Toaster';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
 import { notifyOverlayOpen, notifyOverlayClose } from './overlay-hooks';
-import { saveSessionState, loadSessionState, launchResumeWorkspaceId, haltedSessionFor } from './session-hooks';
+import { saveSessionState, loadSessionState, launchResumeWorkspaceId, haltedSessionFor, sessionAfterHalt, autoSaveBlocked } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
 import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
 import { autoStartPortForwards } from './port-forward-hooks';
@@ -37,6 +37,7 @@ import { handleKeyPress } from './handleKeyPress';
 import { ViewerScreen } from '../viewer/ViewerScreen';
 import { getIntentFilesProvider, type IntentFile } from '../intent/provider';
 import type { ConnectedWorkspace } from './types';
+import type { SessionData } from './session-hooks';
 import { keepsNativeContextMenu } from './context-menu';
 import '../themes/dark.css';
 
@@ -318,6 +319,9 @@ export function App() {
   const [screen, setScreen] = useState<Screen>('workspace-list');
   const [activeTab, setActiveTab] = useState<string>('terminal');
   const prevTabRef = useRef<string>('terminal');
+  // The workspace a halt or list Disconnect is taking down. Automatic saves skip it until it
+  // connects again, so none can land between the halt's save and the connection going away.
+  const haltingWsIdRef = useRef<string | null>(null);
   // Per-workspace active tab — switching workspace restores the tab last used there
   const tabPerWsRef = useRef<Map<string, string>>(new Map());
   const [debugEnabled, setDebugEnabled] = useState(() => localStorage.getItem('intode_debug') === 'true');
@@ -433,6 +437,7 @@ export function App() {
     const save = () => {
       if (!activeConn) return;
       if (activeTab === 'settings') return;
+      if (autoSaveBlocked(activeConn.wsId, haltingWsIdRef.current)) return;
       const ftm = getFileTabMgr(activeConn.wsId);
       const activeFile = ftm.getActiveTab();
       saveSessionState({
@@ -584,6 +589,8 @@ export function App() {
         sftpError = String(e);
       }
 
+      // Connecting again ends a halt for this workspace; automatic saves resume.
+      if (haltingWsIdRef.current === ws.id) haltingWsIdRef.current = null;
       const newConns = [...connections, { wsId: ws.id, workspace: ws, sessionId: sid, sftpId, sftpError }];
       setConnections(newConns);
       setActiveWsId(ws.id);
@@ -654,6 +661,7 @@ export function App() {
 
   const handleDisconnect = useCallback(async () => {
     if (!activeConn) return;
+    haltingWsIdRef.current = activeConn.wsId;
     (window as any).__intodeHideKeyboard?.();
     // Capture session state before disconnecting, while the file tabs still exist.
     // `resumeOnLaunch: false` is what makes the halt stick: the next launch starts at the
@@ -663,7 +671,7 @@ export function App() {
     const currentTab = activeTabRef.current;
     const ftm = getFileTabMgr(activeConn.wsId);
     const activeFile = ftm.getActiveTab();
-    const halted = {
+    const halted: SessionData = {
       workspaceId: activeConn.wsId,
       // Settings sits on top of a workspace tab; restore the tab underneath it.
       activeTab: currentTab === 'settings' ? prevTabRef.current : currentTab,
@@ -673,7 +681,6 @@ export function App() {
       expandedFolders: (window as any).__intodeExpandedFolders,
       terminalTabIds: (window as any).__intodeTerminalTabIds ?? undefined,
       previewUrl: (window as any).__intodePreviewUrl,
-      resumeOnLaunch: false,
     };
     try {
       if (activeConn.sftpId) await Ssh.closeSftp({ sftpId: activeConn.sftpId });
@@ -682,12 +689,20 @@ export function App() {
       /* ignore */
     }
 
-    // Written after the awaits, in the same synchronous run as setConnections below: leaving
-    // the app while the disconnect is in flight fires the backgrounding save, which carries no
-    // `resumeOnLaunch` and would otherwise overwrite the halt.
-    saveSessionState(halted);
-    ftmRef.current.delete(activeConn.wsId);
     const remaining = connections.filter((c) => c.wsId !== activeConn.wsId);
+    // Written after the awaits; automatic saves for this workspace are blocked meanwhile
+    // (haltingWsIdRef). If another workspace is still connected, save that one instead — the
+    // automatic save does not run from Settings, and an app killed before leaving Settings would
+    // otherwise come back to nothing.
+    const next = remaining[0];
+    const nextFtm = next ? getFileTabMgr(next.wsId) : null;
+    saveSessionState(sessionAfterHalt(halted, next && nextFtm ? {
+      workspaceId: next.wsId,
+      activeTab: halted.activeTab,
+      openFiles: nextFtm.getFileTabStates(),
+      activeFile: nextFtm.getActiveTab()?.path,
+    } : null));
+    ftmRef.current.delete(activeConn.wsId);
     setConnections(remaining);
 
     if (remaining.length > 0) {
@@ -701,6 +716,7 @@ export function App() {
   }, [activeConn, connections]);
 
   const handleDisconnectWorkspace = useCallback(async (ws: Workspace) => {
+    haltingWsIdRef.current = ws.id;
     await teardownConnection(ws.id);
     const halted = haltedSessionFor(loadSessionState(), ws.id);
     if (halted) saveSessionState(halted);

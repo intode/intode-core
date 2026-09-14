@@ -61,3 +61,17 @@ export function haltedSessionFor(saved: SessionData | null, wsId: string): Sessi
   if (!saved || saved.workspaceId !== wsId) return null;
   return { ...saved, resumeOnLaunch: false };
 }
+
+/**
+ * What to save once the user halts a workspace. If another workspace is still connected the app is
+ * still in a session, so that one is saved and the next launch reconnects it; otherwise the halted
+ * workspace is saved with resume off.
+ */
+export function sessionAfterHalt(halted: SessionData, stillConnected: SessionData | null): SessionData {
+  return stillConnected ?? { ...halted, resumeOnLaunch: false };
+}
+
+/** Automatic saves (backgrounding, tab changes) skip a workspace while it is being halted. */
+export function autoSaveBlocked(activeWsId: string, haltingWsId: string | null): boolean {
+  return haltingWsId !== null && activeWsId === haltingWsId;
+}
