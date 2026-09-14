@@ -102,3 +102,66 @@ describe('ExtraKeyBar terminal modifiers', () => {
     }
   });
 });
+
+describe('ExtraKeyBar key repeat', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /** Holding a D-pad key sends once, then repeats after a delay until the finger lifts. */
+  function hold(label: string) {
+    const button = screen.getByText(label);
+    fireEvent.touchStart(button, { touches: [{ clientX: 0, clientY: 0 }] });
+    return button;
+  }
+
+  it('repeats while held and stops on touchend', () => {
+    vi.useFakeTimers();
+    const onKeyPress = renderBar();
+    const button = hold('↑');
+    vi.advanceTimersByTime(1000);
+    const held = onKeyPress.mock.calls.length;
+    expect(held).toBeGreaterThan(1);
+
+    fireEvent.touchEnd(button, { touches: [] });
+    vi.advanceTimersByTime(5000);
+    expect(onKeyPress).toHaveBeenCalledTimes(held);
+  });
+
+  // The system takes the touch over (edge back gesture, notification shade, a scroll) and sends
+  // touchcancel instead of touchend. Without handling it the key repeated every 80ms for as long
+  // as the app lived — straight down the SSH connection, in the background too.
+  it('stops repeating when the touch is cancelled', () => {
+    vi.useFakeTimers();
+    const onKeyPress = renderBar();
+    const button = hold('⏎');
+    vi.advanceTimersByTime(1000);
+
+    fireEvent.touchCancel(button, { touches: [] });
+    const atCancel = onKeyPress.mock.calls.length;
+    vi.advanceTimersByTime(5000);
+    expect(onKeyPress).toHaveBeenCalledTimes(atCancel);
+  });
+
+  it('stops repeating when the bar unmounts under a held key', () => {
+    vi.useFakeTimers();
+    const onKeyPress = vi.fn();
+    const { unmount } = render(<ExtraKeyBar context="terminal" onKeyPress={onKeyPress} />);
+    hold('↓');
+    vi.advanceTimersByTime(1000);
+
+    unmount();
+    const atUnmount = onKeyPress.mock.calls.length;
+    vi.advanceTimersByTime(5000);
+    expect(onKeyPress).toHaveBeenCalledTimes(atUnmount);
+  });
+
+  it('never starts repeating when cancelled before the repeat delay', () => {
+    vi.useFakeTimers();
+    const onKeyPress = renderBar();
+    const button = hold('←');
+    fireEvent.touchCancel(button, { touches: [] });
+    vi.advanceTimersByTime(5000);
+    expect(onKeyPress).toHaveBeenCalledTimes(1);
+  });
+});

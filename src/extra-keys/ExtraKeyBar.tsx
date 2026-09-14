@@ -157,6 +157,16 @@ function DpadButton({ keyDef, onPress, resolve }: {
     }
   };
 
+  // A held key must never outlive its button: once the timer escapes, it sends a key every
+  // REPEAT_INTERVAL down the SSH connection for as long as the app runs, background included.
+  useEffect(() => stopRepeat, []);
+
+  const endPress = () => {
+    stopRepeat();
+    restoreFocus(prevFocus.current);
+    prevFocus.current = null;
+  };
+
   return (
     <button
       tabIndex={-1}
@@ -175,10 +185,12 @@ function DpadButton({ keyDef, onPress, resolve }: {
       }}
       onTouchEnd={(e) => {
         e.preventDefault();
-        stopRepeat();
-        restoreFocus(prevFocus.current);
-        prevFocus.current = null;
+        endPress();
       }}
+      // The system cancels the touch instead of ending it when it takes the gesture over —
+      // edge back swipe, notification shade, a scroll starting under the finger. No touchend
+      // follows, so this is the only chance to stop the repeat.
+      onTouchCancel={endPress}
       style={dpadKeyStyle}
     >
       {keyDef.label}

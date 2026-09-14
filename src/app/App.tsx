@@ -27,7 +27,7 @@ import { Toaster } from '../ui/Toaster';
 import { debugLog } from '../lib/debug-log';
 import { initTheme } from '../themes/theme-manager';
 import { notifyOverlayOpen, notifyOverlayClose } from './overlay-hooks';
-import { saveSessionState, loadSessionState } from './session-hooks';
+import { saveSessionState, loadSessionState, launchResumeWorkspaceId } from './session-hooks';
 import { getFilePanels, getEditorPanels } from './panel-registry';
 import { keepAliveStart, keepAliveStop, keepAliveUpdate } from './keepalive-hooks';
 import { autoStartPortForwards } from './port-forward-hooks';
@@ -346,10 +346,10 @@ export function App() {
   useEffect(() => {
     if (autoReconnectDone.current) return;
     autoReconnectDone.current = true;
-    const saved = loadSessionState();
-    if (!saved?.workspaceId) return;
+    const resumeId = launchResumeWorkspaceId(loadSessionState());
+    if (!resumeId) return;
     getWorkspaceStore().getAll().then((all) => {
-      const ws = all.find((w) => w.id === saved.workspaceId);
+      const ws = all.find((w) => w.id === resumeId);
       if (ws) {
         setConnectingWorkspace(ws);
         setScreen('connecting');
@@ -473,7 +473,12 @@ export function App() {
     }
   }, [activeConn?.sessionId, activeConn?.sftpId, activeConn?.wsId]);
 
-  const gitStatusMap = useGitStatus(activeConn?.sessionId, activeConn?.workspace.defaultPath);
+  // Same condition as the FileTree's `visible` below — the badges are only read there.
+  const gitStatusMap = useGitStatus(
+    activeConn?.sessionId,
+    activeConn?.workspace.defaultPath,
+    screen === 'workspace-view' && activeTab === 'files' && fileSubTab === 'tree',
+  );
 
   const getFileTabMgr = useCallback((wsId: string): FileTabManager => {
     let mgr = ftmRef.current.get(wsId);
@@ -650,22 +655,26 @@ export function App() {
   const handleDisconnect = useCallback(async () => {
     if (!activeConn) return;
     (window as any).__intodeHideKeyboard?.();
-    // Save session state before disconnecting
+    // Capture session state before disconnecting, while the file tabs still exist.
+    // `resumeOnLaunch: false` is what makes the halt stick: the next launch starts at the
+    // workspace list, while connecting again by hand still restores the files and tabs saved
+    // here. It is saved from Settings too — skipping the save there left the last automatic
+    // save in place, and that one reconnects on launch.
     const currentTab = activeTabRef.current;
-    if (currentTab !== 'settings') {
-      const ftm = getFileTabMgr(activeConn.wsId);
-      const activeFile = ftm.getActiveTab();
-      saveSessionState({
-        workspaceId: activeConn.wsId,
-        activeTab: currentTab,
-        fileSubTab: (window as any).__intodeFileSubTab,
-        openFiles: ftm.getFileTabStates(),
-        activeFile: activeFile?.path,
-        expandedFolders: (window as any).__intodeExpandedFolders,
-        terminalTabIds: (window as any).__intodeTerminalTabIds ?? undefined,
-        previewUrl: (window as any).__intodePreviewUrl,
-      });
-    }
+    const ftm = getFileTabMgr(activeConn.wsId);
+    const activeFile = ftm.getActiveTab();
+    const halted = {
+      workspaceId: activeConn.wsId,
+      // Settings sits on top of a workspace tab; restore the tab underneath it.
+      activeTab: currentTab === 'settings' ? prevTabRef.current : currentTab,
+      fileSubTab: (window as any).__intodeFileSubTab,
+      openFiles: ftm.getFileTabStates(),
+      activeFile: activeFile?.path,
+      expandedFolders: (window as any).__intodeExpandedFolders,
+      terminalTabIds: (window as any).__intodeTerminalTabIds ?? undefined,
+      previewUrl: (window as any).__intodePreviewUrl,
+      resumeOnLaunch: false,
+    };
     try {
       if (activeConn.sftpId) await Ssh.closeSftp({ sftpId: activeConn.sftpId });
       await Ssh.disconnect({ sessionId: activeConn.sessionId });
@@ -673,6 +682,10 @@ export function App() {
       /* ignore */
     }
 
+    // Written after the awaits, in the same synchronous run as setConnections below: leaving
+    // the app while the disconnect is in flight fires the backgrounding save, which carries no
+    // `resumeOnLaunch` and would otherwise overwrite the halt.
+    saveSessionState(halted);
     ftmRef.current.delete(activeConn.wsId);
     const remaining = connections.filter((c) => c.wsId !== activeConn.wsId);
     setConnections(remaining);
